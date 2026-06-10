@@ -265,7 +265,14 @@ img,svg{display:block}
 .ui--ship .chart i{transform-origin:bottom;animation:breathe 2.8s ease-in-out infinite}
 .ui--ship .chart i:nth-child(odd){animation-delay:-1.4s}
 .ui--ship .ui__chip{animation:chipPulse 1.6s ease-in-out infinite}
-@media(max-width:820px){.pstep{grid-template-columns:1fr;gap:26px}.pstep .ui,.pstep.alt .ui{order:0}}
+/* orient + float the process assets like the hero cards */
+@keyframes uiFloat{0%,100%{transform:var(--rot) translateY(0)}50%{transform:var(--rot) translateY(-14px)}}
+.pstep .ui{--rot:rotate(2.4deg);transform:rotate(2.4deg);animation:uiFloat 7s ease-in-out infinite;will-change:transform}
+.pstep.alt .ui{--rot:rotate(-2.4deg);transform:rotate(-2.4deg)}
+.pstep:nth-child(2) .ui{animation-delay:-1.7s}
+.pstep:nth-child(3) .ui{animation-delay:-3.4s}
+.pstep:nth-child(4) .ui{animation-delay:-5.1s}
+@media(max-width:820px){.pstep{grid-template-columns:1fr;gap:26px}.pstep .ui,.pstep.alt .ui{order:0}.pstep .ui{--rot:rotate(1.2deg)}.pstep.alt .ui{--rot:rotate(-1.2deg)}}
 
 /* ===== TESTIMONIALS (dark) uniform ===== */
 .testi{padding:108px 0}
