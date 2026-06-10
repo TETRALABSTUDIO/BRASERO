@@ -1,9 +1,11 @@
-import { send } from './_lib.js';
+import { send, saveOnboarding } from './_lib.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
-    const { order = {}, answers = {} } = req.body || {};
+    const { order = {}, answers = {}, sessionId = '' } = req.body || {};
+    try { await saveOnboarding({ sessionId, email: order.email, handle: order.handle, answers }); }
+    catch (e) { console.error('saveOnboarding failed', e); }
     const rows = Object.entries(answers)
       .map(([k, v]) => `<tr><td style="padding:6px 12px;font-weight:700;vertical-align:top">${k}</td><td style="padding:6px 12px">${(v || '—').toString().replace(/</g, '&lt;')}</td></tr>`)
       .join('');

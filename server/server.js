@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { saveOrder, markPaid, saveOnboarding } from '../api/_lib.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -51,6 +52,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object;
     const m = s.metadata || {};
+    markPaid(s.id, s.amount_total).catch(console.error);
     send(`💸 New ${m.plan || ''} order — ${m.name || s.customer_email}`,
       `<h2>Payment received</h2>
        <p><b>Plan:</b> ${m.plan} (${m.billing === 'sub' ? 'subscription' : 'one-time'})</p>
@@ -76,20 +78,22 @@ app.post('/api/checkout-session', async (req, res) => {
     const { plan, billing, name, email, handle, instagram } = req.body || {};
     if (!PLANS[plan]) return res.status(400).json({ error: 'Unknown plan' });
 
-    let mode, line_items;
+    let mode, line_items, amount;
     if (process.env.STRIPE_PRICE_ID) {
       // Use an existing Stripe Price (e.g. your 1€ test product).
       const priceObj = await stripe.prices.retrieve(process.env.STRIPE_PRICE_ID);
       mode = priceObj.recurring ? 'subscription' : 'payment';
+      amount = priceObj.unit_amount;
       line_items = [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }];
     } else {
       // Dynamic pricing from the server-side PLANS table (production).
       mode = billing === 'sub' ? 'subscription' : 'payment';
+      amount = amountFor(plan, billing);
       line_items = [{
         quantity: 1,
         price_data: {
           currency: 'usd',
-          unit_amount: amountFor(plan, billing),
+          unit_amount: amount,
           product_data: { name: `Brasero — ${PLANS[plan].name} pack` },
           ...(mode === 'subscription' ? { recurring: { interval: 'month' } } : {}),
         },
@@ -104,6 +108,8 @@ app.post('/api/checkout-session', async (req, res) => {
       cancel_url: `${SITE_URL}/checkout.html?plan=${plan}&billing=${billing}`,
       metadata: { plan, billing, name: name || '', email: email || '', handle: handle || '', instagram: instagram || '' },
     });
+    try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing, amount, name, email, instagram, handle }); }
+    catch (e) { console.error('saveOrder failed', e); }
     res.json({ url: session.url });
   } catch (err) {
     console.error(err);
@@ -114,7 +120,9 @@ app.post('/api/checkout-session', async (req, res) => {
 /* Receive the onboarding answers and email them to the studio */
 app.post('/api/onboarding', async (req, res) => {
   try {
-    const { order = {}, answers = {} } = req.body || {};
+    const { order = {}, answers = {}, sessionId = '' } = req.body || {};
+    try { await saveOnboarding({ sessionId, email: order.email, handle: order.handle, answers }); }
+    catch (e) { console.error('saveOnboarding failed', e); }
     const rows = Object.entries(answers)
       .map(([k, v]) => `<tr><td style="padding:6px 12px;font-weight:700;vertical-align:top">${k}</td><td style="padding:6px 12px">${(v || '—').toString().replace(/</g, '&lt;')}</td></tr>`)
       .join('');

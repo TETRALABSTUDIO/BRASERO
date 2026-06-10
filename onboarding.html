@@ -226,7 +226,8 @@ function back(){collect();if(step>0){step--;render();}}
 
 function submit(){
   bar.style.width='100%';stepcount.textContent='';
-  const payload={order,answers:ans,submittedAt:new Date().toISOString()};
+  const sid=new URLSearchParams(location.search).get('session_id')||'';
+  const payload={order,answers:ans,sessionId:sid,submittedAt:new Date().toISOString()};
   sessionStorage.setItem('brasero_onboarding',JSON.stringify(payload));
   if(API!==null){ fetch(API+'/api/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(console.error); }
   else { console.log('Onboarding submitted →',payload); }

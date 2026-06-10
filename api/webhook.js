@@ -1,4 +1,4 @@
-import { stripe, send } from './_lib.js';
+import { stripe, send, markPaid } from './_lib.js';
 
 // Stripe needs the raw request body to verify the signature.
 export const config = { api: { bodyParser: false } };
@@ -25,6 +25,7 @@ export default async function handler(req, res) {
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object;
     const m = s.metadata || {};
+    try { await markPaid(s.id, s.amount_total); } catch (e) { console.error(e); }
     try {
       await send(`💸 New ${m.plan || ''} order — ${m.name || s.customer_email}`,
         `<h2>Payment received</h2>
