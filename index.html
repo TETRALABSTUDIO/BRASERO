@@ -99,9 +99,9 @@ img,svg{display:block}
 .hslide .fb h4{font-size:21px;font-weight:900;line-height:1.05;letter-spacing:-.02em}
 .hb1{background:linear-gradient(160deg,#8b3df0,#4a13aa)}.hb2{background:linear-gradient(160deg,#1a1a1a,#000)}.hb3{background:var(--grad-r)}
 /* staggered: left card sits high, center mid, right card low */
-.hslide.s2{--tx:-98%;--ty:-74%;--rot:rotate(-11deg);z-index:2}
-.hslide.s1{--tx:-50%;--ty:-50%;--rot:rotate(-1deg);z-index:3}
-.hslide.s3{--tx:-2%;--ty:-26%;--rot:rotate(10deg);z-index:1}
+.hslide.s2{--tx:-98%;--ty:-74%;--rot:rotate(-11deg);z-index:2;animation-duration:8s}
+.hslide.s1{--tx:-50%;--ty:-50%;--rot:rotate(-1deg);z-index:3;animation-duration:7s}
+.hslide.s3{--tx:-2%;--ty:-26%;--rot:rotate(10deg);z-index:1;animation-duration:6.3s}
 .hslide{transform:translate(var(--tx),var(--ty)) var(--rot)}
 .float{animation:float 7s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translate(var(--tx),var(--ty)) var(--rot) translateY(0)}50%{transform:translate(var(--tx),var(--ty)) var(--rot) translateY(-14px)}}
@@ -112,8 +112,8 @@ img,svg{display:block}
 .hchip .ic svg{width:18px;height:18px}
 .hchip b{display:block;font-size:16px;font-weight:900;letter-spacing:-.02em;line-height:1.05}
 .hchip small{font-size:11px;font-weight:600;color:var(--grey)}
-.hchip--tl{top:3%;left:-5%}
-.hchip--br{bottom:5%;right:-6%;animation-delay:-2.6s}
+.hchip--tl{top:3%;left:-5%;animation-duration:5.2s;animation-delay:-.6s}
+.hchip--br{bottom:5%;right:-6%;animation-duration:6.4s;animation-delay:-2.6s}
 @keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
 
 /* mini orange deck cards + visual giggles */
@@ -123,16 +123,16 @@ img,svg{display:block}
 .hmini span{display:flex;flex-direction:column;gap:3px}
 .hmini span em{height:4px;border-radius:2px;background:rgba(255,255,255,.9)}
 .hmini span em:nth-child(2){width:72%}
-.hmini--a{top:-3%;right:7%;--r:rotate(13deg)}
-.hmini--b{bottom:9%;left:-5%;--r:rotate(-13deg);animation-delay:-3s;z-index:7}
+.hmini--a{top:-3%;right:7%;--r:rotate(13deg);animation-duration:6.6s;animation-delay:-1.2s}
+.hmini--b{bottom:9%;left:-5%;--r:rotate(-13deg);animation-duration:5.3s;animation-delay:-3.4s;z-index:7}
 
 .hgig{position:absolute;z-index:6;color:var(--orange);animation:bob 5s ease-in-out infinite}
 .hgig svg{width:100%;height:100%;display:block}
-.hgig--spark{width:30px;height:30px;top:13%;right:1%;animation-delay:-1.5s}
-.hgig--spark2{width:17px;height:17px;bottom:26%;right:13%;animation-delay:-2.8s}
-.hgig--dot{width:14px;height:14px;border-radius:50%;background:var(--orange);box-shadow:0 6px 14px rgba(248,80,0,.4);bottom:1%;left:32%;animation-delay:-2s}
-.hgig--ring{width:22px;height:22px;border:3px solid var(--orange);border-radius:50%;top:45%;left:-7%;opacity:.85;animation-delay:-3.5s}
-.hgig--px{width:26px;height:34px;border-radius:7px;background-image:url(assets/pxgrad.svg);background-size:100% 100%;image-rendering:pixelated;box-shadow:0 10px 20px rgba(248,80,0,.35);top:61%;right:-1%;--r:rotate(-14deg);animation-delay:-1s}
+.hgig--spark{width:30px;height:30px;top:13%;right:1%;animation-duration:4.6s;animation-delay:-.7s}
+.hgig--spark2{width:17px;height:17px;bottom:26%;right:13%;animation-duration:5.8s;animation-delay:-2.2s}
+.hgig--dot{width:14px;height:14px;border-radius:50%;background:var(--orange);box-shadow:0 6px 14px rgba(248,80,0,.4);bottom:1%;left:32%;animation-duration:4.2s;animation-delay:-1.1s}
+.hgig--ring{width:22px;height:22px;border:3px solid var(--orange);border-radius:50%;top:45%;left:-7%;opacity:.85;animation-duration:6.3s;animation-delay:-.4s}
+.hgig--px{width:26px;height:34px;border-radius:7px;background-image:url(assets/pxgrad.svg);background-size:100% 100%;image-rendering:pixelated;box-shadow:0 10px 20px rgba(248,80,0,.35);top:61%;right:-1%;--r:rotate(-14deg);animation-duration:5.5s;animation-delay:-2.9s}
 
 @media(max-width:980px){.hero__grid{grid-template-columns:1fr;gap:30px;align-items:start}.hstack{height:480px;margin-top:8px}}
 @media(max-width:560px){.hslide{width:208px}.hslide.s2{--tx:-92%;--ty:-66%}.hslide.s3{--tx:-8%;--ty:-30%}.hchip,.hmini,.hgig{display:none}}
@@ -351,17 +351,52 @@ img,svg{display:block}
 .plan--feat .deckcount__cap{color:#bdbdbd}
 .plan{background:#fff;border:1px solid var(--line);border-radius:24px;padding:34px 30px;display:flex;flex-direction:column;transition:transform .3s ease, box-shadow .3s}
 .plan:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(0,0,0,.08)}
-.plan--feat{background:var(--black);border-color:var(--black);color:#fff;position:relative;overflow:hidden}
-.plan--feat .plan__desc{color:#aaa}.plan--feat .plan__sub{color:#9a9a9a}.plan--feat li{color:#e4e4e4}
+.plan--feat{background:linear-gradient(#111111,#111111) padding-box,var(--grad) border-box;border:1.6px solid transparent;color:#fff;position:relative;overflow:hidden}
+.plan--feat .plan__desc{color:#bdbdbd}.plan.plan--feat li{color:#ffffff}
 .plan--feat>*{position:relative;z-index:2}
+.plan--feat::after{content:"";position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.3),transparent 70%);filter:blur(22px);pointer-events:none;z-index:0}
 .plan__badge{position:absolute;top:24px;right:24px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--grad);padding:6px 13px;border-radius:100px;color:#fff;z-index:3}
-.plan h3{font-size:22px;font-weight:900;letter-spacing:-.01em}
+.plan h3{font-size:56px;font-weight:900;letter-spacing:-.035em;line-height:1}
 .plan__desc{color:var(--grey);font-size:15px;margin-top:8px;line-height:1.45;min-height:42px}
-.plan__price{display:flex;align-items:baseline;gap:6px;margin:24px 0 4px}
-.plan__price b,.plan__price .grad-text{font-size:46px;font-weight:900;letter-spacing:-.03em}
-.plan__price span{font-size:15px;color:var(--grey);font-weight:500}
-.plan--feat .plan__price span{color:#9a9a9a}
-.plan__sub{font-size:14px;color:var(--grey);margin-bottom:24px}
+.plan__price{display:flex;align-items:baseline;gap:9px;margin:24px 0 24px;flex-wrap:wrap}
+.plan__price b,.plan__price .grad-text,.plan__now{font-size:56px;font-weight:900;letter-spacing:-.035em}
+.plan__per{font-size:15px;color:var(--grey);font-weight:500}
+.plan--feat .plan__per{color:#9a9a9a}
+.plan__was{font-size:23px;font-weight:700;color:#c4c4c4;text-decoration:line-through;letter-spacing:-.02em}
+.plan--feat .plan__was{color:#8a8a8a}
+.plan__off{align-self:center;font-size:12px;font-weight:800;color:#fff;background:var(--grad);padding:4px 10px;border-radius:100px;box-shadow:0 5px 12px rgba(248,80,0,.3)}
+.plan__was:empty,.plan__off:empty{display:none}
+
+/* billing toggle */
+.bill{display:inline-flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:100px;padding:5px;margin-top:28px;box-shadow:0 6px 18px rgba(0,0,0,.05)}
+.bill button{font-family:inherit;border:none;background:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--grey);padding:11px 22px;border-radius:100px;transition:color .25s,background .25s,box-shadow .25s;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.bill button.on{color:#fff;background:var(--grad);box-shadow:0 8px 18px rgba(248,80,0,.28)}
+.bill .save{font-size:11px;font-weight:800;color:#16a34a}
+.bill button.on .save{color:#fff}
+
+/* custom band */
+.pack__custom{display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap;margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:30px 36px}
+.pack__custom .pc-tag{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;display:block}
+.pack__custom h3{font-size:22px;font-weight:900;letter-spacing:-.01em}
+.pack__custom p{color:var(--grey);font-size:15px;margin-top:6px;max-width:560px;line-height:1.45}
+.pack__custom .btn{flex-shrink:0}
+
+/* burst : orange gradient border + floating mini cards & giggles */
+.plan--burst{background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box;border:1.6px solid transparent;position:relative}
+.plan--burst .pmini,.plan--burst .pgig{position:absolute;pointer-events:none;z-index:4;animation:bob 6s ease-in-out infinite}
+.pmini{width:48px;aspect-ratio:1080/1350;border-radius:9px;background:var(--grad);box-shadow:0 12px 26px rgba(248,80,0,.42);padding:6px;display:flex;flex-direction:column;justify-content:space-between}
+.pmini > i{width:55%;height:4px;border-radius:2px;background:rgba(255,255,255,.55)}
+.pmini span{display:flex;flex-direction:column;gap:2px}
+.pmini span em{height:3px;border-radius:2px;background:rgba(255,255,255,.9)}
+.pmini span em:nth-child(2){width:70%}
+.pmini--a{top:-20px;right:-16px;--r:rotate(14deg);animation-duration:6.4s;animation-delay:-.8s}
+.pmini--b{bottom:48px;left:-22px;--r:rotate(-12deg);animation-duration:5.2s;animation-delay:-2.1s}
+.pgig{color:var(--orange)}
+.pgig svg{width:100%;height:100%;display:block}
+.pgig--spark{width:24px;height:24px;top:34px;left:-12px;animation-duration:4.7s;animation-delay:-.5s}
+.pgig--dot{width:11px;height:11px;border-radius:50%;background:var(--orange);box-shadow:0 5px 12px rgba(248,80,0,.4);top:-12px;left:34%;animation-duration:5.6s;animation-delay:-3.2s}
+.pgig--ring{width:18px;height:18px;border:3px solid var(--orange);border-radius:50%;bottom:-6px;right:30px;opacity:.85;animation-duration:6.7s;animation-delay:-1.4s}
+
 .plan ul{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:30px;flex:1}
 .plan li{display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#333;line-height:1.4}
 .plan li svg{width:18px;height:18px;flex-shrink:0;margin-top:2px}
@@ -673,55 +708,69 @@ img,svg{display:block}
   <div class="wrap">
     <div class="pack__head reveal">
       <h2 class="h-lg">Pick your<br>growth speed.</h2>
-      <p class="lead">Simple, flat pricing. No retainers you can't escape, no surprise invoices.</p>
+      <p class="lead">Simple, flat pricing. Pay once, or subscribe and save 10% on every cycle.</p>
+      <div class="bill">
+        <button data-mode="once" class="on">One-time</button>
+        <button data-mode="sub">Subscribe <span class="save">−10%</span></button>
+      </div>
     </div>
     <div class="pack__grid">
       <div class="plan reveal">
-        <div class="deckcount" data-count="4" data-cap="4 decks / month"></div>
+        <div class="deckcount" data-count="3" data-cap="3 decks"></div>
         <h3>Starter</h3>
         <p class="plan__desc">For pages testing the waters with consistent, on-brand decks.</p>
-        <div class="plan__price"><b>$890</b><span>/ month</span></div>
-        <p class="plan__sub">4 custom decks · ~32 slides</p>
+        <div class="plan__price" data-price="120"><b class="plan__now">$120</b><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>4 carousels / month</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>3 carousel decks</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting included</li>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>2 revisions per carousel</li>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email · 72h</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 revision per carousel</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email in 72h</li>
         </ul>
-        <a href="#" class="btn btn--ghost-light">Choose Starter</a>
+        <a href="checkout.html?plan=starter&billing=once" class="btn btn--ghost-light plan__cta" data-plan="starter">Choose Starter</a>
       </div>
 
       <div class="plan plan--feat reveal">
-        <div class="pxgrad-bg" style="position:absolute;inset:0;opacity:.16;z-index:1"></div>
         <span class="plan__badge">Most popular</span>
-        <div class="deckcount" data-count="10" data-cap="10 decks / month"></div>
-        <h3>Growth</h3>
+        <div class="deckcount" data-count="6" data-cap="6 decks"></div>
+        <h3>Flame</h3>
         <p class="plan__desc">For pages posting consistently and scaling reach month over month.</p>
-        <div class="plan__price"><span class="grad-text">$1,690</span><span>/ month</span></div>
-        <p class="plan__sub">10 custom decks · hook bank included</p>
+        <div class="plan__price" data-price="240"><span class="grad-text plan__now">$240</span><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>10 carousels / month</li>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Monthly hook &amp; strategy session</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>6 carousel decks</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting included</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>2 revisions per carousel</li>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email · 48h</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email in 72h</li>
         </ul>
-        <a href="#" class="btn btn--grad">Choose Growth</a>
+        <a href="checkout.html?plan=flame&billing=once" class="btn btn--grad plan__cta" data-plan="flame">Choose Flame</a>
       </div>
 
-      <div class="plan reveal">
-        <div class="deckcount" data-count="20" data-cap="20+ decks / month"></div>
-        <h3>Studio</h3>
-        <p class="plan__desc">A full content engine for pages and brands that post daily.</p>
-        <div class="plan__price"><b>Custom</b></div>
-        <p class="plan__sub">20+ decks · dedicated designer</p>
+      <div class="plan plan--burst reveal">
+        <div class="pmini pmini--a"><i></i><span><em></em><em></em></span></div>
+        <div class="pmini pmini--b"><i></i><span><em></em><em></em></span></div>
+        <div class="pgig pgig--spark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg></div>
+        <div class="pgig pgig--dot"></div>
+        <div class="pgig pgig--ring"></div>
+        <div class="deckcount" data-count="10" data-cap="9 + 1 free"></div>
+        <h3>Burst</h3>
+        <p class="plan__desc">Maximum output and priority turnaround for serious, fast growth.</p>
+        <div class="plan__price" data-price="290"><b class="plan__now">$290</b><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>20+ carousels / month</li>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated designer + strategist</li>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited revisions</li>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email · 24h priority</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>9 carousel decks <strong style="font-weight:800;color:var(--orange);margin-left:4px">+ 1 free</strong></li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting included</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>4 revisions per carousel</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email in 48h · priority</li>
         </ul>
-        <a href="#" class="btn btn--ghost-light">Book a call</a>
+        <a href="checkout.html?plan=burst&billing=once" class="btn btn--grad plan__cta" data-plan="burst">Choose Burst</a>
       </div>
+    </div>
+
+    <div class="pack__custom reveal">
+      <div>
+        <span class="pc-tag">Custom</span>
+        <h3>Need more decks or something tailored?</h3>
+        <p>Bigger volume, specific formats, or a workflow built around your team — let's scope it together on a quick call.</p>
+      </div>
+      <button type="button" data-cal-link="brasero/custom" data-cal-config='{"layout":"month_view"}' class="btn btn--grad">Book a call →</button>
     </div>
   </div>
   <svg width="0" height="0"><defs><linearGradient id="chk" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient></defs></svg>
@@ -892,10 +941,43 @@ document.querySelectorAll('.deckcount').forEach(dc=>{
   dc.innerHTML=html+(dc.dataset.cap?`<span class="deckcount__cap">${dc.dataset.cap}</span>`:'');
 });
 
+/* packages: one-time / subscription billing toggle (-10%) */
+(function(){
+  const opts=document.querySelectorAll('.bill button');
+  if(!opts.length) return;
+  const fmt=n=>'$'+n.toLocaleString('en-US');
+  function render(mode){
+    document.querySelectorAll('.plan__price[data-price]').forEach(p=>{
+      const base=parseInt(p.dataset.price,10);
+      const was=p.querySelector('.plan__was'),now=p.querySelector('.plan__now'),per=p.querySelector('.plan__per'),off=p.querySelector('.plan__off');
+      if(mode==='sub'){
+        now.textContent=fmt(Math.round(base*0.9));
+        was.textContent=fmt(base);
+        if(off) off.textContent='−10%';
+        per.textContent='/ month';
+      }else{
+        now.textContent=fmt(base);
+        was.textContent='';
+        if(off) off.textContent='';
+        per.textContent='one-time';
+      }
+    });
+    opts.forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+    document.querySelectorAll('.plan__cta[data-plan]').forEach(a=>{a.href=`checkout.html?plan=${a.dataset.plan}&billing=${mode}`;});
+  }
+  opts.forEach(b=>b.addEventListener('click',()=>render(b.dataset.mode)));
+  render('once');
+})();
+
 /* outer carousel: browse between decks */
 function ostep(){const s=ctrack.querySelector('.cslide');return s?s.getBoundingClientRect().width+16:240;}
 document.getElementById('cnext').addEventListener('click',()=>ctrack.scrollBy({left:ostep()*2,behavior:'smooth'}));
 document.getElementById('cprev').addEventListener('click',()=>ctrack.scrollBy({left:-ostep()*2,behavior:'smooth'}));
+
+/* Cal.com embed (popup) — replace "brasero/custom" with your real Cal link */
+(function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", {origin:"https://cal.com"});
+Cal("ui", {hideEventTypeDetails:false, layout:"month_view"});
 </script>
 </body>
 </html>

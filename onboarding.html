@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding · Brasero</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0c0c0c;--ink:#111;--soft:#f7f4ef;--grey:#6b6b6b;--line:rgba(0,0,0,.10);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00 0%,#f87000 100%);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Satoshi',system-ui,sans-serif;background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-weight:700;font-size:15px;letter-spacing:-.01em;padding:13px 24px;border-radius:100px;border:1px solid transparent;cursor:pointer;transition:transform .25s,box-shadow .25s,color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn--grad{background:var(--grad);color:#fff;box-shadow:0 10px 26px rgba(248,80,0,.3)}
+.btn--grad:hover{box-shadow:0 16px 38px rgba(248,80,0,.42)}
+.btn--ghost{background:transparent;border-color:rgba(0,0,0,.16);color:var(--ink)}
+.btn--ghost:hover{border-color:var(--ink)}
+
+.prog{position:fixed;top:0;left:0;right:0;height:4px;background:rgba(0,0,0,.06);z-index:10}
+.prog__bar{height:100%;width:0;background:var(--grad);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.top{display:flex;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto;padding:16px 24px 2px}
+.logo-svg{height:24px;width:auto;color:var(--ink)}
+.stepcount{font-size:13px;font-weight:700;color:var(--grey)}
+.glow{position:fixed;width:560px;height:560px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.13),transparent 72%);filter:blur(30px);pointer-events:none;top:-180px;right:-160px;z-index:0}
+
+.shell{position:relative;z-index:2;max-width:680px;margin:0 auto;padding:4px 24px 26px}
+
+/* stepper */
+.stepper{display:flex;align-items:center;justify-content:center;margin:8px 0 18px}
+.snode{display:flex;align-items:center;gap:9px}
+.snum{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:15px;background:#fff;border:1px solid var(--line);color:#bdbdbd;transition:.35s;flex-shrink:0}
+.snode.active .snum,.snode.done .snum{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(248,80,0,.28)}
+.snode.done .snum{font-size:0}.snode.done .snum::after{content:"✓";font-size:16px}
+.slabel{font-size:13px;font-weight:700;color:#bdbdbd;transition:.35s;white-space:nowrap}
+.snode.active .slabel,.snode.done .slabel{color:var(--ink)}
+.sline{width:40px;height:2px;background:var(--line);margin:0 10px;border-radius:2px;transition:.35s}
+.sline.fill{background:var(--grad)}
+
+/* intro */
+.intro{margin-bottom:16px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:9px}
+.eyebrow .pxa{display:inline-flex;gap:3px}
+.eyebrow .pxa i{width:8px;height:11px;border-radius:3px;background-image:url(assets/pxgrad.svg);background-size:100% 100%;image-rendering:pixelated}
+.eyebrow .pxa i:nth-child(1){transform:rotate(-10deg);opacity:.6}
+.eyebrow .pxa i:nth-child(3){transform:rotate(10deg)}
+h1.title{font-size:clamp(25px,3.6vw,38px);font-weight:900;letter-spacing:-.038em;line-height:1.0}
+.intro p{color:var(--grey);font-size:15px;line-height:1.45;margin-top:9px;max-width:40em}
+
+/* card + fields */
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 14px 40px rgba(0,0,0,.06);animation:fin .4s cubic-bezier(.2,.7,.2,1)}
+@keyframes fin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.who{display:flex;align-items:center;gap:13px;padding:11px 13px;border:1px solid var(--line);border-radius:14px;background:var(--soft);margin-bottom:16px}
+.who img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.who .ph{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
+.who b{font-size:15px;font-weight:800;display:block;line-height:1.2}
+.who span{display:block;font-size:12px;color:var(--grey);font-weight:600;margin-top:1px}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:flex;align-items:baseline;gap:8px;font-size:14px;font-weight:800;letter-spacing:-.01em;margin-bottom:7px}
+.field label .opt-tag{font-size:12px;font-weight:600;color:#bbb;letter-spacing:0}
+.field input,.field textarea{width:100%;font-family:inherit;font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--soft);outline:none;transition:border .2s,box-shadow .2s,background .2s;color:var(--ink)}
+.field textarea{resize:none;min-height:60px;line-height:1.4}
+.field input::placeholder,.field textarea::placeholder{color:#bdbab2}
+.field input:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.12);background:#fff}
+.field.err input,.field.err textarea{border-color:#ff1a00;box-shadow:0 0 0 2px rgba(255,26,0,.4)}
+.field.err .opts{box-shadow:0 0 0 2px rgba(255,26,0,.4);border-radius:13px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px}
+.opt{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;font-weight:700;cursor:pointer;background:var(--soft);transition:.18s;font-family:inherit;text-align:left;color:var(--ink);display:flex;align-items:center;gap:10px}
+.opt:hover{border-color:var(--orange)}
+.opt.sel{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(248,80,0,.28)}
+.opt .dot{width:17px;height:17px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;transition:.18s}
+.opt.sel .dot{border-color:#fff;background:radial-gradient(circle at center,#fff 0 34%,transparent 38%)}
+.actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+
+/* done */
+.done{text-align:center;max-width:600px;margin:24px auto 0;animation:fin .55s ease}
+.done__ic{width:84px;height:84px;border-radius:50%;background:var(--grad);display:grid;place-items:center;margin:0 auto 24px;box-shadow:0 18px 44px rgba(248,80,0,.38)}
+.done h2{font-size:clamp(30px,4.6vw,46px);font-weight:900;letter-spacing:-.035em;line-height:1.04;margin-bottom:14px}
+.done p{color:var(--grey);font-size:16px;line-height:1.55}
+.done .recap-mini{display:inline-flex;align-items:center;gap:10px;margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:9px 18px;font-size:14px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.05)}
+.done .recap-mini b{color:var(--orange)}
+
+@media(max-width:560px){.slabel{display:none}.sline{width:26px;margin:0 7px}.card{padding:20px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="g_mark" x1="16" y1="56" x2="163" y2="141" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<g id="brasero-mark">
+<path d="M89.6395 47.9895C94.3875 45.2482 94.3875 38.3952 89.6395 35.6539L81.4719 30.9384C79.2684 29.6662 76.5535 29.6662 74.35 30.9384L58.8599 39.8815C56.6564 41.1536 53.9416 41.1536 51.7381 39.8814L42.8628 34.7573C38.1148 32.0161 38.1148 25.163 42.8628 22.4218L74.3503 4.24237C76.5538 2.97016 79.2687 2.97015 81.4722 4.24236L120.108 26.5485C122.311 27.8207 123.668 30.1718 123.668 32.7163L123.668 73.9556C123.668 77.2688 120.082 79.3396 117.212 77.683C114.343 76.0264 110.756 78.0972 110.756 81.4104L110.756 119.155C110.756 124.138 116.151 127.253 120.467 124.761C122.471 123.605 123.704 121.467 123.704 119.154L123.704 85.3354C123.704 82.7909 125.061 80.4398 127.265 79.1676L150.028 66.0252C154.776 63.284 160.711 66.7105 160.711 72.193L160.711 140.146C160.711 142.691 159.354 145.042 157.15 146.314L91.03 184.488C88.8265 185.761 86.1116 185.761 83.9081 184.488L17.7879 146.314C15.5843 145.042 14.2269 142.69 14.2269 140.146L14.2268 72.0684C14.2268 66.5859 20.1617 63.1594 24.9097 65.9006L47.6719 79.0424C49.8754 80.3146 51.2329 82.6657 51.2329 85.2101L51.2333 118.781C51.2334 121.325 52.5908 123.676 54.7943 124.948L84.0442 141.836C86.1635 143.059 88.7745 143.059 90.8937 141.836C95.46 139.199 95.46 132.608 90.8937 129.972L68.5858 117.093C66.3823 115.82 65.0248 113.469 65.0248 110.925L65.0248 66.3125C65.0248 63.7681 66.3822 61.417 68.5858 60.1448L89.6395 47.9895Z" fill="url(#g_mark)"/>
+<path d="M214.652 163.952H187.418V22.3374H216.342V89.0127C221.977 80.5609 234.373 66.8502 247.896 66.8502C274.19 66.8502 290.906 87.3224 290.906 117.937C290.906 147.048 272.312 166.394 245.642 166.394C232.495 166.394 221.226 160.571 216.155 151.932L214.652 163.952ZM216.53 116.434C216.53 130.521 225.921 139.911 239.444 139.911C253.155 139.911 261.794 130.333 261.794 116.434C261.794 102.536 253.155 92.9569 239.444 92.9569C225.921 92.9569 216.53 102.348 216.53 116.434Z" fill="currentColor"/>
+<path d="M359.018 70.0431V97.2767H349.815C333.287 97.2767 323.333 104.602 323.333 123.196V163.952H294.409V70.231H321.642L323.145 84.1295C327.089 74.9264 335.353 68.7284 347.937 68.7284C351.317 68.7284 355.074 69.1041 359.018 70.0431Z" fill="currentColor"/>
+<path d="M385.189 166.394C365.281 166.394 352.885 154.749 352.885 136.343C352.885 119.064 365.093 108.358 387.631 106.668L413.925 104.602V103.099C413.925 93.896 408.291 89.0127 397.961 89.0127C385.753 89.0127 379.179 93.7082 379.179 102.16H355.138C355.138 80.9366 372.605 67.0381 399.463 67.0381C426.697 67.0381 442.098 82.2513 442.098 109.109V163.952H416.555L414.677 151.556C411.672 160.196 399.276 166.394 385.189 166.394ZM395.331 144.982C406.413 144.982 414.113 139.536 414.113 128.83V123.759L399.463 125.074C386.88 126.201 382.372 129.018 382.372 135.028C382.372 141.79 386.504 144.982 395.331 144.982Z" fill="currentColor"/>
+<path d="M442.934 134.277H470.356C470.731 140.85 475.615 144.795 484.442 144.795C493.457 144.795 497.589 141.602 497.589 136.718C497.589 133.901 496.087 130.896 489.138 129.394L471.858 125.637C454.579 121.881 446.127 114.368 446.127 97.8402C446.127 78.3071 462.843 67.0381 485.381 67.0381C507.168 67.0381 522.381 79.8097 522.381 98.7793H494.96C494.96 92.3935 491.016 88.0737 484.067 88.0737C477.493 88.0737 473.361 91.4544 473.361 96.5255C473.361 100.845 476.929 103.287 483.503 104.789L500.97 108.546C516.371 111.927 524.823 119.064 524.823 134.089C524.823 154.186 507.732 166.394 483.315 166.394C458.523 166.394 442.934 153.246 442.934 134.277Z" fill="currentColor"/>
+<path d="M570.363 166.394C542.003 166.394 521.718 145.734 521.718 116.81C521.718 87.5102 541.439 67.0381 569.8 67.0381C599.287 67.0381 617.693 86.3833 617.693 116.998V124.323L549.515 124.698C551.206 137.094 558.155 142.916 570.926 142.916C581.82 142.916 589.52 138.972 591.586 132.211H618.069C614.688 153.059 596.094 166.394 570.363 166.394ZM569.987 90.5153C558.53 90.5153 552.145 95.5864 549.891 106.855H588.957C588.957 96.9011 581.632 90.5153 569.987 90.5153Z" fill="currentColor"/>
+<path d="M686.283 70.0431V97.2767H677.08C660.552 97.2767 650.598 104.602 650.598 123.196V163.952H621.674V70.231H648.907L650.41 84.1295C654.354 74.9264 662.618 68.7284 675.202 68.7284C678.583 68.7284 682.339 69.1041 686.283 70.0431Z" fill="currentColor"/>
+<path d="M679.94 116.81C679.94 87.1346 701.727 67.2259 731.778 67.2259C761.641 67.2259 783.428 87.1346 783.428 116.81C783.428 146.485 761.641 166.206 731.778 166.206C701.727 166.206 679.94 146.485 679.94 116.81ZM709.052 116.622C709.052 130.896 718.255 140.287 731.778 140.287C745.113 140.287 754.316 130.896 754.316 116.622C754.316 102.536 745.113 93.1447 731.778 93.1447C718.255 93.1447 709.052 102.536 709.052 116.622Z" fill="currentColor"/>
+</g>
+</defs></svg>
+
+<div class="prog"><div class="prog__bar" id="bar"></div></div>
+<div class="glow"></div>
+
+<header class="top">
+  <a href="index.html" aria-label="Brasero home"><svg class="logo-svg" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></a>
+  <span class="stepcount" id="stepcount"></span>
+</header>
+
+<main class="shell">
+  <div class="stepper" id="stepper"></div>
+  <div id="view"></div>
+</main>
+
+<script>
+/* Set API to your backend URL to send onboarding answers for real.
+   Leave empty for the demo (answers are logged + kept in sessionStorage). */
+const API='http://localhost:4242';
+const STEPS=[
+  {tag:'Step 1 · Your page',short:'Your page',title:['Let’s set up your ','page','.'],
+    sub:'We pulled in your Instagram — just confirm and fill the rest.',
+    fields:[
+      {key:'page',label:'Page / brand name',type:'text',placeholder:'e.g. Wealth Notes',required:true},
+      {key:'handle',label:'Handle & platform',type:'text',placeholder:'@yourpage · Instagram',required:true},
+      {key:'niche',label:'What is your page about?',type:'textarea',placeholder:'Your niche, topics and angle…',required:true},
+      {key:'audience',label:'Who are you talking to?',type:'textarea',placeholder:'Your ideal follower: age, stage, what they want…',required:true},
+    ]},
+  {tag:'Step 2 · Your goals',short:'Goals',title:['What does ','winning',' look like?'],
+    sub:'So every deck pushes the metric that actually matters to you.',
+    fields:[
+      {key:'goal',label:'Your #1 goal right now',type:'choice',options:['Reach & virality','Saves & shares','Followers growth','Sales / leads'],required:true},
+      {key:'freq',label:'How often do you want to post?',type:'choice',options:['1–2 / week','3–4 / week','Daily'],required:true},
+      {key:'challenge',label:'Biggest content challenge today?',type:'textarea',placeholder:'Running out of ideas, low saves, inconsistent look…',required:false},
+    ]},
+  {tag:'Step 3 · Your brand',short:'Brand',title:['Make it ','unmistakably',' yours.'],
+    sub:'The look, the feel, the references — the more you share, the sharper your decks.',
+    fields:[
+      {key:'style',label:'Describe your brand vibe',type:'textarea',placeholder:'Bold, high-contrast, warm orange accents, big type…',required:false},
+      {key:'inspo',label:'Accounts or posts you love',type:'textarea',placeholder:'Paste 1–3 links for inspiration…',required:false},
+      {key:'notes',label:'Anything else we should know?',type:'textarea',placeholder:'Tell us anything…',required:false},
+    ]},
+];
+
+const order=JSON.parse(sessionStorage.getItem('brasero_order')||'{}');
+const ans={};
+/* prefill the handle from the Instagram info imported at checkout */
+if(order.handle) ans.handle=order.handle+' · Instagram';
+let step=0;
+const view=document.getElementById('view'),bar=document.getElementById('bar'),
+      stepper=document.getElementById('stepper'),stepcount=document.getElementById('stepcount');
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+function renderStepper(){
+  let h='';
+  STEPS.forEach((s,k)=>{
+    const cls=k<step?'done':(k===step?'active':'');
+    h+=`<div class="snode ${cls}"><div class="snum">${k+1}</div><span class="slabel">${s.short}</span></div>`;
+    if(k<STEPS.length-1) h+=`<div class="sline ${k<step?'fill':''}"></div>`;
+  });
+  stepper.innerHTML=h;
+  bar.style.width=(step/STEPS.length*100)+'%';
+  stepcount.textContent=`Step ${step+1} of ${STEPS.length}`;
+}
+
+function whoHTML(){
+  if(step!==0 || (!order.photo && !order.handle)) return '';
+  const av=order.photo?`<img src="${order.photo}" alt="">`:`<span class="ph">${(order.handle||'B').replace(/^@/,'').charAt(0).toUpperCase()}</span>`;
+  return `<div class="who">${av}<div><b>${esc(order.handle||'Your account')}</b><span>Imported from Instagram</span></div></div>`;
+}
+
+function fieldHTML(f){
+  const v=ans[f.key]||'';
+  const optTag=f.required?'':'<span class="opt-tag">optional</span>';
+  let inner;
+  if(f.type==='textarea') inner=`<textarea data-k="${f.key}" placeholder="${esc(f.placeholder)}">${esc(v)}</textarea>`;
+  else if(f.type==='choice')
+    inner=`<div class="opts" data-k="${f.key}">${f.options.map(o=>`<button type="button" class="opt ${v===o?'sel':''}" data-v="${esc(o)}"><span class="dot"></span>${o}</button>`).join('')}</div>`;
+  else inner=`<input data-k="${f.key}" type="text" value="${esc(v)}" placeholder="${esc(f.placeholder)}" autocomplete="off">`;
+  return `<div class="field" data-field="${f.key}"><label>${f.label}${optTag}</label>${inner}</div>`;
+}
+
+function render(){
+  renderStepper();
+  const s=STEPS[step],last=step===STEPS.length-1;
+  view.innerHTML=`
+    <div class="intro">
+      <span class="eyebrow"><span class="pxa"><i></i><i></i><i></i></span>${s.tag}</span>
+      <h1 class="title">${s.title[0]}<span class="grad-text">${s.title[1]}</span>${s.title[2]}</h1>
+      <p>${s.sub}</p>
+    </div>
+    <div class="card">${whoHTML()}${s.fields.map(fieldHTML).join('')}</div>
+    <div class="actions">
+      ${step>0?'<button class="btn btn--ghost" id="back">← Back</button>':'<a class="btn btn--ghost" href="index.html">← Cancel</a>'}
+      <button class="btn btn--grad" id="next">${last?'Submit ✓':'Continue →'}</button>
+    </div>`;
+
+  view.querySelectorAll('.opts').forEach(grp=>{
+    grp.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
+      ans[grp.dataset.k]=o.dataset.v;
+      grp.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+      o.classList.add('sel');grp.closest('.field').classList.remove('err');
+    }));
+  });
+  view.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('input',()=>el.closest('.field').classList.remove('err')));
+  const nb=document.getElementById('next');nb&&nb.addEventListener('click',next);
+  const bb=document.getElementById('back');bb&&bb.addEventListener('click',back);
+  const first=view.querySelector('input,textarea');first&&first.focus();
+}
+
+function collect(){view.querySelectorAll('input,textarea').forEach(el=>{ans[el.dataset.k]=el.value.trim();});}
+function validate(){
+  collect();let ok=true,firstErr=null;
+  STEPS[step].fields.forEach(f=>{
+    if(!f.required) return;
+    if(!ans[f.key]){ok=false;const fl=view.querySelector(`.field[data-field="${f.key}"]`);if(fl){fl.classList.add('err');if(!firstErr)firstErr=fl;}}
+  });
+  if(firstErr){const t=firstErr.querySelector('input,textarea');t?t.focus():firstErr.scrollIntoView({behavior:'smooth',block:'center'});}
+  return ok;
+}
+function next(){if(!validate())return;if(step<STEPS.length-1){step++;render();}else submit();}
+function back(){collect();if(step>0){step--;render();}}
+
+function submit(){
+  bar.style.width='100%';stepcount.textContent='';
+  const payload={order,answers:ans,submittedAt:new Date().toISOString()};
+  sessionStorage.setItem('brasero_onboarding',JSON.stringify(payload));
+  if(API){ fetch(API+'/api/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(console.error); }
+  else { console.log('Onboarding submitted →',payload); }
+  const first=order.name?(', '+order.name.split(' ')[0]):'';
+  stepper.innerHTML='';
+  view.innerHTML=`<div class="done">
+    <div class="done__ic"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+    <h2>You’re all set${first}! 🎉</h2>
+    <p>We’ve received your brief. Our team is on it — we’ll start crafting your decks and reach out${order.email?` at <b>${esc(order.email)}</b>`:''} shortly.</p>
+    ${order.planName?`<div class="recap-mini"><b>${esc(order.planName)}</b> pack · confirmed</div>`:''}
+    <div style="margin-top:28px"><a href="index.html" class="btn btn--grad">Back to home</a></div>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>

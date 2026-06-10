@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout · Brasero</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0c0c0c;--ink:#111;--white:#fff;--soft:#f7f4ef;--grey:#6b6b6b;--line:rgba(0,0,0,.10);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00 0%,#f87000 100%);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Satoshi',system-ui,sans-serif;background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-weight:700;font-size:16px;letter-spacing:-.01em;padding:15px 26px;border-radius:100px;border:1px solid transparent;cursor:pointer;transition:transform .25s,box-shadow .25s,opacity .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn--grad{background:var(--grad);color:#fff;box-shadow:0 10px 26px rgba(248,80,0,.3)}
+.btn--grad:hover{box-shadow:0 16px 38px rgba(248,80,0,.42)}
+.top{display:flex;align-items:center;justify-content:space-between;max-width:1060px;margin:0 auto;padding:22px 24px}
+.logo-svg{height:26px;width:auto;color:var(--ink)}
+.secure{font-size:13px;font-weight:600;color:var(--grey);display:flex;align-items:center;gap:7px}
+.co{max-width:1060px;margin:0 auto;padding:6px 24px 70px;display:grid;grid-template-columns:1fr .92fr;gap:24px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:0 14px 40px rgba(0,0,0,.05)}
+.co__title{font-size:clamp(24px,3.4vw,34px);font-weight:900;letter-spacing:-.03em;line-height:1.04;margin-bottom:6px}
+.co__sub{color:var(--grey);margin-bottom:22px;font-size:15px}
+.steps{display:flex;gap:8px;margin-bottom:20px}
+.steps i{flex:1;height:5px;border-radius:3px;background:rgba(0,0,0,.08);transition:background .3s}
+.steps i.on{background:var(--grad)}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input{width:100%;font-family:inherit;font-size:16px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--soft);outline:none;transition:border .2s,box-shadow .2s,background .2s}
+.field input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.12);background:#fff}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ig-row{display:flex;gap:10px}
+.ig-row input{flex:1}
+.ig-connect{font-family:inherit;font-weight:700;font-size:14px;padding:0 20px;border-radius:12px;border:none;cursor:pointer;background:var(--ink);color:#fff;white-space:nowrap;transition:transform .2s,opacity .2s}
+.ig-connect:hover{transform:translateY(-2px)}
+.ig-connect:disabled{opacity:.55;cursor:default;transform:none}
+.ig-card{display:flex;align-items:center;gap:13px;margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--soft);animation:fin .3s ease}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ig-card img{width:50px;height:50px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.12);background:#fff}
+.ig-card .meta{flex:1;min-width:0}
+.ig-card .meta b{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px}
+.ig-card .meta .ig-ok{color:#16a34a;font-size:13px}
+.ig-card .meta i{font-style:normal;display:block;font-size:12px;color:var(--grey);font-weight:600}
+.ig-card .meta p{font-size:13px;color:#444;margin-top:4px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ig-note{font-size:11px;color:var(--grey);margin-top:8px;line-height:1.45}
+.pay{width:100%;margin-top:10px;font-size:17px;padding:16px}
+.note{font-size:12px;color:var(--grey);text-align:center;margin-top:12px;line-height:1.5}
+.recap__top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+.recap__name{font-size:28px;font-weight:900;letter-spacing:-.02em}
+.badge{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--grad);color:#fff;padding:5px 11px;border-radius:100px}
+.recap__sub{color:var(--grey);font-size:14px;margin-bottom:16px}
+.bill{display:inline-flex;align-items:center;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:5px;margin-bottom:18px}
+.bill button{font-family:inherit;border:none;background:none;cursor:pointer;font-size:13px;font-weight:700;color:var(--grey);padding:9px 16px;border-radius:100px;transition:.2s;display:inline-flex;gap:6px;align-items:center}
+.bill button.on{color:#fff;background:var(--grad)}
+.bill .save{font-size:10px;font-weight:800;color:#16a34a}.bill button.on .save{color:#fff}
+.recap ul{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:20px}
+.recap li{display:flex;gap:10px;font-size:15px;color:#333;align-items:flex-start}
+.recap li svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+.recap__row{display:flex;justify-content:space-between;align-items:baseline;padding-top:16px;border-top:1px solid var(--line)}
+.recap__row>span{font-size:13px;color:var(--grey)}
+.tot{display:flex;align-items:baseline;gap:8px}
+.tot s{color:#bbb;text-decoration:line-through;font-size:18px;font-weight:700}
+.tot b{font-size:32px;font-weight:900;letter-spacing:-.03em}
+.tot em{font-style:normal;font-size:14px;color:var(--grey)}
+.stripe{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#635bff;margin-bottom:16px}
+.cardbox{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--soft);font-size:15px;color:#9a9a9a;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+@media(max-width:860px){.co{grid-template-columns:1fr}.recap{order:-1}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="g_mark" x1="16" y1="56" x2="163" y2="141" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<g id="brasero-mark">
+<path d="M89.6395 47.9895C94.3875 45.2482 94.3875 38.3952 89.6395 35.6539L81.4719 30.9384C79.2684 29.6662 76.5535 29.6662 74.35 30.9384L58.8599 39.8815C56.6564 41.1536 53.9416 41.1536 51.7381 39.8814L42.8628 34.7573C38.1148 32.0161 38.1148 25.163 42.8628 22.4218L74.3503 4.24237C76.5538 2.97016 79.2687 2.97015 81.4722 4.24236L120.108 26.5485C122.311 27.8207 123.668 30.1718 123.668 32.7163L123.668 73.9556C123.668 77.2688 120.082 79.3396 117.212 77.683C114.343 76.0264 110.756 78.0972 110.756 81.4104L110.756 119.155C110.756 124.138 116.151 127.253 120.467 124.761C122.471 123.605 123.704 121.467 123.704 119.154L123.704 85.3354C123.704 82.7909 125.061 80.4398 127.265 79.1676L150.028 66.0252C154.776 63.284 160.711 66.7105 160.711 72.193L160.711 140.146C160.711 142.691 159.354 145.042 157.15 146.314L91.03 184.488C88.8265 185.761 86.1116 185.761 83.9081 184.488L17.7879 146.314C15.5843 145.042 14.2269 142.69 14.2269 140.146L14.2268 72.0684C14.2268 66.5859 20.1617 63.1594 24.9097 65.9006L47.6719 79.0424C49.8754 80.3146 51.2329 82.6657 51.2329 85.2101L51.2333 118.781C51.2334 121.325 52.5908 123.676 54.7943 124.948L84.0442 141.836C86.1635 143.059 88.7745 143.059 90.8937 141.836C95.46 139.199 95.46 132.608 90.8937 129.972L68.5858 117.093C66.3823 115.82 65.0248 113.469 65.0248 110.925L65.0248 66.3125C65.0248 63.7681 66.3822 61.417 68.5858 60.1448L89.6395 47.9895Z" fill="url(#g_mark)"/>
+<path d="M214.652 163.952H187.418V22.3374H216.342V89.0127C221.977 80.5609 234.373 66.8502 247.896 66.8502C274.19 66.8502 290.906 87.3224 290.906 117.937C290.906 147.048 272.312 166.394 245.642 166.394C232.495 166.394 221.226 160.571 216.155 151.932L214.652 163.952ZM216.53 116.434C216.53 130.521 225.921 139.911 239.444 139.911C253.155 139.911 261.794 130.333 261.794 116.434C261.794 102.536 253.155 92.9569 239.444 92.9569C225.921 92.9569 216.53 102.348 216.53 116.434Z" fill="currentColor"/>
+<path d="M359.018 70.0431V97.2767H349.815C333.287 97.2767 323.333 104.602 323.333 123.196V163.952H294.409V70.231H321.642L323.145 84.1295C327.089 74.9264 335.353 68.7284 347.937 68.7284C351.317 68.7284 355.074 69.1041 359.018 70.0431Z" fill="currentColor"/>
+<path d="M385.189 166.394C365.281 166.394 352.885 154.749 352.885 136.343C352.885 119.064 365.093 108.358 387.631 106.668L413.925 104.602V103.099C413.925 93.896 408.291 89.0127 397.961 89.0127C385.753 89.0127 379.179 93.7082 379.179 102.16H355.138C355.138 80.9366 372.605 67.0381 399.463 67.0381C426.697 67.0381 442.098 82.2513 442.098 109.109V163.952H416.555L414.677 151.556C411.672 160.196 399.276 166.394 385.189 166.394ZM395.331 144.982C406.413 144.982 414.113 139.536 414.113 128.83V123.759L399.463 125.074C386.88 126.201 382.372 129.018 382.372 135.028C382.372 141.79 386.504 144.982 395.331 144.982Z" fill="currentColor"/>
+<path d="M442.934 134.277H470.356C470.731 140.85 475.615 144.795 484.442 144.795C493.457 144.795 497.589 141.602 497.589 136.718C497.589 133.901 496.087 130.896 489.138 129.394L471.858 125.637C454.579 121.881 446.127 114.368 446.127 97.8402C446.127 78.3071 462.843 67.0381 485.381 67.0381C507.168 67.0381 522.381 79.8097 522.381 98.7793H494.96C494.96 92.3935 491.016 88.0737 484.067 88.0737C477.493 88.0737 473.361 91.4544 473.361 96.5255C473.361 100.845 476.929 103.287 483.503 104.789L500.97 108.546C516.371 111.927 524.823 119.064 524.823 134.089C524.823 154.186 507.732 166.394 483.315 166.394C458.523 166.394 442.934 153.246 442.934 134.277Z" fill="currentColor"/>
+<path d="M570.363 166.394C542.003 166.394 521.718 145.734 521.718 116.81C521.718 87.5102 541.439 67.0381 569.8 67.0381C599.287 67.0381 617.693 86.3833 617.693 116.998V124.323L549.515 124.698C551.206 137.094 558.155 142.916 570.926 142.916C581.82 142.916 589.52 138.972 591.586 132.211H618.069C614.688 153.059 596.094 166.394 570.363 166.394ZM569.987 90.5153C558.53 90.5153 552.145 95.5864 549.891 106.855H588.957C588.957 96.9011 581.632 90.5153 569.987 90.5153Z" fill="currentColor"/>
+<path d="M686.283 70.0431V97.2767H677.08C660.552 97.2767 650.598 104.602 650.598 123.196V163.952H621.674V70.231H648.907L650.41 84.1295C654.354 74.9264 662.618 68.7284 675.202 68.7284C678.583 68.7284 682.339 69.1041 686.283 70.0431Z" fill="currentColor"/>
+<path d="M679.94 116.81C679.94 87.1346 701.727 67.2259 731.778 67.2259C761.641 67.2259 783.428 87.1346 783.428 116.81C783.428 146.485 761.641 166.206 731.778 166.206C701.727 166.206 679.94 146.485 679.94 116.81ZM709.052 116.622C709.052 130.896 718.255 140.287 731.778 140.287C745.113 140.287 754.316 130.896 754.316 116.622C754.316 102.536 745.113 93.1447 731.778 93.1447C718.255 93.1447 709.052 102.536 709.052 116.622Z" fill="currentColor"/>
+</g>
+</defs></svg>
+
+<header class="top">
+  <a href="index.html" aria-label="Brasero home"><svg class="logo-svg" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></a>
+  <span class="secure"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Secure checkout</span>
+</header>
+
+<main class="co">
+  <section class="card" id="left">
+    <div class="steps"><i class="on"></i><i></i></div>
+    <h1 class="co__title">Your details</h1>
+    <p class="co__sub">We'll use these to set up your project and send your decks.</p>
+    <form id="contact">
+      <div class="field"><label>Full name</label><input name="name" required placeholder="Jane Doe"></div>
+      <div class="field"><label>Email</label><input name="email" type="email" required placeholder="jane@brand.com"></div>
+      <div class="field"><label>Instagram</label>
+        <div class="ig-row">
+          <input name="instagram" id="iginput" type="text" required placeholder="instagram.com/yourpage">
+          <button type="button" class="ig-connect" id="connect">Add</button>
+        </div>
+        <div id="igresult"></div>
+        <p class="ig-note">Click <b>Add</b> to import your profile photo &amp; @handle from Instagram.</p>
+      </div>
+      <div class="field"><label>Phone (optional)</label><input name="phone" placeholder="+1 555 …"></div>
+      <button type="submit" class="btn btn--grad pay">Continue to payment →</button>
+      <p class="note">Next step: secure payment via Stripe.</p>
+    </form>
+  </section>
+  <aside class="card recap" id="recap"></aside>
+</main>
+
+<script>
+/* Set API to your backend URL (e.g. "https://api.brasero.studio") to go live.
+   Leave empty for the simulated demo flow. */
+const API='http://localhost:4242';
+const PLANS={
+  starter:{name:'Starter',price:120,feat:false,items:['3 carousel decks','Copywriting included','1 revision per carousel','Delivered by email in 72h']},
+  flame:{name:'Flame',price:240,feat:true,items:['6 carousel decks','Copywriting included','2 revisions per carousel','Delivered by email in 72h']},
+  burst:{name:'Burst',price:290,feat:true,items:['9 carousel decks + 1 free','Copywriting included','4 revisions per carousel','Delivered by email in 48h · priority']},
+};
+const qp=new URLSearchParams(location.search);
+const key=PLANS[qp.get('plan')]?qp.get('plan'):'flame';
+let mode=qp.get('billing')==='sub'?'sub':'once';
+const plan=PLANS[key];
+const fmt=n=>'$'+n.toLocaleString('en-US');
+const price=()=>mode==='sub'?Math.round(plan.price*0.9):plan.price;
+const chk='<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#f87000"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function usernameFrom(link){
+  if(!link) return '';
+  const m=String(link).trim().replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i);
+  return (m?m[1]:String(link).trim()).replace(/^@/,'').trim();
+}
+/* Import the Instagram profile photo + @handle.
+   Photo is fetched live via unavatar.io (no API key) and embedded as a data URL
+   so it never dead-links. If it can't load, we generate an initial avatar. */
+function fallbackAvatar(u){
+  const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,128,128);g.addColorStop(0,'#ff1a00');g.addColorStop(1,'#f87000');
+  x.fillStyle=g;x.fillRect(0,0,128,128);
+  x.fillStyle='#fff';x.font='700 64px Satoshi,system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';
+  x.fillText((u||'@').charAt(0).toUpperCase(),64,70);
+  return c.toDataURL('image/jpeg',0.9);
+}
+function loadAvatar(username){
+  const live='https://unavatar.io/instagram/'+encodeURIComponent(username)+'?fallback=false';
+  return new Promise(resolve=>{
+    const a=new Image();a.crossOrigin='anonymous';
+    a.onload=()=>{try{
+      const max=256,sc=Math.min(1,max/Math.max(a.width,a.height));
+      const c=document.createElement('canvas');c.width=Math.round(a.width*sc);c.height=Math.round(a.height*sc);
+      c.getContext('2d').drawImage(a,0,0,c.width,c.height);
+      resolve(c.toDataURL('image/jpeg',0.85)); // embedded, never dead-links
+    }catch(e){resolve(live);}};
+    a.onerror=()=>{ // CORS-blocked or not found — retry plain to tell them apart
+      const b=new Image();
+      b.onload=()=>resolve(live);                       // exists → keep live URL
+      b.onerror=()=>resolve(fallbackAvatar(username));  // not found → generated avatar
+      b.src=live;
+    };
+    a.src=live;
+  });
+}
+async function addInstagram(username){return {handle:'@'+username,photo:await loadAvatar(username)};}
+
+let ig=null; // {handle,photo}
+const addBtn=document.getElementById('connect');
+const igInput=document.getElementById('iginput');
+const igResult=document.getElementById('igresult');
+addBtn.addEventListener('click',async()=>{
+  const u=usernameFrom(igInput.value);
+  if(!u){igInput.focus();return;}
+  addBtn.disabled=true;addBtn.textContent='Adding…';
+  ig=await addInstagram(u);
+  addBtn.textContent='Added ✓';
+  igResult.innerHTML=`<div class="ig-card">
+    <img src="${ig.photo}" alt="">
+    <div class="meta"><b>${ig.handle} <span class="ig-ok">✓ added</span></b><i>Photo imported from Instagram</i></div>
+  </div>`;
+});
+igInput.addEventListener('input',()=>{ig=null;igResult.innerHTML='';addBtn.disabled=false;addBtn.textContent='Add';});
+
+function updatePayBtn(){const b=document.getElementById('pay-btn');if(b)b.textContent=`Pay ${fmt(price())}${mode==='sub'?' / mo':''}`;}
+function renderRecap(){
+  const sub=mode==='sub';
+  document.getElementById('recap').innerHTML=`
+    <div class="recap__top"><span class="recap__name">${plan.name}</span>${plan.feat?'<span class="badge">Popular</span>':''}</div>
+    <p class="recap__sub">Custom carousel decks, done-for-you.</p>
+    <div class="bill">
+      <button data-m="once" class="${sub?'':'on'}">One-time</button>
+      <button data-m="sub" class="${sub?'on':''}">Subscribe <span class="save">−10%</span></button>
+    </div>
+    <ul>${plan.items.map(it=>`<li>${chk}${it}</li>`).join('')}</ul>
+    <div class="recap__row"><span>${sub?'Billed monthly':'One-time payment'}</span>
+      <div class="tot">${sub?`<s>${fmt(plan.price)}</s>`:''}<b>${fmt(price())}</b><em>${sub?'/mo':''}</em></div>
+    </div>`;
+  document.querySelectorAll('.bill button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.m;renderRecap();updatePayBtn();}));
+}
+renderRecap();
+
+document.getElementById('contact').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const fd=new FormData(e.target);
+  const instagram=fd.get('instagram');
+  const u=usernameFrom(instagram);
+  // if they typed a handle but didn't hit Add, import on the fly
+  if(!ig && u) ig=await addInstagram(u);
+  const order={plan:key,planName:plan.name,billing:mode,price:price(),
+    name:fd.get('name'),email:fd.get('email'),instagram,
+    handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone')};
+  sessionStorage.setItem('brasero_order',JSON.stringify(order));
+  if(API){
+    const btn=e.submitter;if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
+    try{
+      const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({plan:key,billing:mode,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram})});
+      const d=await r.json();
+      if(d.url){location.href=d.url;return;}
+      throw new Error(d.error||'No checkout URL');
+    }catch(err){
+      console.error(err);
+      if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
+      alert('Could not start payment. Please try again.');
+    }
+    return;
+  }
+  showPayment(order); // simulated demo
+});
+
+function showPayment(order){
+  document.getElementById('left').innerHTML=`
+    <div class="steps"><i class="on"></i><i class="on"></i></div>
+    <h1 class="co__title">Payment</h1>
+    <p class="co__sub">Paying as <b>${order.email}</b>.</p>
+    <div class="stripe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg> Powered by Stripe · test mode</div>
+    <div class="field"><label>Card number</label><div class="cardbox"><span>4242 4242 4242 4242</span><span>VISA</span></div></div>
+    <div class="row2"><div class="field"><label>Expiry</label><div class="cardbox"><span>12 / 34</span></div></div><div class="field"><label>CVC</label><div class="cardbox"><span>123</span></div></div></div>
+    <button class="btn btn--grad pay" id="pay-btn">Pay ${fmt(price())}${mode==='sub'?' / mo':''}</button>
+    <p class="note">⚠️ Simulated checkout — no real card is charged.<br>Wire this button to your live Stripe Checkout later.</p>`;
+  document.getElementById('pay-btn').addEventListener('click',()=>{
+    const o=JSON.parse(sessionStorage.getItem('brasero_order'));o.billing=mode;o.price=price();
+    sessionStorage.setItem('brasero_order',JSON.stringify(o));
+    const b=document.getElementById('pay-btn');b.disabled=true;b.style.opacity=.6;b.textContent='Processing…';
+    setTimeout(()=>{location.href='onboarding.html';},900);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
