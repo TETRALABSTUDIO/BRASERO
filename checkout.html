@@ -115,7 +115,9 @@ a{color:inherit;text-decoration:none}
 <script>
 /* Set API to your backend URL (e.g. "https://api.brasero.studio") to go live.
    Leave empty for the simulated demo flow. */
-const API='http://localhost:4242';
+/* localhost → local Express backend ; otherwise same-origin Vercel /api functions.
+   Set to null to force the simulated demo. */
+const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
 const PLANS={
   starter:{name:'Starter',price:120,feat:false,items:['3 carousel decks','Copywriting included','1 revision per carousel','Delivered by email in 72h']},
   flame:{name:'Flame',price:240,feat:true,items:['6 carousel decks','Copywriting included','2 revisions per carousel','Delivered by email in 72h']},
@@ -212,7 +214,7 @@ document.getElementById('contact').addEventListener('submit',async e=>{
     name:fd.get('name'),email:fd.get('email'),instagram,
     handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone')};
   sessionStorage.setItem('brasero_order',JSON.stringify(order));
-  if(API){
+  if(API!==null){
     const btn=e.submitter;if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
     try{
       const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},

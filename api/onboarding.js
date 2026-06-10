@@ -1,0 +1,21 @@
+import { send } from './_lib.js';
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ ok: false });
+  try {
+    const { order = {}, answers = {} } = req.body || {};
+    const rows = Object.entries(answers)
+      .map(([k, v]) => `<tr><td style="padding:6px 12px;font-weight:700;vertical-align:top">${k}</td><td style="padding:6px 12px">${(v || '—').toString().replace(/</g, '&lt;')}</td></tr>`)
+      .join('');
+    await send(`📥 New onboarding — ${order.handle || order.email || 'client'}`,
+      `<h2>New onboarding submitted</h2>
+       <p><b>Client:</b> ${order.name || '—'} · ${order.email || '—'}</p>
+       <p><b>Plan:</b> ${order.planName || order.plan || '—'} (${order.billing === 'sub' ? 'subscription' : 'one-time'})</p>
+       <p><b>Instagram:</b> ${order.handle || ''} ${order.instagram ? `(${order.instagram})` : ''}</p>
+       <table style="border-collapse:collapse;margin-top:12px">${rows}</table>`);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false });
+  }
+}

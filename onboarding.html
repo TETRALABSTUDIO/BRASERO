@@ -118,7 +118,8 @@ h1.title{font-size:clamp(25px,3.6vw,38px);font-weight:900;letter-spacing:-.038em
 <script>
 /* Set API to your backend URL to send onboarding answers for real.
    Leave empty for the demo (answers are logged + kept in sessionStorage). */
-const API='http://localhost:4242';
+/* localhost → local Express backend ; otherwise same-origin Vercel /api functions. */
+const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
 const STEPS=[
   {tag:'Step 1 · Your page',short:'Your page',title:['Let’s set up your ','page','.'],
     sub:'We pulled in your Instagram — just confirm and fill the rest.',
@@ -227,7 +228,7 @@ function submit(){
   bar.style.width='100%';stepcount.textContent='';
   const payload={order,answers:ans,submittedAt:new Date().toISOString()};
   sessionStorage.setItem('brasero_onboarding',JSON.stringify(payload));
-  if(API){ fetch(API+'/api/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(console.error); }
+  if(API!==null){ fetch(API+'/api/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(console.error); }
   else { console.log('Onboarding submitted →',payload); }
   const first=order.name?(', '+order.name.split(' ')[0]):'';
   stepper.innerHTML='';

@@ -57,7 +57,23 @@ Tu reçois alors : un mail à **chaque paiement** (via webhook) et un mail à **
 
 ---
 
-## 3. Passer en production
+## 3 bis. Déploiement Vercel (recommandé)
+
+Le front (HTML + `assets/`) est servi en statique, et le backend tourne en **Serverless Functions** dans le dossier `/api` (`/api/checkout-session`, `/api/onboarding`, `/api/webhook`). Front et back sont sur le **même domaine** → pas de CORS, le front appelle `/api/...` en relatif automatiquement.
+
+1. **Pousser le repo** sur GitHub puis l'importer dans Vercel (ou `vercel` en CLI). Aucun build : Vercel détecte les fichiers `/api/*.js` et installe le `package.json` racine.
+2. Dans **Vercel → Project → Settings → Environment Variables**, ajoute :
+   - `STRIPE_SECRET_KEY` = `sk_live_...` (ou `sk_test_...`)
+   - `STRIPE_PRICE_ID` = `price_...` (ton produit 1€) — *optionnel, sinon prix dynamiques*
+   - `SITE_URL` = l'URL de ton déploiement (ex. `https://brasero.vercel.app`)
+   - `STRIPE_WEBHOOK_SECRET` = `whsec_...` *(optionnel, pour l'email de paiement)*
+   - `SMTP_*` / `MAIL_*` *(optionnel, pour les emails)*
+3. **Redéployer** (Vercel → Deployments → Redeploy) pour prendre en compte les variables.
+4. (Webhook, optionnel) Stripe → Developers → Webhooks → **Add endpoint** : `https://TON-DOMAINE/api/webhook`, évènement `checkout.session.completed` → copie le `whsec_...` dans les env Vercel.
+
+⚠️ Le front détecte tout seul l'environnement : sur `localhost` il appelle `http://localhost:4242` (l'Express local), partout ailleurs il appelle `/api` (les fonctions Vercel). Tu n'as donc **rien à changer dans le HTML** entre local et prod.
+
+## 3. Passer en production (générique)
 
 ### Front (au choix)
 - **Netlify / Vercel / Cloudflare Pages / GitHub Pages** : déploie le dossier racine (les fichiers HTML + `assets/`).
