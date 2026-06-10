@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brasero · Visual decks that create lasting trust</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0c0c0c;--ink:#111111;--white:#ffffff;--cream:#f7f4ef;--grey:#6b6b6b;
+  --line:rgba(0,0,0,.10);--line-light:rgba(255,255,255,.12);
+  --red:#ff0000;--orange:#f87000;
+  --grad:linear-gradient(100deg,#ff1a00 0%,#f87000 100%);
+  --grad-r:linear-gradient(135deg,#ff0000 0%,#f87000 100%);
+  --radius:20px;--maxw:1300px;--banner-h:42px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Satoshi',system-ui,sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img,svg{display:block}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;position:relative;z-index:2}
+
+.sec{position:relative;overflow:hidden}
+.sec--dark{background:var(--black);color:var(--white)}
+.sec--light{background:var(--cream);color:var(--ink)}
+.sec--white{background:#fff;color:var(--ink)}
+.sec--dark .muted{color:#9a9a9a}
+.sec--light .muted,.sec--white .muted{color:var(--grey)}
+
+.glow{position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.30),rgba(255,40,0,.10),transparent 72%);filter:blur(36px);pointer-events:none;z-index:0}
+.pxgrad-bg{background-image:url(assets/pxgrad.svg);background-size:100% 100%;image-rendering:pixelated}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:9px;font-family:inherit;font-weight:700;font-size:16px;letter-spacing:-.01em;padding:15px 26px;border-radius:100px;border:1px solid transparent;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease, background .25s ease, color .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn--grad{background:var(--grad);color:#fff;box-shadow:0 10px 26px rgba(248,80,0,.30)}
+.btn--grad:hover{box-shadow:0 16px 38px rgba(248,80,0,.42)}
+.btn--black{background:var(--black);color:#fff}
+.btn--ghost-dark{background:transparent;color:#fff;border-color:var(--line-light)}
+.btn--ghost-light{background:transparent;color:var(--ink);border-color:rgba(0,0,0,.18)}
+.btn--text{background:none;padding:15px 6px;color:var(--orange);font-weight:700}
+.btn--text:hover{transform:none;color:var(--red)}
+
+/* type */
+.h-xl{font-size:clamp(44px,6.2vw,84px);line-height:.94;font-weight:900;letter-spacing:-.04em}
+.h-lg{font-size:clamp(34px,5vw,58px);line-height:1.0;font-weight:900;letter-spacing:-.035em}
+.lead{font-size:clamp(17px,1.4vw,20px);line-height:1.55;font-weight:500}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* promo + nav (NOT sticky) */
+.promo{position:relative;z-index:6;height:var(--banner-h);background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;letter-spacing:-.01em;padding:0 16px;text-align:center}
+.promo b{font-weight:900}
+.nav{position:relative;z-index:5;background:var(--cream);border-bottom:1px solid var(--line)}
+.nav__in{max-width:var(--maxw);margin:0 auto;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.nav__logo{height:30px;width:auto;color:var(--ink)}
+.nav__links{display:flex;gap:34px;align-items:center}
+.nav__links a{font-size:15px;font-weight:600;color:#2a2a2a;transition:color .2s}
+.nav__links a:hover{color:var(--orange)}
+.nav__cta{padding:12px 22px;font-size:15px}
+@media(max-width:880px){.nav__links{display:none}}
+
+/* ===== HERO ===== */
+.hero{padding-top:54px;padding-bottom:74px}
+.hero__grid{max-width:var(--maxw);margin:0 auto;padding:0 32px;display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center}
+.hero__social{display:flex;align-items:center;gap:11px;margin-bottom:24px}
+.hero__icons{display:flex;gap:6px}
+.hero__icons i{width:24px;height:24px;border-radius:7px;display:grid;place-items:center}
+.hero__icons svg{width:14px;height:14px}
+.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}.li{background:#0a66c2}.me{background:#0866ff}.xx{background:#000}
+.hero__social span{font-size:15px;font-weight:700;color:#1a1a1a}
+.hero h1{margin-bottom:30px}
+.hero h1 .decks-accent{display:inline-flex;align-items:center;vertical-align:middle;margin:0 .14em;position:relative;width:1.4em;height:.92em}
+.decks-accent i{position:absolute;border-radius:6px;background-image:url(assets/pxgrad.svg);background-size:100% 100%;image-rendering:pixelated;box-shadow:0 6px 14px rgba(248,80,0,.35)}
+.decks-accent i:nth-child(1){width:.62em;height:.86em;left:.04em;top:.04em;transform:rotate(-11deg);opacity:.55}
+.decks-accent i:nth-child(2){width:.62em;height:.86em;left:.36em;top:0;transform:rotate(-4deg);opacity:.8}
+.decks-accent i:nth-child(3){width:.62em;height:.86em;left:.68em;top:.02em;transform:rotate(7deg)}
+.hero__actions{display:flex;gap:10px;align-items:center}
+
+/* hero fanned carousel stack, staggered heights */
+.hstack{position:relative;height:540px}
+.hslide{position:absolute;top:50%;left:50%;width:258px;aspect-ratio:1080/1350;border-radius:18px;overflow:hidden;border:1px solid rgba(0,0,0,.10);box-shadow:0 30px 60px rgba(0,0,0,.28);background:#1a1a1a}
+.hslide img{width:100%;height:100%;object-fit:cover;position:relative;z-index:2}
+.hslide .fb{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;justify-content:space-between;padding:18px;color:#fff}
+.hslide .fb .pill{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.2);padding:5px 9px;border-radius:100px}
+.hslide .fb h4{font-size:21px;font-weight:900;line-height:1.05;letter-spacing:-.02em}
+.hb1{background:linear-gradient(160deg,#8b3df0,#4a13aa)}.hb2{background:linear-gradient(160deg,#1a1a1a,#000)}.hb3{background:var(--grad-r)}
+/* staggered: left card sits high, center mid, right card low */
+.hslide.s2{--tx:-96%;--ty:-72%;--rot:rotate(-10deg);z-index:2}
+.hslide.s1{--tx:-50%;--ty:-50%;--rot:rotate(0deg);z-index:3}
+.hslide.s3{--tx:-4%;--ty:-26%;--rot:rotate(10deg);z-index:1}
+.hslide{transform:translate(var(--tx),var(--ty)) var(--rot)}
+.float{animation:float 7s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate(var(--tx),var(--ty)) var(--rot) translateY(0)}50%{transform:translate(var(--tx),var(--ty)) var(--rot) translateY(-12px)}}
+@media(max-width:980px){.hero__grid{grid-template-columns:1fr}.hstack{height:460px;margin-top:14px}}
+@media(max-width:560px){.hslide{width:198px}.hslide.s2{--tx:-90%;--ty:-66%}.hslide.s3{--tx:-10%;--ty:-30%}}
+
+/* ===== COLLECTION (dark) ===== */
+.collection{padding:108px 0}
+.collection__head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:42px;flex-wrap:wrap}
+.cstats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:54px}
+.cstat{border-top:2px solid rgba(255,255,255,.18);padding-top:18px}
+.cstat b{display:block;font-size:clamp(34px,4.4vw,54px);font-weight:900;letter-spacing:-.03em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cstat span{font-size:15px;color:#9a9a9a;font-weight:500;display:block;margin-top:8px}
+
+.carousel{position:relative}
+.ctrack{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:4px 2px 10px;scrollbar-width:none}
+.ctrack::-webkit-scrollbar{display:none}
+.cslide{flex:0 0 auto;width:224px;scroll-snap-align:start}
+/* inner deck carousel */
+.deck{position:relative;aspect-ratio:1080/1350;border-radius:16px;overflow:hidden;border:1px solid var(--line-light);background:#141414}
+.deck__track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none}
+.deck__track::-webkit-scrollbar{display:none}
+.dslide{position:relative;flex:0 0 100%;height:100%;scroll-snap-align:start}
+.dslide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.dfb{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;padding:16px;color:#fff}
+.dtag{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.2);padding:5px 9px;border-radius:100px;backdrop-filter:blur(5px)}
+.dtitle{font-size:19px;font-weight:900;letter-spacing:-.02em;line-height:1.06;margin-top:auto}
+.dnum{font-size:11px;font-weight:700;letter-spacing:.08em;opacity:.85}
+.dlines{margin-top:14px;display:flex;flex-direction:column;gap:9px}
+.dlines i{height:9px;border-radius:5px;background:rgba(255,255,255,.28)}
+.dlines i:nth-child(1){width:88%}.dlines i:nth-child(2){width:70%}.dlines i:nth-child(3){width:80%}.dlines i:nth-child(4){width:55%}
+.dcta{margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px}
+.dcta .bm{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center}
+.dcta .bm svg{width:22px;height:22px}
+.dcta b{font-size:19px;font-weight:900;letter-spacing:-.02em}
+.dcta span{font-size:12px;opacity:.85;font-weight:600}
+.darrow{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.42);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.28);color:#fff;display:grid;place-items:center;cursor:pointer;z-index:4;opacity:.55;transition:opacity .2s, background .2s}
+.deck:hover .darrow{opacity:1}
+.darrow:hover{background:var(--grad);border-color:transparent}
+.darrow svg{width:16px;height:16px}
+.dprev{left:8px}.dnext{right:8px}
+.ddots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:5px;justify-content:center;z-index:4}
+.ddots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45);transition:all .25s}
+.ddots i.on{background:#fff;width:16px;border-radius:3px}
+.cslide__meta{display:flex;justify-content:space-between;align-items:center;padding:11px 4px 0}
+.cslide__meta b{font-size:14px;font-weight:700}.cslide__meta span{font-size:12px;color:#9a9a9a}
+.cv1{background:linear-gradient(160deg,#8b3df0,#4a13aa)}.cv2{background:var(--grad-r)}.cv3{background:linear-gradient(160deg,#0f5132,#04341f)}.cv4{background:linear-gradient(160deg,#1a1a1a,#000)}.cv5{background:linear-gradient(160deg,#ff8a00,#d63a00)}.cv6{background:linear-gradient(160deg,#2b3a67,#0b1530)}
+.carrows{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+.carrow{width:48px;height:48px;border-radius:50%;border:1px solid var(--line-light);background:#161616;color:#fff;display:grid;place-items:center;cursor:pointer;transition:all .25s}
+.carrow:hover{background:var(--grad);border-color:transparent;transform:translateY(-2px)}
+.carrow svg{width:20px;height:20px}
+@media(max-width:900px){.cstats{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== COMPARISON ===== */
+.compare{padding:108px 0}
+.compare__head{text-align:center;max-width:680px;margin:0 auto 56px}
+.compare__head .lead{color:var(--grey);margin-top:16px}
+.ctable{display:grid;grid-template-columns:1.5fr 1fr 1.18fr;max-width:1000px;margin:0 auto;align-items:stretch}
+.cCol{display:flex;flex-direction:column}
+.cHead{height:80px;display:flex;align-items:center;padding:0 22px;font-size:15px;font-weight:800;letter-spacing:-.01em}
+.cRow{min-height:64px;display:flex;align-items:center;gap:10px;padding:13px 22px;border-top:1px solid var(--line);font-size:15px;line-height:1.3}
+.cCrit .cHead{color:transparent}
+.cCrit .cRow{font-weight:700;color:var(--ink)}
+.cAmateur .cHead{color:#8a8a8a}
+.cAmateur .cRow{background:#f2efe9;color:var(--grey)}
+.cAmateur .x{width:17px;height:17px;flex-shrink:0;color:#c2c2c2}
+.cBrasero{margin-top:-20px;background:#fff;border:2px solid var(--orange);border-radius:22px;overflow:hidden;box-shadow:0 34px 70px rgba(248,80,0,.20);position:relative;z-index:2}
+.cBrasero .cHead{height:100px;justify-content:center;background:var(--grad)}
+.cBrasero .cHead svg{height:26px;width:auto;color:#fff}
+.cBrasero .cRow{border-top:1px solid rgba(0,0,0,.06);font-weight:600;color:var(--ink)}
+.cBrasero .ck{width:18px;height:18px;flex-shrink:0}
+.cBrasero b{font-weight:900}
+.cBrasero em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;margin-left:5px}
+.compare__cta{text-align:center;margin-top:44px}
+.compare__cta p{font-size:15px;color:var(--grey);margin-bottom:16px;font-weight:600}
+@media(max-width:760px){.ctable{grid-template-columns:1.15fr .85fr 1fr}.cHead,.cRow{padding:11px 12px;font-size:13px;gap:7px}.cBrasero{margin-top:0}.cBrasero .cHead{height:80px}.cBrasero .cHead svg{height:20px}}
+
+/* ===== PROCESS (light) zig-zag ===== */
+.process{padding:116px 0}
+.process__head{text-align:center;max-width:680px;margin:0 auto 60px}
+.process__head .lead{color:var(--grey);margin-top:18px}
+.psteps{display:flex;flex-direction:column;gap:72px;max-width:1080px;margin:0 auto}
+.pstep{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.pstep .ui{order:2;margin:0}
+.pstep.alt .ui{order:-1}
+.pstep__head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.pstep__num{width:46px;height:46px;border-radius:14px;background:var(--grad);color:#fff;font-weight:900;display:grid;place-items:center;font-size:18px;flex-shrink:0;box-shadow:0 10px 24px rgba(248,80,0,.3)}
+.pstep h3{font-size:clamp(22px,2.4vw,30px);font-weight:900;letter-spacing:-.02em}
+.pstep p{color:var(--grey);font-size:16px;line-height:1.55;margin-bottom:14px}
+.step__tagrow{display:flex;gap:8px;flex-wrap:wrap}
+.step__tagrow span{font-size:12px;font-weight:600;color:#444;border:1px solid var(--line);padding:5px 11px;border-radius:100px}
+
+/* UI mockups */
+.ui{border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:0 18px 44px rgba(0,0,0,.08);padding:14px;overflow:hidden}
+.ui__bar{display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.ui__bar i{width:9px;height:9px;border-radius:50%;background:#e0ddd6}.ui__bar i:nth-child(1){background:#ff5a4d}.ui__bar i:nth-child(2){background:#ffbd2e}.ui__bar i:nth-child(3){background:#28c840}
+.ui__title{font-size:11px;font-weight:700;color:#999;margin-left:6px}
+.ui__chip{margin-left:auto;font-size:10px;font-weight:700;color:#fff;background:var(--grad);padding:4px 9px;border-radius:100px}
+/* hooks */
+.ui__search{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:#888;background:#f7f4ef;border:1px solid var(--line);border-radius:9px;padding:8px 11px;margin-bottom:10px}
+.ui__search svg{width:13px;height:13px}
+.hookrow{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#f7f4ef;margin-bottom:7px;font-size:12px;font-weight:600;color:#333}
+.hookrow .h{width:8px;height:24px;border-radius:4px;background:#dcd7cd;flex-shrink:0}
+.hookrow .ht{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.hookrow .score{font-size:11px;font-weight:900;color:#888;background:#fff;border:1px solid var(--line);border-radius:7px;padding:3px 7px}
+.hookrow.on{background:#fff;border:1px solid rgba(248,80,0,.45);box-shadow:0 6px 16px rgba(248,80,0,.14)}
+.hookrow.on .h{background:var(--grad)}
+.hookrow .score.hot{color:#fff;background:var(--grad);border-color:transparent}
+/* copy */
+.copy2{display:flex;gap:12px}
+.thumbs{display:flex;flex-direction:column;gap:7px}
+.thumbs i{width:30px;aspect-ratio:1080/1350;border-radius:5px;background:#ece8e1}
+.thumbs i.on{background:var(--grad)}
+.doc{flex:1;padding-top:2px}
+.doc i{display:block;height:8px;border-radius:5px;background:#ece8e1;margin-bottom:9px}
+.doc i.t{width:62%;height:13px;background:#1a1a1a;margin-bottom:13px}
+.doc i.hl{background:var(--grad);width:80%}
+.doc i.w1{width:94%}.doc i.w2{width:86%}.doc i.w3{width:72%}
+/* design */
+.canvas{display:flex;gap:14px}
+.canvas__frame{width:96px;aspect-ratio:1080/1350;border-radius:11px;background:linear-gradient(160deg,#8b3df0,#4a13aa);flex-shrink:0;padding:11px;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
+.canvas__frame .cf-tag{align-self:flex-start;font-size:8px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.22);padding:3px 7px;border-radius:100px}
+.canvas__frame b{font-size:13px;font-weight:900;line-height:1.05}
+.canvas__side{flex:1;display:flex;flex-direction:column;gap:10px}
+.panel{background:#f7f4ef;border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.panel .pl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:7px}
+.swatches{display:flex;gap:6px}
+.swatches i{width:22px;height:22px;border-radius:6px}
+.swatches i:nth-child(1){background:#ff1a00}.swatches i:nth-child(2){background:#f87000}.swatches i:nth-child(3){background:#ffd24a}.swatches i:nth-child(4){background:#111}
+.typebox{font-size:24px;font-weight:900;letter-spacing:-.02em;color:#1a1a1a;line-height:.9;display:flex;align-items:baseline;gap:8px}
+.typebox span{font-size:10px;font-weight:600;color:#aaa;letter-spacing:0}
+.layers{display:flex;flex-direction:column;gap:6px}
+.layers em{height:7px;border-radius:4px;background:#dcd7cd}
+.layers em:nth-child(1){width:90%}.layers em:nth-child(2){width:65%}.layers em:nth-child(3){width:78%}
+/* ship */
+.tiles{display:flex;gap:9px;margin-bottom:12px}
+.tile{flex:1;background:#f7f4ef;border:1px solid var(--line);border-radius:11px;padding:11px}
+.tile b{display:block;font-size:19px;font-weight:900;letter-spacing:-.02em}
+.tile span{font-size:11px;color:#999;font-weight:600}
+.chart{display:flex;align-items:flex-end;gap:7px;height:78px;padding:0 2px}
+.chart i{flex:1;border-radius:5px 5px 0 0;background:var(--grad)}
+.chart i:nth-child(1){height:34%}.chart i:nth-child(2){height:48%}.chart i:nth-child(3){height:42%}.chart i:nth-child(4){height:62%}.chart i:nth-child(5){height:74%}.chart i:nth-child(6){height:90%}.chart i:nth-child(7){height:100%}
+.ship-row{margin-top:12px}
+.mail{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#16a34a;background:rgba(22,163,74,.12);padding:7px 12px;border-radius:100px}
+.mail svg{width:14px;height:14px}
+/* loop micro-animations on process assets */
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.78)}}
+@keyframes chipPulse{0%,100%{opacity:1}50%{opacity:.45}}
+/* asset 1 : cascading hook highlight */
+@keyframes rowScan{0%,100%{background:#f7f4ef;border-color:transparent;box-shadow:none}7%,20%{background:#fff;border-color:rgba(248,80,0,.55);box-shadow:0 8px 20px rgba(248,80,0,.18)}}
+@keyframes hGlow{0%,100%{background:#dcd7cd}7%,20%{background:var(--grad)}}
+@keyframes scoreP{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.ui--hooks .hookrow{border:1px solid transparent;animation:rowScan 5.2s ease-in-out infinite}
+.ui--hooks .hookrow .h{animation:hGlow 5.2s ease-in-out infinite}
+.ui--hooks .hookrow:nth-child(3),.ui--hooks .hookrow:nth-child(3) .h{animation-delay:0s}
+.ui--hooks .hookrow:nth-child(4),.ui--hooks .hookrow:nth-child(4) .h{animation-delay:1.3s}
+.ui--hooks .hookrow:nth-child(5),.ui--hooks .hookrow:nth-child(5) .h{animation-delay:2.6s}
+.ui--hooks .hookrow:nth-child(6),.ui--hooks .hookrow:nth-child(6) .h{animation-delay:3.9s}
+.ui--hooks .score.hot{animation:scoreP 1.8s ease-in-out infinite}
+/* asset 2 : typing line + cycling slide thumbnails + caret */
+@keyframes typeline{0%{width:0}55%,100%{width:80%}}
+@keyframes thumbOn{0%,100%{background:#ece8e1}12%,24%{background:var(--grad)}}
+.ui--copy .doc i.hl{animation:typeline 3.2s ease-in-out infinite}
+.ui--copy .thumbs i{animation:thumbOn 4.8s ease-in-out infinite}
+.ui--copy .thumbs i:nth-child(1){animation-delay:0s}
+.ui--copy .thumbs i:nth-child(2){animation-delay:1.2s}
+.ui--copy .thumbs i:nth-child(3){animation-delay:2.4s}
+.ui--copy .thumbs i:nth-child(4){animation-delay:3.6s}
+.doc .caret{display:block;width:2px;height:13px;background:var(--grad);margin-top:2px;animation:blink 1s step-end infinite}
+.ui--design .canvas__frame{animation:floaty 4.5s ease-in-out infinite}
+.ui--ship .chart i{transform-origin:bottom;animation:breathe 2.8s ease-in-out infinite}
+.ui--ship .chart i:nth-child(odd){animation-delay:-1.4s}
+.ui--ship .ui__chip{animation:chipPulse 1.6s ease-in-out infinite}
+@media(max-width:820px){.pstep{grid-template-columns:1fr;gap:26px}.pstep .ui,.pstep.alt .ui{order:0}}
+
+/* ===== TESTIMONIALS (dark) uniform ===== */
+.testi{padding:108px 0}
+.testi__head{text-align:center;max-width:680px;margin:0 auto 30px}
+.trustpilot{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:0 auto 50px;background:#141414;border:1px solid var(--line-light);border-radius:100px;padding:12px 14px 12px 22px;width:max-content;max-width:100%}
+.trustpilot .tp-stars{display:flex;gap:3px}
+.trustpilot .tp-stars i{width:22px;height:22px;background:#00b67a;display:grid;place-items:center;border-radius:3px}
+.trustpilot .tp-stars svg{width:14px;height:14px}
+.trustpilot .tp-txt{font-size:14px;font-weight:600;color:#dcdcdc}
+.trustpilot .tp-txt b{color:#fff;font-weight:900}
+.trustpilot .tp-cta{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;background:#fff;color:#111;padding:10px 16px;border-radius:100px;transition:transform .25s}
+.trustpilot .tp-cta:hover{transform:translateY(-2px)}
+.trustpilot .tp-cta .g{color:#00b67a;font-weight:900}
+.testi__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.quote{background:#141414;border:1px solid var(--line-light);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column}
+.quote__stars{color:#00b67a;font-size:15px;letter-spacing:2px;margin-bottom:13px}
+.quote p{font-size:16px;line-height:1.55;font-weight:500;color:#eee;flex:1}
+.quote__by{display:flex;align-items:center;gap:12px;margin-top:22px}
+.quote__by .av{width:42px;height:42px;border-radius:50%;background:var(--grad-r);display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px}
+.quote__by b{display:block;font-size:15px;font-weight:700}
+.quote__by span{font-size:13px;color:#9a9a9a}
+@media(max-width:900px){.testi__grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.testi__grid{grid-template-columns:1fr}}
+
+/* ===== PACKAGES (light) ===== */
+.pack{padding:116px 0}
+.pack__head{text-align:center;max-width:640px;margin:0 auto 54px}
+.pack__head .lead{color:var(--grey);margin-top:16px}
+.pack__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+.deckcount{display:flex;align-items:center;height:52px;margin-bottom:14px;padding-top:6px}
+.deckcount i{width:30px;height:40px;border-radius:7px;background:var(--grad-r);border:1.5px solid #fff;box-shadow:0 5px 12px rgba(248,80,0,.24);flex:0 0 auto;margin-left:-18px;transform-origin:bottom center}
+.deckcount i:first-child{margin-left:0}
+.plan--feat .deckcount i{border-color:#1c1c1c}
+.deckcount__cap{font-size:13px;font-weight:700;color:var(--grey);margin-left:16px;white-space:nowrap}
+.plan--feat .deckcount__cap{color:#bdbdbd}
+.plan{background:#fff;border:1px solid var(--line);border-radius:24px;padding:34px 30px;display:flex;flex-direction:column;transition:transform .3s ease, box-shadow .3s}
+.plan:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(0,0,0,.08)}
+.plan--feat{background:var(--black);border-color:var(--black);color:#fff;position:relative;overflow:hidden}
+.plan--feat .plan__desc{color:#aaa}.plan--feat .plan__sub{color:#9a9a9a}.plan--feat li{color:#e4e4e4}
+.plan--feat>*{position:relative;z-index:2}
+.plan__badge{position:absolute;top:24px;right:24px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--grad);padding:6px 13px;border-radius:100px;color:#fff;z-index:3}
+.plan h3{font-size:22px;font-weight:900;letter-spacing:-.01em}
+.plan__desc{color:var(--grey);font-size:15px;margin-top:8px;line-height:1.45;min-height:42px}
+.plan__price{display:flex;align-items:baseline;gap:6px;margin:24px 0 4px}
+.plan__price b,.plan__price .grad-text{font-size:46px;font-weight:900;letter-spacing:-.03em}
+.plan__price span{font-size:15px;color:var(--grey);font-weight:500}
+.plan--feat .plan__price span{color:#9a9a9a}
+.plan__sub{font-size:14px;color:var(--grey);margin-bottom:24px}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:30px;flex:1}
+.plan li{display:flex;gap:11px;align-items:flex-start;font-size:15px;color:#333;line-height:1.4}
+.plan li svg{width:18px;height:18px;flex-shrink:0;margin-top:2px}
+.plan .btn{width:100%;justify-content:center}
+@media(max-width:900px){.pack__grid{grid-template-columns:1fr;max-width:430px;margin:0 auto}}
+
+/* ===== FAQ (dark) ===== */
+.faq{padding:108px 0}
+.faq__grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:50px;align-items:start}
+.faq__head p{color:#9a9a9a;font-size:17px;line-height:1.55;margin-top:18px;max-width:340px}
+.faq__head .btn{margin-top:26px}
+.acc{border-top:1px solid var(--line-light)}
+.acc__item{border-bottom:1px solid var(--line-light)}
+.acc__q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:inherit;font-size:18px;font-weight:700;letter-spacing:-.01em;color:#fff;padding:24px 0;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.acc__q .ico{width:26px;height:26px;flex-shrink:0;position:relative}
+.acc__q .ico::before,.acc__q .ico::after{content:"";position:absolute;background:#fff;border-radius:2px}
+.acc__q .ico::before{width:14px;height:2px;top:12px;left:6px}
+.acc__q .ico::after{width:2px;height:14px;top:6px;left:12px;transition:transform .3s ease}
+.acc__item.open .acc__q .ico::after{transform:scaleY(0)}
+.acc__item.open .acc__q{color:var(--orange)}
+.acc__a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.acc__a p{color:#9a9a9a;font-size:16px;line-height:1.6;padding:0 0 24px;max-width:620px}
+@media(max-width:820px){.faq__grid{grid-template-columns:1fr;gap:30px}}
+
+/* ===== CTA + FOOTER (dark) ===== */
+.footer{padding:30px 0 36px}
+.ctastrip__inner{border-radius:30px;padding:62px 48px;text-align:center;position:relative;overflow:hidden;color:#fff}
+.ctastrip__inner>*{position:relative;z-index:2}
+.ctastrip__inner h2{font-size:clamp(30px,4.4vw,52px);font-weight:900;letter-spacing:-.03em;line-height:1.02}
+.ctastrip__inner p{color:rgba(255,255,255,.92);font-size:18px;margin:16px auto 30px;max-width:520px;font-weight:500}
+.ctastrip__inner .btn{background:#0a0a0a;color:#fff}
+.footer__top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding:80px 0 50px;border-bottom:1px solid var(--line-light)}
+.footer__brand .nav__logo{height:32px;margin-bottom:20px;color:#fff}
+.footer__brand p{color:#9a9a9a;font-size:15px;line-height:1.55;max-width:280px}
+.footer__col h4{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-bottom:18px}
+.footer__col a{display:block;color:#cfcfcf;font-size:15px;margin-bottom:13px;transition:color .2s}
+.footer__col a:hover{color:#fff}
+.footer__bottom{display:flex;justify-content:space-between;align-items:center;padding-top:26px;gap:16px;flex-wrap:wrap}
+.footer__bottom small{color:#777;font-size:14px}
+.footer__social{display:flex;gap:10px}
+.footer__social a{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-light);display:grid;place-items:center;transition:all .25s}
+.footer__social a:hover{background:var(--grad);border-color:transparent;transform:translateY(-2px)}
+.footer__social svg{width:18px;height:18px}
+@media(max-width:820px){.footer__top{grid-template-columns:1fr 1fr;gap:34px}}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .7s ease}
+.reveal.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div class="promo">Use code <b>&nbsp;CREATEHERE&nbsp;</b> for <b>20% OFF</b>&nbsp;your first order on any package!</div>
+
+<nav class="nav">
+  <div class="nav__in">
+    <a href="#top" aria-label="Brasero home"><svg class="nav__logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></a>
+    <div class="nav__links">
+      <a href="#collection">Collection</a>
+      <a href="#process">How it works</a>
+      <a href="#testimonials">Testimonials</a>
+    </div>
+    <a href="#packages" class="btn btn--black nav__cta">Go to packages</a>
+  </div>
+</nav>
+
+<span id="top"></span>
+
+<!-- ============ HERO ============ -->
+<section class="sec sec--light hero">
+  <div class="hero__grid">
+    <div class="hero__main">
+      <div class="hero__social">
+        <div class="hero__icons">
+          <i class="ig"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="#fff" stroke="none"/></svg></i>
+          <i class="li"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.9 3.9 6 2.5 6S0 4.9 0 3.5 1.1 1 2.5 1 4.98 2.1 4.98 3.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.1c.7-1.3 2.3-2.6 4.7-2.6 5 0 5.9 3.3 5.9 7.6V24h-5v-7.1c0-1.7 0-3.9-2.4-3.9s-2.7 1.8-2.7 3.7V24h-5V8z"/></svg></i>
+          <i class="me"><svg viewBox="0 0 28 18" fill="#fff"><path d="M5.5 1C2.6 1 1 4.2 1 9s1.6 8 4.5 8c2 0 3.4-1.7 4.6-4 .9-1.7 1.7-3.6 2.4-4.9.7 1.3 1.5 3.2 2.4 4.9 1.2 2.3 2.6 4 4.6 4 2.9 0 4.5-3.2 4.5-8s-1.6-8-4.5-8c-2 0-3.4 1.7-4.6 4-.3.6-.6 1.2-.9 1.8-.3-.6-.6-1.2-.9-1.8C11.9 2.7 10.5 1 8.5 1H5.5zm0 3c.8 0 1.6 1 2.5 2.7.4.8.8 1.6 1.2 2.3-.4.7-.8 1.5-1.2 2.3C7.1 13 6.3 14 5.5 14 4.4 14 4 11.9 4 9s.4-5 1.5-5zm17 0c1.1 0 1.5 2.1 1.5 5s-.4 5-1.5 5c-.8 0-1.6-1-2.5-2.7-.4-.8-.8-1.6-1.2-2.3.4-.7.8-1.5 1.2-2.3C20.9 5 21.7 4 22.5 4z"/></svg></i>
+          <i class="xx"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.2 2h3.3l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2l7.7-8.8L1.7 2h6.8l4.7 6.2L18.2 2zm-1.2 18h1.8L7.1 3.9H5.2L17 20z"/></svg></i>
+        </div>
+        <span>Content that follows you everywhere</span>
+      </div>
+
+      <h1 class="h-xl">Visual <span class="decks-accent"><i></i><i></i><i></i></span>decks that create lasting valuable trust</h1>
+
+      <div class="hero__actions">
+        <a href="#packages" class="btn btn--text">Go to packages →</a>
+        <a href="#collection" class="btn btn--grad">Take a look</a>
+      </div>
+    </div>
+
+    <div class="hero__visual">
+      <div class="hstack">
+        <div class="hslide s2 float" style="animation-delay:-2s"><img src="assets/carousels/hero-2.jpg" alt="" onerror="this.style.display='none'"><div class="fb hb1"><span class="pill">Finance</span><h4>Vocabulaire fiscal, Part 1</h4></div></div>
+        <div class="hslide s3 float" style="animation-delay:-4s"><img src="assets/carousels/hero-3.jpg" alt="" onerror="this.style.display='none'"><div class="fb hb2"><span class="pill">Tech</span><h4>AI tools that feel illegal</h4></div></div>
+        <div class="hslide s1 float"><img src="assets/carousels/hero-1.jpg" alt="" onerror="this.style.display='none'"><div class="fb hb3"><span class="pill">Money</span><h4>The untapped $500B market</h4></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COLLECTION (dark) ============ -->
+<section class="sec sec--dark collection" id="collection">
+  <div class="glow" style="top:-120px;right:-80px"></div>
+  <div class="wrap">
+    <div class="collection__head reveal">
+      <div>
+        <h2 class="h-lg">Decks built<br>to be saved.</h2>
+      </div>
+      <p class="lead muted" style="max-width:380px">A selection of decks shipped for thematic pages across finance, mindset, fitness and tech, engineered to be saved, shared, and remembered.</p>
+    </div>
+
+    <div class="cstats" id="cstats">
+      <div class="cstat"><b data-to="1800" data-suffix="+" data-comma="1">0</b><span>Decks designed</span></div>
+      <div class="cstat"><b data-to="89" data-suffix="M+">0</b><span>Total views</span></div>
+      <div class="cstat"><b data-to="3.1" data-suffix="x" data-dec="1">0</b><span>Avg. save-rate lift</span></div>
+      <div class="cstat"><b data-to="120" data-suffix="+">0</b><span>Pages &amp; creators</span></div>
+    </div>
+
+    <div class="carousel reveal">
+      <div class="ctrack" id="ctrack"></div>
+      <div class="carrows">
+        <button class="carrow" id="cprev" aria-label="Previous decks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="carrow" id="cnext" aria-label="Next decks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARISON (white) ============ -->
+<section class="sec sec--white compare" id="compare">
+  <div class="wrap">
+    <div class="compare__head reveal">
+      <h2 class="h-lg">Amateur hour vs<br>a Brasero deck.</h2>
+      <p class="lead">Same topic, same audience. The difference is whether people keep scrolling, or stop, save, and follow.</p>
+    </div>
+
+    <div class="ctable reveal">
+      <div class="cCol cCrit">
+        <div class="cHead"></div>
+        <div class="cRow">Save &amp; conversion rate</div>
+        <div class="cRow">Hook strategy</div>
+        <div class="cRow">Copywriting</div>
+        <div class="cRow">Design &amp; branding</div>
+        <div class="cRow">Your time per week</div>
+        <div class="cRow">Turnaround</div>
+        <div class="cRow">Consistency</div>
+      </div>
+
+      <div class="cCol cAmateur">
+        <div class="cHead">Doing it yourself</div>
+        <div class="cRow">1.2% average</div>
+        <div class="cRow"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 7l10 10M17 7L7 17" stroke-linecap="round"/></svg>Guesswork</div>
+        <div class="cRow"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 7l10 10M17 7L7 17" stroke-linecap="round"/></svg>Generic captions</div>
+        <div class="cRow"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 7l10 10M17 7L7 17" stroke-linecap="round"/></svg>Inconsistent look</div>
+        <div class="cRow">8 to 10 hrs</div>
+        <div class="cRow">Whenever you can</div>
+        <div class="cRow"><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 7l10 10M17 7L7 17" stroke-linecap="round"/></svg>Hit or miss</div>
+      </div>
+
+      <div class="cCol cBrasero">
+        <div class="cHead"><svg viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></div>
+        <div class="cRow"><b>3.8% average</b><em>3.1×</em></div>
+        <div class="cRow"><svg class="ck" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Scored hook bank</div>
+        <div class="cRow"><svg class="ck" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Slide-by-slide pro copy</div>
+        <div class="cRow"><svg class="ck" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Custom brand system</div>
+        <div class="cRow"><b>~0 hrs</b>, done for you</div>
+        <div class="cRow"><svg class="ck" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>48 to 72h, by email</div>
+        <div class="cRow"><svg class="ck" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Every single week</div>
+      </div>
+    </div>
+
+    <div class="compare__cta reveal">
+      <p>Stop guessing. Start converting.</p>
+      <a href="#packages" class="btn btn--grad">Go to packages</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS (light) ============ -->
+<section class="sec sec--light process" id="process">
+  <div class="wrap">
+    <div class="process__head reveal">
+      <h2 class="h-lg">From idea to<br>scroll-stopper.</h2>
+      <p class="lead">A tight, repeatable process so your page never runs out of decks worth posting.</p>
+    </div>
+
+    <div class="psteps">
+      <!-- step 1 : text left, asset right -->
+      <div class="pstep reveal">
+        <div class="pstep__text">
+          <div class="pstep__head"><span class="pstep__num">01</span><h3>Strategy &amp; hook mapping</h3></div>
+          <p>We dig into your niche and top posts, then map a backlog of hooks engineered to make people stop and swipe.</p>
+          <div class="step__tagrow"><span>Niche audit</span><span>Hook bank</span><span>Content pillars</span></div>
+        </div>
+        <div class="ui ui--hooks">
+          <div class="ui__bar"><i></i><i></i><i></i><span class="ui__title">Hook bank</span><span class="ui__chip">scored</span></div>
+          <div class="ui__search"><svg viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4" stroke-linecap="round"/></svg>finance hooks</div>
+          <div class="hookrow"><span class="h"></span><span class="ht">The $500B market nobody talks about</span><b class="score hot">94</b></div>
+          <div class="hookrow"><span class="h"></span><span class="ht">5 mistakes killing your reach</span><b class="score">88</b></div>
+          <div class="hookrow"><span class="h"></span><span class="ht">What the top 1% do differently</span><b class="score">82</b></div>
+          <div class="hookrow"><span class="h"></span><span class="ht">Steal this framework</span><b class="score">79</b></div>
+        </div>
+      </div>
+
+      <!-- step 2 : asset left, text right -->
+      <div class="pstep alt reveal">
+        <div class="pstep__text">
+          <div class="pstep__head"><span class="pstep__num">02</span><h3>Copy &amp; narrative</h3></div>
+          <p>Every slide is written before it's designed: sharp hooks, a clean arc, and a closing slide that drives saves and follows.</p>
+          <div class="step__tagrow"><span>Slide-by-slide copy</span><span>CTA strategy</span></div>
+        </div>
+        <div class="ui ui--copy">
+          <div class="ui__bar"><i></i><i></i><i></i><span class="ui__title">deck-copy</span><span class="ui__chip">Slide 3 / 8</span></div>
+          <div class="copy2">
+            <div class="thumbs"><i></i><i></i><i></i><i></i></div>
+            <div class="doc"><i class="t"></i><i class="hl"></i><i class="w1"></i><i class="w2"></i><i class="w3"></i><span class="caret"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- step 3 : text left, asset right -->
+      <div class="pstep reveal">
+        <div class="pstep__text">
+          <div class="pstep__head"><span class="pstep__num">03</span><h3>Design &amp; art direction</h3></div>
+          <p>Your brand, leveled up. A distinct visual system (type, color, layout) so every deck is unmistakably yours and impossible to scroll past.</p>
+          <div class="step__tagrow"><span>Custom layouts</span><span>Brand system</span><span>Motion-ready</span></div>
+        </div>
+        <div class="ui ui--design">
+          <div class="ui__bar"><i></i><i></i><i></i><span class="ui__title">brasero-canvas</span></div>
+          <div class="canvas">
+            <div class="canvas__frame"><span class="cf-tag">Finance</span><b>The untapped $500B market</b></div>
+            <div class="canvas__side">
+              <div class="panel"><span class="pl">Palette</span><div class="swatches"><i></i><i></i><i></i><i></i></div></div>
+              <div class="panel"><span class="pl">Type</span><div class="typebox">Aa<span>Satoshi 900</span></div></div>
+              <div class="panel"><span class="pl">Layers</span><div class="layers"><em></em><em></em><em></em></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- step 4 : asset left, text right -->
+      <div class="pstep alt reveal">
+        <div class="pstep__text">
+          <div class="pstep__head"><span class="pstep__num">04</span><h3>Delivery &amp; iteration</h3></div>
+          <p>Post-ready decks sent directly by email. We track what performs and refine every cycle so your results keep compounding.</p>
+          <div class="step__tagrow"><span>Ready-to-post</span><span>Delivered by email</span><span>Performance review</span></div>
+        </div>
+        <div class="ui ui--ship">
+          <div class="ui__bar"><i></i><i></i><i></i><span class="ui__title">Performance</span><span class="ui__chip">live</span></div>
+          <div class="tiles"><div class="tile"><b>+312%</b><span>Saves</span></div><div class="tile"><b>48M</b><span>Reach</span></div><div class="tile"><b>4.9★</b><span>Rating</span></div></div>
+          <div class="chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="ship-row"><span class="mail"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6" stroke-linecap="round"/></svg>Decks delivered straight to your inbox</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS (dark) ============ -->
+<section class="sec sec--dark testi" id="testimonials">
+  <div class="glow" style="bottom:-140px;left:-100px"></div>
+  <div class="wrap">
+    <div class="testi__head reveal">
+      <h2 class="h-lg">Pages grow.<br>Founders stay.</h2>
+    </div>
+
+    <div class="trustpilot reveal">
+      <div class="tp-stars">
+        <i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.8L12 18.6 5.9 20.8 7.1 14l-5-4.8 6.9-.9z"/></svg></i>
+        <i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.8L12 18.6 5.9 20.8 7.1 14l-5-4.8 6.9-.9z"/></svg></i>
+        <i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.8L12 18.6 5.9 20.8 7.1 14l-5-4.8 6.9-.9z"/></svg></i>
+        <i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.8L12 18.6 5.9 20.8 7.1 14l-5-4.8 6.9-.9z"/></svg></i>
+        <i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.8L12 18.6 5.9 20.8 7.1 14l-5-4.8 6.9-.9z"/></svg></i>
+      </div>
+      <span class="tp-txt"><b>Excellent</b> · 4.9 / 5 from 214 reviews</span>
+      <a href="https://www.trustpilot.com" target="_blank" rel="noopener" class="tp-cta"><span class="g">★</span> See on Trustpilot</a>
+    </div>
+
+    <div class="testi__grid">
+      <div class="quote reveal"><div class="quote__stars">★★★★★</div><p>"Our save-rate doubled in the first month. Brasero just gets what makes a thematic page actually spread."</p><div class="quote__by"><span class="av">MK</span><div><b>Maya Klein</b><span>@mindset.mvmt · 340k</span></div></div></div>
+      <div class="quote reveal"><div class="quote__stars">★★★★★</div><p>"I send a topic on Monday and post a banger on Wednesday. Easily the best money I spend on the page each month."</p><div class="quote__by"><span class="av">JD</span><div><b>Jonas Dietrich</b><span>@wealth.notes · 510k</span></div></div></div>
+      <div class="quote reveal"><div class="quote__stars">★★★★★</div><p>"The design system is so recognizable now that people screenshot our slides and tag us. That's the dream."</p><div class="quote__by"><span class="av">SL</span><div><b>Sofia Lind</b><span>@lean.protocol · 220k</span></div></div></div>
+      <div class="quote reveal"><div class="quote__stars">★★★★★</div><p>"Hooks are where most studios fall flat. Brasero treats the first slide like a science. It shows in the reach."</p><div class="quote__by"><span class="av">RA</span><div><b>Rami Adel</b><span>@futurestack · 180k</span></div></div></div>
+      <div class="quote reveal"><div class="quote__stars">★★★★★</div><p>"We went from posting twice a week to daily without burning out. The consistency completely changed our growth."</p><div class="quote__by"><span class="av">TC</span><div><b>Tara Cho</b><span>@deepwork.io · 95k</span></div></div></div>
+      <div class="quote reveal"><div class="quote__stars">★★★★★</div><p>"Three of our decks crossed a million views this quarter. We've never had a partner this dialed in on the page."</p><div class="quote__by"><span class="av">FB</span><div><b>Felix Boucher</b><span>@founder.log · 270k</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKAGES (light) ============ -->
+<section class="sec sec--light pack" id="packages">
+  <div class="wrap">
+    <div class="pack__head reveal">
+      <h2 class="h-lg">Pick your<br>growth speed.</h2>
+      <p class="lead">Simple, flat pricing. No retainers you can't escape, no surprise invoices.</p>
+    </div>
+    <div class="pack__grid">
+      <div class="plan reveal">
+        <div class="deckcount" data-count="4" data-cap="4 decks / month"></div>
+        <h3>Starter</h3>
+        <p class="plan__desc">For pages testing the waters with consistent, on-brand decks.</p>
+        <div class="plan__price"><b>$890</b><span>/ month</span></div>
+        <p class="plan__sub">4 custom decks · ~32 slides</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>4 carousels / month</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting included</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>2 revisions per carousel</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email · 72h</li>
+        </ul>
+        <a href="#" class="btn btn--ghost-light">Choose Starter</a>
+      </div>
+
+      <div class="plan plan--feat reveal">
+        <div class="pxgrad-bg" style="position:absolute;inset:0;opacity:.16;z-index:1"></div>
+        <span class="plan__badge">Most popular</span>
+        <div class="deckcount" data-count="10" data-cap="10 decks / month"></div>
+        <h3>Growth</h3>
+        <p class="plan__desc">For pages posting consistently and scaling reach month over month.</p>
+        <div class="plan__price"><span class="grad-text">$1,690</span><span>/ month</span></div>
+        <p class="plan__sub">10 custom decks · hook bank included</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>10 carousels / month</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Monthly hook &amp; strategy session</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>2 revisions per carousel</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email · 48h</li>
+        </ul>
+        <a href="#" class="btn btn--grad">Choose Growth</a>
+      </div>
+
+      <div class="plan reveal">
+        <div class="deckcount" data-count="20" data-cap="20+ decks / month"></div>
+        <h3>Studio</h3>
+        <p class="plan__desc">A full content engine for pages and brands that post daily.</p>
+        <div class="plan__price"><b>Custom</b></div>
+        <p class="plan__sub">20+ decks · dedicated designer</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>20+ carousels / month</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated designer + strategist</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited revisions</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email · 24h priority</li>
+        </ul>
+        <a href="#" class="btn btn--ghost-light">Book a call</a>
+      </div>
+    </div>
+  </div>
+  <svg width="0" height="0"><defs><linearGradient id="chk" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient></defs></svg>
+</section>
+
+<!-- ============ FAQ (dark) ============ -->
+<section class="sec sec--dark faq" id="faq">
+  <div class="glow" style="top:-100px;left:-60px"></div>
+  <div class="wrap faq__grid">
+    <div class="faq__head reveal">
+      <h2 class="h-lg">Good<br>questions.</h2>
+      <p>Everything you need to know before working with the studio. Still curious? We're a message away.</p>
+      <a href="#packages" class="btn btn--grad">Start a project</a>
+    </div>
+    <div class="acc reveal">
+      <div class="acc__item"><button class="acc__q">What exactly is a "deck"?<span class="ico"></span></button><div class="acc__a"><p>A deck is a swipeable carousel post, typically 6 to 10 slides at 1080×1350, designed for Instagram, LinkedIn or TikTok. We handle the hook, the copy, and the design for every slide.</p></div></div>
+      <div class="acc__item"><button class="acc__q">Do you write the copy or just design?<span class="ico"></span></button><div class="acc__a"><p>Both. Every deck starts with strategy and slide-by-slide copywriting, then moves into design. You can also hand us your own copy if you prefer, pricing stays the same.</p></div></div>
+      <div class="acc__item"><button class="acc__q">How do I receive the decks?<span class="ico"></span></button><div class="acc__a"><p>Finished decks are exported post-ready at 1080×1350 and delivered straight to your inbox. Drafts land in 48 to 72 hours depending on your package, with 24-hour priority for Studio.</p></div></div>
+      <div class="acc__item"><button class="acc__q">Which niches do you work with?<span class="ico"></span></button><div class="acc__a"><p>We specialize in thematic pages and creators. Finance, mindset, fitness, tech, business and productivity are our most common, but we adapt to any niche with a clear point of view.</p></div></div>
+      <div class="acc__item"><button class="acc__q">Can I cancel anytime?<span class="ico"></span></button><div class="acc__a"><p>Yes. Packages are month-to-month with no long lock-in. Pause or cancel whenever, and you keep every deck we've created for you.</p></div></div>
+      <div class="acc__item"><button class="acc__q">What do you need from me to start?<span class="ico"></span></button><div class="acc__a"><p>Your handle, a sense of your brand, and the topics you want to cover. We handle the rest. The first week is onboarding and building your visual system.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA + FOOTER (dark) ============ -->
+<section class="sec sec--dark footer">
+  <div class="glow" style="top:120px;right:-120px"></div>
+  <div class="wrap">
+    <div class="ctastrip reveal">
+      <div class="ctastrip__inner pxgrad-bg">
+        <h2>Let's make your page<br>impossible to scroll past.</h2>
+        <p>Join the pages turning swipes into followers with decks built by Brasero.</p>
+        <a href="#packages" class="btn">Start a project</a>
+      </div>
+    </div>
+
+    <div class="footer__top">
+      <div class="footer__brand">
+        <svg class="nav__logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg>
+        <p>The carousel design studio for thematic pages and creators who want to stop the scroll.</p>
+      </div>
+      <div class="footer__col"><h4>Studio</h4><a href="#collection">Collection</a><a href="#process">How it works</a><a href="#packages">Packages</a><a href="#faq">FAQ</a></div>
+      <div class="footer__col"><h4>Company</h4><a href="#">About</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Contact</a></div>
+      <div class="footer__col"><h4>Get started</h4><a href="#packages">Book a call</a><a href="#">hello@brasero.studio</a><a href="#packages">Pricing</a></div>
+    </div>
+
+    <div class="footer__bottom">
+      <small>© 2026 Brasero Studio. All rights reserved.</small>
+      <div class="footer__social">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="#fff" stroke="none"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.5 3c.3 2 1.6 3.6 3.5 3.9v2.6c-1.3.1-2.5-.3-3.5-1v5.9c0 3-2.4 5.4-5.4 5.4S5.7 17.4 5.7 14.4 8.1 9 11.1 9c.3 0 .6 0 .9.1v2.7c-.3-.1-.6-.2-.9-.2-1.4 0-2.6 1.2-2.6 2.6S9.7 17 11.1 17s2.7-1.1 2.7-2.6V3h2.7z"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.9 3.9 6 2.5 6S0 4.9 0 3.5 1.1 1 2.5 1 4.98 2.1 4.98 3.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.1c.7-1.3 2.3-2.6 4.7-2.6 5 0 5.9 3.3 5.9 7.6V24h-5v-7.1c0-1.7 0-3.9-2.4-3.9s-2.7 1.8-2.7 3.7V24h-5V8z"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.2 2h3.3l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2l7.7-8.8L1.7 2h6.8l4.7 6.2L18.2 2zm-1.2 18h1.8L7.1 3.9H5.2L17 20z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- shared symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g_mark" x1="16" y1="56" x2="163" y2="141" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <g id="brasero-mark">
+      <path d="M89.6395 47.9895C94.3875 45.2482 94.3875 38.3952 89.6395 35.6539L81.4719 30.9384C79.2684 29.6662 76.5535 29.6662 74.35 30.9384L58.8599 39.8815C56.6564 41.1536 53.9416 41.1536 51.7381 39.8814L42.8628 34.7573C38.1148 32.0161 38.1148 25.163 42.8628 22.4218L74.3503 4.24237C76.5538 2.97016 79.2687 2.97015 81.4722 4.24236L120.108 26.5485C122.311 27.8207 123.668 30.1718 123.668 32.7163L123.668 73.9556C123.668 77.2688 120.082 79.3396 117.212 77.683C114.343 76.0264 110.756 78.0972 110.756 81.4104L110.756 119.155C110.756 124.138 116.151 127.253 120.467 124.761C122.471 123.605 123.704 121.467 123.704 119.154L123.704 85.3354C123.704 82.7909 125.061 80.4398 127.265 79.1676L150.028 66.0252C154.776 63.284 160.711 66.7105 160.711 72.193L160.711 140.146C160.711 142.691 159.354 145.042 157.15 146.314L91.03 184.488C88.8265 185.761 86.1116 185.761 83.9081 184.488L17.7879 146.314C15.5843 145.042 14.2269 142.69 14.2269 140.146L14.2268 72.0684C14.2268 66.5859 20.1617 63.1594 24.9097 65.9006L47.6719 79.0424C49.8754 80.3146 51.2329 82.6657 51.2329 85.2101L51.2333 118.781C51.2334 121.325 52.5908 123.676 54.7943 124.948L84.0442 141.836C86.1635 143.059 88.7745 143.059 90.8937 141.836C95.46 139.199 95.46 132.608 90.8937 129.972L68.5858 117.093C66.3823 115.82 65.0248 113.469 65.0248 110.925L65.0248 66.3125C65.0248 63.7681 66.3822 61.417 68.5858 60.1448L89.6395 47.9895Z" fill="url(#g_mark)"/>
+      <path d="M214.652 163.952H187.418V22.3374H216.342V89.0127C221.977 80.5609 234.373 66.8502 247.896 66.8502C274.19 66.8502 290.906 87.3224 290.906 117.937C290.906 147.048 272.312 166.394 245.642 166.394C232.495 166.394 221.226 160.571 216.155 151.932L214.652 163.952ZM216.53 116.434C216.53 130.521 225.921 139.911 239.444 139.911C253.155 139.911 261.794 130.333 261.794 116.434C261.794 102.536 253.155 92.9569 239.444 92.9569C225.921 92.9569 216.53 102.348 216.53 116.434Z" fill="currentColor"/>
+      <path d="M359.018 70.0431V97.2767H349.815C333.287 97.2767 323.333 104.602 323.333 123.196V163.952H294.409V70.231H321.642L323.145 84.1295C327.089 74.9264 335.353 68.7284 347.937 68.7284C351.317 68.7284 355.074 69.1041 359.018 70.0431Z" fill="currentColor"/>
+      <path d="M385.189 166.394C365.281 166.394 352.885 154.749 352.885 136.343C352.885 119.064 365.093 108.358 387.631 106.668L413.925 104.602V103.099C413.925 93.896 408.291 89.0127 397.961 89.0127C385.753 89.0127 379.179 93.7082 379.179 102.16H355.138C355.138 80.9366 372.605 67.0381 399.463 67.0381C426.697 67.0381 442.098 82.2513 442.098 109.109V163.952H416.555L414.677 151.556C411.672 160.196 399.276 166.394 385.189 166.394ZM395.331 144.982C406.413 144.982 414.113 139.536 414.113 128.83V123.759L399.463 125.074C386.88 126.201 382.372 129.018 382.372 135.028C382.372 141.79 386.504 144.982 395.331 144.982Z" fill="currentColor"/>
+      <path d="M442.934 134.277H470.356C470.731 140.85 475.615 144.795 484.442 144.795C493.457 144.795 497.589 141.602 497.589 136.718C497.589 133.901 496.087 130.896 489.138 129.394L471.858 125.637C454.579 121.881 446.127 114.368 446.127 97.8402C446.127 78.3071 462.843 67.0381 485.381 67.0381C507.168 67.0381 522.381 79.8097 522.381 98.7793H494.96C494.96 92.3935 491.016 88.0737 484.067 88.0737C477.493 88.0737 473.361 91.4544 473.361 96.5255C473.361 100.845 476.929 103.287 483.503 104.789L500.97 108.546C516.371 111.927 524.823 119.064 524.823 134.089C524.823 154.186 507.732 166.394 483.315 166.394C458.523 166.394 442.934 153.246 442.934 134.277Z" fill="currentColor"/>
+      <path d="M570.363 166.394C542.003 166.394 521.718 145.734 521.718 116.81C521.718 87.5102 541.439 67.0381 569.8 67.0381C599.287 67.0381 617.693 86.3833 617.693 116.998V124.323L549.515 124.698C551.206 137.094 558.155 142.916 570.926 142.916C581.82 142.916 589.52 138.972 591.586 132.211H618.069C614.688 153.059 596.094 166.394 570.363 166.394ZM569.987 90.5153C558.53 90.5153 552.145 95.5864 549.891 106.855H588.957C588.957 96.9011 581.632 90.5153 569.987 90.5153Z" fill="currentColor"/>
+      <path d="M686.283 70.0431V97.2767H677.08C660.552 97.2767 650.598 104.602 650.598 123.196V163.952H621.674V70.231H648.907L650.41 84.1295C654.354 74.9264 662.618 68.7284 675.202 68.7284C678.583 68.7284 682.339 69.1041 686.283 70.0431Z" fill="currentColor"/>
+      <path d="M679.94 116.81C679.94 87.1346 701.727 67.2259 731.778 67.2259C761.641 67.2259 783.428 87.1346 783.428 116.81C783.428 146.485 761.641 166.206 731.778 166.206C701.727 166.206 679.94 146.485 679.94 116.81ZM709.052 116.622C709.052 130.896 718.255 140.287 731.778 140.287C745.113 140.287 754.316 130.896 754.316 116.622C754.316 102.536 745.113 93.1447 731.778 93.1447C718.255 93.1447 709.052 102.536 709.052 116.622Z" fill="currentColor"/>
+    </g>
+  </defs>
+</svg>
+
+<script>
+/* reveal */
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target);}});},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* count-up stats on scroll into view */
+function animateStat(el){
+  const to=parseFloat(el.dataset.to),dec=el.dataset.dec?1:0,comma=el.dataset.comma,suf=el.dataset.suffix||'';
+  const dur=1400,t0=performance.now();
+  function fmt(v){let s=dec?v.toFixed(1):Math.round(v).toString();if(comma)s=Math.round(v).toLocaleString('en-US');return s+suf;}
+  function tick(now){let p=Math.min((now-t0)/dur,1);p=1-Math.pow(1-p,3);el.textContent=fmt(to*p);if(p<1)requestAnimationFrame(tick);}
+  requestAnimationFrame(tick);
+}
+const statObs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('b[data-to]').forEach(animateStat);statObs.unobserve(e.target);}});},{threshold:.4});
+const cstats=document.getElementById('cstats');if(cstats)statObs.observe(cstats);
+
+/* FAQ accordion */
+document.querySelectorAll('.acc__q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const item=q.parentElement,a=item.querySelector('.acc__a'),open=item.classList.contains('open');
+    document.querySelectorAll('.acc__item').forEach(i=>{i.classList.remove('open');i.querySelector('.acc__a').style.maxHeight=null;});
+    if(!open){item.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+  });
+});
+
+/* ===== Collection: build deck cards, each an inner swipeable carousel ===== */
+const decks=[
+  {h:'@finance.fr',  s:'+24k saves', g:'cv1', tag:'Finance',      title:'Vocabulaire fiscal the rich use'},
+  {h:'@wealth.notes',s:'+18k saves', g:'cv2', tag:'Money',        title:'The untapped $500B market'},
+  {h:'@lean.protocol',s:'+12k saves',g:'cv3', tag:'Wellness',     title:'The habit nobody talks about'},
+  {h:'@futurestack', s:'+31k saves', g:'cv4', tag:'Tech',         title:'AI tools that feel illegal'},
+  {h:'@founder.log', s:'+27k saves', g:'cv5', tag:'Business',     title:'The 1% millionaire method'},
+  {h:'@deepwork.io', s:'+9k saves',  g:'cv6', tag:'Productivity', title:'The 2-hour workday system'}
+];
+const bm='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z" stroke-linejoin="round"/></svg>';
+const arrowL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const arrowR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ctrack=document.getElementById('ctrack');
+const MAX_SLIDES=20;
+
+function placeholderSlides(d){
+  return [
+    `<div class="dfb ${d.g}"><span class="dtag">${d.tag}</span><div class="dtitle">${d.title}</div></div>`,
+    `<div class="dfb ${d.g}"><span class="dnum">02 / 03</span><div class="dlines"><i></i><i></i><i></i><i></i></div></div>`,
+    `<div class="dfb ${d.g}"><div class="dcta"><div class="bm">${bm}</div><b>Save this</b><span>follow ${d.h}</span></div></div>`
+  ];
+}
+function imageExists(src){return new Promise(r=>{const im=new Image();im.onload=()=>r(true);im.onerror=()=>r(false);im.src=src;});}
+/* count however many slide images were imported for this deck */
+async function findSlides(di){
+  const out=[];
+  for(let i=1;i<=MAX_SLIDES;i++){
+    const jpg=`assets/carousels/${di+1}-${i}.jpg`, png=`assets/carousels/${di+1}-${i}.png`;
+    if(await imageExists(jpg)){out.push(jpg);continue;}
+    if(await imageExists(png)){out.push(png);continue;}
+    break;
+  }
+  return out;
+}
+function renderDeck(card,slides){
+  const deck=card.querySelector('.deck');
+  const n=slides.length;
+  deck.innerHTML=
+    `<div class="deck__track">${slides.map(s=>`<div class="dslide">${s}</div>`).join('')}</div>`+
+    (n>1?`<button class="darrow dprev" aria-label="Previous slide">${arrowL}</button><button class="darrow dnext" aria-label="Next slide">${arrowR}</button><div class="ddots">${slides.map((_,si)=>`<i class="${si===0?'on':''}"></i>`).join('')}</div>`:'');
+  if(n<=1)return;
+  const track=deck.querySelector('.deck__track'),dots=deck.querySelectorAll('.ddots i');let idx=0;
+  const paint=()=>dots.forEach((dt,k)=>dt.classList.toggle('on',k===idx));
+  const go=i=>{idx=Math.max(0,Math.min(n-1,i));track.scrollTo({left:track.clientWidth*idx,behavior:'smooth'});paint();};
+  deck.querySelector('.dnext').addEventListener('click',e=>{e.stopPropagation();go(idx+1);});
+  deck.querySelector('.dprev').addEventListener('click',e=>{e.stopPropagation();go(idx-1);});
+  let to;track.addEventListener('scroll',()=>{clearTimeout(to);to=setTimeout(()=>{const i=Math.round(track.scrollLeft/track.clientWidth);if(i!==idx){idx=i;paint();}},80);});
+}
+decks.forEach((d,di)=>{
+  const card=document.createElement('div');
+  card.className='cslide';
+  card.innerHTML=`<div class="deck"></div><div class="cslide__meta"><b>${d.h}</b><span>${d.s}</span></div>`;
+  ctrack.appendChild(card);
+  renderDeck(card,placeholderSlides(d)); /* instant fallback */
+  findSlides(di).then(srcs=>{ if(srcs.length){ renderDeck(card,srcs.map(s=>`<img class="dimg" src="${s}" alt="">`)); } });
+});
+
+/* packages: floating mini deck-cards visualizing each plan's volume */
+document.querySelectorAll('.deckcount').forEach(dc=>{
+  const n=Math.min(parseInt(dc.dataset.count)||0,20);
+  const span=24; /* total fan spread in degrees */
+  let html='';
+  for(let i=0;i<n;i++){
+    const deg=n>1?(i-(n-1)/2)*(span/(n-1)):0;
+    html+=`<i style="transform:rotate(${deg.toFixed(1)}deg)"></i>`;
+  }
+  dc.innerHTML=html+(dc.dataset.cap?`<span class="deckcount__cap">${dc.dataset.cap}</span>`:'');
+});
+
+/* outer carousel: browse between decks */
+function ostep(){const s=ctrack.querySelector('.cslide');return s?s.getBoundingClientRect().width+16:240;}
+document.getElementById('cnext').addEventListener('click',()=>ctrack.scrollBy({left:ostep()*2,behavior:'smooth'}));
+document.getElementById('cprev').addEventListener('click',()=>ctrack.scrollBy({left:-ostep()*2,behavior:'smooth'}));
+</script>
+</body>
+</html>
