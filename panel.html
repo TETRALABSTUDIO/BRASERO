@@ -248,6 +248,9 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .np-sec+.np-sec{padding-top:18px;border-top:1px solid var(--line)}
 .np-sec__t{font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .np-opt{font-size:10px;font-weight:800;letter-spacing:.02em;text-transform:none;color:#9a9a9a;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:2px 8px}
+.np-fill{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;text-transform:none;letter-spacing:0;color:var(--orange);background:rgba(248,80,0,.08);border:1px solid rgba(248,80,0,.25);border-radius:100px;padding:5px 11px}
+.np-fill:hover{background:rgba(248,80,0,.14)}
+.np-fill svg{width:14px;height:14px}
 /* plan picker */
 .planpick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
 .plancard{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 13px;transition:border .18s,box-shadow .18s,transform .12s}
@@ -455,7 +458,12 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 
         <!-- Brief -->
         <div class="np-sec">
-          <div class="np-sec__t">Brief <span class="np-opt">optional</span></div>
+          <div class="np-sec__t">Brief <span class="np-opt">optional</span>
+            <button type="button" class="np-fill" id="npFill" title="Fill with a random credible sample">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3v4M3 5h4M6 17v4M4 19h4" stroke-linecap="round"/><path d="M19 3l1.6 3.4L24 8l-3.4 1.6L19 13l-1.6-3.4L14 8l3.4-1.6z" fill="currentColor" stroke="none"/><path d="M14.5 14.5l5 5" stroke-linecap="round"/></svg>
+              Auto-fill
+            </button>
+          </div>
           <div class="grid2">
             <div class="field"><label>Page / brand</label><input id="npBPage" placeholder="e.g. Wealth Notes"></div>
             <div class="field"><label>#1 goal</label><select id="npBGoal">
@@ -713,6 +721,48 @@ function npBrief(){
   Object.keys(b).forEach(k=>{ if(!b[k]) delete b[k]; });
   return Object.keys(b).length?b:null;
 }
+/* one-click random but coherent sample case — handy to test the flow fast */
+const NP_SAMPLES=[
+  {name:'Nina Park',ig:'@wealthnotes',phone:'+1 415 555 0142',page:'Wealth Notes',goal:'Sales / leads',
+   niche:'Personal finance for millennials — budgeting, index investing and money mindset, no jargon.',
+   audience:'25–38 y/o professionals starting to invest, want to build wealth but feel overwhelmed by finance content.',
+   style:'Clean, high-contrast, deep green + cream, big bold type, lots of negative space. Refs: @humphreytalks, @her.first.100k',
+   notes:'Tone should feel reassuring and expert, never salesy. Avoid stock-photo vibes.'},
+  {name:'Marcus Hale',ig:'@hale.strength',phone:'+1 312 555 0188',page:'Hale Strength',goal:'Followers growth',
+   niche:'Strength training and fat-loss for busy men over 30 — minimalist programs, science-backed.',
+   audience:'30–45 y/o men, desk jobs, limited time, tired of fitness fads and want a no-BS plan.',
+   style:'Dark, gritty, orange + charcoal, bold condensed type, before/after energy. Refs: @jeffnippard',
+   notes:'Lots of myth-busting hooks. Keep it motivational but practical, science citations welcome.'},
+  {name:'Sofia Rinaldi',ig:'@glow.lab',phone:'+44 7700 900321',page:'Glow Lab',goal:'Saves & shares',
+   niche:'Evidence-based skincare — ingredient breakdowns, routine building, debunking trends.',
+   audience:'20–35 y/o women confused by skincare marketing, want science not hype.',
+   style:'Soft pastel, glossy, rounded type, dermatology-meets-editorial. Refs: @drmamina, @theordinary',
+   notes:'Every claim must be backed. Carousel-friendly, saveable “cheat sheet” formats.'},
+  {name:'Daniel Osei',ig:'@buildwithdan',phone:'+1 646 555 0173',page:'Build with Dan',goal:'Reach & virality',
+   niche:'Indie SaaS and bootstrapping — building in public, growth tactics, founder lessons.',
+   audience:'Aspiring and early-stage indie founders, 22–40, devs and designers going solo.',
+   style:'Modern tech, electric blue + black, mono accents, clean grid. Refs: @levelsio, @marc_louvion',
+   notes:'Hooky contrarian takes do well. Keep it honest and a bit edgy.'},
+  {name:'Camille Mercier',ig:'@maison.mercier',phone:'+33 6 12 34 56 78',page:'Maison Mercier',goal:'Sales / leads',
+   niche:'Boutique interior design studio — small-space styling, mood boards, client transformations.',
+   audience:'28–50 urban homeowners and renters who want a designer look on a realistic budget.',
+   style:'Warm editorial, terracotta + off-white, serif headlines, magazine layouts. Refs: @studiomcgee',
+   notes:'Showcase transformations. Aspirational but attainable, soft warm tone.'},
+  {name:'Priya Nair',ig:'@calm.code',phone:'+1 206 555 0119',page:'Calm Code',goal:'Followers growth',
+   niche:'Mindful productivity for knowledge workers — focus systems, anti-burnout, deep work.',
+   audience:'24–40 overworked professionals and students who feel scattered and want calm focus.',
+   style:'Minimal, muted sage + sand, airy type, lots of breathing room. Refs: @aliabdaal',
+   notes:'Calming, not hustle-culture. Practical frameworks people can apply same day.'},
+];
+$('#npFill').onclick=()=>{
+  const s=NP_SAMPLES[Math.floor(Math.random()*NP_SAMPLES.length)];
+  if(!$('#npName').value.trim()) $('#npName').value=s.name;
+  if(!$('#npEmail').value.trim()) $('#npEmail').value=s.ig.replace(/^@/,'').replace(/\./g,'')+'@gmail.com';
+  $('#npIg').value=s.ig; $('#npPhone').value=s.phone;
+  $('#npBPage').value=s.page; $('#npBGoal').value=s.goal;
+  $('#npBNiche').value=s.niche; $('#npBAudience').value=s.audience;
+  $('#npBStyle').value=s.style; $('#npBNotes').value=s.notes;
+};
 $('#npForm').addEventListener('submit',async e=>{
   e.preventDefault(); $('#npErr').textContent='';
   const btn=$('#npSubmit'); btn.disabled=true; const old=btn.textContent; btn.innerHTML='<span class="spin"></span>';
