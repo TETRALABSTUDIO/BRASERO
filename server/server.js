@@ -17,7 +17,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_xxx');
 const SITE_URL = (process.env.SITE_URL || 'http://localhost:8080').replace(/\/+$/, '');
 const PORT = process.env.PORT || 4242;
 
-/* ---- Plans (prices live ONLY on the server — never trust the client) ----
+/* ---- Plans (prices live ONLY on the server - never trust the client) ----
    Amounts in cents. Subscription = 10% off, rounded to whole dollars
    to match the frontend display. */
 const PLANS = {
@@ -57,7 +57,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
     const s = event.data.object;
     const m = s.metadata || {};
 
-    // Add-on: extra decks for an existing order — attach instead of creating a new order.
+    // Add-on: extra decks for an existing order - attach instead of creating a new order.
     if (m.addon_ref) {
       (async () => {
         try {
@@ -83,14 +83,14 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
       name: m.name, planName: PLANS[m.plan]?.name || m.plan, billing: m.billing,
       amountCents: s.amount_total, handle: m.handle, ref, trackUrl,
     })).catch(console.error);
-    send(`💸 New ${m.plan || ''} order — ${m.name || s.customer_email}`,
+    send(`💸 New ${m.plan || ''} order - ${m.name || s.customer_email}`,
       `<h2>Payment received</h2>
        <p><b>Plan:</b> ${m.plan} (${m.billing === 'sub' ? 'subscription' : 'one-time'})</p>
        <p><b>Amount:</b> $${(s.amount_total / 100).toFixed(2)}</p>
-       <p><b>Name:</b> ${m.name || '—'}</p>
-       <p><b>Email:</b> ${s.customer_email || m.email || '—'}</p>
+       <p><b>Name:</b> ${m.name || '-'}</p>
+       <p><b>Email:</b> ${s.customer_email || m.email || '-'}</p>
        <p><b>Instagram:</b> ${m.handle || ''} ${m.instagram ? `(${m.instagram})` : ''}</p>
-       <p><b>Add-ons:</b> ${m.addons || '—'}</p>
+       <p><b>Add-ons:</b> ${m.addons || '-'}</p>
        <p><b>Stripe session:</b> ${s.id}</p>`
     ).catch(console.error);
   }
@@ -115,7 +115,7 @@ app.post('/api/checkout-session', async (req, res) => {
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         customer_email: email || undefined,
-        line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero — ${it.name}` } } }],
+        line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero - ${it.name}` } } }],
         success_url: `${SITE_URL}/track.html?ref=${ar}&email=${em}&addon=1`,
         cancel_url: `${SITE_URL}/track.html?ref=${ar}&email=${em}`,
         metadata: { addon_ref, addon_item, email: email || '' },
@@ -144,7 +144,7 @@ app.post('/api/checkout-session', async (req, res) => {
         price_data: {
           currency: 'usd',
           unit_amount: amount,
-          product_data: { name: `Brasero — ${PLANS[plan].name} pack` },
+          product_data: { name: `Brasero - ${PLANS[plan].name} pack` },
           ...(mode === 'subscription' ? { recurring: { interval: 'month' } } : {}),
         },
       }];
@@ -183,12 +183,12 @@ app.post('/api/onboarding', async (req, res) => {
     try { await saveOnboarding({ sessionId, email: order.email, handle: order.handle, answers }); }
     catch (e) { console.error('saveOnboarding failed', e); }
     const rows = Object.entries(answers)
-      .map(([k, v]) => `<tr><td style="padding:6px 12px;font-weight:700;vertical-align:top">${k}</td><td style="padding:6px 12px">${(v || '—').toString().replace(/</g, '&lt;')}</td></tr>`)
+      .map(([k, v]) => `<tr><td style="padding:6px 12px;font-weight:700;vertical-align:top">${k}</td><td style="padding:6px 12px">${(v || '-').toString().replace(/</g, '&lt;')}</td></tr>`)
       .join('');
-    await send(`📥 New onboarding — ${order.handle || order.email || 'client'}`,
+    await send(`📥 New onboarding - ${order.handle || order.email || 'client'}`,
       `<h2>New onboarding submitted</h2>
-       <p><b>Client:</b> ${order.name || '—'} · ${order.email || '—'}</p>
-       <p><b>Plan:</b> ${order.planName || order.plan || '—'} (${order.billing === 'sub' ? 'subscription' : 'one-time'})</p>
+       <p><b>Client:</b> ${order.name || '-'} · ${order.email || '-'}</p>
+       <p><b>Plan:</b> ${order.planName || order.plan || '-'} (${order.billing === 'sub' ? 'subscription' : 'one-time'})</p>
        <p><b>Instagram:</b> ${order.handle || ''} ${order.instagram ? `(${order.instagram})` : ''}</p>
        <table style="border-collapse:collapse;margin-top:12px">${rows}</table>`
     );

@@ -66,10 +66,10 @@ export const MEM = db ? null : {
   ],
   decks: [
     { id: 'dk-1', order_id: 'ord-demo', position: 0, status: 'script_review',
-      title: 'Hook deck — “3 myths about X”',
-      script: 'Slide 1 — Stop believing these 3 myths about X.\n\nSlide 2 — Myth #1: ...\n\nSlide 3 — Myth #2: ...\n\nSlide 4 — The truth: ...\n\nSlide 5 — Save this & follow for more.' },
+      title: 'Hook deck - “3 myths about X”',
+      script: 'Slide 1 - Stop believing these 3 myths about X.\n\nSlide 2 - Myth #1: ...\n\nSlide 3 - Myth #2: ...\n\nSlide 4 - The truth: ...\n\nSlide 5 - Save this & follow for more.' },
     { id: 'dk-2', order_id: 'ord-demo', position: 1, status: 'design_review',
-      title: 'Carousel — mini case study',
+      title: 'Carousel - mini case study',
       script: 'How we took @client from 1k to 40k in 60 days.',
       design_urls: ['assets/carousels/1-1.jpg', 'assets/carousels/1-2.jpg', 'assets/carousels/1-3.jpg'] },
     { id: 'dk-3', order_id: 'ord-demo', position: 2, status: 'writing', type: 'story', title: 'Founder story' },
@@ -268,7 +268,7 @@ function expectedElements({ plan, addons, decks }) {
 }
 
 // Top up an order's board to the full offer (plan decks + purchased upsells),
-// adding only the elements MISSING per type — never removes or touches existing
+// adding only the elements MISSING per type - never removes or touches existing
 // ones. Safe to re-run (idempotent once the board is complete).
 export async function populateOrderElements(orderId, { plan, addons, decks } = {}) {
   const existing = await decksForOrder(orderId);
@@ -503,18 +503,18 @@ export function amountFor(plan, billing) {
 // One-time upsell add-ons. Cents. Prices live on the server (never trust the client).
 export const ADDONS = {
   branding: { name: 'Social media branding',  amount: 21000 },
-  story3:   { name: 'Story pack — 3 stories', amount: 10000 },
-  story6:   { name: 'Story pack — 6 stories', amount: 22000 },
-  story9:   { name: 'Story pack — 9 + 1 stories', amount: 33000 },
-  bundle:   { name: 'Mega Bundle — branding + 9 stories + 1 free', amount: 45900 },
+  story3:   { name: 'Story pack - 3 stories', amount: 10000 },
+  story6:   { name: 'Story pack - 6 stories', amount: 22000 },
+  story9:   { name: 'Story pack - 9 + 1 stories', amount: 33000 },
+  bundle:   { name: 'Mega Bundle - branding + 9 stories + 1 free', amount: 45900 },
 };
 // Build Stripe line items for the selected add-ons (one-time price_data, mixes
-// fine with a recurring plan — Stripe invoices them once on the first invoice).
+// fine with a recurring plan - Stripe invoices them once on the first invoice).
 export function addonLineItems(addons) {
   const keys = Array.isArray(addons) ? addons.filter(a => ADDONS[a]) : [];
   return keys.map(a => ({
     quantity: 1,
-    price_data: { currency: 'usd', unit_amount: ADDONS[a].amount, product_data: { name: `Brasero — ${ADDONS[a].name}` } },
+    price_data: { currency: 'usd', unit_amount: ADDONS[a].amount, product_data: { name: `Brasero - ${ADDONS[a].name}` } },
   }));
 }
 export function addonKeys(addons) {
@@ -592,13 +592,13 @@ function emailCta(url, label) {
   return `<tr><td style="padding:20px 30px 30px">${ctaButton(url, label)}</td></tr>`;
 }
 
-// "You have something to validate" email — script ready or design ready.
+// "You have something to validate" email - script ready or design ready.
 export function reviewEmail({ name, kind, deckTitle, ref, url }) {
   const first = name ? name.split(' ')[0] : '';
   const isScript = kind === 'script';
   const heading = isScript ? `Your script is ready to review` : `Your design is ready to review`;
   const blurb = isScript
-    ? `We've written the script for <b>${deckTitle || 'your next deck'}</b>. Take a look — you can tweak the copy and approve it so we move it into design.`
+    ? `We've written the script for <b>${deckTitle || 'your next deck'}</b>. Take a look, you can tweak the copy and approve it so we move it into design.`
     : `The design for <b>${deckTitle || 'your next deck'}</b> is ready. Approve it, or send a retouch and we'll rework it.`;
   return emailShell(`
     <tr><td style="padding:30px 28px 6px">
@@ -626,11 +626,11 @@ export function clientOrderEmail({ name, planName, billing, amountCents, handle,
       </td></tr>
       <tr><td style="padding:30px 28px 6px">
         <h1 style="margin:0 0 8px;font-size:26px;letter-spacing:-1px">Order confirmed${first ? ', ' + first : ''} 🎉</h1>
-        <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">Thanks for your order — payment received. Here's your recap.</p>
+        <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">Thanks for your order, payment received. Here's your recap.</p>
       </td></tr>
       <tr><td style="padding:18px 28px">
         <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:12px">
-          <tr><td style="${cell};color:#6b6b6b">Pack</td><td align="right" style="${cell};font-weight:700">${planName || '—'}</td></tr>
+          <tr><td style="${cell};color:#6b6b6b">Pack</td><td align="right" style="${cell};font-weight:700">${planName || '-'}</td></tr>
           <tr><td style="${cell};color:#6b6b6b;${top}">Billing</td><td align="right" style="${cell};font-weight:700;${top}">${billing === 'sub' ? 'Subscription · monthly' : 'One-time'}</td></tr>
           ${handle ? `<tr><td style="${cell};color:#6b6b6b;${top}">Account</td><td align="right" style="${cell};font-weight:700;${top}">${handle}</td></tr>` : ''}
           ${ref ? `<tr><td style="${cell};color:#6b6b6b;${top}">Order ref</td><td align="right" style="${cell};font-weight:700;${top}">#${ref}</td></tr>` : ''}
@@ -655,7 +655,7 @@ export function addonClientEmail({ name, planName, count, ref, trackUrl }) {
   return emailShell(`
     <tr><td style="padding:30px 28px 6px">
       <h1 style="margin:0 0 8px;font-size:26px;letter-spacing:-1px">More decks incoming${first ? ', ' + first : ''} 🔥</h1>
-      <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">Payment received — we've added ${c} new ${planName || ''} deck${count === 1 ? '' : 's'} to your order.</p>
+      <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">Payment received. We've added ${c} new ${planName || ''} deck${count === 1 ? '' : 's'} to your order.</p>
     </td></tr>
     <tr><td style="padding:14px 28px 6px">
       <p style="margin:0 0 16px;font-size:14px;color:#333333;line-height:1.55">They're now in production and will appear in your tracker. We'll email you at each step to review.</p>

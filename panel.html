@@ -443,7 +443,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
     Guide
   </button>
   <div class="helpcard hide" id="helpCard">
-    <div class="helpcard__h"><span class="tag" id="tutTag">Step 1</span><b>Talent guide</b><button class="mx" id="helpClose" type="button">✕</button></div>
+    <div class="helpcard__h"><span class="tag" id="tutTag">Step 1</span><b>How it works</b><button class="mx" id="helpClose" type="button">✕</button></div>
     <div class="tut-vis" id="tutVis"></div>
     <div class="tut-body"><h4 id="tutTitle"></h4><p id="tutBody"></p></div>
     <div class="tut-foot">
@@ -504,7 +504,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           <div class="grid2">
             <div class="field"><label>Page / brand</label><input id="npBPage" placeholder="e.g. Wealth Notes"></div>
             <div class="field"><label>#1 goal</label><select id="npBGoal">
-              <option value="">—</option><option>Reach &amp; virality</option><option>Saves &amp; shares</option><option>Followers growth</option><option>Sales / leads</option>
+              <option value="">Select…</option><option>Reach &amp; virality</option><option>Saves &amp; shares</option><option>Followers growth</option><option>Sales / leads</option>
             </select></div>
           </div>
           <div class="field"><label>What is the page about?</label><textarea id="npBNiche" style="min-height:64px" placeholder="Niche, topics and angle…"></textarea></div>
@@ -758,35 +758,35 @@ function npBrief(){
   Object.keys(b).forEach(k=>{ if(!b[k]) delete b[k]; });
   return Object.keys(b).length?b:null;
 }
-/* one-click random but coherent sample case — handy to test the flow fast */
+/* one-click random but coherent sample case, handy to test the flow fast */
 const NP_SAMPLES=[
   {name:'Nina Park',ig:'@wealthnotes',phone:'+1 415 555 0142',page:'Wealth Notes',goal:'Sales / leads',
-   niche:'Personal finance for millennials — budgeting, index investing and money mindset, no jargon.',
+   niche:'Personal finance for millennials: budgeting, index investing and money mindset, no jargon.',
    audience:'25–38 y/o professionals starting to invest, want to build wealth but feel overwhelmed by finance content.',
    style:'Clean, high-contrast, deep green + cream, big bold type, lots of negative space. Refs: @humphreytalks, @her.first.100k',
    notes:'Tone should feel reassuring and expert, never salesy. Avoid stock-photo vibes.'},
   {name:'Marcus Hale',ig:'@hale.strength',phone:'+1 312 555 0188',page:'Hale Strength',goal:'Followers growth',
-   niche:'Strength training and fat-loss for busy men over 30 — minimalist programs, science-backed.',
+   niche:'Strength training and fat-loss for busy men over 30: minimalist programs, science-backed.',
    audience:'30–45 y/o men, desk jobs, limited time, tired of fitness fads and want a no-BS plan.',
    style:'Dark, gritty, orange + charcoal, bold condensed type, before/after energy. Refs: @jeffnippard',
    notes:'Lots of myth-busting hooks. Keep it motivational but practical, science citations welcome.'},
   {name:'Sofia Rinaldi',ig:'@glow.lab',phone:'+44 7700 900321',page:'Glow Lab',goal:'Saves & shares',
-   niche:'Evidence-based skincare — ingredient breakdowns, routine building, debunking trends.',
+   niche:'Evidence-based skincare: ingredient breakdowns, routine building, debunking trends.',
    audience:'20–35 y/o women confused by skincare marketing, want science not hype.',
    style:'Soft pastel, glossy, rounded type, dermatology-meets-editorial. Refs: @drmamina, @theordinary',
    notes:'Every claim must be backed. Carousel-friendly, saveable “cheat sheet” formats.'},
   {name:'Daniel Osei',ig:'@buildwithdan',phone:'+1 646 555 0173',page:'Build with Dan',goal:'Reach & virality',
-   niche:'Indie SaaS and bootstrapping — building in public, growth tactics, founder lessons.',
+   niche:'Indie SaaS and bootstrapping: building in public, growth tactics, founder lessons.',
    audience:'Aspiring and early-stage indie founders, 22–40, devs and designers going solo.',
    style:'Modern tech, electric blue + black, mono accents, clean grid. Refs: @levelsio, @marc_louvion',
    notes:'Hooky contrarian takes do well. Keep it honest and a bit edgy.'},
   {name:'Camille Mercier',ig:'@maison.mercier',phone:'+33 6 12 34 56 78',page:'Maison Mercier',goal:'Sales / leads',
-   niche:'Boutique interior design studio — small-space styling, mood boards, client transformations.',
+   niche:'Boutique interior design studio: small-space styling, mood boards, client transformations.',
    audience:'28–50 urban homeowners and renters who want a designer look on a realistic budget.',
    style:'Warm editorial, terracotta + off-white, serif headlines, magazine layouts. Refs: @studiomcgee',
    notes:'Showcase transformations. Aspirational but attainable, soft warm tone.'},
   {name:'Priya Nair',ig:'@calm.code',phone:'+1 206 555 0119',page:'Calm Code',goal:'Followers growth',
-   niche:'Mindful productivity for knowledge workers — focus systems, anti-burnout, deep work.',
+   niche:'Mindful productivity for knowledge workers: focus systems, anti-burnout, deep work.',
    audience:'24–40 overworked professionals and students who feel scattered and want calm focus.',
    style:'Minimal, muted sage + sand, airy type, lots of breathing room. Refs: @aliabdaal',
    notes:'Calming, not hustle-culture. Practical frameworks people can apply same day.'},
@@ -805,7 +805,7 @@ $('#npFill').onclick=()=>{
 const pill=(txt,col,bg)=>`<span style="font-size:10.5px;font-weight:800;color:${col};background:${bg};border-radius:100px;padding:3px 10px;white-space:nowrap">${txt}</span>`;
 const TUT=[
   { tag:'Step 1', title:'All your elements are here',
-    body:'On the left, every card is one element of the order — carousels, stories and branding. Click one to open it on the right.',
+    body:'On the left, every card is one element of the order: carousels, stories and branding. Click one to open it on the right.',
     vis:`<div style="width:100%;max-width:196px;display:flex;flex-direction:column;gap:8px">
       <div style="background:#fff;border:2px solid var(--orange);border-radius:12px;padding:9px 11px;box-shadow:0 8px 18px rgba(248,80,0,.16)">
         <div style="font-weight:800;font-size:12px;margin-bottom:7px">▢ Deck 1</div>
@@ -822,7 +822,7 @@ const TUT=[
         <span style="font-size:10px;font-weight:800;border:1px solid var(--line);border-radius:100px;padding:5px 11px">Save draft</span>
         ${pill('Send script →','#fff','var(--grad)')}</div></div>` },
   { tag:'Step 3', title:'Add the design',
-    body:'Once the script is approved, the element switches to design — upload up to 10 images and send them to the client.',
+    body:'Once the script is approved, the element switches to design. Upload up to 10 images and send them to the client.',
     vis:`<div style="width:100%;max-width:224px">
       <div style="font-size:10px;color:var(--grey);font-weight:700;margin-bottom:7px">2/10 images</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
@@ -831,7 +831,7 @@ const TUT=[
         <div style="aspect-ratio:1;border-radius:9px;border:1.5px dashed var(--line);display:grid;place-items:center;font-size:9px;font-weight:800;color:var(--grey);text-align:center;line-height:1.2">+ Add</div></div>
       <div style="display:flex;justify-content:flex-end;margin-top:9px">${pill('Send design →','#fff','var(--grad)')}</div></div>` },
   { tag:'Step 4', title:'The client reviews',
-    body:'The client approves the design — or asks for a retouch. If they do, update the images and resend until it’s perfect.',
+    body:'The client approves the design, or requests a retouch. They get the number of retouches included in their offer, and the same applies to add-on elements. Once those are used up, ask them to contact us directly instead of retouching further.',
     vis:`<div style="display:flex;flex-direction:column;gap:10px;align-items:center">
       ${pill('Design · awaiting client','#2563eb','rgba(37,99,235,.12)')}
       <div style="font-size:18px;color:var(--grey);line-height:1">↓</div>
