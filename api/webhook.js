@@ -1,4 +1,4 @@
-import { stripe, send, markPaid } from './_lib.js';
+import { stripe, send, sendTo, markPaid, PLANS, clientOrderEmail } from './_lib.js';
 
 // Stripe needs the raw request body to verify the signature.
 export const config = { api: { bodyParser: false } };
@@ -25,7 +25,17 @@ export default async function handler(req, res) {
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object;
     const m = s.metadata || {};
+    const ref = s.id.slice(-8).toUpperCase();
     try { await markPaid(s.id, s.amount_total); } catch (e) { console.error(e); }
+    // Confirmation email to the customer
+    try {
+      const to = s.customer_email || m.email;
+      await sendTo(to, 'Your Brasero order is confirmed 🎉', clientOrderEmail({
+        name: m.name, planName: PLANS[m.plan]?.name || m.plan, billing: m.billing,
+        amountCents: s.amount_total, handle: m.handle, ref,
+      }));
+    } catch (e) { console.error('client email failed', e); }
+    // Internal notification (only if MAIL_TO is set)
     try {
       await send(`💸 New ${m.plan || ''} order — ${m.name || s.customer_email}`,
         `<h2>Payment received</h2>

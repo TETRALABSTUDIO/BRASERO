@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { saveOrder, markPaid, saveOnboarding } from '../api/_lib.js';
+import { saveOrder, markPaid, saveOnboarding, sendTo, clientOrderEmail } from '../api/_lib.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -53,6 +53,11 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
     const s = event.data.object;
     const m = s.metadata || {};
     markPaid(s.id, s.amount_total).catch(console.error);
+    const to = s.customer_email || m.email;
+    sendTo(to, 'Your Brasero order is confirmed 🎉', clientOrderEmail({
+      name: m.name, planName: PLANS[m.plan]?.name || m.plan, billing: m.billing,
+      amountCents: s.amount_total, handle: m.handle, ref: s.id.slice(-8).toUpperCase(),
+    })).catch(console.error);
     send(`💸 New ${m.plan || ''} order — ${m.name || s.customer_email}`,
       `<h2>Payment received</h2>
        <p><b>Plan:</b> ${m.plan} (${m.billing === 'sub' ? 'subscription' : 'one-time'})</p>
