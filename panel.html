@@ -155,6 +155,35 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .dl.late{background:rgba(220,38,38,.12);color:#c0291f}
 .dlrow{margin-top:9px}
 
+/* right detail, same design as the client tracker */
+.detail__head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.detail__titleinput{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.1;border:none;background:transparent;padding:5px 7px;flex:1;min-width:0}
+.detail__titleinput:hover{background:var(--soft)}
+.detail__instr{font-size:14.5px;color:var(--ink);line-height:1.55;margin:8px 0 16px;max-width:64ch}
+.detail__instr b{color:var(--orange)}
+.note-line{font-size:14px;color:var(--ink);line-height:1.55;margin:0 0 12px}
+.note-line b{color:var(--orange)}
+.board__detail textarea{width:100%;min-height:180px}
+.tscript{margin-top:14px}
+.tscript summary{cursor:pointer;font-weight:700;font-size:12.5px;color:var(--grey)}
+.board__detail .imgcount{font-size:11.5px;color:var(--grey);font-weight:700;margin-top:14px}
+.board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:11px;margin-top:10px}
+.board__detail .gal figure{position:relative;aspect-ratio:1080/1350;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.board__detail .gal figure img{width:100%;height:100%;object-fit:cover;display:block}
+.board__detail .gal .x{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:12px;display:grid;place-items:center;padding:0;line-height:1;cursor:pointer}
+.board__detail .gal .x:hover{background:#c33}
+.board__detail .gal .adder{aspect-ratio:1080/1350;border-radius:10px;border:1.5px dashed var(--line);background:var(--soft);display:grid;place-items:center;cursor:pointer;color:var(--grey);font-size:12px;font-weight:700;text-align:center;line-height:1.2}
+.board__detail .gal .adder:hover{border-color:var(--orange);color:var(--orange)}
+/* command bar (talent actions + progress) at the bottom edge */
+.cmdbar{border-top:1px solid var(--line);background:var(--soft)}
+.cmdbar:empty{display:none}
+.cmdbar__row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 24px}
+.cmdbar__meta{display:flex;align-items:center;gap:12px;margin-right:auto}
+.cmdbar__hint{font-size:12.5px;color:var(--grey);font-weight:600}
+.foot-count{font-size:12.5px;color:var(--grey);font-weight:700}
+.cmdprog{height:8px;background:rgba(0,0,0,.08);overflow:hidden}
+.cmdprog i{display:block;height:100%;background:var(--grad);transition:width .6s cubic-bezier(.4,0,.2,1)}
+
 /* team */
 .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
 .tcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:14px}
@@ -258,7 +287,10 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
             <div class="board__list-head"><button class="b-grad b-sm" id="addDeck">+ Add element</button></div>
             <div id="deckList"></div>
           </aside>
-          <div class="board__right"><div class="board__detail" id="deckDetail"></div></div>
+          <div class="board__right">
+            <div class="board__detail" id="deckDetail"></div>
+            <div class="cmdbar" id="deckCmd"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -389,6 +421,7 @@ function renderProjects(){
 /* ---------- detail ---------- */
 $('#back').onclick=()=>{ $('#detail').classList.add('hide'); $('#overview').classList.remove('hide'); REF=''; };
 $('#deckList').addEventListener('click',e=>{ const it=e.target.closest('[data-pick]'); if(!it) return; SELDECK=it.dataset.pick; renderDeckList(); renderDeckDetail(); });
+$('#deckDetail').addEventListener('click',e=>{ const x=e.target.closest('[data-x]'); if(!x) return; x.closest('figure')?.remove(); const det=$('#deckDetail'), c=det.querySelector('[data-count]'); if(c) c.textContent=det.querySelectorAll('[data-imgs] img').length; });
 async function openOrder(ref){
   REF=ref.replace(/^#/,'');
   const d=await api('/api/admin',{action:'get',ref:REF});
@@ -397,6 +430,7 @@ async function openOrder(ref){
   $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
   $('#oMeta').textContent=[d.order.plan?planName(d.order.plan)+' pack':'',d.order.email].filter(Boolean).join(' · ');
   $('#oDeadline').innerHTML=dlBadge(d.order,(d.decks||[]).length);
+  $('#addDeck').style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   SELDECK=null; renderBoard(d.decks||[]);
 }
 $('#addDeck').onclick=async()=>{ const title=prompt('Element title','New deck'); if(title===null) return; const d=await api('/api/admin',{action:'add_deck',ref:REF,title}); renderBoard(d.decks||[]); };
@@ -422,54 +456,65 @@ function renderDeckList(){
 }
 function renderDeckDetail(){
   const d=DECKS.find(x=>x.id===SELDECK);
-  if(!d){ $('#deckDetail').innerHTML=''; return; }
-  $('#deckDetail').innerHTML=deckCard(d);
+  if(!d){ $('#deckDetail').innerHTML='<div class="empty">Select an element on the left.</div>'; $('#deckCmd').innerHTML=''; return; }
+  $('#deckDetail').innerHTML=detailHTML(d);
+  $('#deckCmd').innerHTML=cmdHTML(d);
   bind(d);
 }
 function imagesOf(d){ return Array.isArray(d.design_urls)&&d.design_urls.length?d.design_urls:(d.design_url?[d.design_url]:[]); }
-function deckCard(d){
-  const scriptApproved=['designing','design_review','revision','done'].includes(d.status);
-  const [pc,pl]=PILL[d.status]||PILL.writing; const imgs=imagesOf(d);
-  let scriptStage;
-  if(!scriptApproved){
-    const sent=d.status==='script_review';
-    scriptStage=`<div class="stage"><div class="stage__h"><span class="num">1</span> Script</div>
-      ${sent?'<div class="statusline wait">⏳ Sent, awaiting client approval</div><br>':''}
-      <textarea data-f="script" placeholder="Write the post script / copy…">${esc(d.script)}</textarea>
-      <div class="actions"><button class="b-ghost b-sm" data-a="save_deck">Save draft</button>
-        <button class="b-grad b-sm" data-a="send_script">${sent?'Update & resend':'Send script to client →'}</button></div></div>`;
-  } else { scriptStage=`<div class="stage approved"><div class="stage__h"><span class="num">✓</span> Script · approved by client</div><div class="scriptview">${esc(d.script)||'No script yet'}</div></div>`; }
-  let designStage;
-  if(!scriptApproved){ designStage=`<div class="stage locked"><div class="stage__h"><span class="num">2</span> Design</div><div class="lockmsg">🔒 Unlocks once the client approves the script.</div></div>`; }
-  else {
-    const sent=d.status==='design_review', done=d.status==='done', rev=d.status==='revision';
-    designStage=`<div class="stage ${done?'approved':''}"><div class="stage__h"><span class="num">${done?'✓':'2'}</span> Design ${done?'· approved by client':''}</div>
-      ${rev&&d.revision_note?`<div class="note"><b>Client retouch:</b> ${esc(d.revision_note)}</div>`:''}
-      ${sent?'<div class="statusline wait">⏳ Sent, awaiting client approval</div>':''}${done?'<div class="statusline ok">✓ Approved & live</div>':''}
-      <div class="imgcount"><span data-count>${imgs.length}</span>/10 images</div>
-      <div class="imgs" data-imgs>${imgs.map(u=>thumb(u)).join('')}${done?'':'<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>'}</div>
-      ${done?'':`<div class="actions"><button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_design">${sent||rev?'Update & resend':'Send design to client →'}</button></div>`}</div>`;
+const T_INSTR={
+  writing:'✍️ Write the script for this element, then send it to the client for approval.',
+  script_review:'📤 Script sent, awaiting the client’s approval. You can still update &amp; resend.',
+  designing:'🎨 Script approved, upload the design and send it to the client.',
+  design_review:'📤 Design sent, awaiting the client’s approval.',
+  revision:'✏️ The client requested a retouch, update the design and resend.',
+  done:'✅ Approved by the client, ready to post.',
+};
+function tThumb(u,editable){ return `<figure><img src="${esc(u)}" alt="">${editable?'<button class="x" data-x title="Remove">✕</button>':''}</figure>`; }
+function detailHTML(d){
+  const scriptEdit=d.status==='writing'||d.status==='script_review';
+  const head=`<div class="detail__head"><input class="detail__titleinput" data-f="title" value="${esc(d.title)}"><button class="b-del b-sm" data-a="delete_deck">Delete</button></div>`;
+  const instr=`<p class="detail__instr">${T_INSTR[d.status]||''}</p>`;
+  let body;
+  if(scriptEdit){
+    body=`<textarea data-f="script" placeholder="Write the post script / copy…">${esc(d.script)}</textarea>`;
+  } else {
+    const imgs=imagesOf(d), editable=d.status!=='done';
+    const note=(d.status==='revision'&&d.revision_note)?`<p class="note-line"><b>Client retouch:</b> ${esc(d.revision_note)}</p>`:'';
+    const grid=`<div class="imgcount"><span data-count>${imgs.length}</span>/10 images</div>
+      <div class="gal" data-imgs>${imgs.map(u=>tThumb(u,editable)).join('')}${editable?'<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>':''}</div>`;
+    const sc=d.script?`<details class="tscript"><summary>View approved script</summary><div class="scriptview">${esc(d.script)}</div></details>`:'';
+    body=note+grid+sc;
   }
-  return `<div class="deck" data-deck="${d.id}"><div class="deck__top"><input data-f="title" value="${esc(d.title)}"><span class="pill ${pc}">${pl}</span><button class="b-del b-sm" data-a="delete_deck">Delete</button></div>${scriptStage}${designStage}</div>`;
+  return head+instr+`<div class="detail__body">${body}</div>`;
 }
-function thumb(u){ return `<div class="thumb"><img src="${esc(u)}" alt=""><button class="x" data-x title="Remove">✕</button></div>`; }
+function cmdHTML(d){
+  const [pc,pl]=PILL[d.status]||PILL.writing, imgs=imagesOf(d);
+  let actions='';
+  if(d.status==='writing') actions=`<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_script">Send script →</button>`;
+  else if(d.status==='script_review') actions=`<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_script">Update &amp; resend</button>`;
+  else if(d.status==='designing') actions=`<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_design">Send design →</button>`;
+  else if(d.status==='design_review'||d.status==='revision') actions=`<button class="b-grad b-sm" data-a="send_design">Update &amp; resend</button>`;
+  const meta=`<div class="cmdbar__meta">${imgs.length?`<span class="foot-count">${imgs.length} image${imgs.length>1?'s':''}</span>`:''}<span class="pill ${pc}">${pl}</span></div>`;
+  const right=actions?`<div class="actions">${actions}</div>`:`<span class="cmdbar__hint">Approved, nothing to do here.</span>`;
+  return `<div class="cmdbar__row">${meta}${right}</div><div class="cmdprog"><i style="width:${DPCT[d.status]||10}%"></i></div>`;
+}
 function bind(d){
-  const card=document.querySelector(`[data-deck="${d.id}"]`); if(!card) return;
-  const val=f=>{ const el=card.querySelector(`[data-f="${f}"]`); return el?el.value:undefined; };
-  const gatherImgs=()=>[...card.querySelectorAll('[data-imgs] img')].map(i=>i.getAttribute('src'));
-  const countEl=card.querySelector('[data-count]'); const refreshCount=()=>{ if(countEl) countEl.textContent=card.querySelectorAll('[data-imgs] img').length; };
-  const file=card.querySelector('[data-file]');
+  const det=$('#deckDetail'), root=document.querySelector('.board__right'); if(!root) return;
+  const val=f=>{ const el=det.querySelector(`[data-f="${f}"]`); return el?el.value:undefined; };
+  const gatherImgs=()=>[...det.querySelectorAll('[data-imgs] img')].map(i=>i.getAttribute('src'));
+  const file=det.querySelector('[data-file]');
   if(file) file.onchange=async e=>{
-    const adder=card.querySelector('.adder'); const slots=10-card.querySelectorAll('[data-imgs] img').length;
+    const adder=det.querySelector('.adder'); const slots=10-det.querySelectorAll('[data-imgs] img').length;
     const files=[...e.target.files].slice(0,Math.max(0,slots));
-    if(e.target.files.length>slots) alert('Max 10 images per deck, extra files were skipped.');
-    for(const f of files){ const url=await compress(f); adder.insertAdjacentHTML('beforebegin',thumb(url)); }
-    refreshCount(); e.target.value='';
+    if(e.target.files.length>slots) alert('Max 10 images per element, extra files were skipped.');
+    for(const f of files){ const url=await compress(f); adder.insertAdjacentHTML('beforebegin',tThumb(url,true)); }
+    const c=det.querySelector('[data-count]'); if(c) c.textContent=det.querySelectorAll('[data-imgs] img').length;
+    e.target.value='';
   };
-  card.addEventListener('click',e=>{ if(e.target.matches('[data-x]')){ e.target.closest('.thumb').remove(); refreshCount(); }});
-  card.querySelectorAll('[data-a]').forEach(btn=>btn.onclick=async()=>{
+  root.querySelectorAll('[data-a]').forEach(btn=>btn.onclick=async()=>{
     const a=btn.dataset.a;
-    if(a==='delete_deck'&&!confirm('Delete this deck?')) return;
+    if(a==='delete_deck'&&!confirm('Delete this element?')) return;
     if(a==='send_script'&&!confirm('Send this script to the client for approval?')) return;
     if(a==='send_design'){ if(!gatherImgs().length){ alert('Add at least one image first.'); return; } if(!confirm('Send this design to the client for approval?')) return; }
     const body={action:a,ref:REF,deckId:d.id,title:val('title'),script:val('script'),images:gatherImgs()};
