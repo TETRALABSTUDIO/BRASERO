@@ -109,11 +109,13 @@ export default async function handler(req, res) {
       if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
       if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
       let decks = await decksForOrder(order.id);
-      // Backfill: orders created before auto-population open empty — seed the full
-      // element list (plan decks + upsells) on first open so the talent fills directly.
-      if (!decks.length) {
-        await populateOrderElements(order.id, { plan: order.plan, addons: order.addons });
-        decks = await decksForOrder(order.id);
+      // Top up the board to the full offer (plan decks + upsells) as long as no work
+      // has started — so old/partial orders show every element ready to fill, while
+      // any order already in progress is left untouched.
+      const started = decks.some(d => d.script || d.design_url || (Array.isArray(d.design_urls) && d.design_urls.length) || (d.status && d.status !== 'writing'));
+      if (!started) {
+        const r = await populateOrderElements(order.id, { plan: order.plan, addons: order.addons });
+        if (r.created) decks = await decksForOrder(order.id);
       }
       return res.json({ ok: true, order: pub(order), decks });
     }

@@ -251,35 +251,41 @@ export async function addItemsToOrder(ref, key) {
   return { ok: true, order, created, type: it.type, name: it.name };
 }
 
-// The production elements a checkout add-on should spawn on the board.
-// Keys match the checkout add-ons (branding, story3/6/9, bundle).
-function addonElements(key) {
+// The full set of production elements an order's offer implies, by type.
+// Carousels come from the plan (or an explicit count); upsells add stories/branding.
+function expectedElements({ plan, addons, decks }) {
   const brandTitles = ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'LinkedIn CTA buttons'];
-  const stories = n => Array.from({ length: n }, (_, i) => ({ title: `Story ${i + 1}`, type: 'story' }));
-  if (key === 'branding') return brandTitles.map(title => ({ title, type: 'branding' }));
-  if (key === 'bundle')   return [...brandTitles.map(title => ({ title, type: 'branding' })), ...stories(10)];
-  const STORY_N = { story3: 3, story6: 6, story9: 10 };
-  if (STORY_N[key]) return stories(STORY_N[key]);
-  return [];
+  const nCarousel = decks != null ? Math.max(0, Math.min(50, Number(decks) || 0)) : (PLAN_DECKS[plan] || 0);
+  let nStory = 0, branding = [];
+  for (const key of addonKeys(addons)) {
+    if (key === 'branding') branding = brandTitles.slice();
+    else if (key === 'bundle') { branding = brandTitles.slice(); nStory += 10; }
+    else if (key === 'story3') nStory += 3;
+    else if (key === 'story6') nStory += 6;
+    else if (key === 'story9') nStory += 10;
+  }
+  return { nCarousel, nStory, branding };
 }
 
-// Seed every element an order needs so the talent opens a fully-populated board:
-// the plan's carousel decks first, then one element per purchased upsell.
-// Idempotent — skips an order that already has elements (safe to re-run on webhook retries).
+// Top up an order's board to the full offer (plan decks + purchased upsells),
+// adding only the elements MISSING per type — never removes or touches existing
+// ones. Safe to re-run (idempotent once the board is complete).
 export async function populateOrderElements(orderId, { plan, addons, decks } = {}) {
   const existing = await decksForOrder(orderId);
-  if (existing.length) return { created: 0, skipped: true };
-  const nCarousel = decks != null ? Math.max(0, Math.min(50, Number(decks) || 0)) : (PLAN_DECKS[plan] || 0);
-  let pos = 0, created = 0;
-  for (let i = 0; i < nCarousel; i++) {
+  const have = { carousel: 0, story: 0, branding: 0 };
+  for (const d of existing) { const t = d.type || 'carousel'; have[t] = (have[t] || 0) + 1; }
+  const want = expectedElements({ plan, addons, decks });
+  let pos = existing.length, created = 0;
+  for (let i = have.carousel; i < want.nCarousel; i++) {
     if (await createDeck(orderId, { title: `Deck ${i + 1}`, position: pos++, type: 'carousel' })) created++;
   }
-  for (const key of addonKeys(addons)) {
-    for (const el of addonElements(key)) {
-      if (await createDeck(orderId, { title: el.title, position: pos++, type: el.type })) created++;
-    }
+  for (let i = have.story; i < want.nStory; i++) {
+    if (await createDeck(orderId, { title: `Story ${i + 1}`, position: pos++, type: 'story' })) created++;
   }
-  return { created, skipped: false };
+  for (let i = have.branding; i < want.branding.length; i++) {
+    if (await createDeck(orderId, { title: want.branding[i], position: pos++, type: 'branding' })) created++;
+  }
+  return { created };
 }
 
 // Random 8-char public ref for manually-created (non-Stripe) orders.
