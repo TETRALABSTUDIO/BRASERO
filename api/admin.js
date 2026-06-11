@@ -1,6 +1,6 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
-  assignOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
+  assignOrder, createManualOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
   signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail } from './_lib.js';
 
 const pub = o => ({ ref: o.ref || orderRef(o.stripe_session_id), name: o.name, email: o.email, plan: o.plan, talent_email: o.talent_email || '', created_at: o.created_at });
@@ -83,6 +83,24 @@ export default async function handler(req, res) {
         } catch (e) { console.error('assign email', e); }
       }
       return res.json({ ok: true, orders: (await adminListOrders()).map(pub) });
+    }
+    if (action === 'create_order') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (!b.email && !b.name) return res.status(400).json({ ok: false, error: 'missing' });
+      const r = await createManualOrder({ name: b.name, email: b.email, instagram: b.instagram, handle: b.handle, plan: b.plan, billing: b.billing, talent_email: b.talentEmail, decks: b.decks });
+      if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      if (b.talentEmail) {   // notify the assigned talent
+        try {
+          const talent = await getTalentByEmail(b.talentEmail);
+          await sendTo(b.talentEmail, '🚀 New project assigned to you', talentAssignedEmail({
+            name: talent?.name, ref: r.ref, clientName: b.name,
+            planName: b.plan ? (PLANS[b.plan]?.name || b.plan) : '', panelUrl: `${siteUrl(req)}/panel.html`,
+          }));
+        } catch (e) { console.error('assign email', e); }
+      }
+      const rows = await adminListOrders();
+      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o), state: orderState(dk), items: dk.length }; }));
+      return res.json({ ok: true, ref: r.ref, orders });
     }
 
     /* ----- order-scoped ----- */

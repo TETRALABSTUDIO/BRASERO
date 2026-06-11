@@ -249,6 +249,35 @@ export async function addItemsToOrder(ref, key) {
   return { ok: true, order, created, type: it.type, name: it.name };
 }
 
+// Random 8-char public ref for manually-created (non-Stripe) orders.
+const randRef = () => crypto.randomBytes(6).toString('hex').slice(0, 8).toUpperCase();
+
+// Owner-created project from the panel: behaves exactly like a real paid order
+// (gets a ref, status 'paid', plan amount, and seeded deck rows).
+export async function createManualOrder({ name, email, instagram, handle, plan, billing, talent_email, decks }) {
+  const bill = billing || 'once';
+  const amount = PLANS[plan] ? amountFor(plan, bill) : 0;
+  const n = decks != null ? Math.max(0, Math.min(50, Number(decks) || 0)) : (PLAN_DECKS[plan] || 0);
+  const row = {
+    stripe_session_id: 'manual_' + crypto.randomBytes(9).toString('hex'),
+    ref: randRef(), status: 'paid', plan: plan || '', billing: bill, amount,
+    name: name || '', email: String(email || '').trim().toLowerCase(),
+    instagram: instagram || '', handle: handle || '',
+    talent_email: talent_email ? String(talent_email).trim().toLowerCase() : null,
+  };
+  if (MEM) {
+    const o = { id: uid(), created_at: new Date().toISOString(), ...row };
+    MEM.orders.push(o);
+    for (let i = 0; i < n; i++) await createDeck(o.id, { title: `Deck ${i + 1}`, position: i, type: 'carousel' });
+    return { ok: true, order: o, ref: row.ref };
+  }
+  if (!db) return { error: 'no_store' };
+  const { data, error } = await db.from('orders').insert(row).select('*').maybeSingle();
+  if (error) return { error: error.message };
+  for (let i = 0; i < n; i++) await createDeck(data.id, { title: `Deck ${i + 1}`, position: i, type: 'carousel' });
+  return { ok: true, order: data, ref: row.ref };
+}
+
 /* ---- Talent accounts + project assignment ---- */
 const pubTalent = t => t && ({ email: t.email, name: t.name || '', is_owner: !!t.is_owner, photo: t.photo || '' });
 
