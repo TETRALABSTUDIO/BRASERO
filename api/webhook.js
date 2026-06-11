@@ -1,4 +1,4 @@
-import { stripe, send, sendTo, markPaid, PLANS, clientOrderEmail, siteUrl } from './_lib.js';
+import { stripe, send, sendTo, markPaid, PLANS, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, siteUrl } from './_lib.js';
 
 // Stripe needs the raw request body to verify the signature.
 export const config = { api: { bodyParser: false } };
@@ -26,6 +26,23 @@ export default async function handler(req, res) {
     const s = event.data.object;
     const m = s.metadata || {};
     const ref = s.id.slice(-8).toUpperCase();
+
+    // Add-on: extra items bought for an existing order, attach, don't create a new order.
+    if (m.addon_ref) {
+      try {
+        const r = m.addon_item ? await addItemsToOrder(m.addon_ref, m.addon_item) : await addDecksToOrder(m.addon_ref, m.plan);
+        const label = m.addon_item ? (r.name || m.addon_item) : `${PLANS[m.plan]?.name || m.plan} pack`;
+        const to = s.customer_email || m.email;
+        const trackUrl = to ? `${siteUrl(req)}/track.html?ref=${encodeURIComponent(m.addon_ref)}&email=${encodeURIComponent(to)}` : '';
+        await sendTo(to, 'Your new Brasero items are on the way 🔥', addonClientEmail({
+          name: m.name, planName: label, count: r.created || 0, ref: m.addon_ref, trackUrl,
+        }));
+        await send(`➕ Add-on on #${m.addon_ref}: ${label} (+${r.created || 0})`,
+          `<p><b>Order:</b> #${m.addon_ref}</p><p><b>Item:</b> ${label} · +${r.created || 0}</p><p><b>Amount:</b> $${(s.amount_total / 100).toFixed(2)}</p><p><b>Email:</b> ${s.customer_email || m.email || '-'}</p>`);
+      } catch (e) { console.error('addon failed', e); }
+      return res.json({ received: true });
+    }
+
     try { await markPaid(s.id, s.amount_total); } catch (e) { console.error(e); }
     // Confirmation email to the customer
     try {
@@ -45,6 +62,7 @@ export default async function handler(req, res) {
          <p><b>Name:</b> ${m.name || '—'}</p>
          <p><b>Email:</b> ${s.customer_email || m.email || '—'}</p>
          <p><b>Instagram:</b> ${m.handle || ''} ${m.instagram ? `(${m.instagram})` : ''}</p>
+         <p><b>Add-ons:</b> ${m.addons || '—'}</p>
          <p><b>Stripe session:</b> ${s.id}</p>`);
     } catch (e) { console.error(e); }
   }

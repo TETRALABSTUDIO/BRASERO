@@ -141,7 +141,7 @@ h1.title{font-size:clamp(25px,3.6vw,38px);font-weight:900;letter-spacing:-.038em
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
 const STEPS=[
   {tag:'Step 1 · Your page',short:'Your page',title:['Let’s set up your ','page','.'],
-    sub:'We pulled in your Instagram — just confirm and fill the rest.',
+    sub:'We pulled in your Instagram, just confirm and fill the rest.',
     fields:[
       {key:'page',label:'Page / brand name',type:'text',placeholder:'e.g. Wealth Notes',required:true},
       {key:'handle',label:'Handle & platform',type:'text',placeholder:'@yourpage · Instagram',required:true},
@@ -156,7 +156,7 @@ const STEPS=[
       {key:'challenge',label:'Biggest content challenge today?',type:'textarea',placeholder:'Running out of ideas, low saves, inconsistent look…',required:false},
     ]},
   {tag:'Step 3 · Your brand',short:'Brand',title:['Make it ','unmistakably',' yours.'],
-    sub:'The look, the feel, the references — the more you share, the sharper your decks.',
+    sub:'The look, the feel, the references, the more you share, the sharper your decks.',
     fields:[
       {key:'style',label:'Describe your brand vibe',type:'textarea',placeholder:'Bold, high-contrast, warm orange accents, big type…',required:false},
       {key:'inspo',label:'Accounts or posts you love',type:'textarea',placeholder:'Paste 1–3 links for inspiration…',required:false},
@@ -259,7 +259,7 @@ function submit(){
   view.innerHTML=`<div class="done">
     <div class="done__ic"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
     <h2>Order confirmed${first}! 🎉</h2>
-    <p>Payment received and your brief is in. Here's a recap${order.email?` — a copy goes to <b>${esc(order.email)}</b>`:''}.</p>
+    <p>Payment received and your brief is in. Here's a recap${order.email?`, a copy goes to <b>${esc(order.email)}</b>`:''}.</p>
 
     <div class="oc-card">
       <div class="oc-head">

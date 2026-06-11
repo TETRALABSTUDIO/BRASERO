@@ -67,6 +67,87 @@ a{color:inherit;text-decoration:none}
 .tot em{font-style:normal;font-size:14px;color:var(--grey)}
 .stripe{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#635bff;margin-bottom:16px}
 .cardbox{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--soft);font-size:15px;color:#9a9a9a;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+
+/* ===== upsell add-ons ===== */
+.addons{display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
+.addon{display:flex;width:100%;text-align:left;font-family:inherit;background:#fff;border:1.5px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
+.addon:hover{border-color:rgba(248,80,0,.5);box-shadow:0 12px 30px rgba(0,0,0,.07);transform:translateY(-2px)}
+.addon.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
+.addon__vis{width:142px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;position:relative;overflow:hidden}
+.ph{width:100%;height:100%;min-height:96px;display:flex;align-items:center;justify-content:center;background:#eceae4;color:#bcb6aa}
+.ph svg{width:36px;height:36px}
+.addon__vis--branding{background:linear-gradient(160deg,#fff3ec,#ffd9c4)}
+.addon__vis--stories{background:linear-gradient(160deg,#1a1a1a,#0a0a0a)}
+.addon__body{flex:1;padding:15px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.addon__head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.addon__head{justify-content:space-between}
+.addon__head b{font-size:20px;font-weight:900;letter-spacing:-.03em;color:var(--ink)}
+.addon__price{font-size:20px;font-weight:900;letter-spacing:-.03em;color:var(--ink);white-space:nowrap;margin-left:auto}
+.addon__feats{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:2px 0}
+.addon__feats li{list-style:none;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#333;font-weight:600;line-height:1.25}
+.addon__feats li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.addon__add{margin-top:6px;align-self:flex-start;font-size:13.5px;font-weight:800;color:var(--orange);display:inline-flex;align-items:center;gap:5px}
+.addon.on .addon__add{color:#15803d}
+/* branding mock, project palette (orange + dark), fills its space */
+.brv{width:100%;display:flex;flex-direction:column;gap:12px;justify-content:center}
+.brv__banner{height:38px;border-radius:9px;background:var(--grad);position:relative}
+.brv__pf{position:absolute;left:11px;bottom:-14px;width:32px;height:32px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.22);background:#ddd center/cover url(assets/team.jpg)}
+.brv__nets{display:flex;gap:7px;margin-top:13px}
+.brv__nets i{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:900;color:#fff;font-style:normal;background:#0c0c0c}
+.brv__cta{align-self:flex-start;font-size:10px;font-weight:800;color:#fff;background:var(--grad);padding:5px 13px;border-radius:100px}
+/* stories mock, orange + dark cards, fills its space */
+.stv{display:flex;gap:7px;align-items:center;justify-content:center;width:100%}
+.stv__card{width:31px;height:92px;border-radius:8px;position:relative;box-shadow:0 8px 18px rgba(0,0,0,.34)}
+.stv__card--1{background:var(--grad)}
+.stv__card--2{background:linear-gradient(160deg,#262626,#070707);transform:scale(1.1);z-index:2}
+.stv__card--3{background:linear-gradient(160deg,#ff9a4d,#f85a00)}
+.stv__seg{position:absolute;top:5px;left:5px;right:5px;height:3px;border-radius:2px;background:rgba(255,255,255,.4);overflow:hidden}
+.stv__seg::after{content:"";position:absolute;inset:0;width:55%;background:#fff;border-radius:2px}
+/* expandable story pack */
+.addon--story{display:block;padding:0;cursor:default}
+.addon--story:hover{transform:none;box-shadow:none}
+.addon--story.on,.addon--story.open{border-color:var(--orange)}
+.addon__trigger{display:flex;width:100%;text-align:left;font-family:inherit;background:none;border:none;cursor:pointer}
+.addon__trigger:hover .addon__add{color:#c64600}
+.storyopts{display:flex;flex-direction:column;gap:10px;padding:14px;border-top:1px solid var(--line);background:var(--soft)}
+.storyopts[hidden]{display:none}
+.storyopt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
+.storyopt:hover{border-color:rgba(248,80,0,.5);box-shadow:0 8px 20px rgba(0,0,0,.06);transform:translateY(-1px)}
+.storyopt.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
+.storyopt__fan{position:relative;width:142px;height:102px;flex-shrink:0;overflow:hidden}
+.storyopt__fan i{position:absolute;bottom:-6px;left:50%;width:40px;height:100px;border-radius:7px;background:#fff;border:1px solid var(--line);box-shadow:0 7px 16px rgba(0,0,0,.16);transform-origin:50% 100%}
+.storyopt__fan::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,#fff 98%);pointer-events:none}
+.storyopt__info{display:flex;flex-direction:column;gap:4px;margin-right:auto}
+.storyopt__count{font-size:19px;font-weight:900;letter-spacing:-.025em;line-height:1}
+.storyopt__free{align-self:flex-start;display:inline-block;text-transform:uppercase;font-size:9.5px;font-weight:800;letter-spacing:.04em;line-height:1;color:#3d2a00;background:linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a);padding:4px 8px;border-radius:100px;box-shadow:0 3px 8px rgba(200,144,26,.35)}
+.storyopt__sub{font-size:12px;color:var(--grey);font-weight:600}
+.storyopt__price{font-size:16px;font-weight:900;white-space:nowrap}
+/* mega bundle (orange gradient outline) */
+.addon--bundle{border:2px solid transparent;background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box}
+.addon--bundle:hover{border-color:transparent;box-shadow:0 14px 34px rgba(248,80,0,.16)}
+.addon--bundle.on{box-shadow:0 0 0 2px rgba(248,80,0,.2)}
+.addon--bundle .addon__body{gap:8px}
+.bundle__top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bundle__badge{font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--grad);padding:4px 10px;border-radius:100px;box-shadow:0 4px 10px rgba(248,80,0,.3)}
+.bundle__pct{font-size:16px;font-weight:800;color:#15803d;background:rgba(22,163,74,.12);padding:3px 11px;border-radius:100px;white-space:nowrap}
+.bundle__head{display:flex;align-items:baseline;justify-content:space-between;gap:9px}
+.bundle__name{font-size:20px;font-weight:900;letter-spacing:-.03em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bundle__prices{display:flex;align-items:baseline;gap:8px;margin-left:auto}
+.bundle__price{font-size:20px;font-weight:900;letter-spacing:-.03em;color:var(--ink)}
+.bundle__head s{color:#bbb;text-decoration:line-through;font-size:14px;font-weight:700}
+.addon__vis--bundle{background:linear-gradient(160deg,#1a1a1a,#0a0a0a)}
+.bnv{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.bnv .stv__card{width:24px;height:74px}
+.bnv__pf{position:absolute;left:5px;top:8px;width:29px;height:29px;border-radius:50%;border:2px solid #fff;background:#ddd center/cover url(assets/team.jpg);box-shadow:0 4px 10px rgba(0,0,0,.32);z-index:4}
+/* recap add-on lines */
+.recap__addons{display:flex;flex-direction:column;gap:9px;margin:14px 0 0;padding-top:14px;border-top:1px dashed var(--line)}
+.recap__addon{display:flex;align-items:center;gap:8px;font-size:14px;color:#333}
+.recap__addon svg{width:16px;height:16px;flex-shrink:0}
+.recap__addon b{margin-left:auto;font-weight:800}
+.recap__total{margin-top:14px}
+.recap__fine{font-size:11px;color:var(--grey);margin-top:8px;line-height:1.45}
+.linkbtn{background:none;border:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--grey);cursor:pointer;padding:10px;width:100%}
+
 @media(max-width:860px){.co{grid-template-columns:1fr}.recap{order:-1}}
 </style>
 </head>
@@ -92,7 +173,7 @@ a{color:inherit;text-decoration:none}
 
 <main class="co">
   <section class="card" id="left">
-    <div class="steps"><i class="on"></i><i></i></div>
+    <div class="steps"><i class="on"></i><i></i><i></i></div>
     <h1 class="co__title">Your details</h1>
     <p class="co__sub">We'll use these to set up your project and send your decks.</p>
     <form id="contact">
@@ -133,6 +214,109 @@ const fmt=n=>'$'+n.toLocaleString('en-US');
 const price=()=>mode==='sub'?Math.round(plan.price*0.9):plan.price;
 const chk='<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#f87000"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+/* one-time upsell add-ons (prices enforced server-side too) */
+const ADDONS={
+  branding:{name:'Social media branding',price:210,desc:'Matching profile photo, X / LinkedIn / Facebook banners, plus LinkedIn CTA buttons, all in your brand style.'},
+  story3:{name:'Story pack',count:3,price:100},
+  story6:{name:'Story pack',count:6,price:220},
+  story9:{name:'Story pack',count:9,price:330,free:true},
+  bundle:{name:'Mega Bundle',price:459,full:540},
+};
+const STORY_KEYS=['story3','story6','story9'];
+const selectedAddons=new Set();
+let selectedStory=null, storyOpen=false, recapBtn=null;
+const addonsSum=()=>[...selectedAddons].reduce((s,k)=>s+ADDONS[k].price,0);
+const addonLabel=k=>{const a=ADDONS[k];return a.count?`${a.name} · ${a.count} stor${a.count>1?'ies':'y'}`:a.name;};
+
+/* feature bullets shown in the upsell cards (2 columns) */
+const BRANDING_FEATS=['Profile photo','LinkedIn CTAs','X / Twitter banner','LinkedIn banner','Facebook banner','On-brand style'];
+const STORY_FEATS=['Custom written','On-brand design','You approve each','Post-ready files'];
+const BUNDLE_FEATS=['Full social branding','9 stories + 1 free','Everything in-brand','One-time payment'];
+const featsHTML=arr=>`<ul class="addon__feats">${arr.map(f=>`<li>${f}</li>`).join('')}</ul>`;
+
+// TODO: swap this placeholder for the real upsell illustrations
+function placeholderVis(){
+  return `<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 15l-5-5L5 20" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+}
+function addonVisual(){ return placeholderVis(); }
+// white card fan that spreads up from a shared bottom pivot (longer/thinner for stories)
+function fanHTML(n){
+  const step=Math.min(13,70/Math.max(1,n-1)), mid=(n-1)/2;
+  let h='';
+  for(let i=0;i<n;i++) h+=`<i style="transform:translateX(-50%) rotate(${((i-mid)*step).toFixed(1)}deg)"></i>`;
+  return h;
+}
+function brandingCardHTML(){
+  const a=ADDONS.branding, on=selectedAddons.has('branding');
+  return `<button type="button" class="addon ${on?'on':''}" data-addon="branding">
+    <div class="addon__vis addon__vis--branding">${addonVisual('branding')}</div>
+    <div class="addon__body">
+      <div class="addon__head"><b>${a.name}</b><span class="addon__price">+${fmt(a.price)}</span></div>
+      ${featsHTML(BRANDING_FEATS)}
+      <span class="addon__add">${on?'✓ Added to order':'+ Add to order'}</span>
+    </div>
+  </button>`;
+}
+function storyOptHTML(k){
+  const a=ADDONS[k];
+  return `<button type="button" class="storyopt ${selectedStory===k?'on':''}" data-story="${k}">
+    <span class="storyopt__fan" aria-hidden="true">${fanHTML(a.count)}</span>
+    <span class="storyopt__info">
+      <b class="storyopt__count">${a.count} Stories</b>
+      ${a.free?'<span class="storyopt__free">+1 Free</span>':''}
+      <span class="storyopt__sub">one-time</span>
+    </span>
+    <span class="storyopt__price">${fmt(a.price)}</span>
+  </button>`;
+}
+function storyCardHTML(){
+  const priceTxt=selectedStory?'+'+fmt(ADDONS[selectedStory].price):'from '+fmt(100);
+  return `<div class="addon addon--story ${selectedStory?'on':''} ${storyOpen?'open':''}">
+    <button type="button" class="addon__trigger" data-story-toggle>
+      <div class="addon__vis addon__vis--stories">${addonVisual('stories')}</div>
+      <div class="addon__body">
+        <div class="addon__head"><b>Story pack</b><span class="addon__price">${priceTxt}</span></div>
+        ${featsHTML(STORY_FEATS)}
+        <span class="addon__add">${storyOpen?'▲ Hide story packs':'▾ Choose your story pack'}</span>
+      </div>
+    </button>
+    <div class="storyopts" ${storyOpen?'':'hidden'}>
+      ${storyOptHTML('story3')}${storyOptHTML('story6')}${storyOptHTML('story9')}
+    </div>
+  </div>`;
+}
+function selectStory(k){
+  selectedAddons.delete('bundle');
+  STORY_KEYS.forEach(s=>selectedAddons.delete(s));
+  selectedStory=k;
+  if(k) selectedAddons.add(k);
+}
+function bundleVisual(){ return placeholderVis(); }
+function bundleCardHTML(){
+  const a=ADDONS.bundle, on=selectedAddons.has('bundle');
+  return `<button type="button" class="addon addon--bundle ${on?'on':''}" data-bundle>
+    <div class="addon__vis addon__vis--bundle">${bundleVisual()}</div>
+    <div class="addon__body">
+      <div class="bundle__top">
+        <span class="bundle__badge">★ Special offer</span>
+        <span class="bundle__pct">Save ${fmt(a.full-a.price)}</span>
+      </div>
+      <div class="bundle__head">
+        <b class="bundle__name">Mega Bundle</b>
+        <span class="bundle__prices"><s>${fmt(a.full)}</s><span class="bundle__price">+${fmt(a.price)}</span></span>
+      </div>
+      ${featsHTML(BUNDLE_FEATS)}
+      <span class="addon__add">${on?'✓ Added to order':'+ Add the bundle'}</span>
+    </div>
+  </button>`;
+}
+function toggleBundle(){
+  if(selectedAddons.has('bundle')){ selectedAddons.delete('bundle'); return; }
+  selectedAddons.delete('branding');
+  STORY_KEYS.forEach(s=>selectedAddons.delete(s)); selectedStory=null;
+  selectedAddons.add('bundle');
+}
+
 function usernameFrom(link){
   if(!link) return '';
   const m=String(link).trim().replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i);
@@ -159,7 +343,7 @@ function loadAvatar(username){
       c.getContext('2d').drawImage(a,0,0,c.width,c.height);
       resolve(c.toDataURL('image/jpeg',0.85)); // embedded, never dead-links
     }catch(e){resolve(live);}};
-    a.onerror=()=>{ // CORS-blocked or not found — retry plain to tell them apart
+    a.onerror=()=>{ // CORS-blocked or not found, retry plain to tell them apart
       const b=new Image();
       b.onload=()=>resolve(live);                       // exists → keep live URL
       b.onerror=()=>resolve(fallbackAvatar(username));  // not found → generated avatar
@@ -187,9 +371,10 @@ addBtn.addEventListener('click',async()=>{
 });
 igInput.addEventListener('input',()=>{ig=null;igResult.innerHTML='';addBtn.disabled=false;addBtn.textContent='Add';});
 
-function updatePayBtn(){const b=document.getElementById('pay-btn');if(b)b.textContent=`Pay ${fmt(price())}${mode==='sub'?' / mo':''}`;}
+function updatePayBtn(){const b=document.getElementById('pay-btn');if(b)b.textContent=`Pay ${fmt(price()+addonsSum())}${mode==='sub'?' / mo':''}`;}
 function renderRecap(){
   const sub=mode==='sub';
+  const adds=[...selectedAddons], aSum=addonsSum(), total=price()+aSum;
   document.getElementById('recap').innerHTML=`
     <div class="recap__top"><img class="recap__logo" src="${plan.logo}" alt="${plan.name}" style="height:30px;width:auto">${plan.feat?'<span class="badge">Popular</span>':''}</div>
     <p class="recap__sub">Custom carousel decks, done-for-you.</p>
@@ -198,10 +383,17 @@ function renderRecap(){
       <button data-m="sub" class="${sub?'on':''}">Subscribe <span class="save">−10%</span></button>
     </div>
     <ul>${plan.items.map(it=>`<li>${chk}${it}</li>`).join('')}</ul>
-    <div class="recap__row"><span>${sub?'Billed monthly':'One-time payment'}</span>
+    <div class="recap__row"><span>${sub?'Plan · billed monthly':'Plan · one-time'}</span>
       <div class="tot">${sub?`<s>${fmt(plan.price)}</s>`:''}<b>${fmt(price())}</b><em>${sub?'/mo':''}</em></div>
-    </div>`;
+    </div>
+    ${adds.length?`
+      <div class="recap__addons">${adds.map(k=>`<div class="recap__addon">${chk}<span>${addonLabel(k)}</span><b>+${fmt(ADDONS[k].price)}</b></div>`).join('')}</div>
+      <div class="recap__row recap__total"><span>Total${sub?' due today':''}</span><div class="tot"><b>${fmt(total)}</b></div></div>
+      ${sub?`<p class="recap__fine">Then ${fmt(price())}/mo. Add-ons are billed once.</p>`:''}
+    `:''}
+    ${recapBtn?`<button type="button" class="btn btn--grad pay" id="recap-cta">${recapBtn.label}</button>`:''}`;
   document.querySelectorAll('.bill button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.m;renderRecap();updatePayBtn();}));
+  if(recapBtn){const b=document.getElementById('recap-cta');if(b)b.addEventListener('click',recapBtn.fn);}
 }
 renderRecap();
 
@@ -216,11 +408,43 @@ document.getElementById('contact').addEventListener('submit',async e=>{
     name:fd.get('name'),email:fd.get('email'),instagram,
     handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone')};
   sessionStorage.setItem('brasero_order',JSON.stringify(order));
+  showAddons(order); // step 2 → upsell add-ons, then payment
+});
+
+/* ===== step 2 : upsell add-ons ===== */
+function renderAddons(){ document.getElementById('addons').innerHTML=brandingCardHTML()+storyCardHTML()+bundleCardHTML(); }
+function showAddons(order){
+  document.getElementById('left').innerHTML=`
+    <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+    <h1 class="co__title">Add the finishing touches</h1>
+    <p class="co__sub">Optional one-time add-ons, designed in your brand style, add them now and skip a second checkout.</p>
+    <div class="addons" id="addons"></div>
+    <p class="note">Add-ons are optional, they're billed once.</p>`;
+  renderAddons();
+  document.getElementById('addons').addEventListener('click',ev=>{
+    if(ev.target.closest('[data-bundle]')){ toggleBundle(); renderAddons(); renderRecap(); return; }
+    if(ev.target.closest('[data-story-toggle]')){ storyOpen=!storyOpen; renderAddons(); return; }
+    const op=ev.target.closest('[data-story]');
+    if(op){ const k=op.dataset.story; selectStory(selectedStory===k?null:k); renderAddons(); renderRecap(); return; }
+    const ad=ev.target.closest('[data-addon]');
+    if(ad){ const k=ad.dataset.addon; if(selectedAddons.has(k)){selectedAddons.delete(k);}else{selectedAddons.delete('bundle');selectedAddons.add(k);} renderAddons(); renderRecap(); return; }
+  });
+  recapBtn={label:'Continue to payment →',fn:()=>proceedToPayment(order)};
+  renderRecap();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===== step 3 : payment (Stripe or simulated) ===== */
+async function proceedToPayment(order){
+  order.billing=mode; order.price=price();
+  order.addons=[...selectedAddons];
+  order.addonsTotal=addonsSum();
+  sessionStorage.setItem('brasero_order',JSON.stringify(order));
   if(API!==null){
-    const btn=e.submitter;if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
+    const btn=document.getElementById('recap-cta');if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
     try{
       const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({plan:key,billing:mode,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram})});
+        body:JSON.stringify({plan:key,billing:mode,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,addons:order.addons})});
       const d=await r.json();
       if(d.url){location.href=d.url;return;}
       throw new Error(d.error||'No checkout URL');
@@ -232,18 +456,19 @@ document.getElementById('contact').addEventListener('submit',async e=>{
     return;
   }
   showPayment(order); // simulated demo
-});
+}
 
 function showPayment(order){
+  recapBtn=null; renderRecap();
   document.getElementById('left').innerHTML=`
-    <div class="steps"><i class="on"></i><i class="on"></i></div>
+    <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
     <h1 class="co__title">Payment</h1>
     <p class="co__sub">Paying as <b>${order.email}</b>.</p>
     <div class="stripe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg> Powered by Stripe · test mode</div>
     <div class="field"><label>Card number</label><div class="cardbox"><span>4242 4242 4242 4242</span><span>VISA</span></div></div>
     <div class="row2"><div class="field"><label>Expiry</label><div class="cardbox"><span>12 / 34</span></div></div><div class="field"><label>CVC</label><div class="cardbox"><span>123</span></div></div></div>
-    <button class="btn btn--grad pay" id="pay-btn">Pay ${fmt(price())}${mode==='sub'?' / mo':''}</button>
-    <p class="note">⚠️ Simulated checkout — no real card is charged.<br>Wire this button to your live Stripe Checkout later.</p>`;
+    <button class="btn btn--grad pay" id="pay-btn">Pay ${fmt(price()+addonsSum())}${mode==='sub'?' / mo':''}</button>
+    <p class="note">⚠️ Simulated checkout, no real card is charged.<br>Wire this button to your live Stripe Checkout later.</p>`;
   document.getElementById('pay-btn').addEventListener('click',()=>{
     const o=JSON.parse(sessionStorage.getItem('brasero_order'));o.billing=mode;o.price=price();
     sessionStorage.setItem('brasero_order',JSON.stringify(o));

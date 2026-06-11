@@ -24,10 +24,10 @@ a{color:inherit;text-decoration:none}
 .btn[disabled]{opacity:.5;pointer-events:none}
 
 .glow{position:fixed;width:560px;height:560px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.13),transparent 72%);filter:blur(30px);pointer-events:none;top:-200px;right:-160px;z-index:0}
-.top{display:flex;align-items:center;justify-content:space-between;max-width:880px;margin:0 auto;padding:18px 24px 2px;position:relative;z-index:2}
+.top{display:flex;align-items:center;justify-content:space-between;max-width:1240px;margin:0 auto;padding:18px 24px 2px;position:relative;z-index:2}
 .logo-svg{height:26px;width:auto;color:var(--ink)}
 .top a.help{font-size:13px;font-weight:700;color:var(--grey)}
-.shell{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:8px 24px 60px}
+.shell{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:8px 24px 60px}
 
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
 .eyebrow .pxa{display:inline-flex;gap:3px}
@@ -48,66 +48,132 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .obadge{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:7px 14px}
 .obadge b{font-weight:900}
 
-/* progress */
-.prog-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 24px;box-shadow:0 12px 34px rgba(0,0,0,.05);margin-bottom:26px}
-.pbar{height:8px;border-radius:100px;background:rgba(0,0,0,.07);overflow:hidden;margin:4px 0 20px}
-.pbar i{display:block;height:100%;border-radius:100px;background:var(--grad);transition:width .7s cubic-bezier(.4,0,.2,1)}
-.steps{display:flex;gap:6px;overflow-x:auto}
-.step{flex:1;min-width:92px;text-align:center}
-.step .dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;background:#fff;border:1px solid var(--line);color:#bdbdbd;font-weight:900;font-size:13px;transition:.35s}
-.step.done .dot,.step.active .dot{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(248,80,0,.28)}
-.step.done .dot{font-size:0}.step.done .dot::after{content:"✓";font-size:15px}
-.step .lab{font-size:11.5px;font-weight:700;color:#bdbdbd;transition:.35s;letter-spacing:-.01em}
-.step.done .lab,.step.active .lab{color:var(--ink)}
-
-/* decks */
-.sec-h{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin:0 0 12px}
-.decks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;align-items:stretch}
-.deck{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 17px;box-shadow:0 8px 24px rgba(0,0,0,.045)}
-.deck__top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px}
-.deck__title{font-size:16px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
-.pill{font-size:11.5px;font-weight:800;letter-spacing:.02em;padding:5px 11px;border-radius:100px;white-space:nowrap}
+/* ===== decks ===== */
+.sec-h{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin:0 0 14px}
+.pill{font-size:11px;font-weight:800;letter-spacing:.02em;padding:5px 11px;border-radius:100px;white-space:nowrap}
 .pill--wait{background:#f1f1f1;color:#777}
 .pill--act{background:rgba(248,80,0,.12);color:#c64600}
 .pill--done{background:rgba(22,163,74,.12);color:#15803d}
-.deck__hint{font-size:12.5px;color:var(--grey);line-height:1.45;margin:3px 0 0}
-.deck__body{margin-top:12px}
-textarea.script{width:100%;min-height:120px;font-family:inherit;font-size:13.5px;line-height:1.55;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--soft);outline:none;resize:vertical;color:var(--ink)}
-textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.10);background:#fff}
-textarea.script[readonly]{background:#fafafa;color:#555}
-/* small image thumbnails */
-.gal{display:flex;flex-wrap:wrap;gap:7px}
-.gal img{width:62px;height:62px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;transition:transform .15s,box-shadow .15s}
-.gal img:hover{transform:scale(1.05);box-shadow:0 6px 16px rgba(0,0,0,.18)}
-.gal .dl{display:flex;align-items:center;padding:0 12px;font-weight:700;color:var(--orange);font-size:13px;border:1px dashed var(--line);border-radius:10px}
-.galcount{font-size:11.5px;color:var(--grey);font-weight:700;margin:0 0 6px}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-/* uniform two-stage card */
-.deck{display:flex;flex-direction:column}
-.stages{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-.stage{border:1px solid var(--line);border-radius:13px;padding:13px 14px;background:#fff}
-.stage.locked{background:var(--soft);opacity:.7}
-.stage.pending{background:var(--soft)}
-.stage.approved{border-color:rgba(22,163,74,.32);background:rgba(22,163,74,.045)}
-.stage.active{border-color:rgba(248,80,0,.45);box-shadow:0 0 0 2px rgba(248,80,0,.10)}
-.stage__h{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin-bottom:9px}
-.stage__h .num{width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;color:#fff;background:#cbcbcb;flex-shrink:0}
-.stage.active .num,.stage.pending .num{background:var(--grad)}
-.stage.approved .num{background:#15803d}
-.stagemsg{font-size:12.5px;color:var(--grey);line-height:1.45}
-.scriptview{background:var(--soft);border-radius:9px;padding:10px;font-size:12.5px;line-height:1.5;white-space:pre-wrap;color:#555;max-height:90px;overflow:auto}
+
+/* per-deck progress stepper (centré + orange, icônes centrées) */
+/* per-deck progress = simple orange gradient bar (no step pastilles) */
+.cmdprog{height:8px;background:rgba(0,0,0,.08);overflow:hidden}
+.cmdprog i{display:block;height:100%;background:var(--grad);transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* two-column dashboard inside one full-page panel (master / detail) */
+.board{display:grid;grid-template-columns:300px 1fr;align-items:stretch;margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 14px 38px rgba(0,0,0,.06);overflow:hidden}
+.board__list{background:var(--soft);border-right:1px solid var(--line)}
+.board__list-head{padding:20px 18px 14px}
+.board__list .sec-h{margin-bottom:12px}
+#deckList{border-top:1px solid var(--line)}
+.deckitem{width:100%;text-align:left;font-family:inherit;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:15px 18px;cursor:pointer;display:flex;flex-direction:column;gap:11px;transition:background .2s,box-shadow .2s}
+.deckitem:hover{background:rgba(255,255,255,.6)}
+.deckitem.sel{background:#fff;box-shadow:inset 3px 0 0 var(--orange)}
+.deckitem__top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.deckitem__title{font-size:14.5px;font-weight:900;letter-spacing:-.02em;line-height:1.2;display:flex;align-items:center;gap:8px;min-width:0}
+.deckitem__title>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ti{width:17px;height:17px;flex-shrink:0;display:block}
+.miniprog{height:6px;border-radius:100px;background:rgba(0,0,0,.08);overflow:hidden}
+.miniprog i{display:block;height:100%;background:var(--grad);border-radius:100px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.deckitem__pill{align-self:flex-start}
+.board__right{display:flex;flex-direction:column;min-height:72vh}
+.board__detail{flex:1 1 auto;padding:26px 28px}
+.detail__head{margin-bottom:2px}
+.detail__title{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:13px}
+.board__detail .gal figure{width:100%;height:auto;aspect-ratio:1080/1350}
+@media(max-width:780px){.board{grid-template-columns:1fr}.board__list{border-right:none;border-bottom:1px solid var(--line)}.board__right{min-height:0}.board__detail{padding:20px}}
+
+/* detail content, directly in the column, no colored boxes */
+.detail__instr{font-size:14.5px;color:var(--ink);line-height:1.55;margin:8px 0 18px;max-width:64ch}
+.detail__instr b{color:var(--orange)}
+.waiting{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;padding:42px 20px 26px;min-height:230px}
+.waiting__ic{font-size:42px;line-height:1}
+.waiting__h{font-size:18px;font-weight:800;color:var(--ink)}
+.waiting__p{font-size:14.5px;color:var(--grey);line-height:1.55;max-width:46ch}
+.note-line{font-size:14px;color:var(--ink);line-height:1.55;margin-top:12px}
+.note-line b{color:var(--orange)}
+textarea.script{width:100%;min-height:150px;font-family:inherit;font-size:14px;line-height:1.6;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none;resize:vertical;color:var(--ink);margin-top:12px}
+textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.10)}
+.revbox{margin-top:14px;display:none}
+.revbox.open{display:block}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.revbox .actions{margin-top:10px}
+
+/* slides, nothing layered on the slides themselves */
+.gal{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.gal figure{position:relative;width:66px;height:66px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.gal img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;display:block;transition:transform .15s}
+.gal figure:hover img{transform:scale(1.04)}
+
+/* bottom toolbar: slide count + status + download / actions */
+.cmdbar{border-top:1px solid var(--line);background:var(--soft)}
+.cmdbar__row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 26px}
+.cmdbar__meta{display:flex;align-items:center;gap:12px;margin-right:auto}
+.cmdbar__hint{font-size:12.5px;color:var(--grey);font-weight:600}
+.foot-count{font-size:12.5px;color:var(--grey);font-weight:700}
+.lb__dl{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:51;cursor:pointer}
 /* lightbox */
 .lb{position:fixed;inset:0;background:rgba(12,12,12,.86);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;cursor:zoom-out}
 .lb.open{display:flex}
 .lb img{max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
-.note{font-size:13px;color:#c64600;background:rgba(248,80,0,.07);border-radius:10px;padding:10px 12px;margin-top:12px}
-.revbox{margin-top:12px;display:none}
-.revbox.open{display:block}
 .empty{text-align:center;color:var(--grey);padding:34px;border:1px dashed var(--line);border-radius:18px}
+.flash{background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.3);color:#15803d;font-weight:700;font-size:14px;border-radius:14px;padding:13px 16px;margin-bottom:16px}
 .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hide{display:none!important}
-@media(max-width:560px){.step{min-width:70px}.step .lab{font-size:10.5px}}
+
+/* add-decks button + pack picker modal */
+.addbtn{width:100%;justify-content:center;margin-bottom:0}
+.modal{position:fixed;inset:0;background:rgba(12,12,12,.6);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.modal.open{display:flex}
+.modal__card{background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:88vh;overflow-y:auto;padding:26px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.42)}
+.modal__x{position:absolute;top:13px;right:13px;width:30px;height:30px;border:none;background:none;font-size:17px;cursor:pointer;color:var(--grey);border-radius:8px}
+.modal__x:hover{background:var(--soft)}
+.modal__card h3{font-size:20px;font-weight:900;letter-spacing:-.02em}
+.modal__sub{font-size:13.5px;color:var(--grey);margin:7px 0 18px;line-height:1.5}
+.addpacks{display:flex;flex-direction:column;gap:18px}
+.addpack{display:flex;align-items:center;gap:16px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
+.addpack:hover{border-color:var(--orange);box-shadow:0 12px 26px rgba(248,80,0,.13);transform:translateY(-1px)}
+.addpack--gold{border:2px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a) border-box}
+.addpack--gold:hover{border-color:transparent;box-shadow:0 12px 26px rgba(200,144,26,.22)}
+/* static white deck fan (like the collection section), wide cards rising from the bottom edge */
+.addpack__fan{position:relative;width:190px;height:84px;flex-shrink:0;overflow:hidden}
+.addpack__fan i{position:absolute;bottom:-6px;left:50%;width:66px;height:82px;border-radius:9px;background:#fff;border:1px solid var(--line);box-shadow:0 8px 18px rgba(0,0,0,.16);transform-origin:50% 100%}
+.addpack__fan::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,#fff 98%);pointer-events:none}
+.addpack__info{display:flex;flex-direction:column;gap:3px;margin-right:auto}
+.addpack__count{font-size:23px;font-weight:900;letter-spacing:-.025em;line-height:1}
+.addpack__free{align-self:flex-start;display:inline-block;text-transform:uppercase;font-size:10.5px;font-weight:800;letter-spacing:.04em;line-height:1;color:#3d2a00;background:linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a);padding:4px 9px;border-radius:100px;box-shadow:0 3px 8px rgba(200,144,26,.35)}
+.addpack__sub{font-size:12.5px;color:var(--grey);font-weight:600}
+.addpack__price{font-size:18px;font-weight:900;white-space:nowrap}
+/* story variant: thinner, taller fan cards */
+.addpack--story .addpack__fan{height:96px}
+.addpack--story .addpack__fan i{width:40px;height:100px;border-radius:7px}
+/* catalogue sections */
+.addsec__h{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--grey);margin:0 0 10px}
+.addsec__list{display:flex;flex-direction:column;gap:10px}
+/* branding rows */
+.addrow{display:flex;align-items:center;gap:13px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 15px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
+.addrow:hover{border-color:var(--orange);box-shadow:0 8px 20px rgba(248,80,0,.1);transform:translateY(-1px)}
+.addrow__ic{width:36px;height:36px;border-radius:9px;background:rgba(248,80,0,.1);display:grid;place-items:center;flex-shrink:0}
+.addrow__ic .ti{width:19px;height:19px}
+.addrow__label{font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:8px;margin-right:auto}
+.addrow__tag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#fff;background:var(--grad);padding:3px 7px;border-radius:100px}
+.addrow__price{font-weight:900;font-size:15px;white-space:nowrap}
+/* step 1 : category cards */
+.addcats{display:flex;flex-direction:column;gap:12px}
+.addcat{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
+.addcat:hover{border-color:var(--orange);box-shadow:0 12px 26px rgba(248,80,0,.12);transform:translateY(-1px)}
+.addcat__vis{width:88px;height:66px;border-radius:11px;flex-shrink:0;background:#eceae4;display:grid;place-items:center;color:#bcb6aa}
+.addcat__vis svg{width:30px;height:30px}
+.addcat__body{margin-right:auto;display:flex;flex-direction:column;gap:3px}
+.addcat__body b{font-size:16.5px;font-weight:900;letter-spacing:-.02em}
+.addcat__body span{font-size:13px;color:var(--grey);font-weight:600}
+.addcat__chev{width:20px;height:20px;color:#c9c4ba;flex-shrink:0}
+.addback{background:none;border:none;font-family:inherit;font-size:13px;font-weight:800;color:var(--grey);cursor:pointer;padding:0 0 14px}
+.addback:hover{color:var(--orange)}
+.modal__err{color:#d11;font-size:13px;font-weight:600;min-height:18px;margin-top:12px}
+@media(max-width:560px){.board__detail{padding:18px}}
 </style>
 </head>
 <body>
@@ -115,6 +181,7 @@ textarea.script[readonly]{background:#fafafa;color:#555}
 <!-- brasero wordmark symbol -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="g_mark" x1="16" y1="56" x2="163" y2="141" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="tgrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff1a00"/><stop offset="1" stop-color="#f87000"/></linearGradient>
 <g id="brasero-mark">
 <path d="M89.6395 47.9895C94.3875 45.2482 94.3875 38.3952 89.6395 35.6539L81.4719 30.9384C79.2684 29.6662 76.5535 29.6662 74.35 30.9384L58.8599 39.8815C56.6564 41.1536 53.9416 41.1536 51.7381 39.8814L42.8628 34.7573C38.1148 32.0161 38.1148 25.163 42.8628 22.4218L74.3503 4.24237C76.5538 2.97016 79.2687 2.97015 81.4722 4.24236L120.108 26.5485C122.311 27.8207 123.668 30.1718 123.668 32.7163L123.668 73.9556C123.668 77.2688 120.082 79.3396 117.212 77.683C114.343 76.0264 110.756 78.0972 110.756 81.4104L110.756 119.155C110.756 124.138 116.151 127.253 120.467 124.761C122.471 123.605 123.704 121.467 123.704 119.154L123.704 85.3354C123.704 82.7909 125.061 80.4398 127.265 79.1676L150.028 66.0252C154.776 63.284 160.711 66.7105 160.711 72.193L160.711 140.146C160.711 142.691 159.354 145.042 157.15 146.314L91.03 184.488C88.8265 185.761 86.1116 185.761 83.9081 184.488L17.7879 146.314C15.5843 145.042 14.2269 142.69 14.2269 140.146L14.2268 72.0684C14.2268 66.5859 20.1617 63.1594 24.9097 65.9006L47.6719 79.0424C49.8754 80.3146 51.2329 82.6657 51.2329 85.2101L51.2333 118.781C51.2334 121.325 52.5908 123.676 54.7943 124.948L84.0442 141.836C86.1635 143.059 88.7745 143.059 90.8937 141.836C95.46 139.199 95.46 132.608 90.8937 129.972L68.5858 117.093C66.3823 115.82 65.0248 113.469 65.0248 110.925L65.0248 66.3125C65.0248 63.7681 66.3822 61.417 68.5858 60.1448L89.6395 47.9895Z" fill="url(#g_mark)"/>
 <path d="M214.652 163.952H187.418V22.3374H216.342V89.0127C221.977 80.5609 234.373 66.8502 247.896 66.8502C274.19 66.8502 290.906 87.3224 290.906 117.937C290.906 147.048 272.312 166.394 245.642 166.394C232.495 166.394 221.226 160.571 216.155 151.932L214.652 163.952ZM216.53 116.434C216.53 130.521 225.921 139.911 239.444 139.911C253.155 139.911 261.794 130.333 261.794 116.434C261.794 102.536 253.155 92.9569 239.444 92.9569C225.921 92.9569 216.53 102.348 216.53 116.434Z" fill="currentColor"/>
@@ -157,28 +224,44 @@ textarea.script[readonly]{background:#fafafa;color:#555}
   <section id="dash" class="hide">
     <div class="ohead">
       <div>
-        <span class="eyebrow"><span class="pxa"><i></i><i></i><i></i></span>Your order</span>
         <h1 class="title" id="hello">Welcome back</h1>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <span class="obadge">Order <b id="oref">#—</b></span>
+        <span class="obadge">Order <b id="oref">#</b></span>
         <span class="obadge" id="oplan"></span>
         <button class="btn btn--ghost btn--sm" id="logout">Sign out</button>
       </div>
     </div>
 
-    <div class="prog-card">
-      <div class="pbar"><i id="pfill" style="width:0"></i></div>
-      <div class="steps" id="steps"></div>
-    </div>
+    <div id="flash" class="flash hide"></div>
 
-    <h3 class="sec-h">Your decks</h3>
-    <div id="decks" class="decks-grid"></div>
+    <div class="board">
+      <aside class="board__list">
+        <div class="board__list-head">
+          <button type="button" class="btn btn--grad btn--sm addbtn" id="addDecks">+ Add to this order</button>
+        </div>
+        <div id="deckList"></div>
+      </aside>
+      <div class="board__right">
+        <div class="board__detail" id="deckDetail"></div>
+        <div class="cmdbar" id="deckCmd"></div>
+      </div>
+    </div>
   </section>
 
 </main>
 
-<div class="lb" id="lb"><img id="lbImg" alt=""></div>
+<div class="lb" id="lb"><img id="lbImg" alt=""><button type="button" class="btn btn--grad btn--sm lb__dl" id="lbDl">⬇ Download</button></div>
+
+<div class="modal" id="addModal">
+  <div class="modal__card">
+    <button type="button" class="modal__x" id="addClose" aria-label="Close">✕</button>
+    <h3>Add to your order</h3>
+    <p class="modal__sub">Pay once, the new items are added straight to order <b id="addRef">#</b> and appear in this tracker.</p>
+    <div class="addpacks" id="addPacks"></div>
+    <p class="modal__err" id="addErr"></p>
+  </div>
+</div>
 
 <script>
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
@@ -186,13 +269,54 @@ const $=s=>document.querySelector(s);
 const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let CREDS={ref:'',email:''};
+let DECKS=[];
+let SELECTED=null;
+let ORDER=null;
+// one-time add-on packs (display only, the real price is enforced server-side)
+// orderable extras (keys map to the server-side ITEMS catalogue / Stripe price)
+const ADD_GROUPS=[
+  {key:'decks', title:'Carousels', sub:'Swipeable carousel decks', items:[
+    {key:'deck3',cards:3,label:'3 Decks',price:'$120'},
+    {key:'deck6',cards:6,label:'6 Decks',price:'$240'},
+    {key:'deck9',cards:9,label:'9 Decks',price:'$350',free:true},
+  ]},
+  {key:'stories', title:'Stories', sub:'Vertical 9:16 story sets', items:[
+    {key:'story3',cards:3,label:'3 Stories',price:'$100',story:true},
+    {key:'story6',cards:6,label:'6 Stories',price:'$220',story:true},
+    {key:'story9',cards:9,label:'9 Stories',price:'$330',free:true,story:true},
+  ]},
+  {key:'branding', title:'Branding', sub:'Profile photo, banners & CTAs', items:[
+    {key:'brand_full',label:'Full branding pack',price:'$210',brand:true,pack:true},
+    {key:'brand_pfp', label:'Profile photo',     price:'$60', brand:true},
+    {key:'brand_x',   label:'X / Twitter banner',price:'$70', brand:true},
+    {key:'brand_li',  label:'LinkedIn banner',   price:'$70', brand:true},
+    {key:'brand_fb',  label:'Facebook banner',   price:'$70', brand:true},
+    {key:'brand_cta', label:'LinkedIn CTA',      price:'$50', brand:true},
+  ]},
+];
+// type icons (orange gradient) shown beside each production item + in the catalogue
+const TYPE_ICON={
+  carousel:`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="14" rx="2"/><path d="M18 8v10a2 2 0 0 1-2 2"/><path d="M21 10v6"/></svg>`,
+  story:`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="3" width="11" height="18" rx="3"/><path d="M10 7h4"/></svg>`,
+  branding:`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>`,
+};
+// white deck fan that spreads up from a shared bottom pivot (like the collection section)
+function fanHTML(n){
+  const step=Math.min(13,70/Math.max(1,n-1)), mid=(n-1)/2;
+  let h='';
+  for(let i=0;i<n;i++) h+=`<i style="transform:translateX(-50%) rotate(${((i-mid)*step).toFixed(1)}deg)"></i>`;
+  return h;
+}
 const PLAN_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
+const DL_ICON='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h13"/></svg>';
+const slug=s=>(s||'deck').toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'deck';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 const TAG={
   writing:      ['pill--wait','Writing script'],
-  script_review:['pill--act', 'Your turn · script'],
+  script_review:['pill--act', 'Validate script'],
   designing:    ['pill--wait','In design'],
-  design_review:['pill--act', 'Your turn · design'],
+  design_review:['pill--act', 'Validate design'],
   revision:     ['pill--wait','Retouch in progress'],
   done:         ['pill--done','Approved ✓'],
 };
@@ -240,81 +364,209 @@ function render(o){
   $('#oplan').textContent = o.plan ? ((PLAN_NAMES[o.plan]||o.plan)+' pack') : '';
   $('#oplan').style.display = o.plan?'':'none';
 
-  const p=o.progress;
-  $('#pfill').style.width=p.percent+'%';
-  $('#steps').innerHTML=p.steps.map((s,i)=>{
-    const cls=i<p.active?'done':(i===p.active?'active':'');
-    return `<div class="step ${cls}"><div class="dot">${i+1}</div><div class="lab">${esc(s)}</div></div>`;
-  }).join('');
-
-  const wrap=$('#decks');
-  if(!o.decks.length){
-    wrap.className='';
-    wrap.innerHTML='<div class="empty">Your decks will appear here as soon as we start production. We\'ll email you at every step. 🔥</div>';
+  ORDER=o;
+  DECKS=o.decks||[];
+  if(!DECKS.length){
+    $('#deckList').innerHTML='';
+    $('#deckDetail').innerHTML='<div class="empty">Your decks will appear here as soon as we start production. We\'ll email you at every step. 🔥</div>';
     return;
   }
-  wrap.className='decks-grid';
-  wrap.innerHTML=o.decks.map(deckHTML).join('');
-  o.decks.forEach(bindDeck);
+  if(!DECKS.some(d=>String(d.id)===String(SELECTED))) SELECTED=DECKS[0].id;
+  renderList();
+  renderDetail();
 }
 
-function deckHTML(d){
-  const [pc,pl]=TAG[d.status]||TAG.writing;
-  const scriptApproved=['designing','design_review','revision','done'].includes(d.status);
+const DECK_PCT={writing:12,script_review:34,designing:58,design_review:80,revision:72,done:100};
 
-  // ---- stage 1: script ----
-  let s1;
-  if(d.status==='writing'){
-    s1=`<div class="stage pending"><div class="stage__h"><span class="num">1</span> Script</div>
-      <p class="stagemsg">✍️ We're writing the script for this deck. We'll email you the moment it's ready.</p></div>`;
-  } else if(d.status==='script_review'){
-    s1=`<div class="stage active"><div class="stage__h"><span class="num">1</span> Script · your turn</div>
-      <p class="stagemsg" style="margin-bottom:10px">Tweak anything you like, then approve it to move into design.</p>
-      <textarea class="script" data-id="${d.id}">${esc(d.script)}</textarea>
-      <div class="actions"><button class="btn btn--grad btn--sm" data-act="validate_script" data-id="${d.id}">Approve script ✓</button></div></div>`;
-  } else {
-    s1=`<div class="stage approved"><div class="stage__h"><span class="num">✓</span> Script · approved</div>
-      ${d.script?`<details><summary style="cursor:pointer;font-weight:700;font-size:12px;color:var(--grey)">View script</summary><div class="scriptview" style="margin-top:8px">${esc(d.script)}</div></details>`:'<p class="stagemsg">Approved.</p>'}</div>`;
+function renderList(){
+  $('#deckList').innerHTML=DECKS.map(d=>{
+    const [pc,pl]=TAG[d.status]||TAG.writing;
+    const sel=String(d.id)===String(SELECTED)?'sel':'';
+    const ic=TYPE_ICON[d.type]||TYPE_ICON.carousel;
+    return `<button type="button" class="deckitem ${sel}" data-deck="${esc(d.id)}">
+      <div class="deckitem__top"><span class="deckitem__title">${ic}<span>${esc(d.title)}</span></span></div>
+      <div class="miniprog"><i style="width:${DECK_PCT[d.status]||10}%"></i></div>
+      <span class="pill ${pc} deckitem__pill">${pl}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderDetail(){
+  const d=DECKS.find(x=>String(x.id)===String(SELECTED));
+  const det=$('#deckDetail'), cmd=$('#deckCmd');
+  if(!d){ det.innerHTML='<div class="empty">Select a deck to view its slides.</div>'; cmd.innerHTML=''; return; }
+  det.innerHTML=detailBody(d);
+  cmd.innerHTML=cmdBar(d);
+  bindDeck(d);
+}
+
+/* select a deck from the left list (event delegation, bound once) */
+$('#deckList').addEventListener('click',e=>{
+  const it=e.target.closest('.deckitem'); if(!it) return;
+  SELECTED=it.dataset.deck;
+  renderList(); renderDetail();
+});
+
+/* ---------- add decks: one-time packs added to this same order via Stripe ---------- */
+function optionHTML(it){
+  if(it.brand){
+    return `<button type="button" class="addrow" data-item="${it.key}">
+      <span class="addrow__ic">${TYPE_ICON.branding}</span>
+      <span class="addrow__label">${it.label}${it.pack?'<span class="addrow__tag">best value</span>':''}</span>
+      <span class="addrow__price">${it.price}</span>
+    </button>`;
   }
+  return `<button type="button" class="addpack ${it.free?'addpack--gold':''} ${it.story?'addpack--story':''}" data-item="${it.key}">
+    <span class="addpack__fan" aria-hidden="true">${fanHTML(it.cards)}</span>
+    <span class="addpack__info">
+      <b class="addpack__count">${it.label}</b>
+      ${it.free?'<span class="addpack__free">+1 Free</span>':''}
+      <span class="addpack__sub">one-time</span>
+    </span>
+    <span class="addpack__price">${it.price}</span>
+  </button>`;
+}
+let addCat=null;
+// TODO: swap placeholder for the real category artwork
+function addPlaceholder(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 15l-5-5L5 20" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function catCardHTML(g){
+  return `<button type="button" class="addcat" data-cat="${g.key}">
+    <div class="addcat__vis">${addPlaceholder()}</div>
+    <div class="addcat__body"><b>${g.title}</b><span>${g.sub}</span></div>
+    <svg class="addcat__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  </button>`;
+}
+function renderAddBody(){
+  const wrap=$('#addPacks');
+  if(!addCat){ wrap.innerHTML=`<div class="addcats">${ADD_GROUPS.map(catCardHTML).join('')}</div>`; return; }
+  const g=ADD_GROUPS.find(x=>x.key===addCat);
+  wrap.innerHTML=`<button type="button" class="addback" data-back>← All elements</button>
+    <div class="addsec__list">${g.items.map(optionHTML).join('')}</div>`;
+}
+function openAddModal(){
+  if(!CREDS.ref) return;
+  addCat=null;
+  $('#addRef').textContent='#'+CREDS.ref;
+  $('#addErr').textContent='';
+  renderAddBody();
+  $('#addModal').classList.add('open');
+}
+function closeAddModal(){ $('#addModal').classList.remove('open'); }
 
-  // ---- stage 2: design ----
-  let s2;
-  if(!scriptApproved){
-    s2=`<div class="stage locked"><div class="stage__h"><span class="num">2</span> Design</div>
-      <p class="stagemsg">🔒 Unlocks once you approve the script.</p></div>`;
-  } else if(d.status==='designing'){
-    s2=`<div class="stage pending"><div class="stage__h"><span class="num">2</span> Design</div>
-      <p class="stagemsg">🎨 Script approved — our designers are building this deck now.</p></div>`;
-  } else if(d.status==='design_review'){
-    s2=`<div class="stage active"><div class="stage__h"><span class="num">2</span> Design · your turn</div>
-      ${galleryHTML(d)}
-      <div class="actions">
-        <button class="btn btn--grad btn--sm" data-act="validate_design" data-id="${d.id}">Approve ✓</button>
-        <button class="btn btn--ghost btn--sm" data-act="toggle_rev" data-id="${d.id}">Retouch</button>
-      </div>
-      <div class="revbox" id="rev-${d.id}">
-        <textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:80px;margin-top:8px"></textarea>
-        <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div>
-      </div></div>`;
-  } else if(d.status==='revision'){
-    s2=`<div class="stage pending"><div class="stage__h"><span class="num">2</span> Design</div>
-      <p class="stagemsg">✏️ Applying your retouch — we'll resend it for approval shortly.</p>
-      ${d.revision_note?`<div class="note" style="margin-top:10px"><b>Your retouch:</b> ${esc(d.revision_note)}</div>`:''}</div>`;
-  } else { // done
-    s2=`<div class="stage approved"><div class="stage__h"><span class="num">✓</span> Design · approved</div>
-      ${d.images.length?galleryHTML(d):'<p class="stagemsg">Approved & ready to post. 🔥</p>'}</div>`;
+async function startAddon(item,btn){
+  $('#addErr').textContent='';
+  const priceEl=btn.querySelector('.addpack__price,.addrow__price'), old=priceEl?priceEl.innerHTML:'';
+  btn.style.pointerEvents='none'; if(priceEl) priceEl.innerHTML='<span class="spin" style="border-color:rgba(0,0,0,.25);border-top-color:#111"></span>';
+  try{
+    const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({addon_item:item,addon_ref:CREDS.ref,email:CREDS.email,name:ORDER?ORDER.name:''})});
+    const d=await r.json();
+    if(d&&d.url){ location.href=d.url; return; }   // → Stripe Checkout
+    $('#addErr').textContent=(d&&d.error)||'Could not start checkout. Please try again.';
+  }catch(e){ $('#addErr').textContent='Network error. Please try again.'; }
+  btn.style.pointerEvents=''; if(priceEl) priceEl.innerHTML=old;
+}
+
+$('#addDecks').addEventListener('click',openAddModal);
+$('#addClose').addEventListener('click',closeAddModal);
+$('#addModal').addEventListener('click',e=>{ if(e.target.id==='addModal') closeAddModal(); });
+$('#addPacks').addEventListener('click',e=>{
+  const cat=e.target.closest('[data-cat]'); if(cat){ addCat=cat.dataset.cat; renderAddBody(); return; }
+  if(e.target.closest('[data-back]')){ addCat=null; renderAddBody(); return; }
+  const b=e.target.closest('[data-item]'); if(b) startAddon(b.dataset.item,b);
+});
+
+// states where the CLIENT must act → instruction line under the deck name
+const NEXT={
+  script_review:['📝','Validate script','review the script below, edit anything you like, then approve it to start the design.'],
+  design_review:['👀','Validate design','review your design below, then approve it or request a retouch.'],
+  done:['🎉','All done','your carousel is ready, download it from the bar below.']
+};
+// states where it's NOT the client's turn → centered "news soon" message
+const WAIT={
+  writing:['✍️','Writing your script','We\'re crafting the script for this deck. You\'ll get an email the moment it\'s ready for your review.'],
+  designing:['🎨','In design','Your carousel is in production. We\'ll notify you the moment it\'s ready to review.'],
+  revision:['✏️','Applying your retouch','We\'re updating the design and will resend it for approval shortly.']
+};
+
+function detailBody(d){
+  const head=`<div class="detail__head"><div class="detail__title">${esc(d.title)}</div></div>`;
+  const n=NEXT[d.status];
+  if(n){
+    const instr=`<p class="detail__instr">${n[0]} <b>${n[1]}</b>, ${n[2]}</p>`;
+    let content='';
+    if(d.status==='script_review')
+      content=`<textarea class="script" data-id="${d.id}">${esc(d.script)}</textarea>`;
+    else if(d.status==='design_review')
+      content=`${galleryGrid(d)}
+        <div class="revbox" id="rev-${d.id}">
+          <textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:90px"></textarea>
+          <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div>
+        </div>`;
+    else if(d.status==='done')
+      content=(d.images&&d.images.length)?galleryGrid(d):'';
+    return head+instr+content;
   }
-
-  return `<div class="deck">
-    <div class="deck__top"><div class="deck__title">${esc(d.title)}</div><span class="pill ${pc}">${pl}</span></div>
-    <div class="stages">${s1}${s2}</div>
+  const w=WAIT[d.status]||['⏳','In progress','We\'re working on it, you\'ll get news very soon.'];
+  return head+`<div class="waiting">
+    <div class="waiting__ic">${w[0]}</div>
+    <div class="waiting__h">${w[1]}</div>
+    <p class="waiting__p">${w[2]}</p>
+    ${d.status==='revision'&&d.revision_note?`<p class="note-line"><b>Your retouch:</b> ${esc(d.revision_note)}</p>`:''}
   </div>`;
 }
 
-function galleryHTML(d){
+// horizontal command box: slide count + status + actions, stepper on its bottom edge
+function cmdBar(d){
+  const [pc,pl]=TAG[d.status]||TAG.writing;
+  const n=(d.images||[]).length;
+  let actions='';
+  if(d.status==='script_review')
+    actions=`<button class="btn btn--grad btn--sm" data-act="validate_script" data-id="${d.id}">Approve script ✓</button>`;
+  else if(d.status==='design_review')
+    actions=`<button class="btn btn--grad btn--sm" data-act="validate_design" data-id="${d.id}">Approve ✓</button>
+      <button class="btn btn--ghost btn--sm" data-act="toggle_rev" data-id="${d.id}">Request a retouch</button>`;
+  else if(d.status==='done'&&n)
+    actions=`<button class="btn btn--grad btn--sm" data-act="download_deck" data-id="${d.id}">${DL_ICON} Download carousel (${n})</button>`;
+  const right=actions?`<div class="actions">${actions}</div>`:`<span class="cmdbar__hint">No action needed, we'll keep you posted.</span>`;
+  return `<div class="cmdbar__row">
+      <div class="cmdbar__meta">${n?`<span class="foot-count">${n} slide${n>1?'s':''}</span>`:''}<span class="pill ${pc}">${pl}</span></div>
+      ${right}
+    </div>
+    <div class="cmdprog"><i style="width:${DECK_PCT[d.status]||10}%"></i></div>`;
+}
+
+function galleryGrid(d){
   const imgs=d.images||[]; if(!imgs.length) return '';
-  return `<p class="galcount">${imgs.length} image${imgs.length>1?'s':''}</p>
-    <div class="gal">${imgs.map(u=>`<img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}">`).join('')}</div>`;
+  const name=slug(d.title);
+  return `<div class="gal">${imgs.map((u,i)=>`<figure><img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}" data-name="${esc(name)}-${String(i+1).padStart(2,'0')}"></figure>`).join('')}</div>`;
+}
+
+/* ---------- downloads ---------- */
+async function downloadOne(url,name){
+  try{
+    const r=await fetch(url,{mode:'cors'});
+    if(!r.ok) throw 0;
+    const b=await r.blob();
+    const ext=(b.type&&b.type.split('/')[1])||(url.split('?')[0].split('.').pop())||'jpg';
+    const u=URL.createObjectURL(b);
+    const a=document.createElement('a'); a.href=u; a.download=(name||'deck')+'.'+ext;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),2000);
+  }catch(e){ window.open(url,'_blank'); }   // fallback if the host blocks cross-origin fetch
+}
+async function downloadDeck(id,btn){
+  const d=DECKS.find(x=>String(x.id)===String(id)); if(!d) return;
+  const imgs=d.images||[]; if(!imgs.length) return;
+  const name=slug(d.title), old=btn?btn.innerHTML:'';
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spin"></span> Preparing…'; }
+  for(let i=0;i<imgs.length;i++){
+    await downloadOne(imgs[i],`${name}-${String(i+1).padStart(2,'0')}`);
+    await sleep(350);
+  }
+  if(btn){ btn.disabled=false; btn.innerHTML=old; }
 }
 
 /* ---------- actions ---------- */
@@ -327,6 +579,7 @@ function bindDeck(d){
 async function onAction(el){
   const act=el.dataset.act, id=el.dataset.id;
   if(act==='toggle_rev'){ $('#rev-'+id).classList.toggle('open'); return; }
+  if(act==='download_deck'){ downloadDeck(id,el); return; }
   const payload={...CREDS,deckId:id,action:act};
   if(act==='validate_script'){
     const ta=document.querySelector(`textarea.script[data-id="${id}"]`);
@@ -348,19 +601,28 @@ async function onAction(el){
   }catch(e){ alert('Network error.'); el.disabled=false; el.innerHTML=old; }
 }
 
-/* ---------- lightbox ---------- */
+/* ---------- lightbox + per-image download ---------- */
+let lbUrl='', lbName='';
 document.addEventListener('click',e=>{
   const t=e.target;
-  if(t.matches&&t.matches('.gal img')){ $('#lbImg').src=t.dataset.full; $('#lb').classList.add('open'); }
+  if(t.matches&&t.matches('.gal img')){
+    lbUrl=t.dataset.full; lbName=t.dataset.name||'deck-slide';
+    $('#lbImg').src=lbUrl; $('#lb').classList.add('open');
+  }
 });
 $('#lb').addEventListener('click',()=>$('#lb').classList.remove('open'));
+$('#lbDl').addEventListener('click',e=>{ e.stopPropagation(); if(lbUrl) downloadOne(lbUrl,lbName||'deck-slide'); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList.remove('open'); });
 
 /* ---------- boot: deep-link or saved session ---------- */
 (function(){
   const q=new URLSearchParams(location.search);
   const ref=q.get('ref'), email=q.get('email');
-  if(ref&&email){ $('#ref').value=ref; $('#email').value=email; load(ref,email); return; }
+  if(ref&&email){
+    $('#ref').value=ref; $('#email').value=email;
+    if(q.get('addon')){ const f=$('#flash'); if(f){ f.textContent='🎉 Payment received, your new decks are being added to this order.'; f.classList.remove('hide'); } }
+    load(ref,email); return;
+  }
   if(q.has('login')) return;            // came from "Access your decks": always show the login form
   const saved=localStorage.getItem('brasero_track');
   if(saved){ try{ const c=JSON.parse(saved); if(c.ref&&c.email) load(c.ref,c.email,true); }catch(e){} }

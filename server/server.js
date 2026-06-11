@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { saveOrder, markPaid, saveOnboarding, sendTo, clientOrderEmail, stripePriceId } from '../api/_lib.js';
+import { saveOrder, markPaid, saveOnboarding, sendTo, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, stripePriceId, addonLineItems, addonKeys, ITEMS } from '../api/_lib.js';
 import orderHandler from '../api/order.js';
 import deckHandler from '../api/deck.js';
 import adminHandler from '../api/admin.js';
@@ -56,6 +56,25 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object;
     const m = s.metadata || {};
+
+    // Add-on: extra decks for an existing order — attach instead of creating a new order.
+    if (m.addon_ref) {
+      (async () => {
+        try {
+          const r = m.addon_item ? await addItemsToOrder(m.addon_ref, m.addon_item) : await addDecksToOrder(m.addon_ref, m.plan);
+          const label = m.addon_item ? (r.name || m.addon_item) : `${PLANS[m.plan]?.name || m.plan} pack`;
+          const to = s.customer_email || m.email;
+          const trackUrl = to ? `${SITE_URL}/track.html?ref=${encodeURIComponent(m.addon_ref)}&email=${encodeURIComponent(to)}` : '';
+          await sendTo(to, 'Your new Brasero items are on the way 🔥', addonClientEmail({
+            name: m.name, planName: label, count: r.created || 0, ref: m.addon_ref, trackUrl,
+          }));
+          await send(`➕ Add-on on #${m.addon_ref}: ${label} (+${r.created || 0})`,
+            `<p>Order #${m.addon_ref} · ${label} · +${r.created || 0} · $${(s.amount_total / 100).toFixed(2)}</p>`);
+        } catch (e) { console.error('addon failed', e); }
+      })();
+      return res.json({ received: true });
+    }
+
     markPaid(s.id, s.amount_total).catch(console.error);
     const to = s.customer_email || m.email;
     const ref = s.id.slice(-8).toUpperCase();
@@ -71,6 +90,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
        <p><b>Name:</b> ${m.name || '—'}</p>
        <p><b>Email:</b> ${s.customer_email || m.email || '—'}</p>
        <p><b>Instagram:</b> ${m.handle || ''} ${m.instagram ? `(${m.instagram})` : ''}</p>
+       <p><b>Add-ons:</b> ${m.addons || '—'}</p>
        <p><b>Stripe session:</b> ${s.id}</p>`
     ).catch(console.error);
   }
@@ -86,8 +106,26 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 /* Create a Stripe Checkout Session and return its URL */
 app.post('/api/checkout-session', async (req, res) => {
   try {
-    const { plan, billing, name, email, handle, instagram } = req.body || {};
+    const { plan, billing, name, email, handle, instagram, addon_ref, addons, addon_item } = req.body || {};
+
+    // Tracker upsell: add one catalogue item (carousels / stories / branding) to an existing order.
+    if (addon_ref && addon_item && ITEMS[addon_item]) {
+      const it = ITEMS[addon_item];
+      const ar = encodeURIComponent(addon_ref), em = encodeURIComponent(email || '');
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        customer_email: email || undefined,
+        line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero — ${it.name}` } } }],
+        success_url: `${SITE_URL}/track.html?ref=${ar}&email=${em}&addon=1`,
+        cancel_url: `${SITE_URL}/track.html?ref=${ar}&email=${em}`,
+        metadata: { addon_ref, addon_item, email: email || '' },
+      });
+      return res.json({ url: session.url });
+    }
+
     if (!PLANS[plan]) return res.status(400).json({ error: 'Unknown plan' });
+    const isAddon = !!addon_ref;   // buying extra decks for an existing order
+    const addOns = addonKeys(addons);   // upsell add-ons selected at checkout
 
     let mode, line_items, amount;
     const priceId = stripePriceId(plan, billing) || process.env.STRIPE_PRICE_ID;
@@ -112,16 +150,25 @@ app.post('/api/checkout-session', async (req, res) => {
       }];
     }
 
+    line_items = [...line_items, ...addonLineItems(addOns)];
+
+    const ar = encodeURIComponent(addon_ref || ''), em = encodeURIComponent(email || '');
     const session = await stripe.checkout.sessions.create({
       mode,
       customer_email: email || undefined,
       line_items,
-      success_url: `${SITE_URL}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_URL}/checkout.html?plan=${plan}&billing=${billing}`,
-      metadata: { plan, billing, name: name || '', email: email || '', handle: handle || '', instagram: instagram || '' },
+      success_url: isAddon
+        ? `${SITE_URL}/track.html?ref=${ar}&email=${em}&addon=1`
+        : `${SITE_URL}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: isAddon
+        ? `${SITE_URL}/track.html?ref=${ar}&email=${em}`
+        : `${SITE_URL}/checkout.html?plan=${plan}&billing=${billing}`,
+      metadata: { plan, billing, name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', addon_ref: addon_ref || '', addons: addOns.join(',') },
     });
-    try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing, amount, name, email, instagram, handle }); }
-    catch (e) { console.error('saveOrder failed', e); }
+    if (!isAddon) {
+      try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing, amount, name, email, instagram, handle }); }
+      catch (e) { console.error('saveOrder failed', e); }
+    }
     res.json({ url: session.url });
   } catch (err) {
     console.error(err);

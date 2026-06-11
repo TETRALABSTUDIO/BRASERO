@@ -72,9 +72,9 @@ export const MEM = db ? null : {
       title: 'Carousel — mini case study',
       script: 'How we took @client from 1k to 40k in 60 days.',
       design_urls: ['assets/carousels/1-1.jpg', 'assets/carousels/1-2.jpg', 'assets/carousels/1-3.jpg'] },
-    { id: 'dk-3', order_id: 'ord-demo', position: 2, status: 'writing', title: 'Founder story deck' },
-    { id: 'dk-4', order_id: 'ord-demo', position: 3, status: 'done',
-      title: 'Testimonial deck', script: 'What our clients say...',
+    { id: 'dk-3', order_id: 'ord-demo', position: 2, status: 'writing', type: 'story', title: 'Founder story' },
+    { id: 'dk-4', order_id: 'ord-demo', position: 3, status: 'done', type: 'branding',
+      title: 'Profile photo', script: 'What our clients say...',
       design_urls: ['assets/carousels/2-1.jpg', 'assets/carousels/2-2.jpg'],
       design_validated_at: new Date().toISOString() },
     { id: 'dk-5', order_id: 'ord-done', position: 0, status: 'done',
@@ -172,10 +172,11 @@ export async function adminListOrders() {
   return data || [];
 }
 
-export async function createDeck(orderId, { title, position }) {
-  if (MEM) { const d = { id: uid(), order_id: orderId, position, title, status: 'writing', script: '', design_urls: [] }; MEM.decks.push(d); return d; }
+export async function createDeck(orderId, { title, position, type }) {
+  const t = type || 'carousel';
+  if (MEM) { const d = { id: uid(), order_id: orderId, position, title, type: t, status: 'writing', script: '', design_urls: [] }; MEM.decks.push(d); return d; }
   if (!db) return null;
-  const { data, error } = await db.from('decks').insert({ order_id: orderId, position, title, status: 'writing', design_urls: [] }).select('*').maybeSingle();
+  const { data, error } = await db.from('decks').insert({ order_id: orderId, position, title, type: t, status: 'writing', design_urls: [] }).select('*').maybeSingle();
   if (error) { console.error('createDeck', error); return null; }
   return data;
 }
@@ -184,6 +185,68 @@ export async function deleteDeck(deckId) {
   if (MEM) { MEM.decks = MEM.decks.filter(d => d.id !== deckId); return; }
   if (!db) return;
   await db.from('decks').delete().eq('id', deckId);
+}
+
+// How many decks each pack adds (Meteor = 9 + 1 free).
+export const PLAN_DECKS = { starter: 3, flame: 6, burst: 10 };
+
+// Add-on: append a pack's decks to an EXISTING order (used when a client buys
+// extra one-time packs from the tracker). Decks start in 'writing'.
+export async function addDecksToOrder(ref, plan) {
+  const n = PLAN_DECKS[plan];
+  if (!n) return { error: 'bad_plan' };
+  const order = await findOrderByRef(ref);
+  if (!order) return { error: 'order_not_found' };
+  const existing = await decksForOrder(order.id);
+  let created = 0;
+  for (let i = 0; i < n; i++) {
+    const d = await createDeck(order.id, { title: `New deck ${existing.length + i + 1}`, position: existing.length + i });
+    if (d) created++;
+  }
+  return { ok: true, order, created };
+}
+
+/* ---- Add-on item catalogue (carousels, stories, branding) ----
+   Tracker upsell: a client can add extra production items to an existing order.
+   Prices in cents, enforced on the server. Each item maps to one or more deck
+   rows with a `type` (carousel | story | branding) so the tracker can icon them. */
+export const ITEMS = {
+  deck3:     { name: '3 carousels',          amount: 12000, type: 'carousel', count: 3 },
+  deck6:     { name: '6 carousels',          amount: 24000, type: 'carousel', count: 6 },
+  deck9:     { name: '9 carousels + 1 free', amount: 35000, type: 'carousel', count: 10 },
+  story3:    { name: '3 stories',            amount: 10000, type: 'story',    count: 3 },
+  story6:    { name: '6 stories',            amount: 22000, type: 'story',    count: 6 },
+  story9:    { name: '9 stories + 1 free',   amount: 33000, type: 'story',    count: 10 },
+  brand_full:{ name: 'Branding pack',        amount: 21000, type: 'branding' },
+  brand_pfp: { name: 'Profile photo',        amount: 6000,  type: 'branding' },
+  brand_x:   { name: 'X / Twitter banner',   amount: 7000,  type: 'branding' },
+  brand_li:  { name: 'LinkedIn banner',      amount: 7000,  type: 'branding' },
+  brand_fb:  { name: 'Facebook banner',      amount: 7000,  type: 'branding' },
+  brand_cta: { name: 'LinkedIn CTA buttons', amount: 5000,  type: 'branding' },
+};
+// The deck-row titles created for a given item key.
+function itemTitles(key) {
+  if (key === 'brand_full') return ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'LinkedIn CTA buttons'];
+  const it = ITEMS[key];
+  if (!it) return [];
+  if (it.type === 'branding') return [it.name];
+  const label = it.type === 'story' ? 'Story' : 'Deck';
+  return Array.from({ length: it.count || 1 }, (_, i) => `New ${label} ${i + 1}`);
+}
+// Append a catalogue item's deck rows to an EXISTING order.
+export async function addItemsToOrder(ref, key) {
+  const it = ITEMS[key];
+  if (!it) return { error: 'bad_item' };
+  const order = await findOrderByRef(ref);
+  if (!order) return { error: 'order_not_found' };
+  const existing = await decksForOrder(order.id);
+  const titles = itemTitles(key);
+  let created = 0, pos = existing.length;
+  for (const title of titles) {
+    const d = await createDeck(order.id, { title, position: pos++, type: it.type });
+    if (d) created++;
+  }
+  return { ok: true, order, created, type: it.type, name: it.name };
 }
 
 /* ---- Talent accounts + project assignment ---- */
@@ -320,6 +383,7 @@ export function publicOrder(order, decks) {
     decks: decks.map(d => ({
       id: d.id,
       title: d.title || 'Untitled deck',
+      type: d.type || 'carousel',
       status: d.status,
       script: d.script || '',
       images: deckImages(d),
@@ -363,6 +427,27 @@ export function amountFor(plan, billing) {
   const base = PLANS[plan].amount / 100;
   const dollars = billing === 'sub' ? Math.round(base * 0.9) : base;
   return dollars * 100;
+}
+
+// One-time upsell add-ons. Cents. Prices live on the server (never trust the client).
+export const ADDONS = {
+  branding: { name: 'Social media branding',  amount: 21000 },
+  story3:   { name: 'Story pack — 3 stories', amount: 10000 },
+  story6:   { name: 'Story pack — 6 stories', amount: 22000 },
+  story9:   { name: 'Story pack — 9 + 1 stories', amount: 33000 },
+  bundle:   { name: 'Mega Bundle — branding + 9 stories + 1 free', amount: 45900 },
+};
+// Build Stripe line items for the selected add-ons (one-time price_data, mixes
+// fine with a recurring plan — Stripe invoices them once on the first invoice).
+export function addonLineItems(addons) {
+  const keys = Array.isArray(addons) ? addons.filter(a => ADDONS[a]) : [];
+  return keys.map(a => ({
+    quantity: 1,
+    price_data: { currency: 'usd', unit_amount: ADDONS[a].amount, product_data: { name: `Brasero — ${ADDONS[a].name}` } },
+  }));
+}
+export function addonKeys(addons) {
+  return Array.isArray(addons) ? addons.filter(a => ADDONS[a]) : [];
 }
 
 const mailer = process.env.SMTP_HOST ? nodemailer.createTransport({
@@ -457,6 +542,22 @@ export function clientOrderEmail({ name, planName, billing, amountCents, handle,
       <tr><td style="padding:18px 28px;background:#0c0c0c;color:#9a9a9a;font-size:12px;line-height:1.5">Brasero · decks that build lasting trust<br>Questions? Just reply to this email.</td></tr>
     </table>
   </td></tr></table></body></html>`;
+}
+
+// Confirmation when a client adds extra decks to an existing order.
+export function addonClientEmail({ name, planName, count, ref, trackUrl }) {
+  const first = name ? name.split(' ')[0] : '';
+  const c = count || '';
+  return emailShell(`
+    <tr><td style="padding:30px 28px 6px">
+      <h1 style="margin:0 0 8px;font-size:26px;letter-spacing:-1px">More decks incoming${first ? ', ' + first : ''} 🔥</h1>
+      <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">Payment received — we've added ${c} new ${planName || ''} deck${count === 1 ? '' : 's'} to your order.</p>
+    </td></tr>
+    <tr><td style="padding:14px 28px 6px">
+      <p style="margin:0 0 16px;font-size:14px;color:#333333;line-height:1.55">They're now in production and will appear in your tracker. We'll email you at each step to review.</p>
+      ${trackUrl ? ctaButton(trackUrl, 'Open your tracker →') : ''}
+    </td></tr>
+    <tr><td style="padding:14px 28px 26px;color:#9a9a9a;font-size:12px">Order #${ref || ''}</td></tr>`);
 }
 
 export function siteUrl(req) {

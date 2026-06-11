@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     /* ----- order list (scoped) + per-project state ----- */
     if (action === 'list') {
       const rows = isOwner ? await adminListOrders() : await ordersForTalent(me.email);
-      const orders = await Promise.all(rows.map(async o => ({ ...pub(o), state: orderState(await decksForOrder(o.id)) })));
+      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o), state: orderState(dk), items: dk.length }; }));
       return res.json({ ok: true, me: { email: me.email, name: me.name || '', is_owner: isOwner, photo: me.photo || '' }, orders });
     }
 
