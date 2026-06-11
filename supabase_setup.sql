@@ -34,6 +34,10 @@ alter table orders enable row level security;
 alter table orders add column if not exists ref text;
 create index if not exists orders_ref_idx on orders (ref);
 
+-- Extra fields a manually-created project can carry, just like a real checkout order.
+alter table orders add column if not exists phone  text;
+alter table orders add column if not exists addons jsonb default '[]'::jsonb;   -- selected upsell keys
+
 -- One row per deck the studio produces for an order.
 create table if not exists decks (
   id                   uuid primary key default gen_random_uuid(),

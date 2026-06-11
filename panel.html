@@ -241,6 +241,55 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .mx{width:auto;background:none;border:none;font-size:17px;color:var(--grey);cursor:pointer;padding:4px 6px}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
+
+/* ===== rich New-project overlay ===== */
+.modalc--wide{max-width:660px}
+.np-sec{margin-bottom:20px}
+.np-sec+.np-sec{padding-top:18px;border-top:1px solid var(--line)}
+.np-sec__t{font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.np-opt{font-size:10px;font-weight:800;letter-spacing:.02em;text-transform:none;color:#9a9a9a;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:2px 8px}
+/* plan picker */
+.planpick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.plancard{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 13px;transition:border .18s,box-shadow .18s,transform .12s}
+.plancard:hover{border-color:rgba(248,80,0,.5);transform:translateY(-2px)}
+.plancard.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
+.plancard b{font-size:16px;font-weight:900;letter-spacing:-.03em}
+.plancard .pp{font-size:15px;font-weight:900}.plancard.on .pp{color:var(--orange)}
+.plancard .pd{font-size:11.5px;color:var(--grey);font-weight:600}
+/* billing toggle */
+.btoggle{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:3px;gap:2px}
+.btoggle button{background:none;border:none;border-radius:100px;padding:7px 14px;font-size:12.5px;font-weight:800;color:var(--grey)}
+.btoggle button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.btoggle button.on .save{color:var(--ok)}
+.btoggle .save{font-size:10.5px;color:#9a9a9a;font-weight:800}
+/* upsell cards */
+.upcards{display:flex;flex-direction:column;gap:10px}
+.upcard{display:flex;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;transition:border .18s,box-shadow .18s,transform .12s}
+.upcard:hover{border-color:rgba(248,80,0,.5);transform:translateY(-1px)}
+.upcard.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
+.upcard--bundle{border-width:2px;border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box}
+.upcard--bundle.on{box-shadow:0 0 0 2px rgba(248,80,0,.2)}
+.upcard__vis{width:64px;flex-shrink:0;display:grid;place-items:center;background:linear-gradient(160deg,#fff3ec,#ffd9c4);color:var(--orange)}
+.upcard__vis svg{width:24px;height:24px}
+.upcard--story .upcard__vis,.upcard--bundle .upcard__vis{background:linear-gradient(160deg,#1a1a1a,#0a0a0a);color:#fff}
+.upcard__body{flex:1;padding:11px 13px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.upcard__head{display:flex;align-items:center;gap:10px}
+.upcard__head b{font-size:14.5px;font-weight:900;letter-spacing:-.02em}
+.upcard__price{margin-left:auto;font-size:14.5px;font-weight:900;white-space:nowrap}
+.upcard__sub{font-size:11.5px;color:var(--grey);font-weight:600}
+.upcard__pick{font-size:12px;font-weight:800;color:var(--orange)}.upcard.on .upcard__pick{color:var(--ok)}
+.storyopts{display:flex;gap:6px;margin-top:8px}
+.storyopt2{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 4px;text-align:center;font-size:12px;font-weight:800;color:var(--ink)}
+.storyopt2.on{border-color:var(--orange);background:rgba(248,80,0,.06);color:var(--orange)}
+.storyopt2 small{display:block;font-size:10px;font-weight:700;color:var(--grey)}
+/* recap */
+.np-recap{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.np-recap .rl{display:flex;align-items:center;font-size:13px;color:#333;font-weight:600;padding:3px 0}
+.np-recap .rl b{margin-left:auto;font-weight:800}
+.np-recap .rl.muted{color:var(--grey)}
+.np-recap .rtot{display:flex;align-items:center;margin-top:8px;padding-top:10px;border-top:1px dashed var(--line);font-size:15px;font-weight:900}
+.np-recap .rtot b{margin-left:auto;font-size:18px}
+.np-actions{display:flex;align-items:center;gap:14px}
 @media(max-width:820px){.topnav__in{padding:12px 18px}.main{padding:20px 18px 90px}.kanban{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -366,26 +415,68 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 
   <!-- New project modal (owner) -->
   <div class="modal hide" id="newModal">
-    <div class="modalc">
+    <div class="modalc modalc--wide">
       <div class="modalc__h"><h3>New project</h3><button type="button" class="mx" id="npClose">✕</button></div>
       <form id="npForm">
-        <div class="grid2">
-          <div class="field"><label>Client name</label><input id="npName" placeholder="Nina Park"></div>
-          <div class="field"><label>Client email</label><input id="npEmail" type="email" placeholder="nina@brand.com" required></div>
+
+        <!-- Client -->
+        <div class="np-sec">
+          <div class="np-sec__t">Client</div>
+          <div class="grid2">
+            <div class="field"><label>Client name</label><input id="npName" placeholder="Nina Park"></div>
+            <div class="field"><label>Client email</label><input id="npEmail" type="email" placeholder="nina@brand.com" required></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Instagram handle</label><input id="npIg" placeholder="@brand"></div>
+            <div class="field"><label>Phone (optional)</label><input id="npPhone" placeholder="+1 555 …"></div>
+          </div>
         </div>
-        <div class="grid2">
-          <div class="field"><label>Instagram handle</label><input id="npIg" placeholder="@brand"></div>
-          <div class="field"><label>Pack</label><select id="npPlan">
-            <option value="starter">Ember · 3 decks</option>
-            <option value="flame">Flame · 6 decks</option>
-            <option value="burst" selected>Meteor · 9 + 1 decks</option>
-          </select></div>
+
+        <!-- Pack -->
+        <div class="np-sec">
+          <div class="np-sec__t">Pack</div>
+          <div class="planpick" id="npPlans"></div>
+          <div class="grid2">
+            <div class="field"><label>Billing</label>
+              <div class="btoggle" id="npBilling">
+                <button type="button" data-bill="once" class="on">One-time</button>
+                <button type="button" data-bill="sub">Subscription <span class="save">−10%</span></button>
+              </div>
+            </div>
+            <div class="field"><label>Number of decks</label><input id="npDecks" type="number" min="0" max="50" value="10"></div>
+          </div>
         </div>
-        <div class="grid2">
-          <div class="field"><label>Number of decks</label><input id="npDecks" type="number" min="0" max="50" value="10"></div>
+
+        <!-- Upsells -->
+        <div class="np-sec">
+          <div class="np-sec__t">Upsells <span class="np-opt">optional</span></div>
+          <div class="upcards" id="npAddons"></div>
+        </div>
+
+        <!-- Brief -->
+        <div class="np-sec">
+          <div class="np-sec__t">Brief <span class="np-opt">optional</span></div>
+          <div class="grid2">
+            <div class="field"><label>Page / brand</label><input id="npBPage" placeholder="e.g. Wealth Notes"></div>
+            <div class="field"><label>#1 goal</label><select id="npBGoal">
+              <option value="">—</option><option>Reach &amp; virality</option><option>Saves &amp; shares</option><option>Followers growth</option><option>Sales / leads</option>
+            </select></div>
+          </div>
+          <div class="field"><label>What is the page about?</label><textarea id="npBNiche" style="min-height:64px" placeholder="Niche, topics and angle…"></textarea></div>
+          <div class="field"><label>Target audience</label><textarea id="npBAudience" style="min-height:64px" placeholder="Ideal follower: age, stage, what they want…"></textarea></div>
+          <div class="field"><label>Brand vibe / inspo</label><textarea id="npBStyle" style="min-height:64px" placeholder="Bold, high-contrast, warm accents… + reference links"></textarea></div>
+          <div class="field"><label>Anything else to know?</label><textarea id="npBNotes" style="min-height:64px" placeholder="Tell us anything…"></textarea></div>
+        </div>
+
+        <!-- Assignment -->
+        <div class="np-sec">
+          <div class="np-sec__t">Assignment</div>
           <div class="field"><label>Assign to talent (optional)</label><select id="npTalent"><option value="">Unassigned</option></select></div>
         </div>
-        <div style="display:flex;align-items:center;gap:14px;margin-top:6px">
+
+        <!-- Recap -->
+        <div class="np-recap" id="npRecap"></div>
+        <div class="np-actions">
           <button class="b-grad" type="submit" id="npSubmit">Create project →</button>
           <span class="err" id="npErr" style="margin-top:0"></span>
         </div>
@@ -516,15 +607,111 @@ function renderProjects(){
 }
 
 /* ---------- new project (owner) ---------- */
+/* ----- new-project pricing model (mirrors checkout, prices re-enforced server-side) ----- */
+const NP_PLANS={
+  starter:{name:'Ember', price:120, decks:3,  pd:'3 decks'},
+  flame:  {name:'Flame', price:240, decks:6,  pd:'6 decks'},
+  burst:  {name:'Meteor',price:350, decks:10, pd:'9 + 1 decks'},
+};
+const NP_ADDONS={
+  branding:{name:'Social media branding', price:210, sub:'Profile photo · banners · CTAs', vis:'brand'},
+  story:   {name:'Story pack', sub:'Custom-written, on-brand stories', vis:'story',
+            opts:[{key:'story3',n:3,price:100},{key:'story6',n:6,price:220},{key:'story9',n:9,price:330,free:true}]},
+  bundle:  {name:'Mega Bundle', price:459, was:540, sub:'Full branding + 9 stories + 1 free', vis:'bundle'},
+};
+const STORY_KEYS=['story3','story6','story9'];
+const npFmt=n=>'$'+n.toLocaleString('en-US');
+const NP={plan:'burst', billing:'once', branding:false, story:null, bundle:false}; // selection state
+const npVisIcon=v=> v==='brand'
+  ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 15l-5-5L5 20" stroke-linecap="round"/></svg>'
+  : v==='bundle'
+  ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 7H4v13h16zM4 7l2-3h12l2 3M12 7v13M9 11h6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="3" width="12" height="18" rx="3"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg>';
+
+function npPlanPrice(){ const base=NP_PLANS[NP.plan].price; return NP.billing==='sub'?Math.round(base*0.9):base; }
+function npAddonsTotal(){ let s=0;
+  if(NP.branding) s+=NP_ADDONS.branding.price;
+  if(NP.story){ s+=NP_ADDONS.story.opts.find(o=>o.key===NP.story).price; }
+  if(NP.bundle) s+=NP_ADDONS.bundle.price;
+  return s;
+}
+function npSelectedAddonKeys(){ const k=[]; if(NP.branding)k.push('branding'); if(NP.story)k.push(NP.story); if(NP.bundle)k.push('bundle'); return k; }
+
+function renderNpPlans(){
+  $('#npPlans').innerHTML=Object.entries(NP_PLANS).map(([k,p])=>{
+    const price=NP.billing==='sub'?Math.round(p.price*0.9):p.price;
+    return `<button type="button" class="plancard ${NP.plan===k?'on':''}" data-plan="${k}">
+      <b>${p.name}</b><span class="pp">${npFmt(price)}${NP.billing==='sub'?'<small style="font-size:10px">/mo</small>':''}</span><span class="pd">${p.pd}</span>
+    </button>`;
+  }).join('');
+}
+function renderNpAddons(){
+  const a=NP_ADDONS;
+  const storyOpts=a.story.opts.map(o=>`<button type="button" class="storyopt2 ${NP.story===o.key?'on':''}" data-story="${o.key}">${o.n} stor${o.n>1?'ies':'y'}${o.free?' +1':''}<small>${npFmt(o.price)}</small></button>`).join('');
+  $('#npAddons').innerHTML=`
+    <button type="button" class="upcard upcard--brand ${NP.branding?'on':''}" data-up="branding">
+      <div class="upcard__vis">${npVisIcon('brand')}</div>
+      <div class="upcard__body"><div class="upcard__head"><b>${a.branding.name}</b><span class="upcard__price">+${npFmt(a.branding.price)}</span></div>
+        <span class="upcard__sub">${a.branding.sub}</span><span class="upcard__pick">${NP.branding?'✓ Added':'+ Add'}</span></div>
+    </button>
+    <div class="upcard upcard--story ${NP.story?'on':''}">
+      <div class="upcard__vis">${npVisIcon('story')}</div>
+      <div class="upcard__body"><div class="upcard__head"><b>${a.story.name}</b><span class="upcard__price">${NP.story?'+'+npFmt(a.story.opts.find(o=>o.key===NP.story).price):'from '+npFmt(100)}</span></div>
+        <span class="upcard__sub">${a.story.sub}</span>
+        <div class="storyopts">${storyOpts}</div></div>
+    </div>
+    <button type="button" class="upcard upcard--bundle ${NP.bundle?'on':''}" data-up="bundle">
+      <div class="upcard__vis">${npVisIcon('bundle')}</div>
+      <div class="upcard__body"><div class="upcard__head"><b>${a.bundle.name}</b><span class="upcard__price">+${npFmt(a.bundle.price)} <small style="color:var(--grey);text-decoration:line-through;font-weight:700">${npFmt(a.bundle.was)}</small></span></div>
+        <span class="upcard__sub">${a.bundle.sub}</span><span class="upcard__pick">${NP.bundle?'✓ Added':'+ Add'}</span></div>
+    </button>`;
+}
+function renderNpRecap(){
+  const p=NP_PLANS[NP.plan], lines=[];
+  lines.push(`<div class="rl">${p.name} pack <span class="muted" style="margin-left:6px">· ${NP.billing==='sub'?'subscription':'one-time'}</span><b>${npFmt(npPlanPrice())}${NP.billing==='sub'?'/mo':''}</b></div>`);
+  if(NP.branding) lines.push(`<div class="rl">${NP_ADDONS.branding.name}<b>+${npFmt(NP_ADDONS.branding.price)}</b></div>`);
+  if(NP.story){ const o=NP_ADDONS.story.opts.find(o=>o.key===NP.story); lines.push(`<div class="rl">Story pack · ${o.n} stories<b>+${npFmt(o.price)}</b></div>`); }
+  if(NP.bundle) lines.push(`<div class="rl">${NP_ADDONS.bundle.name}<b>+${npFmt(NP_ADDONS.bundle.price)}</b></div>`);
+  const total=npPlanPrice()+npAddonsTotal();
+  $('#npRecap').innerHTML=lines.join('')+`<div class="rtot">Total<b>${npFmt(total)}${NP.billing==='sub'?'/mo + add-ons once':''}</b></div>`;
+}
+function renderNp(){ renderNpPlans(); renderNpAddons(); renderNpRecap(); }
+
 $('#newProject').onclick=openNewModal;
 $('#npClose').onclick=()=>$('#newModal').classList.add('hide');
 $('#newModal').addEventListener('click',e=>{ if(e.target.id==='newModal') $('#newModal').classList.add('hide'); });
-$('#npPlan').addEventListener('change',()=>{ const n=PLAN_PACK[$('#npPlan').value]; if(n!=null) $('#npDecks').value=n; });
+/* plan cards */
+$('#npPlans').addEventListener('click',e=>{ const c=e.target.closest('[data-plan]'); if(!c)return; NP.plan=c.dataset.plan; $('#npDecks').value=NP_PLANS[NP.plan].decks; renderNp(); });
+/* billing toggle */
+$('#npBilling').addEventListener('click',e=>{ const b=e.target.closest('[data-bill]'); if(!b)return; NP.billing=b.dataset.bill;
+  $('#npBilling').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderNp(); });
+/* upsell cards */
+$('#npAddons').addEventListener('click',e=>{
+  const st=e.target.closest('[data-story]'); if(st){ NP.story=NP.story===st.dataset.story?null:st.dataset.story; if(NP.story) NP.bundle=false; renderNp(); return; }
+  const up=e.target.closest('[data-up]'); if(!up)return;
+  const k=up.dataset.up;
+  if(k==='bundle'){ NP.bundle=!NP.bundle; if(NP.bundle){ NP.branding=false; NP.story=null; } }
+  else if(k==='branding'){ NP.branding=!NP.branding; if(NP.branding) NP.bundle=false; }
+  renderNp();
+});
+
 async function openNewModal(){
   if(ME&&ME.is_owner&&!TALENTS.length){ try{ const t=await api('/api/admin',{action:'list_talents'}); if(t.ok) TALENTS=t.talents||[]; }catch(e){} }
-  $('#npForm').reset(); $('#npPlan').value='burst'; $('#npDecks').value=PLAN_PACK.burst; $('#npErr').textContent='';
+  $('#npForm').reset(); $('#npErr').textContent='';
+  NP.plan='burst'; NP.billing='once'; NP.branding=false; NP.story=null; NP.bundle=false;
+  $('#npBilling').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.bill==='once'));
+  $('#npDecks').value=NP_PLANS.burst.decks;
   $('#npTalent').innerHTML='<option value="">Unassigned</option>'+(TALENTS||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}">${esc(t.name||t.email)}</option>`).join('');
+  renderNp();
   $('#newModal').classList.remove('hide'); setTimeout(()=>$('#npName').focus(),30);
+}
+/* assemble the optional onboarding brief (same keys as the client onboarding flow) */
+function npBrief(){
+  const b={ page:$('#npBPage').value.trim(), handle:$('#npIg').value.trim(), goal:$('#npBGoal').value.trim(),
+    niche:$('#npBNiche').value.trim(), audience:$('#npBAudience').value.trim(),
+    style:$('#npBStyle').value.trim(), notes:$('#npBNotes').value.trim() };
+  Object.keys(b).forEach(k=>{ if(!b[k]) delete b[k]; });
+  return Object.keys(b).length?b:null;
 }
 $('#npForm').addEventListener('submit',async e=>{
   e.preventDefault(); $('#npErr').textContent='';
@@ -532,7 +719,9 @@ $('#npForm').addEventListener('submit',async e=>{
   try{
     const r=await api('/api/admin',{action:'create_order',
       name:$('#npName').value.trim(), email:$('#npEmail').value.trim(), instagram:$('#npIg').value.trim(),
-      plan:$('#npPlan').value, decks:Number($('#npDecks').value)||0, talentEmail:$('#npTalent').value||null});
+      phone:$('#npPhone').value.trim(), plan:NP.plan, billing:NP.billing,
+      decks:Number($('#npDecks').value)||0, addons:npSelectedAddonKeys(),
+      answers:npBrief(), talentEmail:$('#npTalent').value||null});
     if(!r.ok){ $('#npErr').textContent='Could not create ('+(r.error||'error')+').'; return; }
     ORDERS=r.orders||ORDERS; $('#newModal').classList.add('hide'); renderProjects();
     if(r.ref) openOrder(r.ref);
@@ -550,7 +739,15 @@ async function openOrder(ref){
   if(!d.ok){ alert(d.error==='forbidden'?'Not your project.':'Order not found'); return; }
   $('#overview').classList.add('hide'); $('#detail').classList.remove('hide');
   $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
-  $('#oMeta').textContent=[d.order.plan?planName(d.order.plan)+' pack':'',d.order.email].filter(Boolean).join(' · ');
+  const o=d.order, ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
+  const meta=[
+    o.plan?planName(o.plan)+' pack':'',
+    o.billing==='sub'?'subscription':'one-time',
+    o.amount?'$'+Math.round(o.amount/100).toLocaleString('en-US'):'',
+    o.email, o.phone, o.instagram,
+    (o.addons&&o.addons.length)?'+ '+o.addons.map(k=>ADDON_LBL[k]||k).join(', '):''
+  ].filter(Boolean).join(' · ');
+  $('#oMeta').textContent=meta;
   $('#oDeadline').innerHTML=dlBadge(d.order,(d.decks||[]).length);
   $('#addDeck').style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   SELDECK=null; renderBoard(d.decks||[]);

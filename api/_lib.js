@@ -254,15 +254,19 @@ const randRef = () => crypto.randomBytes(6).toString('hex').slice(0, 8).toUpperC
 
 // Owner-created project from the panel: behaves exactly like a real paid order
 // (gets a ref, status 'paid', plan amount, and seeded deck rows).
-export async function createManualOrder({ name, email, instagram, handle, plan, billing, talent_email, decks }) {
+export async function createManualOrder({ name, email, instagram, handle, plan, billing, talent_email, decks, phone, addons, answers }) {
   const bill = billing || 'once';
-  const amount = PLANS[plan] ? amountFor(plan, bill) : 0;
+  const addOns = addonKeys(addons);                                   // validated upsell keys
+  const addonsTotal = addOns.reduce((s, k) => s + ADDONS[k].amount, 0);
+  const amount = (PLANS[plan] ? amountFor(plan, bill) : 0) + addonsTotal;
   const n = decks != null ? Math.max(0, Math.min(50, Number(decks) || 0)) : (PLAN_DECKS[plan] || 0);
   const row = {
     stripe_session_id: 'manual_' + crypto.randomBytes(9).toString('hex'),
     ref: randRef(), status: 'paid', plan: plan || '', billing: bill, amount,
     name: name || '', email: String(email || '').trim().toLowerCase(),
     instagram: instagram || '', handle: handle || '',
+    phone: phone || '', addons: addOns,
+    answers: (answers && typeof answers === 'object') ? answers : null,
     talent_email: talent_email ? String(talent_email).trim().toLowerCase() : null,
   };
   if (MEM) {

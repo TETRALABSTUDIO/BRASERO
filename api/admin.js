@@ -3,7 +3,7 @@ import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOr
   assignOrder, createManualOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
   signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail } from './_lib.js';
 
-const pub = o => ({ ref: o.ref || orderRef(o.stripe_session_id), name: o.name, email: o.email, plan: o.plan, talent_email: o.talent_email || '', created_at: o.created_at });
+const pub = o => ({ ref: o.ref || orderRef(o.stripe_session_id), name: o.name, email: o.email, plan: o.plan, billing: o.billing || '', amount: o.amount || 0, instagram: o.instagram || '', phone: o.phone || '', addons: Array.isArray(o.addons) ? o.addons : [], talent_email: o.talent_email || '', created_at: o.created_at });
 
 // Talent panel API. Authenticated by the Talent session token (Authorization: Bearer …).
 // Talents see only orders assigned to them; owners see all + manage the team.
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
     if (action === 'create_order') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
       if (!b.email && !b.name) return res.status(400).json({ ok: false, error: 'missing' });
-      const r = await createManualOrder({ name: b.name, email: b.email, instagram: b.instagram, handle: b.handle, plan: b.plan, billing: b.billing, talent_email: b.talentEmail, decks: b.decks });
+      const r = await createManualOrder({ name: b.name, email: b.email, instagram: b.instagram, handle: b.handle, plan: b.plan, billing: b.billing, talent_email: b.talentEmail, decks: b.decks, phone: b.phone, addons: b.addons, answers: b.answers });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
       if (b.talentEmail) {   // notify the assigned talent
         try {
