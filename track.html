@@ -174,6 +174,28 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .addback:hover{color:var(--orange)}
 .modal__err{color:#d11;font-size:13px;font-weight:600;min-height:18px;margin-top:12px}
 @media(max-width:560px){.board__detail{padding:18px}}
+
+/* ===== floating "How it works" guide (bottom-right) ===== */
+.helpfab{position:fixed;right:18px;bottom:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:8px 16px 8px 8px;box-shadow:0 14px 34px rgba(0,0,0,.16);font-family:inherit;font-weight:800;font-size:13.5px;color:var(--ink);cursor:pointer}
+.helpfab:hover{transform:translateY(-1px)}
+.helpfab .bulb{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#fff;box-shadow:0 5px 12px rgba(248,80,0,.3);flex-shrink:0}
+.helpfab .bulb svg{width:18px;height:18px}
+.helpcard{position:fixed;right:18px;bottom:74px;z-index:61;width:372px;max-width:calc(100vw - 36px);background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.30);overflow:hidden;transform-origin:bottom right;animation:tutpop .18s ease}
+.helpcard.hide{display:none!important}
+@keyframes tutpop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+.helpcard__h{display:flex;align-items:center;gap:9px;padding:15px 16px 13px}
+.helpcard__h b{font-size:15px;font-weight:900;letter-spacing:-.02em}
+.helpcard__h .tag{font-size:10.5px;font-weight:800;color:var(--orange);background:rgba(248,80,0,.1);border-radius:100px;padding:3px 9px}
+.helpcard__x{margin-left:auto;background:none;border:none;font-size:16px;color:var(--grey);cursor:pointer;line-height:1;padding:2px 4px;font-family:inherit}
+.tut-vis{height:178px;background:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;place-items:center;padding:16px;overflow:hidden}
+.tut-body{padding:14px 16px 6px}
+.tut-body h4{font-size:15.5px;font-weight:900;letter-spacing:-.02em;margin-bottom:5px}
+.tut-body p{font-size:13px;color:var(--grey);line-height:1.5}
+.tut-foot{display:flex;align-items:center;gap:8px;padding:10px 16px 15px}
+.tut-dots{display:flex;gap:6px;margin-right:auto}
+.tut-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:.22s}
+.tut-dots i.on{background:var(--orange);width:18px;border-radius:100px}
+.tut-foot .btn{padding:7px 14px;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -352,6 +374,7 @@ function logout(){
   localStorage.removeItem('brasero_track');
   CREDS={ref:'',email:''};
   $('#dash').classList.add('hide'); $('#gate').classList.remove('hide');
+  $('#helpFab').classList.add('hide'); $('#helpCard').classList.add('hide');
   history.replaceState(null,'','track.html');
 }
 $('#logout').addEventListener('click',logout);
@@ -359,6 +382,7 @@ $('#logout').addEventListener('click',logout);
 /* ---------- render ---------- */
 function render(o){
   $('#gate').classList.add('hide'); $('#dash').classList.remove('hide');
+  $('#helpFab').classList.remove('hide');
   $('#hello').innerHTML = o.name ? `Hi <span class="grad-text">${esc(o.name.split(' ')[0])}</span>` : 'Your <span class="grad-text">decks</span>';
   $('#oref').textContent = '#'+o.ref;
   $('#oplan').textContent = o.plan ? ((PLAN_NAMES[o.plan]||o.plan)+' pack') : '';
@@ -626,6 +650,82 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
   if(q.has('login')) return;            // came from "Access your decks": always show the login form
   const saved=localStorage.getItem('brasero_track');
   if(saved){ try{ const c=JSON.parse(saved); if(c.ref&&c.email) load(c.ref,c.email,true); }catch(e){} }
+})();
+</script>
+
+<!-- floating "How it works" guide (client) -->
+<button class="helpfab hide" id="helpFab" type="button" title="How it works">
+  <span class="bulb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.4c.8.7 1 1.3 1 2.6h6c0-1.3.2-1.9 1-2.6A6 6 0 0 0 12 3z"/></svg></span>
+  How it works
+</button>
+<div class="helpcard hide" id="helpCard">
+  <div class="helpcard__h"><span class="tag" id="tutTag">Step 1</span><b>How it works</b><button class="helpcard__x" id="helpClose" type="button">✕</button></div>
+  <div class="tut-vis" id="tutVis"></div>
+  <div class="tut-body"><h4 id="tutTitle"></h4><p id="tutBody"></p></div>
+  <div class="tut-foot">
+    <div class="tut-dots" id="tutDots"></div>
+    <button class="btn btn--ghost" id="tutBack" type="button">← Back</button>
+    <button class="btn btn--grad" id="tutNext" type="button">Next →</button>
+  </div>
+</div>
+<script>
+/* ---------- client "How it works" guide (5 steps, zoomed tracker mockups) ---------- */
+(function(){
+  const $=s=>document.querySelector(s);
+  const pill=(txt,col,bg)=>`<span style="font-size:10.5px;font-weight:800;color:${col};background:${bg};border-radius:100px;padding:3px 10px;white-space:nowrap">${txt}</span>`;
+  const TUT=[
+    { tag:'Step 1', title:'Your deliverables are here',
+      body:'On the left, every card is one piece of your order: carousels, stories and branding. Click a card to open it.',
+      vis:`<div style="width:100%;max-width:196px;display:flex;flex-direction:column;gap:8px">
+        <div style="background:#fff;border:2px solid var(--orange);border-radius:12px;padding:9px 11px;box-shadow:0 8px 18px rgba(248,80,0,.16)">
+          <div style="font-weight:800;font-size:12px;margin-bottom:7px">Carousel 1</div>
+          <div style="height:5px;border-radius:3px;background:#eee;overflow:hidden"><i style="display:block;width:34%;height:100%;background:var(--grad)"></i></div>
+          <div style="margin-top:7px">${pill('Validate script','var(--orange)','rgba(248,80,0,.12)')}</div></div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;opacity:.7;font-weight:800;font-size:12px">Story 1</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;opacity:.5;font-weight:800;font-size:12px">Profile photo</div></div>` },
+    { tag:'Step 2', title:'Approve the script',
+      body:'We write the copy first. Read it, edit anything you like right in the box, then “Approve script ✓” to send it into design.',
+      vis:`<div style="width:100%;max-width:224px">
+        <div style="font-weight:900;font-size:13px;margin-bottom:7px">Carousel 1</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;height:60px;padding:9px;font-size:11px;color:#555;line-height:1.4">Slide 1: Stop believing these 3 myths…</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:9px">${pill('Approve script ✓','#fff','var(--grad)')}</div></div>` },
+    { tag:'Step 3', title:'Approve the design',
+      body:'Once the visuals are ready, review them. If you love it, “Approve ✓”. If something is off, “Request a retouch” and tell us what to change.',
+      vis:`<div style="width:100%;max-width:224px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px">
+          <div style="aspect-ratio:1;border-radius:9px;background:linear-gradient(160deg,#ffd9c4,#fff3ec)"></div>
+          <div style="aspect-ratio:1;border-radius:9px;background:linear-gradient(160deg,#1a1a1a,#0a0a0a)"></div>
+          <div style="aspect-ratio:1;border-radius:9px;background:linear-gradient(160deg,#ffd9c4,#fff3ec)"></div></div>
+        <div style="display:flex;justify-content:flex-end;gap:6px">
+          <span style="font-size:10px;font-weight:800;border:1px solid var(--line);border-radius:100px;padding:5px 11px">Request a retouch</span>
+          ${pill('Approve ✓','#fff','var(--grad)')}</div></div>` },
+    { tag:'Step 4', title:'Retouches',
+      body:'You get the number of retouches included in your offer, and the same on any add-on you bought. Once those are used up, just reply to us or email hello@brasero.studio and we will sort it out.',
+      vis:`<div style="display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center">
+        ${pill('Request a retouch','var(--orange)','rgba(248,80,0,.12)')}
+        <div style="font-size:18px;color:var(--grey);line-height:1">↓</div>
+        <div style="font-size:11.5px;color:var(--grey);max-width:200px;line-height:1.4">Included in your offer. Need more? Contact us directly.</div></div>` },
+    { tag:'Step 5', title:'Download & post 🎉',
+      body:'When you approve, the piece turns “Approved ✓” and a Download button appears in the bar. Grab your files and post.',
+      vis:`<div style="display:grid;place-items:center;gap:12px">
+        <div style="width:66px;height:66px;border-radius:50%;background:rgba(22,163,74,.12);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+        ${pill('Approved ✓','#15803d','rgba(22,163,74,.12)')}</div>` },
+  ];
+  let i=0;
+  function renderTut(){
+    const s=TUT[i];
+    $('#tutTag').textContent=s.tag;
+    $('#tutVis').innerHTML=s.vis;
+    $('#tutTitle').textContent=s.title;
+    $('#tutBody').textContent=s.body;
+    $('#tutDots').innerHTML=TUT.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
+    $('#tutBack').style.visibility=i===0?'hidden':'visible';
+    $('#tutNext').textContent=i===TUT.length-1?'Got it ✓':'Next →';
+  }
+  $('#helpFab').addEventListener('click',()=>{ const c=$('#helpCard'); const open=c.classList.contains('hide'); c.classList.toggle('hide'); if(open){ i=0; renderTut(); } });
+  $('#helpClose').addEventListener('click',()=>$('#helpCard').classList.add('hide'));
+  $('#tutBack').addEventListener('click',()=>{ if(i>0){ i--; renderTut(); } });
+  $('#tutNext').addEventListener('click',()=>{ if(i<TUT.length-1){ i++; renderTut(); } else $('#helpCard').classList.add('hide'); });
 })();
 </script>
 </body>
