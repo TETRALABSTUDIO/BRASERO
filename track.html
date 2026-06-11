@@ -186,6 +186,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let CREDS={ref:'',email:''};
+const PLAN_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
 
 const TAG={
   writing:      ['pill--wait','Writing script'],
@@ -236,7 +237,7 @@ function render(o){
   $('#gate').classList.add('hide'); $('#dash').classList.remove('hide');
   $('#hello').innerHTML = o.name ? `Hi <span class="grad-text">${esc(o.name.split(' ')[0])}</span>` : 'Your <span class="grad-text">decks</span>';
   $('#oref').textContent = '#'+o.ref;
-  $('#oplan').textContent = o.plan ? (o.plan.charAt(0).toUpperCase()+o.plan.slice(1)+' pack') : '';
+  $('#oplan').textContent = o.plan ? ((PLAN_NAMES[o.plan]||o.plan)+' pack') : '';
   $('#oplan').style.display = o.plan?'':'none';
 
   const p=o.progress;

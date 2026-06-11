@@ -346,10 +346,19 @@ export async function saveOnboarding({ sessionId, email, handle, answers }) {
 
 // Prices live ONLY on the server (never trust the client). Cents.
 export const PLANS = {
-  starter: { name: 'Starter', amount: 12000 },
-  flame:   { name: 'Flame',   amount: 24000 },
-  burst:   { name: 'Burst',   amount: 29000 },
+  starter: { name: 'Ember',  amount: 12000 },
+  flame:   { name: 'Flame',  amount: 24000 },
+  burst:   { name: 'Meteor', amount: 35000 },
 };
+// Real Stripe Price IDs per plan + billing, read from env.
+//   STRIPE_PRICE_EMBER_ONCE / _SUB, _FLAME_ , _METEOR_ ...
+export function stripePriceId(plan, billing) {
+  const KEY = { starter: 'EMBER', flame: 'FLAME', burst: 'METEOR' }[plan];
+  if (!KEY) return null;
+  const suffix = billing === 'sub' ? 'SUB' : 'ONCE';
+  return process.env[`STRIPE_PRICE_${KEY}_${suffix}`] || null;
+}
+
 export function amountFor(plan, billing) {
   const base = PLANS[plan].amount / 100;
   const dollars = billing === 'sub' ? Math.round(base * 0.9) : base;

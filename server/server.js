@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { saveOrder, markPaid, saveOnboarding, sendTo, clientOrderEmail } from '../api/_lib.js';
+import { saveOrder, markPaid, saveOnboarding, sendTo, clientOrderEmail, stripePriceId } from '../api/_lib.js';
 import orderHandler from '../api/order.js';
 import deckHandler from '../api/deck.js';
 import adminHandler from '../api/admin.js';
@@ -21,9 +21,9 @@ const PORT = process.env.PORT || 4242;
    Amounts in cents. Subscription = 10% off, rounded to whole dollars
    to match the frontend display. */
 const PLANS = {
-  starter: { name: 'Starter', amount: 12000 },
-  flame:   { name: 'Flame',   amount: 24000 },
-  burst:   { name: 'Burst',   amount: 29000 },
+  starter: { name: 'Ember',  amount: 12000 },
+  flame:   { name: 'Flame',  amount: 24000 },
+  burst:   { name: 'Meteor', amount: 35000 },
 };
 function amountFor(plan, billing) {
   const baseDollars = PLANS[plan].amount / 100;
@@ -90,12 +90,13 @@ app.post('/api/checkout-session', async (req, res) => {
     if (!PLANS[plan]) return res.status(400).json({ error: 'Unknown plan' });
 
     let mode, line_items, amount;
-    if (process.env.STRIPE_PRICE_ID) {
-      // Use an existing Stripe Price (e.g. your 1€ test product).
-      const priceObj = await stripe.prices.retrieve(process.env.STRIPE_PRICE_ID);
+    const priceId = stripePriceId(plan, billing) || process.env.STRIPE_PRICE_ID;
+    if (priceId) {
+      // Real Stripe Price for this plan + billing (or legacy test price).
+      const priceObj = await stripe.prices.retrieve(priceId);
       mode = priceObj.recurring ? 'subscription' : 'payment';
       amount = priceObj.unit_amount;
-      line_items = [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }];
+      line_items = [{ price: priceId, quantity: 1 }];
     } else {
       // Dynamic pricing from the server-side PLANS table (production).
       mode = billing === 'sub' ? 'subscription' : 'payment';

@@ -121,9 +121,9 @@ a{color:inherit;text-decoration:none}
    Set to null to force the simulated demo. */
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
 const PLANS={
-  starter:{name:'Starter',price:120,feat:false,items:['3 carousel decks','Copywriting included','1 revision per carousel','Delivered by email in 72h']},
-  flame:{name:'Flame',price:240,feat:true,items:['6 carousel decks','Copywriting included','2 revisions per carousel','Delivered by email in 72h']},
-  burst:{name:'Burst',price:290,feat:true,items:['9 carousel decks + 1 free','Copywriting included','4 revisions per carousel','Delivered by email in 48h · priority']},
+  starter:{name:'Ember',logo:'assets/plans/ember.svg',price:120,feat:false,items:['3 carousel decks','Copywriting included','1 revision per carousel','Delivered by email in 72h']},
+  flame:{name:'Flame',logo:'assets/plans/flame.svg',price:240,feat:true,items:['6 carousel decks','Copywriting included','2 revisions per carousel','Delivered by email in 72h']},
+  burst:{name:'Meteor',logo:'assets/plans/meteor.svg',price:350,feat:true,items:['9 carousel decks + 1 free','Copywriting included','4 revisions per carousel','Delivered by email in 48h · priority']},
 };
 const qp=new URLSearchParams(location.search);
 const key=PLANS[qp.get('plan')]?qp.get('plan'):'flame';
@@ -191,7 +191,7 @@ function updatePayBtn(){const b=document.getElementById('pay-btn');if(b)b.textCo
 function renderRecap(){
   const sub=mode==='sub';
   document.getElementById('recap').innerHTML=`
-    <div class="recap__top"><span class="recap__name">${plan.name}</span>${plan.feat?'<span class="badge">Popular</span>':''}</div>
+    <div class="recap__top"><img class="recap__logo" src="${plan.logo}" alt="${plan.name}" style="height:30px;width:auto">${plan.feat?'<span class="badge">Popular</span>':''}</div>
     <p class="recap__sub">Custom carousel decks, done-for-you.</p>
     <div class="bill">
       <button data-m="once" class="${sub?'':'on'}">One-time</button>

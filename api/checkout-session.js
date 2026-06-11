@@ -1,4 +1,4 @@
-import { stripe, PLANS, amountFor, siteUrl, saveOrder } from './_lib.js';
+import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId } from './_lib.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -8,12 +8,13 @@ export default async function handler(req, res) {
     const SITE = siteUrl(req);
 
     let mode, line_items, amount;
-    if (process.env.STRIPE_PRICE_ID) {
-      // Use an existing Stripe Price (e.g. the 1€ product) for every checkout.
-      const priceObj = await stripe.prices.retrieve(process.env.STRIPE_PRICE_ID);
+    const priceId = stripePriceId(plan, billing) || process.env.STRIPE_PRICE_ID;
+    if (priceId) {
+      // Use the real Stripe Price for this plan + billing (or the legacy test price).
+      const priceObj = await stripe.prices.retrieve(priceId);
       mode = priceObj.recurring ? 'subscription' : 'payment';
       amount = priceObj.unit_amount;
-      line_items = [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }];
+      line_items = [{ price: priceId, quantity: 1 }];
     } else {
       mode = billing === 'sub' ? 'subscription' : 'payment';
       amount = amountFor(plan, billing);

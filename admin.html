@@ -260,6 +260,8 @@ const $=s=>document.querySelector(s);
 const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const initials=s=>{const p=(s||'').trim().split(/[\s@.]+/).filter(Boolean);return ((p[0]||'?')[0]+(p[1]?p[1][0]:'')).toUpperCase();};
 function avatar(t,size,extra){ return t.photo?`<img class="avatar ${size}" src="${esc(t.photo)}" ${extra||''}>`:`<div class="avatar ${size}" ${extra||''}>${esc(initials(t.name||t.email))}</div>`; }
+const PLAN_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
+const planName=p=>PLAN_NAMES[p]||p||'';
 let TOKEN=localStorage.getItem('brasero_session')||'', ME=null, REF='', ORDERS=[], TALENTS=[];
 let VIEW=localStorage.getItem('brasero_view')||'kanban'; if(VIEW==='grid') VIEW='kanban';
 let DVIEW='cards';
@@ -322,11 +324,11 @@ $('#vswitch').querySelectorAll('button').forEach(b=>b.onclick=()=>setView(b.data
 function setView(v,render){ VIEW=v; localStorage.setItem('brasero_view',v); $('#vswitch').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); if(render) renderProjects(); }
 function filtered(){ const q=$('#search').value.trim().toLowerCase(); return ORDERS.filter(o=>!q||(o.ref+' '+(o.name||'')+' '+(o.email||'')+' '+(o.plan||'')).toLowerCase().includes(q)); }
 function spill(st){ const [c,l]=STATE[st]||STATE.todo; return `<span class="spill ${c}">${l}</span>`; }
-function pcard(o){ return `<button class="pcard" data-open="${esc(o.ref)}"><div class="r">#${esc(o.ref)}</div><div class="n">${esc(o.name||o.email||'')}</div><div class="foot"><span class="plan">${esc(o.plan||'')}</span>${spill(o.state)}</div></button>`; }
+function pcard(o){ return `<button class="pcard" data-open="${esc(o.ref)}"><div class="r">#${esc(o.ref)}</div><div class="n">${esc(o.name||o.email||'')}</div><div class="foot"><span class="plan">${esc(planName(o.plan))}</span>${spill(o.state)}</div></button>`; }
 function renderProjects(){
   const list=filtered(), wrap=$('#projects');
   if(!list.length){ wrap.className=''; wrap.innerHTML='<div class="placeholder">No projects yet.</div>'; return; }
-  if(VIEW==='list'){ wrap.className='plist'; wrap.innerHTML=list.map(o=>`<button class="prow" data-open="${esc(o.ref)}"><span class="r">#${esc(o.ref)}</span><span class="n">${esc(o.name||o.email||'')}</span><span class="plan">${esc(o.plan||'')}</span>${spill(o.state)}</button>`).join(''); }
+  if(VIEW==='list'){ wrap.className='plist'; wrap.innerHTML=list.map(o=>`<button class="prow" data-open="${esc(o.ref)}"><span class="r">#${esc(o.ref)}</span><span class="n">${esc(o.name||o.email||'')}</span><span class="plan">${esc(planName(o.plan))}</span>${spill(o.state)}</button>`).join(''); }
   else { wrap.className='kanban'; wrap.innerHTML=['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st); return `<div class="kcol"><div class="kcol__h"><span class="dot" style="background:${col}"></span>${l}<span class="c">${items.length}</span></div>${items.map(pcard).join('')||'<div class="none" style="color:var(--grey);font-size:12.5px;padding:6px">—</div>'}</div>`; }).join(''); }
   wrap.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openOrder(el.dataset.open));
 }
@@ -340,7 +342,7 @@ async function openOrder(ref){
   if(!d.ok){ alert(d.error==='forbidden'?'Not your project.':'Order not found'); return; }
   $('#overview').classList.add('hide'); $('#detail').classList.remove('hide');
   $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
-  $('#oMeta').textContent=[d.order.plan?d.order.plan+' pack':'',d.order.email].filter(Boolean).join(' · ');
+  $('#oMeta').textContent=[d.order.plan?planName(d.order.plan)+' pack':'',d.order.email].filter(Boolean).join(' · ');
   $('#decks').className=DVIEW; renderDecks(d.decks||[]);
 }
 $('#addDeck').onclick=async()=>{ const title=prompt('Deck title','New deck'); if(title===null) return; const d=await api('/api/admin',{action:'add_deck',ref:REF,title}); renderDecks(d.decks||[]); };

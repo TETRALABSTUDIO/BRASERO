@@ -359,6 +359,8 @@ img,svg{display:block}
 .plan--feat::after{content:"";position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.3),transparent 70%);filter:blur(22px);pointer-events:none;z-index:0}
 .plan__badge{position:absolute;top:24px;right:24px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--grad);padding:6px 13px;border-radius:100px;color:#fff;z-index:3}
 .plan h3{font-size:56px;font-weight:900;letter-spacing:-.035em;line-height:1}
+.plan__logo{margin:0 0 6px;line-height:0;display:flex;align-items:flex-end;min-height:46px}
+.plan__logo img{height:auto;width:auto;max-height:42px;max-width:100%;display:block;object-fit:contain}
 .plan__desc{color:var(--grey);font-size:15px;margin-top:8px;line-height:1.45;min-height:42px}
 .plan__price{display:flex;align-items:baseline;gap:9px;margin:24px 0 24px;flex-wrap:wrap}
 .plan__price b,.plan__price .grad-text,.plan__now{font-size:56px;font-weight:900;letter-spacing:-.035em}
@@ -719,7 +721,7 @@ img,svg{display:block}
     <div class="pack__grid">
       <div class="plan reveal">
         <div class="deckcount" data-count="3" data-cap="3 decks"></div>
-        <h3>Starter</h3>
+        <h3 class="plan__logo"><img src="assets/plans/ember.svg" alt="Ember"></h3>
         <p class="plan__desc">For pages testing the waters with consistent, on-brand decks.</p>
         <div class="plan__price" data-price="120"><b class="plan__now">$120</b><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
@@ -728,13 +730,13 @@ img,svg{display:block}
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 revision per carousel</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email in 72h</li>
         </ul>
-        <a href="checkout.html?plan=starter&billing=once" class="btn btn--ghost-light plan__cta" data-plan="starter">Choose Starter</a>
+        <a href="checkout.html?plan=starter&billing=once" class="btn btn--ghost-light plan__cta" data-plan="starter">Choose Ember</a>
       </div>
 
       <div class="plan plan--feat reveal">
         <span class="plan__badge">Most popular</span>
         <div class="deckcount" data-count="6" data-cap="6 decks"></div>
-        <h3>Flame</h3>
+        <h3 class="plan__logo"><img src="assets/plans/flame-white.svg" alt="Flame"></h3>
         <p class="plan__desc">For pages posting consistently and scaling reach month over month.</p>
         <div class="plan__price" data-price="240"><span class="grad-text plan__now">$240</span><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
@@ -753,16 +755,16 @@ img,svg{display:block}
         <div class="pgig pgig--dot"></div>
         <div class="pgig pgig--ring"></div>
         <div class="deckcount" data-count="10" data-cap="9 + 1 free"></div>
-        <h3>Burst</h3>
+        <h3 class="plan__logo"><img src="assets/plans/meteor.svg" alt="Meteor"></h3>
         <p class="plan__desc">Maximum output and priority turnaround for serious, fast growth.</p>
-        <div class="plan__price" data-price="290"><b class="plan__now">$290</b><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
+        <div class="plan__price" data-price="350"><b class="plan__now">$350</b><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>9 carousel decks <strong style="font-weight:800;color:var(--orange);margin-left:4px">+ 1 free</strong></li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting included</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>4 revisions per carousel</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered by email in 48h · priority</li>
         </ul>
-        <a href="checkout.html?plan=burst&billing=once" class="btn btn--grad plan__cta" data-plan="burst">Choose Burst</a>
+        <a href="checkout.html?plan=burst&billing=once" class="btn btn--grad plan__cta" data-plan="burst">Choose Meteor</a>
       </div>
     </div>
 
