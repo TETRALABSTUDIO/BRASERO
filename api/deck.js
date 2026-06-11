@@ -1,4 +1,5 @@
-import { findOrderByRefEmail, decksForOrder, getDeck, patchDeck, publicOrder, send } from './_lib.js';
+import { findOrderByRefEmail, decksForOrder, getDeck, patchDeck, publicOrder, send,
+  sendTo, getTalentByEmail, talentClientActionEmail, talentProjectDoneEmail, siteUrl } from './_lib.js';
 
 // Customer-driven deck actions, authenticated by ref + email each call.
 //   action = validate_script | validate_design | request_revision
@@ -44,6 +45,23 @@ export default async function handler(req, res) {
     } catch (e) { console.error('notify', e); }
 
     const decks = await decksForOrder(order.id);
+
+    // Notify the assigned talent (client approved / requested a change), and on full completion.
+    try {
+      if (order.talent_email) {
+        const talent = await getTalentByEmail(order.talent_email);
+        const panelUrl = `${siteUrl(req)}/panel.html`;
+        const kind = action === 'validate_script' ? 'approved_script' : action === 'validate_design' ? 'approved_design' : 'revision';
+        const subj = kind === 'approved_script' ? '✅ Your client approved a script'
+          : kind === 'approved_design' ? '🎉 Your client approved a design'
+          : '✏️ Your client requested a retouch';
+        await sendTo(order.talent_email, subj, talentClientActionEmail({ name: talent?.name, ref, deckTitle: deck.title, kind, note, panelUrl }));
+        if (action === 'validate_design' && decks.length && decks.every(d => d.status === 'done')) {
+          await sendTo(order.talent_email, '🎉 Project completed', talentProjectDoneEmail({ name: talent?.name, ref, clientName: order.name, panelUrl }));
+        }
+      }
+    } catch (e) { console.error('talent notify', e); }
+
     res.json({ ok: true, order: publicOrder(order, decks) });
   } catch (err) {
     console.error('deck', err);

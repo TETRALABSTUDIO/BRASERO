@@ -469,22 +469,57 @@ export async function sendTo(to, subject, html) {
   await mailer.sendMail({ from: process.env.MAIL_FROM, to, subject, html });
 }
 
-// Shared branded shell: gradient header + footer. `inner` is the body cells.
+const LOGO_URL = 'https://www.braserodecks.com/assets/email-logo.png';
+
+// Shared branded shell: clean white card, logo header (no orange box) + dark footer.
 export function emailShell(inner) {
-  return `<!doctype html><html><body style="margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:28px 0"><tr><td align="center">
-    <table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;border:1px solid #eeeeee;border-radius:18px;overflow:hidden">
-      <tr><td style="background:linear-gradient(100deg,#ff1a00,#f87000);padding:24px 28px">
-        <span style="color:#ffffff;font-size:22px;font-weight:900;letter-spacing:-1px">brasero.</span>
+  return `<!doctype html><html><body style="margin:0;background:#f4f1ec;font-family:Arial,Helvetica,sans-serif;color:#111111">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ec;padding:30px 12px"><tr><td align="center">
+    <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 12px 34px rgba(0,0,0,.07)">
+      <tr><td style="padding:26px 30px 18px;border-bottom:1px solid #f0ece4">
+        <img src="${LOGO_URL}" alt="Brasero" height="28" style="display:block;border:0;height:28px;width:auto">
       </td></tr>
       ${inner}
-      <tr><td style="padding:18px 28px;background:#0c0c0c;color:#9a9a9a;font-size:12px;line-height:1.5">Brasero · decks that build lasting trust<br>Questions? Just reply to this email.</td></tr>
+      <tr><td style="padding:22px 30px;background:#0c0c0c;color:#8d8d8d;font-size:12px;line-height:1.6">Brasero · the carousel design studio<br>Questions? Just reply to this email.</td></tr>
     </table>
   </td></tr></table></body></html>`;
 }
 
 function ctaButton(url, label) {
-  return `<a href="${url}" style="display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 26px;border-radius:100px">${label}</a>`;
+  return `<a href="${url}" style="display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 28px;border-radius:100px">${label}</a>`;
+}
+
+/* ---- structured email building blocks ---- */
+function emailHero(eyebrow, title) {
+  return `<tr><td style="padding:30px 30px 0">
+    ${eyebrow ? `<p style="margin:0 0 7px;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#f87000">${eyebrow}</p>` : ''}
+    <h1 style="margin:0;font-size:25px;letter-spacing:-.6px;line-height:1.15;color:#111111">${title}</h1>
+  </td></tr>`;
+}
+function emailText(html) {
+  return `<tr><td style="padding:16px 30px 0;font-size:15px;color:#333333;line-height:1.6">${html}</td></tr>`;
+}
+function noteBox(label, body) {
+  return `<tr><td style="padding:14px 30px 0">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff4ef;border-radius:10px"><tr>
+      <td width="4" style="background:#f87000"></td>
+      <td style="padding:12px 14px;font-size:14px;color:#444444;line-height:1.5"><b style="color:#c64600">${label}</b><br>${body}</td>
+    </tr></table>
+  </td></tr>`;
+}
+function nextSteps(items) {
+  const rows = items.map(s => `<tr>
+    <td width="22" valign="top"><div style="width:7px;height:7px;border-radius:50%;background:#f87000;margin:7px 0 0"></div></td>
+    <td style="font-size:14px;color:#3a3a3a;line-height:1.55;padding:0 0 9px 2px">${s}</td></tr>`).join('');
+  return `<tr><td style="padding:18px 30px 2px">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4ef;border-radius:12px"><tr><td style="padding:15px 18px">
+      <p style="margin:0 0 11px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#9a8f80">Next steps</p>
+      <table width="100%" cellpadding="0" cellspacing="0">${rows}</table>
+    </td></tr></table>
+  </td></tr>`;
+}
+function emailCta(url, label) {
+  return `<tr><td style="padding:20px 30px 30px">${ctaButton(url, label)}</td></tr>`;
 }
 
 // "You have something to validate" email — script ready or design ready.
@@ -558,6 +593,64 @@ export function addonClientEmail({ name, planName, count, ref, trackUrl }) {
       ${trackUrl ? ctaButton(trackUrl, 'Open your tracker →') : ''}
     </td></tr>
     <tr><td style="padding:14px 28px 26px;color:#9a9a9a;font-size:12px">Order #${ref || ''}</td></tr>`);
+}
+
+/* ===================== Talent emails ===================== */
+export const randomPassword = () => crypto.randomBytes(18).toString('hex');
+const greet = name => `<p style="margin:0 0 8px">Hi${name ? ' ' + name.split(' ')[0] : ''},</p>`;
+
+// Invite a new talent to set up their account (password + name + photo).
+export function talentInviteEmail({ name, setupUrl }) {
+  return emailShell(
+    emailHero('Talent invite', 'Join your studio space 🎨') +
+    emailText(`${greet(name)}<p style="margin:0">You've been invited to Brasero Studio to work on client carousels, stories &amp; branding.</p>`) +
+    nextSteps(['Create your password', 'Add your name &amp; a profile photo', 'See every project assigned to you']) +
+    emailCta(setupUrl || '#', 'Set up my account →')
+  );
+}
+
+// New project assigned to a talent.
+export function talentAssignedEmail({ name, ref, clientName, planName, panelUrl }) {
+  return emailShell(
+    emailHero('New project', `New project · #${ref || ''}`) +
+    emailText(`${greet(name)}<p style="margin:0">A new project${clientName ? ` from <b>${clientName}</b>` : ''}${planName ? ` (${planName} pack)` : ''} has been assigned to you.</p>`) +
+    nextSteps(['Open the panel to see the elements', 'Write the first scripts', 'Send them to the client for approval']) +
+    emailCta(panelUrl || '#', 'Open the panel →')
+  );
+}
+
+// Client action on a deck: approved script / approved design / requested a retouch.
+export function talentClientActionEmail({ name, ref, deckTitle, kind, note, panelUrl }) {
+  const t = deckTitle || 'an element';
+  const map = {
+    approved_script: { eyebrow: 'Client approved', title: `Script approved · #${ref || ''}`,
+      intro: `Your client approved the script for <b>${t}</b>, time to design it.`,
+      steps: ['Open the element in the panel', 'Create &amp; upload the slides', 'Send the design for approval'] },
+    approved_design: { eyebrow: 'Client approved', title: `Design approved · #${ref || ''}`,
+      intro: `Your client approved the design for <b>${t}</b>, it's done and live. 🎉`,
+      steps: ['Nothing to do on this element', 'Move on to the next one in the order'] },
+    revision: { eyebrow: 'Retouch requested', title: `Retouch requested · #${ref || ''}`,
+      intro: `Your client asked for a change on <b>${t}</b>.`,
+      steps: ['Read the client note above', 'Update the design', 'Resend it for approval'] },
+  };
+  const c = map[kind] || map.approved_script;
+  return emailShell(
+    emailHero(c.eyebrow, c.title) +
+    emailText(`${greet(name)}<p style="margin:0">${c.intro}</p>`) +
+    (kind === 'revision' && note ? noteBox('Client note', String(note)) : '') +
+    nextSteps(c.steps) +
+    emailCta(panelUrl || '#', 'Open the panel →')
+  );
+}
+
+// Whole project completed (all elements approved).
+export function talentProjectDoneEmail({ name, ref, clientName, panelUrl }) {
+  return emailShell(
+    emailHero('Completed', `Project completed · #${ref || ''} 🎉`) +
+    emailText(`${greet(name)}<p style="margin:0">Every element${clientName ? ` of <b>${clientName}</b>'s order` : ''} is approved &amp; delivered. Great work!</p>`) +
+    nextSteps(['The full project is now live in the client\'s space', 'Check the panel for any new assignments']) +
+    emailCta(panelUrl || '#', 'View the project →')
+  );
 }
 
 export function siteUrl(req) {

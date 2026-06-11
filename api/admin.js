@@ -1,6 +1,7 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
-  assignOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl } from './_lib.js';
+  assignOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
+  signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail } from './_lib.js';
 
 const pub = o => ({ ref: o.ref || orderRef(o.stripe_session_id), name: o.name, email: o.email, plan: o.plan, talent_email: o.talent_email || '', created_at: o.created_at });
 
@@ -42,8 +43,14 @@ export default async function handler(req, res) {
     }
     if (action === 'create_talent') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
-      const r = await createTalent({ email: b.email, password: b.password, name: b.name, is_owner: !!b.is_owner });
+      // Invite flow: the talent sets their own password/name/photo via the setup link.
+      const r = await createTalent({ email: b.email, password: b.password || randomPassword(), name: b.name, is_owner: !!b.is_owner });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      try {
+        const token = signToken({ email: String(b.email).trim().toLowerCase(), setup: true }, 7);
+        const setupUrl = `${siteUrl(req)}/panel.html?setup=${encodeURIComponent(token)}`;
+        await sendTo(b.email, "You're invited to Brasero Studio 🎨", talentInviteEmail({ name: b.name, setupUrl }));
+      } catch (e) { console.error('invite email', e); }
       return res.json({ ok: true, talent: r.talent, talents: await listTalents() });
     }
     if (action === 'update_talent') {
@@ -63,6 +70,18 @@ export default async function handler(req, res) {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
       const r = await assignOrder(b.ref, b.talentEmail || null);
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      if (b.talentEmail) {   // notify the talent (not on unassign)
+        try {
+          const [order, talent] = await Promise.all([findOrderByRef(b.ref), getTalentByEmail(b.talentEmail)]);
+          await sendTo(b.talentEmail, '🚀 New project assigned to you', talentAssignedEmail({
+            name: talent?.name,
+            ref: order ? (order.ref || orderRef(order.stripe_session_id)) : b.ref,
+            clientName: order?.name,
+            planName: order?.plan ? (PLANS[order.plan]?.name || order.plan) : '',
+            panelUrl: `${siteUrl(req)}/panel.html`,
+          }));
+        } catch (e) { console.error('assign email', e); }
+      }
       return res.json({ ok: true, orders: (await adminListOrders()).map(pub) });
     }
 
@@ -77,6 +96,7 @@ export default async function handler(req, res) {
     if (action === 'add_deck') {
       if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
       if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
       const existing = await decksForOrder(order.id);
       await createDeck(order.id, { position: existing.length, title: b.title || `Deck ${existing.length + 1}` });
       return res.json({ ok: true, decks: await decksForOrder(order.id) });
@@ -98,6 +118,7 @@ export default async function handler(req, res) {
     }
 
     if (action === 'delete_deck') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
       await deleteDeck(deck.id);
       return res.json({ ok: true, decks: await decksForOrder(deck.order_id) });
     }
