@@ -6,6 +6,9 @@ import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { saveOrder, markPaid, saveOnboarding, sendTo, clientOrderEmail } from '../api/_lib.js';
+import orderHandler from '../api/order.js';
+import deckHandler from '../api/deck.js';
+import adminHandler from '../api/admin.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -144,6 +147,11 @@ app.post('/api/onboarding', async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
+
+/* Order tracking (customer) + studio admin panel */
+app.post('/api/order', orderHandler);
+app.post('/api/deck', deckHandler);
+app.post('/api/admin', adminHandler);
 
 /* Optional: serve the static site from this same server (single deploy) */
 if (process.env.SERVE_STATIC === '1') {

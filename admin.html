@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio · Brasero</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--soft:#f7f4ef;--grey:#6b6b6b;--line:rgba(0,0,0,.12);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00,#f87000);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Satoshi',system-ui,sans-serif;background:#faf8f5;color:var(--ink);padding:24px;max-width:920px;margin:0 auto}
+h1{font-size:24px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px}
+.sub{color:var(--grey);font-size:14px;margin-bottom:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,textarea,button{font-family:inherit;font-size:14px}
+input,textarea{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;width:100%}
+textarea{min-height:90px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus{border-color:var(--orange)}
+button{padding:9px 16px;border-radius:100px;border:1px solid transparent;font-weight:700;cursor:pointer}
+.b-grad{background:var(--grad);color:#fff}
+.b-ghost{background:#fff;border-color:var(--line)}
+.b-del{background:#fff;border-color:#f1c0c0;color:#c33}
+.b-sm{padding:6px 12px;font-size:13px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.pill{font-size:11px;font-weight:800;padding:4px 9px;border-radius:100px;background:#eee;color:#666}
+.muted{color:var(--grey);font-size:13px}
+.ordlist a{display:block;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px;cursor:pointer;font-size:13px}
+.ordlist a:hover{border-color:var(--orange)}
+label{font-size:12px;font-weight:700;display:block;margin:10px 0 4px}
+.hide{display:none}
+.gap{margin-top:10px}
+</style>
+</head>
+<body>
+<h1>Brasero Studio</h1>
+<p class="sub">Produce decks, push scripts &amp; designs for client approval.</p>
+
+<div class="card" id="auth">
+  <label>Admin token</label>
+  <div class="row"><input id="token" type="password" placeholder="ADMIN_TOKEN" style="flex:1;min-width:220px"><button class="b-grad" id="login">Enter</button></div>
+  <p class="muted gap" id="authErr"></p>
+</div>
+
+<div id="app" class="hide">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <b>Paid orders</b>
+      <div class="row"><input id="lookup" placeholder="Order # (e.g. A1B2C3D4)" style="width:180px"><button class="b-ghost b-sm" id="open">Open</button><button class="b-ghost b-sm" id="refresh">Reload list</button></div>
+    </div>
+    <div class="ordlist gap" id="orders"></div>
+  </div>
+
+  <div id="order" class="hide">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div><b id="oName"></b> <span class="muted" id="oMeta"></span></div>
+        <button class="b-ghost b-sm" id="addDeck">+ Add deck</button>
+      </div>
+    </div>
+    <div id="decks"></div>
+  </div>
+</div>
+
+<script>
+const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
+const $=s=>document.querySelector(s);
+const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let TOKEN='', REF='';
+
+async function api(body){
+  const r=await fetch(API+'/api/admin',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
+  if(r.status===401) throw new Error('unauthorized');
+  return r.json();
+}
+
+$('#login').onclick=async()=>{
+  TOKEN=$('#token').value.trim(); if(!TOKEN) return;
+  try{ const d=await api({action:'list'}); localStorage.setItem('brasero_admin',TOKEN);
+    $('#auth').classList.add('hide'); $('#app').classList.remove('hide'); renderOrders(d.orders||[]);
+  }catch(e){ $('#authErr').textContent='Invalid token.'; }
+};
+
+$('#refresh').onclick=async()=>{ const d=await api({action:'list'}); renderOrders(d.orders||[]); };
+$('#open').onclick=()=>{ const v=$('#lookup').value.trim(); if(v) openOrder(v); };
+
+function renderOrders(list){
+  $('#orders').innerHTML = list.length? list.map(o=>
+    `<a data-ref="${esc(o.ref)}">#${esc(o.ref)} — ${esc(o.name||o.email)} <span class="muted">· ${esc(o.plan||'')}</span></a>`
+  ).join('') : '<p class="muted">No paid orders yet.</p>';
+  document.querySelectorAll('#orders a').forEach(a=>a.onclick=()=>openOrder(a.dataset.ref));
+}
+
+async function openOrder(ref){
+  REF=ref.replace(/^#/,'');
+  const d=await api({action:'get',ref:REF});
+  if(!d.ok){ alert('Order not found'); return; }
+  $('#order').classList.remove('hide');
+  $('#oName').textContent='#'+(d.order.ref)+' · '+(d.order.name||d.order.email);
+  $('#oMeta').textContent=(d.order.plan||'')+' · '+(d.order.email||'');
+  renderDecks(d.decks||[]);
+  $('#order').scrollIntoView({behavior:'smooth'});
+}
+
+$('#addDeck').onclick=async()=>{
+  const title=prompt('Deck title','New deck'); if(title===null) return;
+  const d=await api({action:'add_deck',ref:REF,title}); renderDecks(d.decks||[]);
+};
+
+const FLOW={writing:'Writing',script_review:'Script · awaiting client',designing:'Designing',design_review:'Design · awaiting client',revision:'Revision requested',done:'Done'};
+
+function renderDecks(decks){
+  $('#decks').innerHTML = decks.length? decks.map(deckCard).join('') : '<p class="muted card">No decks yet — add one.</p>';
+  decks.forEach(bind);
+}
+
+function deckCard(d){
+  return `<div class="card" data-deck="${d.id}">
+    <div class="row" style="justify-content:space-between">
+      <input data-f="title" value="${esc(d.title)}" style="max-width:60%;font-weight:700">
+      <span class="pill">${FLOW[d.status]||d.status}</span>
+    </div>
+    ${d.revision_note?`<p class="muted gap">✏️ Client retouch: ${esc(d.revision_note)}</p>`:''}
+    <label>Script</label>
+    <textarea data-f="script">${esc(d.script)}</textarea>
+    <label>Design URL (image link)</label>
+    <input data-f="design_url" value="${esc(d.design_url||'')}" placeholder="https://...png">
+    <div class="row gap">
+      <button class="b-ghost b-sm" data-a="save_deck">Save draft</button>
+      <button class="b-grad b-sm" data-a="send_script">Send script to client →</button>
+      <button class="b-grad b-sm" data-a="send_design">Send design to client →</button>
+      <button class="b-del b-sm" data-a="delete_deck">Delete</button>
+    </div>
+  </div>`;
+}
+
+function bind(d){
+  const card=document.querySelector(`[data-deck="${d.id}"]`);
+  const val=f=>card.querySelector(`[data-f="${f}"]`).value;
+  card.querySelectorAll('[data-a]').forEach(btn=>btn.onclick=async()=>{
+    const a=btn.dataset.a;
+    if(a==='delete_deck'&&!confirm('Delete this deck?')) return;
+    const body={action:a,ref:REF,deckId:d.id,title:val('title'),script:val('script'),design_url:val('design_url')};
+    btn.disabled=true; const old=btn.textContent; btn.textContent='…';
+    const r=await api(body);
+    if(r.ok){ renderDecks(r.decks||[]); } else { alert('Error: '+(r.error||'')); btn.disabled=false; btn.textContent=old; }
+  });
+}
+
+(function(){ const t=localStorage.getItem('brasero_admin'); if(t){ $('#token').value=t; $('#login').click(); } })();
+</script>
+</body>
+</html>

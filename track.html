@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track your order · Brasero</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" href="assets/favicon.svg">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0c0c0c;--ink:#111;--soft:#f7f4ef;--grey:#6b6b6b;--line:rgba(0,0,0,.10);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00 0%,#f87000 100%);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Satoshi',system-ui,sans-serif;background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-weight:700;font-size:15px;letter-spacing:-.01em;padding:13px 24px;border-radius:100px;border:1px solid transparent;cursor:pointer;transition:transform .25s,box-shadow .25s,color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn--grad{background:var(--grad);color:#fff;box-shadow:0 10px 26px rgba(248,80,0,.3)}
+.btn--grad:hover{box-shadow:0 16px 38px rgba(248,80,0,.42)}
+.btn--ghost{background:transparent;border-color:rgba(0,0,0,.16);color:var(--ink)}
+.btn--ghost:hover{border-color:var(--ink)}
+.btn--sm{padding:9px 16px;font-size:13px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+.glow{position:fixed;width:560px;height:560px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.13),transparent 72%);filter:blur(30px);pointer-events:none;top:-200px;right:-160px;z-index:0}
+.top{display:flex;align-items:center;justify-content:space-between;max-width:880px;margin:0 auto;padding:18px 24px 2px;position:relative;z-index:2}
+.logo-svg{height:26px;width:auto;color:var(--ink)}
+.top a.help{font-size:13px;font-weight:700;color:var(--grey)}
+.shell{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:8px 24px 60px}
+
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
+.eyebrow .pxa{display:inline-flex;gap:3px}
+.eyebrow .pxa i{width:8px;height:11px;border-radius:3px;background-image:url(assets/pxgrad.svg);background-size:100% 100%;image-rendering:pixelated}
+h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;line-height:1.0}
+.lead{color:var(--grey);font-size:15px;line-height:1.45;margin-top:10px;max-width:42em}
+
+/* gate */
+.gate{max-width:430px;margin:6vh auto 0;background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 14px 40px rgba(0,0,0,.06)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.field input{width:100%;font-family:inherit;font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--soft);outline:none;transition:border .2s,box-shadow .2s;color:var(--ink)}
+.field input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.12);background:#fff}
+.err{color:#d11;font-size:13px;font-weight:600;min-height:18px;margin:2px 0 6px}
+
+/* dashboard head */
+.ohead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin:8px 0 22px}
+.obadge{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:7px 14px}
+.obadge b{font-weight:900}
+
+/* progress */
+.prog-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 24px;box-shadow:0 12px 34px rgba(0,0,0,.05);margin-bottom:26px}
+.pbar{height:8px;border-radius:100px;background:rgba(0,0,0,.07);overflow:hidden;margin:4px 0 20px}
+.pbar i{display:block;height:100%;border-radius:100px;background:var(--grad);transition:width .7s cubic-bezier(.4,0,.2,1)}
+.steps{display:flex;gap:6px;overflow-x:auto}
+.step{flex:1;min-width:92px;text-align:center}
+.step .dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;background:#fff;border:1px solid var(--line);color:#bdbdbd;font-weight:900;font-size:13px;transition:.35s}
+.step.done .dot,.step.active .dot{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(248,80,0,.28)}
+.step.done .dot{font-size:0}.step.done .dot::after{content:"✓";font-size:15px}
+.step .lab{font-size:11.5px;font-weight:700;color:#bdbdbd;transition:.35s;letter-spacing:-.01em}
+.step.done .lab,.step.active .lab{color:var(--ink)}
+
+/* decks */
+.sec-h{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin:0 0 12px}
+.deck{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.045)}
+.deck__top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.deck__title{font-size:18px;font-weight:900;letter-spacing:-.02em}
+.pill{font-size:11.5px;font-weight:800;letter-spacing:.02em;padding:5px 11px;border-radius:100px;white-space:nowrap}
+.pill--wait{background:#f1f1f1;color:#777}
+.pill--act{background:rgba(248,80,0,.12);color:#c64600}
+.pill--done{background:rgba(22,163,74,.12);color:#15803d}
+.deck__hint{font-size:13.5px;color:var(--grey);line-height:1.5;margin:4px 0 0}
+.deck__body{margin-top:14px}
+textarea.script{width:100%;min-height:150px;font-family:inherit;font-size:14.5px;line-height:1.6;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--soft);outline:none;resize:vertical;color:var(--ink)}
+textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.10);background:#fff}
+textarea.script[readonly]{background:#fafafa;color:#555}
+.design{border-radius:14px;border:1px solid var(--line);overflow:hidden;background:var(--soft)}
+.design img{display:block;width:100%;height:auto}
+.design a.dl{display:block;padding:14px;font-weight:700;color:var(--orange);text-align:center}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.note{font-size:13px;color:#c64600;background:rgba(248,80,0,.07);border-radius:10px;padding:10px 12px;margin-top:12px}
+.revbox{margin-top:12px;display:none}
+.revbox.open{display:block}
+.empty{text-align:center;color:var(--grey);padding:34px;border:1px dashed var(--line);border-radius:18px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hide{display:none!important}
+@media(max-width:560px){.step{min-width:70px}.step .lab{font-size:10.5px}}
+</style>
+</head>
+<body>
+
+<!-- brasero wordmark symbol -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="g_mark" x1="16" y1="56" x2="163" y2="141" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<g id="brasero-mark">
+<path d="M89.6395 47.9895C94.3875 45.2482 94.3875 38.3952 89.6395 35.6539L81.4719 30.9384C79.2684 29.6662 76.5535 29.6662 74.35 30.9384L58.8599 39.8815C56.6564 41.1536 53.9416 41.1536 51.7381 39.8814L42.8628 34.7573C38.1148 32.0161 38.1148 25.163 42.8628 22.4218L74.3503 4.24237C76.5538 2.97016 79.2687 2.97015 81.4722 4.24236L120.108 26.5485C122.311 27.8207 123.668 30.1718 123.668 32.7163L123.668 73.9556C123.668 77.2688 120.082 79.3396 117.212 77.683C114.343 76.0264 110.756 78.0972 110.756 81.4104L110.756 119.155C110.756 124.138 116.151 127.253 120.467 124.761C122.471 123.605 123.704 121.467 123.704 119.154L123.704 85.3354C123.704 82.7909 125.061 80.4398 127.265 79.1676L150.028 66.0252C154.776 63.284 160.711 66.7105 160.711 72.193L160.711 140.146C160.711 142.691 159.354 145.042 157.15 146.314L91.03 184.488C88.8265 185.761 86.1116 185.761 83.9081 184.488L17.7879 146.314C15.5843 145.042 14.2269 142.69 14.2269 140.146L14.2268 72.0684C14.2268 66.5859 20.1617 63.1594 24.9097 65.9006L47.6719 79.0424C49.8754 80.3146 51.2329 82.6657 51.2329 85.2101L51.2333 118.781C51.2334 121.325 52.5908 123.676 54.7943 124.948L84.0442 141.836C86.1635 143.059 88.7745 143.059 90.8937 141.836C95.46 139.199 95.46 132.608 90.8937 129.972L68.5858 117.093C66.3823 115.82 65.0248 113.469 65.0248 110.925L65.0248 66.3125C65.0248 63.7681 66.3822 61.417 68.5858 60.1448L89.6395 47.9895Z" fill="url(#g_mark)"/>
+<path d="M214.652 163.952H187.418V22.3374H216.342V89.0127C221.977 80.5609 234.373 66.8502 247.896 66.8502C274.19 66.8502 290.906 87.3224 290.906 117.937C290.906 147.048 272.312 166.394 245.642 166.394C232.495 166.394 221.226 160.571 216.155 151.932L214.652 163.952ZM216.53 116.434C216.53 130.521 225.921 139.911 239.444 139.911C253.155 139.911 261.794 130.333 261.794 116.434C261.794 102.536 253.155 92.9569 239.444 92.9569C225.921 92.9569 216.53 102.348 216.53 116.434Z" fill="currentColor"/>
+<path d="M359.018 70.0431V97.2767H349.815C333.287 97.2767 323.333 104.602 323.333 123.196V163.952H294.409V70.231H321.642L323.145 84.1295C327.089 74.9264 335.353 68.7284 347.937 68.7284C351.317 68.7284 355.074 69.1041 359.018 70.0431Z" fill="currentColor"/>
+<path d="M385.189 166.394C365.281 166.394 352.885 154.749 352.885 136.343C352.885 119.064 365.093 108.358 387.631 106.668L413.925 104.602V103.099C413.925 93.896 408.291 89.0127 397.961 89.0127C385.753 89.0127 379.179 93.7082 379.179 102.16H355.138C355.138 80.9366 372.605 67.0381 399.463 67.0381C426.697 67.0381 442.098 82.2513 442.098 109.109V163.952H416.555L414.677 151.556C411.672 160.196 399.276 166.394 385.189 166.394ZM395.331 144.982C406.413 144.982 414.113 139.536 414.113 128.83V123.759L399.463 125.074C386.88 126.201 382.372 129.018 382.372 135.028C382.372 141.79 386.504 144.982 395.331 144.982Z" fill="currentColor"/>
+<path d="M442.934 134.277H470.356C470.731 140.85 475.615 144.795 484.442 144.795C493.457 144.795 497.589 141.602 497.589 136.718C497.589 133.901 496.087 130.896 489.138 129.394L471.858 125.637C454.579 121.881 446.127 114.368 446.127 97.8402C446.127 78.3071 462.843 67.0381 485.381 67.0381C507.168 67.0381 522.381 79.8097 522.381 98.7793H494.96C494.96 92.3935 491.016 88.0737 484.067 88.0737C477.493 88.0737 473.361 91.4544 473.361 96.5255C473.361 100.845 476.929 103.287 483.503 104.789L500.97 108.546C516.371 111.927 524.823 119.064 524.823 134.089C524.823 154.186 507.732 166.394 483.315 166.394C458.523 166.394 442.934 153.246 442.934 134.277Z" fill="currentColor"/>
+<path d="M570.363 166.394C542.003 166.394 521.718 145.734 521.718 116.81C521.718 87.5102 541.439 67.0381 569.8 67.0381C599.287 67.0381 617.693 86.3833 617.693 116.998V124.323L549.515 124.698C551.206 137.094 558.155 142.916 570.926 142.916C581.82 142.916 589.52 138.972 591.586 132.211H618.069C614.688 153.059 596.094 166.394 570.363 166.394ZM569.987 90.5153C558.53 90.5153 552.145 95.5864 549.891 106.855H588.957C588.957 96.9011 581.632 90.5153 569.987 90.5153Z" fill="currentColor"/>
+<path d="M686.283 70.0431V97.2767H677.08C660.552 97.2767 650.598 104.602 650.598 123.196V163.952H621.674V70.231H648.907L650.41 84.1295C654.354 74.9264 662.618 68.7284 675.202 68.7284C678.583 68.7284 682.339 69.1041 686.283 70.0431Z" fill="currentColor"/>
+<path d="M679.94 116.81C679.94 87.1346 701.727 67.2259 731.778 67.2259C761.641 67.2259 783.428 87.1346 783.428 116.81C783.428 146.485 761.641 166.206 731.778 166.206C701.727 166.206 679.94 146.485 679.94 116.81ZM709.052 116.622C709.052 130.896 718.255 140.287 731.778 140.287C745.113 140.287 754.316 130.896 754.316 116.622C754.316 102.536 745.113 93.1447 731.778 93.1447C718.255 93.1447 709.052 102.536 709.052 116.622Z" fill="currentColor"/>
+</g></defs></svg>
+
+<header class="top">
+  <a href="index.html" aria-label="Brasero home"><svg class="logo-svg" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></a>
+  <a class="help" href="mailto:hello@brasero.studio">Need help?</a>
+</header>
+
+<div class="glow"></div>
+
+<main class="shell">
+
+  <!-- ===== GATE ===== -->
+  <section id="gate">
+    <div class="gate">
+      <span class="eyebrow"><span class="pxa"><i></i><i></i><i></i></span>Order tracking</span>
+      <h1 class="title" style="font-size:26px">Track your <span class="grad-text">decks</span></h1>
+      <p class="lead" style="margin-bottom:20px">Enter your order number and the email you used at checkout.</p>
+      <form id="gateForm">
+        <div class="field"><label>Order number</label><input id="ref" placeholder="A1B2C3D4" autocomplete="off" required></div>
+        <div class="field"><label>Email</label><input id="email" type="email" placeholder="you@email.com" required></div>
+        <div class="err" id="gateErr"></div>
+        <button class="btn btn--grad" id="gateBtn" style="width:100%" type="submit">View my order →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== DASHBOARD ===== -->
+  <section id="dash" class="hide">
+    <div class="ohead">
+      <div>
+        <span class="eyebrow"><span class="pxa"><i></i><i></i><i></i></span>Your order</span>
+        <h1 class="title" id="hello">Welcome back</h1>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span class="obadge">Order <b id="oref">#—</b></span>
+        <span class="obadge" id="oplan"></span>
+        <button class="btn btn--ghost btn--sm" id="logout">Sign out</button>
+      </div>
+    </div>
+
+    <div class="prog-card">
+      <div class="pbar"><i id="pfill" style="width:0"></i></div>
+      <div class="steps" id="steps"></div>
+    </div>
+
+    <h3 class="sec-h">Your decks</h3>
+    <div id="decks"></div>
+  </section>
+
+</main>
+
+<script>
+const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
+const $=s=>document.querySelector(s);
+const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let CREDS={ref:'',email:''};
+
+const STATUS={
+  writing:      {pill:'pill--wait',label:'Writing script',  hint:"We're writing the script for this deck. Nothing to do yet — we'll email you the moment it's ready."},
+  script_review:{pill:'pill--act', label:'Your turn · script', hint:'Read the script below. Tweak anything you like, then approve it to move into design.'},
+  designing:    {pill:'pill--wait',label:'In design',       hint:'Script approved 🎉 — our designers are building this deck now.'},
+  design_review:{pill:'pill--act', label:'Your turn · design', hint:'Your design is ready. Approve it, or ask for a retouch and we’ll rework it.'},
+  revision:     {pill:'pill--wait',label:'Retouch in progress', hint:"We're applying your retouch. We'll send the new version for approval shortly."},
+  done:         {pill:'pill--done',label:'Approved',        hint:'This deck is approved and ready to post. 🔥'},
+};
+
+/* ---------- gate ---------- */
+$('#gateForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const ref=$('#ref').value.trim().replace(/^#/,'');
+  const email=$('#email').value.trim();
+  if(!ref||!email) return;
+  await load(ref,email);
+});
+
+async function load(ref,email,silent){
+  const btn=$('#gateBtn'); if(!silent){btn.disabled=true;btn.innerHTML='<span class="spin"></span>';}
+  $('#gateErr').textContent='';
+  try{
+    const r=await fetch(API+'/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref,email})});
+    const d=await r.json();
+    if(!r.ok||!d.ok){
+      if(!silent){$('#gateErr').textContent = r.status===404?"We couldn't find an order with those details.":'Something went wrong. Please try again.';}
+      else logout();
+      return;
+    }
+    CREDS={ref,email};
+    localStorage.setItem('brasero_track',JSON.stringify(CREDS));
+    render(d.order);
+  }catch(err){ if(!silent)$('#gateErr').textContent='Network error. Please try again.'; }
+  finally{ btn.disabled=false; btn.textContent='View my order →'; }
+}
+
+function logout(){
+  localStorage.removeItem('brasero_track');
+  CREDS={ref:'',email:''};
+  $('#dash').classList.add('hide'); $('#gate').classList.remove('hide');
+  history.replaceState(null,'','track.html');
+}
+$('#logout').addEventListener('click',logout);
+
+/* ---------- render ---------- */
+function render(o){
+  $('#gate').classList.add('hide'); $('#dash').classList.remove('hide');
+  $('#hello').innerHTML = o.name ? `Hi <span class="grad-text">${esc(o.name.split(' ')[0])}</span>` : 'Your <span class="grad-text">decks</span>';
+  $('#oref').textContent = '#'+o.ref;
+  $('#oplan').textContent = o.plan ? (o.plan.charAt(0).toUpperCase()+o.plan.slice(1)+' pack') : '';
+  $('#oplan').style.display = o.plan?'':'none';
+
+  const p=o.progress;
+  $('#pfill').style.width=p.percent+'%';
+  $('#steps').innerHTML=p.steps.map((s,i)=>{
+    const cls=i<p.active?'done':(i===p.active?'active':'');
+    return `<div class="step ${cls}"><div class="dot">${i+1}</div><div class="lab">${esc(s)}</div></div>`;
+  }).join('');
+
+  const wrap=$('#decks');
+  if(!o.decks.length){
+    wrap.innerHTML='<div class="empty">Your decks will appear here as soon as we start production. We\'ll email you at every step. 🔥</div>';
+    return;
+  }
+  wrap.innerHTML=o.decks.map(deckHTML).join('');
+  o.decks.forEach(bindDeck);
+}
+
+function deckHTML(d){
+  const st=STATUS[d.status]||STATUS.writing;
+  let body='';
+  if(d.status==='script_review'){
+    body=`<div class="deck__body">
+      <textarea class="script" data-id="${d.id}">${esc(d.script)}</textarea>
+      <div class="actions"><button class="btn btn--grad" data-act="validate_script" data-id="${d.id}">Approve script ✓</button></div>
+    </div>`;
+  } else if(d.status==='design_review'){
+    body=`<div class="deck__body">
+      ${designHTML(d)}
+      <div class="actions">
+        <button class="btn btn--grad" data-act="validate_design" data-id="${d.id}">Approve design ✓</button>
+        <button class="btn btn--ghost" data-act="toggle_rev" data-id="${d.id}">Request a retouch</button>
+      </div>
+      <div class="revbox" id="rev-${d.id}">
+        <textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:90px"></textarea>
+        <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div>
+      </div>
+    </div>`;
+  } else if(d.status==='revision'){
+    body = d.revision_note ? `<div class="note"><b>Your retouch:</b> ${esc(d.revision_note)}</div>` : '';
+  } else if(d.status==='done'){
+    body=`<div class="deck__body">
+      ${d.design_url?designHTML(d):''}
+      ${d.script?`<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--grey)">View script</summary><textarea class="script" readonly style="margin-top:10px">${esc(d.script)}</textarea></details>`:''}
+    </div>`;
+  } else if(d.script && d.status!=='writing'){
+    body=`<div class="deck__body"><textarea class="script" readonly>${esc(d.script)}</textarea></div>`;
+  }
+  return `<div class="deck">
+    <div class="deck__top"><div class="deck__title">${esc(d.title)}</div><span class="pill ${st.pill}">${st.label}</span></div>
+    <p class="deck__hint">${st.hint}</p>
+    ${body}
+  </div>`;
+}
+
+function designHTML(d){
+  const u=d.design_url; if(!u) return '';
+  const isImg=/\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(u);
+  return `<div class="design">${isImg?`<img src="${esc(u)}" alt="${esc(d.title)} design" onerror="this.parentNode.innerHTML='<a class=\\'dl\\' href=\\'${esc(u)}\\' target=_blank>Open the design ↗</a>'">`:`<a class="dl" href="${esc(u)}" target="_blank">Open the design ↗</a>`}</div>`;
+}
+
+/* ---------- actions ---------- */
+function bindDeck(d){
+  document.querySelectorAll(`[data-id="${d.id}"]`).forEach(el=>{
+    if(el.dataset.act) el.addEventListener('click',()=>onAction(el));
+  });
+}
+
+async function onAction(el){
+  const act=el.dataset.act, id=el.dataset.id;
+  if(act==='toggle_rev'){ $('#rev-'+id).classList.toggle('open'); return; }
+  const payload={...CREDS,deckId:id,action:act};
+  if(act==='validate_script'){
+    const ta=document.querySelector(`textarea.script[data-id="${id}"]`);
+    payload.script = ta?ta.value:'';
+    if(!confirm('Approve this script and move it into design?')) return;
+  }
+  if(act==='validate_design'){ if(!confirm('Approve this design as final?')) return; }
+  if(act==='request_revision'){
+    const ta=document.querySelector(`textarea[data-rev="${id}"]`);
+    payload.note=ta?ta.value.trim():'';
+    if(!payload.note){ alert('Tell us what to change first.'); return; }
+  }
+  const old=el.innerHTML; el.disabled=true; el.innerHTML='<span class="spin"></span>';
+  try{
+    const r=await fetch(API+'/api/deck',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const dt=await r.json();
+    if(!r.ok||!dt.ok){ alert('Could not save. Please refresh and try again.'); el.disabled=false; el.innerHTML=old; return; }
+    render(dt.order);
+  }catch(e){ alert('Network error.'); el.disabled=false; el.innerHTML=old; }
+}
+
+/* ---------- boot: deep-link or saved session ---------- */
+(function(){
+  const q=new URLSearchParams(location.search);
+  const ref=q.get('ref'), email=q.get('email');
+  if(ref&&email){ $('#ref').value=ref; $('#email').value=email; load(ref,email); return; }
+  const saved=localStorage.getItem('brasero_track');
+  if(saved){ try{ const c=JSON.parse(saved); if(c.ref&&c.email) load(c.ref,c.email,true); }catch(e){} }
+})();
+</script>
+</body>
+</html>
