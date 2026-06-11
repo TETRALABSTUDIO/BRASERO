@@ -25,8 +25,9 @@ create table if not exists decks (
 
 create index if not exists decks_order_idx on decks (order_id, position);
 
--- If the table already existed from an earlier run, add the column:
+-- If the table already existed from an earlier run, add the columns:
 alter table decks add column if not exists design_urls jsonb default '[]'::jsonb;
+alter table decks add column if not exists type text default 'carousel';   -- carousel | story | branding
 
 alter table decks enable row level security;
 -- The backend uses the SERVICE ROLE key (bypasses RLS); keep RLS on so the

@@ -480,7 +480,6 @@ export function emailShell(inner) {
         <img src="${LOGO_URL}" alt="Brasero" height="28" style="display:block;border:0;height:28px;width:auto">
       </td></tr>
       ${inner}
-      <tr><td style="padding:22px 30px;background:#0c0c0c;color:#8d8d8d;font-size:12px;line-height:1.6">Brasero · the carousel design studio<br>Questions? Just reply to this email.</td></tr>
     </table>
   </td></tr></table></body></html>`;
 }
@@ -574,7 +573,6 @@ export function clientOrderEmail({ name, planName, billing, amountCents, handle,
         <p style="margin:0;font-size:14px;color:#333333">3 · You receive your post-ready decks by email.</p>
       </td></tr>
       ${trackUrl ? `<tr><td align="center" style="padding:6px 28px 28px">${ctaButton(trackUrl, 'Track your order →')}<p style="margin:12px 0 0;font-size:12px;color:#9a9a9a">Follow production, approve scripts &amp; designs anytime.</p></td></tr>` : ''}
-      <tr><td style="padding:18px 28px;background:#0c0c0c;color:#9a9a9a;font-size:12px;line-height:1.5">Brasero · decks that build lasting trust<br>Questions? Just reply to this email.</td></tr>
     </table>
   </td></tr></table></body></html>`;
 }
