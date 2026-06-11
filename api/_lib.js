@@ -100,11 +100,13 @@ export function orderRef(sessionId) {
 }
 
 export async function markPaid(sessionId, amount) {
-  if (!db) return;
-  const { error } = await db.from('orders')
+  if (!db) return null;
+  const { data, error } = await db.from('orders')
     .update({ status: 'paid', amount, ref: orderRef(sessionId) })
-    .eq('stripe_session_id', sessionId);
-  if (error) console.error('markPaid', error);
+    .eq('stripe_session_id', sessionId)
+    .select('*').maybeSingle();
+  if (error) { console.error('markPaid', error); return null; }
+  return data;
 }
 
 /* ---- Order tracking + deck workflow ---- */
@@ -249,6 +251,37 @@ export async function addItemsToOrder(ref, key) {
   return { ok: true, order, created, type: it.type, name: it.name };
 }
 
+// The production elements a checkout add-on should spawn on the board.
+// Keys match the checkout add-ons (branding, story3/6/9, bundle).
+function addonElements(key) {
+  const brandTitles = ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'LinkedIn CTA buttons'];
+  const stories = n => Array.from({ length: n }, (_, i) => ({ title: `Story ${i + 1}`, type: 'story' }));
+  if (key === 'branding') return brandTitles.map(title => ({ title, type: 'branding' }));
+  if (key === 'bundle')   return [...brandTitles.map(title => ({ title, type: 'branding' })), ...stories(10)];
+  const STORY_N = { story3: 3, story6: 6, story9: 10 };
+  if (STORY_N[key]) return stories(STORY_N[key]);
+  return [];
+}
+
+// Seed every element an order needs so the talent opens a fully-populated board:
+// the plan's carousel decks first, then one element per purchased upsell.
+// Idempotent — skips an order that already has elements (safe to re-run on webhook retries).
+export async function populateOrderElements(orderId, { plan, addons, decks } = {}) {
+  const existing = await decksForOrder(orderId);
+  if (existing.length) return { created: 0, skipped: true };
+  const nCarousel = decks != null ? Math.max(0, Math.min(50, Number(decks) || 0)) : (PLAN_DECKS[plan] || 0);
+  let pos = 0, created = 0;
+  for (let i = 0; i < nCarousel; i++) {
+    if (await createDeck(orderId, { title: `Deck ${i + 1}`, position: pos++, type: 'carousel' })) created++;
+  }
+  for (const key of addonKeys(addons)) {
+    for (const el of addonElements(key)) {
+      if (await createDeck(orderId, { title: el.title, position: pos++, type: el.type })) created++;
+    }
+  }
+  return { created, skipped: false };
+}
+
 // Random 8-char public ref for manually-created (non-Stripe) orders.
 const randRef = () => crypto.randomBytes(6).toString('hex').slice(0, 8).toUpperCase();
 
@@ -259,7 +292,6 @@ export async function createManualOrder({ name, email, instagram, handle, plan, 
   const addOns = addonKeys(addons);                                   // validated upsell keys
   const addonsTotal = addOns.reduce((s, k) => s + ADDONS[k].amount, 0);
   const amount = (PLANS[plan] ? amountFor(plan, bill) : 0) + addonsTotal;
-  const n = decks != null ? Math.max(0, Math.min(50, Number(decks) || 0)) : (PLAN_DECKS[plan] || 0);
   const row = {
     stripe_session_id: 'manual_' + crypto.randomBytes(9).toString('hex'),
     ref: randRef(), status: 'paid', plan: plan || '', billing: bill, amount,
@@ -272,13 +304,13 @@ export async function createManualOrder({ name, email, instagram, handle, plan, 
   if (MEM) {
     const o = { id: uid(), created_at: new Date().toISOString(), ...row };
     MEM.orders.push(o);
-    for (let i = 0; i < n; i++) await createDeck(o.id, { title: `Deck ${i + 1}`, position: i, type: 'carousel' });
+    await populateOrderElements(o.id, { plan, addons: addOns, decks });
     return { ok: true, order: o, ref: row.ref };
   }
   if (!db) return { error: 'no_store' };
   const { data, error } = await db.from('orders').insert(row).select('*').maybeSingle();
   if (error) return { error: error.message };
-  for (let i = 0; i < n; i++) await createDeck(data.id, { title: `Deck ${i + 1}`, position: i, type: 'carousel' });
+  await populateOrderElements(data.id, { plan, addons: addOns, decks });
   return { ok: true, order: data, ref: row.ref };
 }
 
