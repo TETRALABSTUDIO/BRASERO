@@ -3,151 +3,477 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Studio · Brasero</title>
+<title>Talent panel · Brasero</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#111;--soft:#f7f4ef;--grey:#6b6b6b;--line:rgba(0,0,0,.12);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00,#f87000);}
+:root{--ink:#111;--soft:#f7f4ef;--grey:#6b6b6b;--line:rgba(0,0,0,.10);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00,#f87000);--ok:#15803d;--okbg:rgba(22,163,74,.12);--wait:#b45309;--waitbg:rgba(245,158,11,.13);
+--c-todo:#dc2626;--c-prog:#2563eb;--c-done:#16a34a;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Satoshi',system-ui,sans-serif;background:#faf8f5;color:var(--ink);padding:24px;max-width:920px;margin:0 auto}
-h1{font-size:24px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px}
-.sub{color:var(--grey);font-size:14px;margin-bottom:18px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-input,textarea,button{font-family:inherit;font-size:14px}
-input,textarea{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;width:100%}
-textarea{min-height:90px;resize:vertical;line-height:1.5}
-input:focus,textarea:focus{border-color:var(--orange)}
-button{padding:9px 16px;border-radius:100px;border:1px solid transparent;font-weight:700;cursor:pointer}
-.b-grad{background:var(--grad);color:#fff}
-.b-ghost{background:#fff;border-color:var(--line)}
-.b-del{background:#fff;border-color:#f1c0c0;color:#c33}
-.b-sm{padding:6px 12px;font-size:13px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
-.pill{font-size:11px;font-weight:800;padding:4px 9px;border-radius:100px;background:#eee;color:#666}
-.muted{color:var(--grey);font-size:13px}
-.ordlist a{display:block;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px;cursor:pointer;font-size:13px}
-.ordlist a:hover{border-color:var(--orange)}
-label{font-size:12px;font-weight:700;display:block;margin:10px 0 4px}
+body{font-family:'Satoshi',system-ui,sans-serif;background:#f4f1ec;color:var(--ink);-webkit-font-smoothing:antialiased}
+input,textarea,button,select{font-family:inherit}
+input,textarea,select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;width:100%;font-size:14px}
+textarea{min-height:120px;resize:vertical;line-height:1.55}
+input:focus,textarea:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.10)}
+button{cursor:pointer;border:1px solid transparent;border-radius:100px;font-weight:700;font-size:13.5px;padding:9px 16px;transition:transform .15s,box-shadow .15s,opacity .15s}
+button:hover{transform:translateY(-1px)}
+button[disabled]{opacity:.45;pointer-events:none;transform:none}
+.b-grad{background:var(--grad);color:#fff;box-shadow:0 8px 20px rgba(248,80,0,.26)}
+.b-ghost{background:#fff;border-color:var(--line);color:var(--ink)}
+.b-del{background:#fff;border-color:#f0caca;color:#c33}
+.b-sm{padding:6px 12px;font-size:12.5px}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.field{margin-bottom:12px}.field label{font-size:12px;font-weight:700;display:block;margin-bottom:5px}
+
+/* auth */
+.authwrap{max-width:390px;margin:13vh auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:0 18px 50px rgba(0,0,0,.08)}
+.authwrap .logo{height:30px;margin-bottom:16px;color:var(--ink)}
+.authwrap p{color:var(--grey);font-size:13.5px;margin-bottom:20px}
+.err{color:#c33;font-size:13px;font-weight:600;margin-top:10px;min-height:16px}
+
+/* layout */
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+.side{background:#fff;border-right:1px solid var(--line);padding:18px 16px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;justify-content:space-between}
+.brand .logo{height:24px;color:var(--ink)}
+
+/* avatar */
+.avatar{border-radius:50%;flex-shrink:0;border:3px solid #fff;box-shadow:0 8px 20px rgba(248,80,0,.26);display:block}
+img.avatar{object-fit:cover}
+div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background:var(--grad)}
+.avatar.lg{width:78px;height:78px;font-size:28px}
+.avatar.sm{width:50px;height:50px;font-size:18px;border-width:2px;box-shadow:0 6px 14px rgba(248,80,0,.22)}
+.avwrap{position:relative;cursor:pointer}
+.avwrap .cam{position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.avwrap .cam svg{width:14px;height:14px}
+
+.profile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:18px 12px;background:linear-gradient(180deg,var(--soft),#fff);border:1px solid var(--line);border-radius:18px}
+.profile .nmrow{display:flex;align-items:center;gap:6px}
+.profile .nm{font-size:19px;font-weight:900;letter-spacing:-.02em;line-height:1.1}
+.profile .pen{cursor:pointer;opacity:.45}.profile .pen:hover{opacity:1}
+.profile .em{font-size:12.5px;color:var(--grey);word-break:break-all}
+.rolebadge{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:100px}
+.rolebadge.owner{color:#fff;background:var(--grad)}
+.rolebadge.talent{color:var(--c-prog);background:rgba(37,99,235,.10)}
+
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;background:#fff;border:1px solid var(--line);color:var(--grey)}
+.tabs button.on{background:linear-gradient(100deg,rgba(255,26,0,.08),rgba(248,80,0,.10));border-color:transparent;box-shadow:inset 0 0 0 1.5px var(--orange);color:var(--ink)}
+.side .hint{font-size:12px;color:var(--grey);text-align:center;margin-top:auto;line-height:1.4}
+
+.main{padding:24px 30px 60px;max-width:1180px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.toolbar h2{font-size:25px;font-weight:900;letter-spacing:-.035em}
+.toolbar .right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.search{position:relative;min-width:230px}
+.search input{padding-left:36px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4}
+.vswitch{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:4px}
+.vswitch button{padding:7px 14px;font-size:12.5px;color:var(--grey);background:transparent;border-radius:100px}
+.vswitch button.on{background:var(--grad);color:#fff}
+.placeholder{display:grid;place-items:center;height:60vh;color:var(--grey);text-align:center}
+
+/* projects */
+.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.kcol{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;min-height:120px}
+.kcol__h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:4px 6px 12px}
+.kcol__h .dot{width:9px;height:9px;border-radius:50%}.kcol__h .c{margin-left:auto;color:var(--grey)}
+.kcol .pcard{margin-bottom:10px}
+.plist{display:flex;flex-direction:column;gap:8px}
+.pcard{text-align:left;width:100%;background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px 16px;cursor:pointer;transition:.15s;display:block}
+.pcard:hover{border-color:rgba(248,80,0,.5);box-shadow:0 10px 26px rgba(0,0,0,.07);transform:translateY(-1px)}
+.pcard .r{font-weight:900;font-size:15px;letter-spacing:-.02em}
+.pcard .n{font-size:13px;color:var(--grey);margin-top:2px}
+.pcard .foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.pcard .plan{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--grey)}
+.prow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 16px;cursor:pointer;transition:.15s;text-align:left;width:100%}
+.prow:hover{border-color:rgba(248,80,0,.5)}
+.prow .r{font-weight:900;min-width:90px}.prow .n{flex:1;color:var(--grey);font-size:13.5px}.prow .plan{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--grey)}
+.spill{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;padding:4px 10px;border-radius:100px;white-space:nowrap}
+.spill.progress{background:rgba(37,99,235,.10);color:var(--c-prog)}.spill.done{background:rgba(22,163,74,.11);color:var(--c-done)}.spill.todo{background:rgba(220,38,38,.10);color:var(--c-todo)}
+
+/* detail */
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;color:var(--grey);background:#fff;border:1px solid var(--line);margin-bottom:16px}
+.ohead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:22px}
+.ohead h2{font-size:24px;font-weight:900;letter-spacing:-.035em}.ohead .meta{color:var(--grey);font-size:14px;margin-top:3px}
+.ohead .right{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+/* decks */
+#decks.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;align-items:start}
+#decks.list{display:flex;flex-direction:column;gap:16px;max-width:720px}
+.deck{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:0 10px 30px rgba(0,0,0,.05)}
+.deck__top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.deck__top input{font-weight:800;font-size:16px;border-color:transparent;background:transparent;padding:6px 8px}
+.deck__top input:hover{background:var(--soft)}
+.pill{font-size:11px;font-weight:800;letter-spacing:.02em;padding:5px 10px;border-radius:100px;white-space:nowrap}
+.pill--wait{background:var(--waitbg);color:var(--wait)}.pill--act{background:rgba(248,80,0,.12);color:#c64600}.pill--done{background:var(--okbg);color:var(--ok)}
+.stage{border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:12px;background:#fff}
+.stage.locked{background:var(--soft);opacity:.85}.stage.approved{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.04)}
+.stage__h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin-bottom:10px}
+.stage__h .num{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;color:#fff;background:var(--grad)}
+.stage.locked .stage__h .num{background:#cbcbcb}.stage.approved .stage__h .num{background:var(--ok)}
+.lockmsg{color:var(--grey);font-size:13px}
+.note{font-size:13px;color:#c64600;background:rgba(248,80,0,.08);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.statusline{font-size:12.5px;font-weight:700;margin-bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:100px}
+.statusline.wait{background:var(--waitbg);color:var(--wait)}.statusline.ok{background:var(--okbg);color:var(--ok)}
+.scriptview{background:var(--soft);border-radius:10px;padding:12px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;color:#444;max-height:120px;overflow:auto}
+.imgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.thumb{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;border:none;font-size:12px;display:grid;place-items:center;padding:0;line-height:1}
+.thumb .x:hover{background:#c33}
+.adder{width:74px;height:74px;border-radius:10px;border:1.5px dashed var(--line);background:var(--soft);display:grid;place-items:center;cursor:pointer;color:var(--grey);font-size:11px;font-weight:700;text-align:center;line-height:1.2}
+.adder:hover{border-color:var(--orange);color:var(--orange)}
+.imgcount{font-size:11.5px;color:var(--grey);font-weight:700;margin-bottom:8px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+
+/* team */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.tcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:14px}
+.tcard__top{display:flex;align-items:center;gap:13px}
+.tcard .nm{font-weight:900;font-size:16px;letter-spacing:-.02em}
+.tcard .em{font-size:12.5px;color:var(--grey);word-break:break-all}
+.tcard__mid{display:flex;align-items:center;gap:16px}
+.donut{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
+.donut.empty{background:#eee}
+.donut .hole{width:58px;height:58px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center}
+.donut .hole b{font-size:20px;font-weight:900;line-height:1}
+.donut .hole span{font-size:8px;color:var(--grey);text-transform:uppercase;letter-spacing:.03em;margin-top:1px}
+.legend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:7px;vertical-align:0}
+.sec{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--grey);margin-bottom:7px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:4px 6px 4px 11px;font-size:12px;font-weight:700}
+.chip button{width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;font-size:11px;display:grid;place-items:center;padding:0;line-height:1}
+.chip button:hover{background:#c33}
+.tcard .none{font-size:12.5px;color:var(--grey)}
+.addcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.05);margin-bottom:18px}
+.addcard h3{font-size:16px;font-weight:900;letter-spacing:-.02em;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
 .hide{display:none}
-.gap{margin-top:10px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:820px){.app{grid-template-columns:1fr}.side{position:static;height:auto}.kanban{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<h1>Brasero Studio</h1>
-<p class="sub">Produce decks, push scripts &amp; designs for client approval.</p>
 
-<div class="card" id="auth">
-  <label>Admin token</label>
-  <div class="row"><input id="token" type="password" placeholder="ADMIN_TOKEN" style="flex:1;min-width:220px"><button class="b-grad" id="login">Enter</button></div>
-  <p class="muted gap" id="authErr"></p>
+<!-- brasero wordmark -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="g_mark" x1="16" y1="56" x2="163" y2="141" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<g id="brasero-mark">
+<path d="M89.6395 47.9895C94.3875 45.2482 94.3875 38.3952 89.6395 35.6539L81.4719 30.9384C79.2684 29.6662 76.5535 29.6662 74.35 30.9384L58.8599 39.8815C56.6564 41.1536 53.9416 41.1536 51.7381 39.8814L42.8628 34.7573C38.1148 32.0161 38.1148 25.163 42.8628 22.4218L74.3503 4.24237C76.5538 2.97016 79.2687 2.97015 81.4722 4.24236L120.108 26.5485C122.311 27.8207 123.668 30.1718 123.668 32.7163L123.668 73.9556C123.668 77.2688 120.082 79.3396 117.212 77.683C114.343 76.0264 110.756 78.0972 110.756 81.4104L110.756 119.155C110.756 124.138 116.151 127.253 120.467 124.761C122.471 123.605 123.704 121.467 123.704 119.154L123.704 85.3354C123.704 82.7909 125.061 80.4398 127.265 79.1676L150.028 66.0252C154.776 63.284 160.711 66.7105 160.711 72.193L160.711 140.146C160.711 142.691 159.354 145.042 157.15 146.314L91.03 184.488C88.8265 185.761 86.1116 185.761 83.9081 184.488L17.7879 146.314C15.5843 145.042 14.2269 142.69 14.2269 140.146L14.2268 72.0684C14.2268 66.5859 20.1617 63.1594 24.9097 65.9006L47.6719 79.0424C49.8754 80.3146 51.2329 82.6657 51.2329 85.2101L51.2333 118.781C51.2334 121.325 52.5908 123.676 54.7943 124.948L84.0442 141.836C86.1635 143.059 88.7745 143.059 90.8937 141.836C95.46 139.199 95.46 132.608 90.8937 129.972L68.5858 117.093C66.3823 115.82 65.0248 113.469 65.0248 110.925L65.0248 66.3125C65.0248 63.7681 66.3822 61.417 68.5858 60.1448L89.6395 47.9895Z" fill="url(#g_mark)"/>
+<path d="M214.652 163.952H187.418V22.3374H216.342V89.0127C221.977 80.5609 234.373 66.8502 247.896 66.8502C274.19 66.8502 290.906 87.3224 290.906 117.937C290.906 147.048 272.312 166.394 245.642 166.394C232.495 166.394 221.226 160.571 216.155 151.932L214.652 163.952ZM216.53 116.434C216.53 130.521 225.921 139.911 239.444 139.911C253.155 139.911 261.794 130.333 261.794 116.434C261.794 102.536 253.155 92.9569 239.444 92.9569C225.921 92.9569 216.53 102.348 216.53 116.434Z" fill="currentColor"/>
+<path d="M359.018 70.0431V97.2767H349.815C333.287 97.2767 323.333 104.602 323.333 123.196V163.952H294.409V70.231H321.642L323.145 84.1295C327.089 74.9264 335.353 68.7284 347.937 68.7284C351.317 68.7284 355.074 69.1041 359.018 70.0431Z" fill="currentColor"/>
+<path d="M385.189 166.394C365.281 166.394 352.885 154.749 352.885 136.343C352.885 119.064 365.093 108.358 387.631 106.668L413.925 104.602V103.099C413.925 93.896 408.291 89.0127 397.961 89.0127C385.753 89.0127 379.179 93.7082 379.179 102.16H355.138C355.138 80.9366 372.605 67.0381 399.463 67.0381C426.697 67.0381 442.098 82.2513 442.098 109.109V163.952H416.555L414.677 151.556C411.672 160.196 399.276 166.394 385.189 166.394ZM395.331 144.982C406.413 144.982 414.113 139.536 414.113 128.83V123.759L399.463 125.074C386.88 126.201 382.372 129.018 382.372 135.028C382.372 141.79 386.504 144.982 395.331 144.982Z" fill="currentColor"/>
+<path d="M442.934 134.277H470.356C470.731 140.85 475.615 144.795 484.442 144.795C493.457 144.795 497.589 141.602 497.589 136.718C497.589 133.901 496.087 130.896 489.138 129.394L471.858 125.637C454.579 121.881 446.127 114.368 446.127 97.8402C446.127 78.3071 462.843 67.0381 485.381 67.0381C507.168 67.0381 522.381 79.8097 522.381 98.7793H494.96C494.96 92.3935 491.016 88.0737 484.067 88.0737C477.493 88.0737 473.361 91.4544 473.361 96.5255C473.361 100.845 476.929 103.287 483.503 104.789L500.97 108.546C516.371 111.927 524.823 119.064 524.823 134.089C524.823 154.186 507.732 166.394 483.315 166.394C458.523 166.394 442.934 153.246 442.934 134.277Z" fill="currentColor"/>
+<path d="M570.363 166.394C542.003 166.394 521.718 145.734 521.718 116.81C521.718 87.5102 541.439 67.0381 569.8 67.0381C599.287 67.0381 617.693 86.3833 617.693 116.998V124.323L549.515 124.698C551.206 137.094 558.155 142.916 570.926 142.916C581.82 142.916 589.52 138.972 591.586 132.211H618.069C614.688 153.059 596.094 166.394 570.363 166.394ZM569.987 90.5153C558.53 90.5153 552.145 95.5864 549.891 106.855H588.957C588.957 96.9011 581.632 90.5153 569.987 90.5153Z" fill="currentColor"/>
+<path d="M686.283 70.0431V97.2767H677.08C660.552 97.2767 650.598 104.602 650.598 123.196V163.952H621.674V70.231H648.907L650.41 84.1295C654.354 74.9264 662.618 68.7284 675.202 68.7284C678.583 68.7284 682.339 69.1041 686.283 70.0431Z" fill="currentColor"/>
+<path d="M679.94 116.81C679.94 87.1346 701.727 67.2259 731.778 67.2259C761.641 67.2259 783.428 87.1346 783.428 116.81C783.428 146.485 761.641 166.206 731.778 166.206C701.727 166.206 679.94 146.485 679.94 116.81ZM709.052 116.622C709.052 130.896 718.255 140.287 731.778 140.287C745.113 140.287 754.316 130.896 754.316 116.622C754.316 102.536 745.113 93.1447 731.778 93.1447C718.255 93.1447 709.052 102.536 709.052 116.622Z" fill="currentColor"/>
+</g></defs></svg>
+
+<!-- ===== AUTH ===== -->
+<div id="auth" class="authwrap">
+  <svg class="logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg>
+  <p>Sign in to manage your projects.</p>
+  <form id="loginForm">
+    <div class="field"><label>Email</label><input id="email" type="email" placeholder="you@brasero.studio" autocomplete="username" required></div>
+    <div class="field"><label>Password</label><input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required></div>
+    <button class="b-grad" id="login" style="width:100%" type="submit">Sign in</button>
+  </form>
+  <div class="err" id="authErr"></div>
 </div>
 
-<div id="app" class="hide">
-  <div class="card">
-    <div class="row" style="justify-content:space-between">
-      <b>Paid orders</b>
-      <div class="row"><input id="lookup" placeholder="Order # (e.g. A1B2C3D4)" style="width:180px"><button class="b-ghost b-sm" id="open">Open</button><button class="b-ghost b-sm" id="refresh">Reload list</button></div>
+<!-- ===== APP ===== -->
+<div id="app" class="app hide">
+  <aside class="side">
+    <div class="brand"><svg class="logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg><button class="b-ghost b-sm" id="logout">Sign out</button></div>
+    <div class="profile">
+      <label class="avwrap" title="Change photo">
+        <span id="meAvatar"></span>
+        <span class="cam"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8h4l2-2h6l2 2h4v11H3z" stroke="#111" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke="#111" stroke-width="2"/></svg></span>
+        <input type="file" accept="image/*" hidden id="mePhoto">
+      </label>
+      <div class="nmrow"><span class="nm" id="whoName"></span><span class="pen" id="editName" title="Edit name"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 20l4.5-1L20 7.5a2 2 0 0 0-2.8-2.8L6 16.5 5 20z" stroke="#111" stroke-width="2" stroke-linejoin="round"/></svg></span></div>
+      <div class="em" id="whoEmail"></div>
+      <span class="rolebadge" id="roleBadge"></span>
     </div>
-    <div class="ordlist gap" id="orders"></div>
-  </div>
+    <div class="tabs hide" id="tabs">
+      <button class="on" data-tab="projects">Projects</button>
+      <button data-tab="team">Team</button>
+    </div>
+    <div class="hint">Need help? <a href="mailto:hello@brasero.studio" style="color:var(--orange);font-weight:700">Contact the studio</a></div>
+  </aside>
 
-  <div id="order" class="hide">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <div><b id="oName"></b> <span class="muted" id="oMeta"></span></div>
-        <button class="b-ghost b-sm" id="addDeck">+ Add deck</button>
+  <main class="main">
+    <div id="vProjects">
+      <div id="overview">
+        <div class="toolbar">
+          <h2>Projects</h2>
+          <div class="right">
+            <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="#999" stroke-width="2" stroke-linecap="round"/></svg><input id="search" placeholder="Search projects…"></div>
+            <div class="vswitch" id="vswitch"><button data-v="kanban">Kanban</button><button data-v="list">List</button></div>
+          </div>
+        </div>
+        <div id="projects"></div>
+      </div>
+      <div id="detail" class="hide">
+        <button class="back b-sm" id="back">← All projects</button>
+        <div class="ohead">
+          <div><h2 id="oName"></h2><div class="meta" id="oMeta"></div></div>
+          <div class="right">
+            <div class="vswitch" id="dswitch"><button data-d="cards" class="on">Cards</button><button data-d="list">List</button></div>
+            <button class="b-ghost" id="addDeck">+ Add deck</button>
+          </div>
+        </div>
+        <div id="decks" class="cards"></div>
       </div>
     </div>
-    <div id="decks"></div>
-  </div>
+
+    <div id="vTeam" class="hide">
+      <div class="toolbar"><h2>Team &amp; assignments</h2></div>
+      <div class="addcard">
+        <h3>Add a Talent</h3>
+        <form id="talentForm">
+          <div class="grid2">
+            <div class="field"><label>Name</label><input id="tName" placeholder="Jane Doe"></div>
+            <div class="field"><label>Email</label><input id="tEmail" type="email" placeholder="jane@brasero.studio" required></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Password</label><input id="tPass" placeholder="set a password" required></div>
+            <div class="field" style="display:flex;align-items:flex-end"><label style="display:flex;align-items:center;gap:7px;margin:0"><input type="checkbox" id="tOwner" style="width:auto"> Make owner</label></div>
+          </div>
+          <button class="b-grad" type="submit">Create Talent</button>
+          <span class="err" id="tErr" style="display:inline-block;margin-left:10px"></span>
+        </form>
+      </div>
+      <div class="tgrid" id="teamGrid"></div>
+    </div>
+  </main>
 </div>
 
 <script>
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
 const $=s=>document.querySelector(s);
 const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let TOKEN='', REF='';
+const initials=s=>{const p=(s||'').trim().split(/[\s@.]+/).filter(Boolean);return ((p[0]||'?')[0]+(p[1]?p[1][0]:'')).toUpperCase();};
+function avatar(t,size,extra){ return t.photo?`<img class="avatar ${size}" src="${esc(t.photo)}" ${extra||''}>`:`<div class="avatar ${size}" ${extra||''}>${esc(initials(t.name||t.email))}</div>`; }
+let TOKEN=localStorage.getItem('brasero_session')||'', ME=null, REF='', ORDERS=[], TALENTS=[];
+let VIEW=localStorage.getItem('brasero_view')||'kanban'; if(VIEW==='grid') VIEW='kanban';
+let DVIEW='cards';
 
-async function api(body){
-  const r=await fetch(API+'/api/admin',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
-  if(r.status===401) throw new Error('unauthorized');
+async function api(path,body){
+  const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json',...(TOKEN?{'Authorization':'Bearer '+TOKEN}:{})},body:JSON.stringify(body)});
+  if(r.status===401){ doLogout(); throw new Error('unauthorized'); }
   return r.json();
 }
 
-$('#login').onclick=async()=>{
-  TOKEN=$('#token').value.trim(); if(!TOKEN) return;
-  try{ const d=await api({action:'list'}); localStorage.setItem('brasero_admin',TOKEN);
-    $('#auth').classList.add('hide'); $('#app').classList.remove('hide'); renderOrders(d.orders||[]);
-  }catch(e){ $('#authErr').textContent='Invalid token.'; }
-};
+/* ---------- auth ---------- */
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault(); $('#authErr').textContent='';
+  const email=$('#email').value.trim(), password=$('#password').value;
+  const btn=$('#login'); btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  try{
+    const r=await fetch(API+'/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',email,password})});
+    const d=await r.json();
+    if(!r.ok||!d.ok){ $('#authErr').textContent='Invalid email or password.'; return; }
+    TOKEN=d.token; localStorage.setItem('brasero_session',TOKEN); boot();
+  }catch(e){ $('#authErr').textContent='Network error.'; }
+  finally{ btn.disabled=false; btn.textContent='Sign in'; }
+});
+function doLogout(){ localStorage.removeItem('brasero_session'); TOKEN=''; ME=null; location.reload(); }
+$('#logout').onclick=doLogout;
 
-$('#refresh').onclick=async()=>{ const d=await api({action:'list'}); renderOrders(d.orders||[]); };
-$('#open').onclick=()=>{ const v=$('#lookup').value.trim(); if(v) openOrder(v); };
-
-function renderOrders(list){
-  $('#orders').innerHTML = list.length? list.map(o=>
-    `<a data-ref="${esc(o.ref)}">#${esc(o.ref)} — ${esc(o.name||o.email)} <span class="muted">· ${esc(o.plan||'')}</span></a>`
-  ).join('') : '<p class="muted">No paid orders yet.</p>';
-  document.querySelectorAll('#orders a').forEach(a=>a.onclick=()=>openOrder(a.dataset.ref));
+async function boot(){
+  const d=await api('/api/admin',{action:'list'});
+  if(!d.ok) return;
+  ME=d.me; ORDERS=d.orders||[];
+  $('#auth').classList.add('hide'); $('#app').classList.remove('hide');
+  renderProfile();
+  $('#tabs').classList.toggle('hide',!ME.is_owner);
+  setView(VIEW); renderProjects();
+}
+function renderProfile(){
+  $('#meAvatar').innerHTML=avatar(ME,'lg');
+  $('#whoName').textContent=ME.name||ME.email.split('@')[0];
+  $('#whoEmail').textContent=ME.email;
+  const rb=$('#roleBadge'); rb.textContent=ME.is_owner?'Owner':'Talent'; rb.className='rolebadge '+(ME.is_owner?'owner':'talent');
 }
 
+/* ---------- profile self-edit ---------- */
+$('#editName').onclick=async()=>{ const name=prompt('Your name', ME.name||''); if(name===null) return; const r=await api('/api/admin',{action:'update_me',name}); if(r.ok){ ME=r.me; renderProfile(); } };
+$('#mePhoto').onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const photo=await compress(f,512,0.8); const r=await api('/api/admin',{action:'update_me',photo}); if(r.ok){ ME=r.me; renderProfile(); } e.target.value=''; };
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  const team=b.dataset.tab==='team';
+  $('#vTeam').classList.toggle('hide',!team);
+  $('#vProjects').classList.toggle('hide',team);
+  if(team) loadTeam();
+});
+
+/* ---------- projects overview ---------- */
+const STATE={todo:['todo','To start','#dc2626'],progress:['progress','In progress','#2563eb'],done:['done','Completed','#16a34a']};
+$('#search').oninput=renderProjects;
+$('#vswitch').querySelectorAll('button').forEach(b=>b.onclick=()=>setView(b.dataset.v,true));
+function setView(v,render){ VIEW=v; localStorage.setItem('brasero_view',v); $('#vswitch').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); if(render) renderProjects(); }
+function filtered(){ const q=$('#search').value.trim().toLowerCase(); return ORDERS.filter(o=>!q||(o.ref+' '+(o.name||'')+' '+(o.email||'')+' '+(o.plan||'')).toLowerCase().includes(q)); }
+function spill(st){ const [c,l]=STATE[st]||STATE.todo; return `<span class="spill ${c}">${l}</span>`; }
+function pcard(o){ return `<button class="pcard" data-open="${esc(o.ref)}"><div class="r">#${esc(o.ref)}</div><div class="n">${esc(o.name||o.email||'')}</div><div class="foot"><span class="plan">${esc(o.plan||'')}</span>${spill(o.state)}</div></button>`; }
+function renderProjects(){
+  const list=filtered(), wrap=$('#projects');
+  if(!list.length){ wrap.className=''; wrap.innerHTML='<div class="placeholder">No projects yet.</div>'; return; }
+  if(VIEW==='list'){ wrap.className='plist'; wrap.innerHTML=list.map(o=>`<button class="prow" data-open="${esc(o.ref)}"><span class="r">#${esc(o.ref)}</span><span class="n">${esc(o.name||o.email||'')}</span><span class="plan">${esc(o.plan||'')}</span>${spill(o.state)}</button>`).join(''); }
+  else { wrap.className='kanban'; wrap.innerHTML=['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st); return `<div class="kcol"><div class="kcol__h"><span class="dot" style="background:${col}"></span>${l}<span class="c">${items.length}</span></div>${items.map(pcard).join('')||'<div class="none" style="color:var(--grey);font-size:12.5px;padding:6px">—</div>'}</div>`; }).join(''); }
+  wrap.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openOrder(el.dataset.open));
+}
+
+/* ---------- detail ---------- */
+$('#back').onclick=()=>{ $('#detail').classList.add('hide'); $('#overview').classList.remove('hide'); REF=''; };
+$('#dswitch').querySelectorAll('button').forEach(b=>b.onclick=()=>{ DVIEW=b.dataset.d; $('#dswitch').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); $('#decks').className=DVIEW; });
 async function openOrder(ref){
   REF=ref.replace(/^#/,'');
-  const d=await api({action:'get',ref:REF});
-  if(!d.ok){ alert('Order not found'); return; }
-  $('#order').classList.remove('hide');
-  $('#oName').textContent='#'+(d.order.ref)+' · '+(d.order.name||d.order.email);
-  $('#oMeta').textContent=(d.order.plan||'')+' · '+(d.order.email||'');
-  renderDecks(d.decks||[]);
-  $('#order').scrollIntoView({behavior:'smooth'});
+  const d=await api('/api/admin',{action:'get',ref:REF});
+  if(!d.ok){ alert(d.error==='forbidden'?'Not your project.':'Order not found'); return; }
+  $('#overview').classList.add('hide'); $('#detail').classList.remove('hide');
+  $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
+  $('#oMeta').textContent=[d.order.plan?d.order.plan+' pack':'',d.order.email].filter(Boolean).join(' · ');
+  $('#decks').className=DVIEW; renderDecks(d.decks||[]);
 }
+$('#addDeck').onclick=async()=>{ const title=prompt('Deck title','New deck'); if(title===null) return; const d=await api('/api/admin',{action:'add_deck',ref:REF,title}); renderDecks(d.decks||[]); };
 
-$('#addDeck').onclick=async()=>{
-  const title=prompt('Deck title','New deck'); if(title===null) return;
-  const d=await api({action:'add_deck',ref:REF,title}); renderDecks(d.decks||[]);
-};
-
-const FLOW={writing:'Writing',script_review:'Script · awaiting client',designing:'Designing',design_review:'Design · awaiting client',revision:'Revision requested',done:'Done'};
-
-function renderDecks(decks){
-  $('#decks').innerHTML = decks.length? decks.map(deckCard).join('') : '<p class="muted card">No decks yet — add one.</p>';
-  decks.forEach(bind);
-}
-
+/* ---------- decks ---------- */
+const PILL={writing:['pill--wait','Writing'],script_review:['pill--act','Script · awaiting client'],designing:['pill--act','Designing'],design_review:['pill--act','Design · awaiting client'],revision:['pill--act','Retouch requested'],done:['pill--done','Done ✓']};
+function renderDecks(decks){ $('#decks').innerHTML = decks.length? decks.map(deckCard).join('') : '<div class="deck" style="text-align:center;color:var(--grey)">No decks yet — add one to start.</div>'; decks.forEach(bind); }
+function imagesOf(d){ return Array.isArray(d.design_urls)&&d.design_urls.length?d.design_urls:(d.design_url?[d.design_url]:[]); }
 function deckCard(d){
-  return `<div class="card" data-deck="${d.id}">
-    <div class="row" style="justify-content:space-between">
-      <input data-f="title" value="${esc(d.title)}" style="max-width:60%;font-weight:700">
-      <span class="pill">${FLOW[d.status]||d.status}</span>
-    </div>
-    ${d.revision_note?`<p class="muted gap">✏️ Client retouch: ${esc(d.revision_note)}</p>`:''}
-    <label>Script</label>
-    <textarea data-f="script">${esc(d.script)}</textarea>
-    <label>Design URL (image link)</label>
-    <input data-f="design_url" value="${esc(d.design_url||'')}" placeholder="https://...png">
-    <div class="row gap">
-      <button class="b-ghost b-sm" data-a="save_deck">Save draft</button>
-      <button class="b-grad b-sm" data-a="send_script">Send script to client →</button>
-      <button class="b-grad b-sm" data-a="send_design">Send design to client →</button>
-      <button class="b-del b-sm" data-a="delete_deck">Delete</button>
-    </div>
-  </div>`;
+  const scriptApproved=['designing','design_review','revision','done'].includes(d.status);
+  const [pc,pl]=PILL[d.status]||PILL.writing; const imgs=imagesOf(d);
+  let scriptStage;
+  if(!scriptApproved){
+    const sent=d.status==='script_review';
+    scriptStage=`<div class="stage"><div class="stage__h"><span class="num">1</span> Script</div>
+      ${sent?'<div class="statusline wait">⏳ Sent — awaiting client approval</div><br>':''}
+      <textarea data-f="script" placeholder="Write the post script / copy…">${esc(d.script)}</textarea>
+      <div class="actions"><button class="b-ghost b-sm" data-a="save_deck">Save draft</button>
+        <button class="b-grad b-sm" data-a="send_script">${sent?'Update & resend':'Send script to client →'}</button></div></div>`;
+  } else { scriptStage=`<div class="stage approved"><div class="stage__h"><span class="num">✓</span> Script · approved by client</div><div class="scriptview">${esc(d.script)||'—'}</div></div>`; }
+  let designStage;
+  if(!scriptApproved){ designStage=`<div class="stage locked"><div class="stage__h"><span class="num">2</span> Design</div><div class="lockmsg">🔒 Unlocks once the client approves the script.</div></div>`; }
+  else {
+    const sent=d.status==='design_review', done=d.status==='done', rev=d.status==='revision';
+    designStage=`<div class="stage ${done?'approved':''}"><div class="stage__h"><span class="num">${done?'✓':'2'}</span> Design ${done?'· approved by client':''}</div>
+      ${rev&&d.revision_note?`<div class="note"><b>Client retouch:</b> ${esc(d.revision_note)}</div>`:''}
+      ${sent?'<div class="statusline wait">⏳ Sent — awaiting client approval</div>':''}${done?'<div class="statusline ok">✓ Approved & live</div>':''}
+      <div class="imgcount"><span data-count>${imgs.length}</span>/10 images</div>
+      <div class="imgs" data-imgs>${imgs.map(u=>thumb(u)).join('')}${done?'':'<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>'}</div>
+      ${done?'':`<div class="actions"><button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_design">${sent||rev?'Update & resend':'Send design to client →'}</button></div>`}</div>`;
+  }
+  return `<div class="deck" data-deck="${d.id}"><div class="deck__top"><input data-f="title" value="${esc(d.title)}"><span class="pill ${pc}">${pl}</span><button class="b-del b-sm" data-a="delete_deck">Delete</button></div>${scriptStage}${designStage}</div>`;
 }
-
+function thumb(u){ return `<div class="thumb"><img src="${esc(u)}" alt=""><button class="x" data-x title="Remove">✕</button></div>`; }
 function bind(d){
-  const card=document.querySelector(`[data-deck="${d.id}"]`);
-  const val=f=>card.querySelector(`[data-f="${f}"]`).value;
+  const card=document.querySelector(`[data-deck="${d.id}"]`); if(!card) return;
+  const val=f=>{ const el=card.querySelector(`[data-f="${f}"]`); return el?el.value:undefined; };
+  const gatherImgs=()=>[...card.querySelectorAll('[data-imgs] img')].map(i=>i.getAttribute('src'));
+  const countEl=card.querySelector('[data-count]'); const refreshCount=()=>{ if(countEl) countEl.textContent=card.querySelectorAll('[data-imgs] img').length; };
+  const file=card.querySelector('[data-file]');
+  if(file) file.onchange=async e=>{
+    const adder=card.querySelector('.adder'); const slots=10-card.querySelectorAll('[data-imgs] img').length;
+    const files=[...e.target.files].slice(0,Math.max(0,slots));
+    if(e.target.files.length>slots) alert('Max 10 images per deck — extra files were skipped.');
+    for(const f of files){ const url=await compress(f); adder.insertAdjacentHTML('beforebegin',thumb(url)); }
+    refreshCount(); e.target.value='';
+  };
+  card.addEventListener('click',e=>{ if(e.target.matches('[data-x]')){ e.target.closest('.thumb').remove(); refreshCount(); }});
   card.querySelectorAll('[data-a]').forEach(btn=>btn.onclick=async()=>{
     const a=btn.dataset.a;
     if(a==='delete_deck'&&!confirm('Delete this deck?')) return;
-    const body={action:a,ref:REF,deckId:d.id,title:val('title'),script:val('script'),design_url:val('design_url')};
-    btn.disabled=true; const old=btn.textContent; btn.textContent='…';
-    const r=await api(body);
-    if(r.ok){ renderDecks(r.decks||[]); } else { alert('Error: '+(r.error||'')); btn.disabled=false; btn.textContent=old; }
+    if(a==='send_script'&&!confirm('Send this script to the client for approval?')) return;
+    if(a==='send_design'){ if(!gatherImgs().length){ alert('Add at least one image first.'); return; } if(!confirm('Send this design to the client for approval?')) return; }
+    const body={action:a,ref:REF,deckId:d.id,title:val('title'),script:val('script'),images:gatherImgs()};
+    const old=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+    try{ const r=await api('/api/admin',body); if(r.ok) renderDecks(r.decks||[]); else { alert('Error: '+(r.error||'')); btn.disabled=false; btn.innerHTML=old; } }
+    catch(e){ btn.disabled=false; btn.innerHTML=old; }
   });
 }
 
-(function(){ const t=localStorage.getItem('brasero_admin'); if(t){ $('#token').value=t; $('#login').click(); } })();
+/* ---------- team (owner) ---------- */
+async function loadTeam(){
+  const [t,o]=await Promise.all([api('/api/admin',{action:'list_talents'}),api('/api/admin',{action:'list'})]);
+  TALENTS=t.talents||[]; ORDERS=o.orders||[]; renderTeam();
+}
+function donut(c){
+  const total=c.todo+c.progress+c.done;
+  if(!total) return `<div class="donut empty"><div class="hole"><b>0</b><span>projects</span></div></div>`;
+  const seg=[['#dc2626',c.todo],['#2563eb',c.progress],['#16a34a',c.done]]; let acc=0, stops=[];
+  seg.forEach(([col,n])=>{ if(n>0){ const a=(acc/total*360).toFixed(1), b=((acc+n)/total*360).toFixed(1); stops.push(`${col} ${a}deg ${b}deg`); } acc+=n; });
+  return `<div class="donut" style="background:conic-gradient(${stops.join(',')})"><div class="hole"><b>${total}</b><span>projects</span></div></div>`;
+}
+function renderTeam(){
+  const unassigned=ORDERS.filter(o=>!o.talent_email);
+  $('#teamGrid').innerHTML=TALENTS.map(t=>{
+    const mine=ORDERS.filter(o=>(o.talent_email||'').toLowerCase()===t.email.toLowerCase());
+    const c={todo:0,progress:0,done:0}; mine.forEach(o=>c[o.state||'todo']++);
+    const chips=t.is_owner?'<div class="none">Owners see every project.</div>'
+      :(mine.length?`<div class="chips">${mine.map(o=>`<span class="chip">#${esc(o.ref)}<button data-unassign="${esc(o.ref)}" title="Remove">✕</button></span>`).join('')}</div>`:'<div class="none">No projects assigned.</div>');
+    const assignSel=t.is_owner?'':`<select data-assign-for="${esc(t.email)}" style="margin-top:8px"><option value="">+ Assign a project…</option>${unassigned.map(o=>`<option value="${esc(o.ref)}">#${esc(o.ref)} — ${esc(o.name||o.email||'')}</option>`).join('')}</select>`;
+    const mid=t.is_owner?'':`<div class="tcard__mid">${donut(c)}<div class="legend"><span><i style="background:#dc2626"></i>${c.todo} to start</span><span><i style="background:#2563eb"></i>${c.progress} in progress</span><span><i style="background:#16a34a"></i>${c.done} completed</span></div></div>`;
+    return `<div class="tcard" data-talent="${esc(t.email)}">
+      <div class="tcard__top">
+        <label class="avwrap" title="Change photo">${avatar(t,'sm')}<input type="file" accept="image/*" hidden data-photo></label>
+        <div style="min-width:0"><div class="nm">${esc(t.name||'—')}</div><div class="em">${esc(t.email)}</div></div>
+        <span class="rolebadge ${t.is_owner?'owner':'talent'}" style="margin-left:auto">${t.is_owner?'Owner':'Talent'}</span></div>
+      ${mid}
+      <div><div class="sec">Projects</div>${chips}${assignSel}</div>
+      <div class="actions"><button class="b-ghost b-sm" data-edit>Edit</button><button class="b-del b-sm" data-del>Delete</button></div>
+    </div>`;
+  }).join('')||'<div class="none">No talents yet.</div>';
+  bindTeam();
+}
+function bindTeam(){
+  document.querySelectorAll('[data-unassign]').forEach(b=>b.onclick=async()=>{ const r=await api('/api/admin',{action:'assign_order',ref:b.dataset.unassign,talentEmail:null}); if(r.ok){ ORDERS=r.orders||ORDERS; renderTeam(); } });
+  document.querySelectorAll('[data-assign-for]').forEach(s=>s.onchange=async()=>{ if(!s.value) return; const r=await api('/api/admin',{action:'assign_order',ref:s.value,talentEmail:s.dataset.assignFor}); if(r.ok){ ORDERS=r.orders||ORDERS; renderTeam(); } });
+  document.querySelectorAll('.tcard [data-photo]').forEach(inp=>inp.onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const email=inp.closest('.tcard').dataset.talent; const photo=await compress(f,512,0.8); const r=await api('/api/admin',{action:'update_talent',email,photo}); if(r.ok){ TALENTS=r.talents||TALENTS; renderTeam(); } e.target.value=''; });
+  document.querySelectorAll('.tcard [data-del]').forEach(b=>b.onclick=async()=>{
+    const email=b.closest('.tcard').dataset.talent;
+    if(!confirm('Delete '+email+'? Their projects will become unassigned.')) return;
+    const r=await api('/api/admin',{action:'delete_talent',email});
+    if(!r.ok){ alert(r.error==='self'?"You can't delete your own account.":'Error: '+(r.error||'')); return; }
+    TALENTS=r.talents||TALENTS; ORDERS=r.orders||ORDERS; renderTeam();
+  });
+  document.querySelectorAll('.tcard [data-edit]').forEach(b=>b.onclick=async()=>{
+    const email=b.closest('.tcard').dataset.talent; const t=TALENTS.find(x=>x.email===email);
+    const name=prompt('Name', t.name||''); if(name===null) return;
+    const pass=prompt('New password (leave blank to keep current):',''); if(pass===null) return;
+    const r=await api('/api/admin',{action:'update_talent',email,name,...(pass?{password:pass}:{})});
+    if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+    TALENTS=r.talents||TALENTS; renderTeam();
+  });
+}
+$('#talentForm').addEventListener('submit',async e=>{
+  e.preventDefault(); $('#tErr').textContent='';
+  const body={action:'create_talent',name:$('#tName').value.trim(),email:$('#tEmail').value.trim(),password:$('#tPass').value,is_owner:$('#tOwner').checked};
+  const r=await api('/api/admin',body);
+  if(!r.ok){ $('#tErr').textContent=r.error==='exists'?'Email already exists.':'Error: '+(r.error||''); return; }
+  TALENTS=r.talents||TALENTS; $('#talentForm').reset(); renderTeam();
+});
+
+/* ---------- image compression ---------- */
+function compress(file, max=1280, q=0.72){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{ let {width:w,height:h}=img; if(w>max||h>max){ const s=max/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
+      const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); res(c.toDataURL('image/jpeg',q)); };
+    img.onerror=()=>res('');
+    const fr=new FileReader(); fr.onload=()=>{ img.src=fr.result; }; fr.readAsDataURL(file);
+  });
+}
+
+if(TOKEN){ boot().catch(()=>{}); }
 </script>
 </body>
 </html>

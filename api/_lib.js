@@ -1,6 +1,7 @@
 // Shared helpers for the Vercel serverless functions.
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
@@ -10,17 +11,59 @@ export const db = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE
   ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })
   : null;
 
+/* ---- Auth primitives (Talent accounts) ---- */
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.ADMIN_TOKEN || 'brasero-dev-secret';
+const b64url = b => Buffer.from(b).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+const unb64url = s => Buffer.from(s.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
+
+export function hashPassword(pw) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  return salt + ':' + crypto.scryptSync(String(pw), salt, 32).toString('hex');
+}
+export function verifyPassword(pw, stored) {
+  if (!stored || !stored.includes(':')) return false;
+  const [salt, h] = stored.split(':');
+  const calc = crypto.scryptSync(String(pw), salt, 32);
+  const orig = Buffer.from(h, 'hex');
+  return calc.length === orig.length && crypto.timingSafeEqual(calc, orig);
+}
+function hmac(body) {
+  return crypto.createHmac('sha256', SESSION_SECRET).update(body).digest('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+export function signToken(payload, days = 14) {
+  const body = b64url(JSON.stringify({ ...payload, exp: Date.now() + days * 864e5 }));
+  return body + '.' + hmac(body);
+}
+export function verifyToken(token) {
+  if (!token || !token.includes('.')) return null;
+  const [body, sig] = token.split('.');
+  const expSig = hmac(body);
+  if (sig.length !== expSig.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expSig))) return null;
+  try { const p = JSON.parse(unb64url(body)); if (p.exp && Date.now() > p.exp) return null; return p; }
+  catch { return null; }
+}
+
 /* ---- Dev-only in-memory store ----
    Active ONLY when Supabase is not configured (local dev). Lets the order
-   tracker + studio panel run end-to-end with a seeded demo order, so the
+   tracker + studio panel run end-to-end with seeded demo data, so the
    UI is fully testable without a database. Never used in production. */
 const uid = () => 'x' + Math.random().toString(36).slice(2, 10);
 export const MEM = db ? null : {
-  orders: [{
-    id: 'ord-demo', ref: 'DEMO1234', stripe_session_id: 'sess_demo', status: 'paid',
-    plan: 'flame', billing: 'sub', name: 'Demo Client', email: 'demo@brasero.studio',
-    created_at: new Date().toISOString(),
-  }],
+  talents: [
+    { id: 'tal-owner', email: 'owner@brasero.studio', name: 'Studio Owner', is_owner: true, password_hash: hashPassword('owner123') },
+    { id: 'tal-1', email: 'talent@brasero.studio', name: 'Demo Talent', is_owner: false, password_hash: hashPassword('talent123') },
+  ],
+  orders: [
+    { id: 'ord-demo', ref: 'DEMO1234', stripe_session_id: 'sess_demo', status: 'paid',
+      plan: 'flame', billing: 'sub', name: 'Demo Client', email: 'demo@brasero.studio',
+      talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
+    { id: 'ord-todo', ref: 'TODO5678', stripe_session_id: 'sess_todo', status: 'paid',
+      plan: 'starter', billing: 'once', name: 'Nina Park', email: 'nina@example.com',
+      talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
+    { id: 'ord-done', ref: 'DONE9001', stripe_session_id: 'sess_done', status: 'paid',
+      plan: 'burst', billing: 'sub', name: 'Leo Marchand', email: 'leo@example.com',
+      talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
+  ],
   decks: [
     { id: 'dk-1', order_id: 'ord-demo', position: 0, status: 'script_review',
       title: 'Hook deck — “3 myths about X”',
@@ -28,11 +71,15 @@ export const MEM = db ? null : {
     { id: 'dk-2', order_id: 'ord-demo', position: 1, status: 'design_review',
       title: 'Carousel — mini case study',
       script: 'How we took @client from 1k to 40k in 60 days.',
-      design_url: 'assets/carousels/1-1.jpg' },
+      design_urls: ['assets/carousels/1-1.jpg', 'assets/carousels/1-2.jpg', 'assets/carousels/1-3.jpg'] },
     { id: 'dk-3', order_id: 'ord-demo', position: 2, status: 'writing', title: 'Founder story deck' },
     { id: 'dk-4', order_id: 'ord-demo', position: 3, status: 'done',
-      title: 'Testimonial deck', script: 'What our clients say...', design_url: 'assets/carousels/2-1.jpg',
+      title: 'Testimonial deck', script: 'What our clients say...',
+      design_urls: ['assets/carousels/2-1.jpg', 'assets/carousels/2-2.jpg'],
       design_validated_at: new Date().toISOString() },
+    { id: 'dk-5', order_id: 'ord-done', position: 0, status: 'done',
+      title: 'Launch announcement', script: 'We are live!',
+      design_urls: ['assets/carousels/3-1.jpg'], design_validated_at: new Date().toISOString() },
   ],
 };
 const STORE = !!(db || MEM);
@@ -120,15 +167,15 @@ export async function adminListOrders() {
   if (MEM) return MEM.orders.filter(o => o.status === 'paid');
   if (!db) return [];
   const { data } = await db.from('orders')
-    .select('id,ref,stripe_session_id,name,email,plan,status,created_at')
-    .eq('status', 'paid').order('created_at', { ascending: false }).limit(100);
+    .select('id,ref,stripe_session_id,name,email,plan,status,talent_email,created_at')
+    .eq('status', 'paid').order('created_at', { ascending: false }).limit(200);
   return data || [];
 }
 
 export async function createDeck(orderId, { title, position }) {
-  if (MEM) { const d = { id: uid(), order_id: orderId, position, title, status: 'writing', script: '', design_url: '' }; MEM.decks.push(d); return d; }
+  if (MEM) { const d = { id: uid(), order_id: orderId, position, title, status: 'writing', script: '', design_urls: [] }; MEM.decks.push(d); return d; }
   if (!db) return null;
-  const { data, error } = await db.from('decks').insert({ order_id: orderId, position, title, status: 'writing' }).select('*').maybeSingle();
+  const { data, error } = await db.from('decks').insert({ order_id: orderId, position, title, status: 'writing', design_urls: [] }).select('*').maybeSingle();
   if (error) { console.error('createDeck', error); return null; }
   return data;
 }
@@ -137,6 +184,96 @@ export async function deleteDeck(deckId) {
   if (MEM) { MEM.decks = MEM.decks.filter(d => d.id !== deckId); return; }
   if (!db) return;
   await db.from('decks').delete().eq('id', deckId);
+}
+
+/* ---- Talent accounts + project assignment ---- */
+const pubTalent = t => t && ({ email: t.email, name: t.name || '', is_owner: !!t.is_owner, photo: t.photo || '' });
+
+export async function getTalentByEmail(email) {
+  if (!STORE || !email) return null;
+  const EM = String(email).trim().toLowerCase();
+  if (MEM) return MEM.talents.find(t => t.email.toLowerCase() === EM) || null;
+  const { data } = await db.from('talents').select('*').ilike('email', EM).maybeSingle();
+  return data || null;
+}
+
+export async function loginTalent(email, password) {
+  const t = await getTalentByEmail(email);
+  if (!t || !verifyPassword(password, t.password_hash)) return null;
+  return { token: signToken({ email: t.email, owner: !!t.is_owner }), talent: pubTalent(t) };
+}
+
+export async function createTalent({ email, password, name, is_owner, photo }) {
+  if (!STORE) return { error: 'no_store' };
+  const EM = String(email || '').trim().toLowerCase();
+  if (!EM || !password) return { error: 'missing' };
+  if (await getTalentByEmail(EM)) return { error: 'exists' };
+  const row = { email: EM, name: name || '', is_owner: !!is_owner, photo: photo || '', password_hash: hashPassword(password) };
+  if (MEM) { const t = { id: uid(), ...row }; MEM.talents.push(t); return { talent: pubTalent(t) }; }
+  const { data, error } = await db.from('talents').insert(row).select('*').maybeSingle();
+  if (error) return { error: error.message };
+  return { talent: pubTalent(data) };
+}
+
+export async function updateTalent({ email, name, password, is_owner, photo }) {
+  const t = await getTalentByEmail(email);
+  if (!t) return { error: 'not_found' };
+  const patch = {};
+  if (name != null) patch.name = name;
+  if (is_owner != null) patch.is_owner = !!is_owner;
+  if (photo != null) patch.photo = photo;
+  if (password) patch.password_hash = hashPassword(password);
+  if (MEM) { Object.assign(t, patch); return { talent: pubTalent(t) }; }
+  const { data, error } = await db.from('talents').update(patch).eq('id', t.id).select('*').maybeSingle();
+  if (error) return { error: error.message };
+  return { talent: pubTalent(data) };
+}
+
+export async function deleteTalent(email) {
+  const t = await getTalentByEmail(email);
+  if (!t) return { error: 'not_found' };
+  const EM = t.email.toLowerCase();
+  if (MEM) {
+    MEM.orders.forEach(o => { if ((o.talent_email || '').toLowerCase() === EM) o.talent_email = null; });
+    MEM.talents = MEM.talents.filter(x => x.id !== t.id);
+    return { ok: true };
+  }
+  await db.from('orders').update({ talent_email: null }).ilike('talent_email', EM);
+  await db.from('talents').delete().eq('id', t.id);
+  return { ok: true };
+}
+
+export async function listTalents() {
+  if (MEM) return MEM.talents.map(pubTalent);
+  if (!db) return [];
+  const { data } = await db.from('talents').select('email,name,is_owner').order('created_at', { ascending: true });
+  return (data || []).map(pubTalent);
+}
+
+// Orders assigned to a Talent (paid only).
+export async function ordersForTalent(email) {
+  const EM = String(email || '').trim().toLowerCase();
+  if (MEM) return MEM.orders.filter(o => o.status === 'paid' && (o.talent_email || '').toLowerCase() === EM);
+  if (!db) return [];
+  const { data } = await db.from('orders').select('id,ref,stripe_session_id,name,email,plan,status,talent_email,created_at')
+    .eq('status', 'paid').ilike('talent_email', EM).order('created_at', { ascending: false }).limit(200);
+  return data || [];
+}
+
+export async function getOrderById(id) {
+  if (!STORE || !id) return null;
+  if (MEM) return MEM.orders.find(o => o.id === id) || null;
+  const { data } = await db.from('orders').select('*').eq('id', id).maybeSingle();
+  return data || null;
+}
+
+export async function assignOrder(ref, talentEmail) {
+  const order = await findOrderByRef(ref);
+  if (!order) return { error: 'not_found' };
+  const EM = talentEmail ? String(talentEmail).trim().toLowerCase() : null;
+  if (MEM) { order.talent_email = EM; return { ok: true }; }
+  await db.from('orders').update({ talent_email: EM }).eq('id', order.id);
+  return { ok: true };
 }
 
 // Aggregate the decks into an overall progress phase for the tracker UI.
@@ -155,6 +292,21 @@ export function orderProgress(decks) {
   return { steps: STEPS, active, percent };
 }
 
+// Normalize a deck's design images to an array (max 10), tolerating the legacy single field.
+export function deckImages(d) {
+  let imgs = Array.isArray(d.design_urls) ? d.design_urls : [];
+  if (!imgs.length && d.design_url) imgs = [d.design_url];
+  return imgs.filter(Boolean).slice(0, 10);
+}
+
+// Coarse project state for the Talent dashboard: todo | progress | done.
+export function orderState(decks) {
+  if (!decks.length) return 'todo';
+  if (decks.every(d => d.status === 'done')) return 'done';
+  if (decks.every(d => d.status === 'writing')) return 'todo';
+  return 'progress';
+}
+
 // Shape an order + its decks for the customer-facing tracker (no internal ids leaked beyond deck ids).
 export function publicOrder(order, decks) {
   return {
@@ -170,7 +322,7 @@ export function publicOrder(order, decks) {
       title: d.title || 'Untitled deck',
       status: d.status,
       script: d.script || '',
-      design_url: d.design_url || '',
+      images: deckImages(d),
       revision_note: d.revision_note || '',
       script_validated_at: d.script_validated_at,
       design_validated_at: d.design_validated_at,
@@ -262,7 +414,7 @@ export function reviewEmail({ name, kind, deckTitle, ref, url }) {
 }
 
 // Branded order-confirmation email sent to the customer.
-export function clientOrderEmail({ name, planName, billing, amountCents, handle, ref }) {
+export function clientOrderEmail({ name, planName, billing, amountCents, handle, ref, trackUrl }) {
   const amount = amountCents != null ? '$' + (amountCents / 100).toFixed(amountCents % 100 ? 2 : 0) : '';
   const first = name ? name.split(' ')[0] : '';
   const cell = 'padding:12px 16px;font-size:14px';
@@ -286,12 +438,13 @@ export function clientOrderEmail({ name, planName, billing, amountCents, handle,
           <tr><td style="padding:14px 16px;font-weight:700;border-top:1px solid #eeeeee">Total paid</td><td align="right" style="padding:14px 16px;font-weight:900;font-size:20px;border-top:1px solid #eeeeee">${amount}${billing === 'sub' ? ' /mo' : ''}</td></tr>
         </table>
       </td></tr>
-      <tr><td style="padding:6px 28px 26px">
+      <tr><td style="padding:6px 28px 22px">
         <h3 style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#f87000;margin:14px 0 10px">What happens next</h3>
         <p style="margin:0 0 8px;font-size:14px;color:#333333">1 · We review your brief &amp; Instagram and map your hooks.</p>
         <p style="margin:0 0 8px;font-size:14px;color:#333333">2 · We write &amp; design your first decks in your brand style.</p>
         <p style="margin:0;font-size:14px;color:#333333">3 · You receive your post-ready decks by email.</p>
       </td></tr>
+      ${trackUrl ? `<tr><td align="center" style="padding:6px 28px 28px">${ctaButton(trackUrl, 'Track your order →')}<p style="margin:12px 0 0;font-size:12px;color:#9a9a9a">Follow production, approve scripts &amp; designs anytime.</p></td></tr>` : ''}
       <tr><td style="padding:18px 28px;background:#0c0c0c;color:#9a9a9a;font-size:12px;line-height:1.5">Brasero · decks that build lasting trust<br>Questions? Just reply to this email.</td></tr>
     </table>
   </td></tr></table></body></html>`;

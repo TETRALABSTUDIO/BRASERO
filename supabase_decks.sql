@@ -15,7 +15,8 @@ create table if not exists decks (
   -- writing | script_review | designing | design_review | revision | done
   script               text,                         -- the post script/copy
   script_validated_at  timestamptz,
-  design_url           text,                         -- preview image/pdf of the design
+  design_url           text,                         -- legacy single design (kept for compat)
+  design_urls          jsonb default '[]'::jsonb,    -- up to 10 design images
   design_validated_at  timestamptz,
   revision_note        text,                         -- customer's last retouch request
   created_at           timestamptz default now(),
@@ -23,6 +24,9 @@ create table if not exists decks (
 );
 
 create index if not exists decks_order_idx on decks (order_id, position);
+
+-- If the table already existed from an earlier run, add the column:
+alter table decks add column if not exists design_urls jsonb default '[]'::jsonb;
 
 alter table decks enable row level security;
 -- The backend uses the SERVICE ROLE key (bypasses RLS); keep RLS on so the

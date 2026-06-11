@@ -62,22 +62,44 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 
 /* decks */
 .sec-h{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin:0 0 12px}
-.deck{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.045)}
-.deck__top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
-.deck__title{font-size:18px;font-weight:900;letter-spacing:-.02em}
+.decks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;align-items:stretch}
+.deck{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 17px;box-shadow:0 8px 24px rgba(0,0,0,.045)}
+.deck__top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px}
+.deck__title{font-size:16px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
 .pill{font-size:11.5px;font-weight:800;letter-spacing:.02em;padding:5px 11px;border-radius:100px;white-space:nowrap}
 .pill--wait{background:#f1f1f1;color:#777}
 .pill--act{background:rgba(248,80,0,.12);color:#c64600}
 .pill--done{background:rgba(22,163,74,.12);color:#15803d}
-.deck__hint{font-size:13.5px;color:var(--grey);line-height:1.5;margin:4px 0 0}
-.deck__body{margin-top:14px}
-textarea.script{width:100%;min-height:150px;font-family:inherit;font-size:14.5px;line-height:1.6;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--soft);outline:none;resize:vertical;color:var(--ink)}
+.deck__hint{font-size:12.5px;color:var(--grey);line-height:1.45;margin:3px 0 0}
+.deck__body{margin-top:12px}
+textarea.script{width:100%;min-height:120px;font-family:inherit;font-size:13.5px;line-height:1.55;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--soft);outline:none;resize:vertical;color:var(--ink)}
 textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.10);background:#fff}
 textarea.script[readonly]{background:#fafafa;color:#555}
-.design{border-radius:14px;border:1px solid var(--line);overflow:hidden;background:var(--soft)}
-.design img{display:block;width:100%;height:auto}
-.design a.dl{display:block;padding:14px;font-weight:700;color:var(--orange);text-align:center}
-.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+/* small image thumbnails */
+.gal{display:flex;flex-wrap:wrap;gap:7px}
+.gal img{width:62px;height:62px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;transition:transform .15s,box-shadow .15s}
+.gal img:hover{transform:scale(1.05);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.gal .dl{display:flex;align-items:center;padding:0 12px;font-weight:700;color:var(--orange);font-size:13px;border:1px dashed var(--line);border-radius:10px}
+.galcount{font-size:11.5px;color:var(--grey);font-weight:700;margin:0 0 6px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+/* uniform two-stage card */
+.deck{display:flex;flex-direction:column}
+.stages{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.stage{border:1px solid var(--line);border-radius:13px;padding:13px 14px;background:#fff}
+.stage.locked{background:var(--soft);opacity:.7}
+.stage.pending{background:var(--soft)}
+.stage.approved{border-color:rgba(22,163,74,.32);background:rgba(22,163,74,.045)}
+.stage.active{border-color:rgba(248,80,0,.45);box-shadow:0 0 0 2px rgba(248,80,0,.10)}
+.stage__h{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin-bottom:9px}
+.stage__h .num{width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;color:#fff;background:#cbcbcb;flex-shrink:0}
+.stage.active .num,.stage.pending .num{background:var(--grad)}
+.stage.approved .num{background:#15803d}
+.stagemsg{font-size:12.5px;color:var(--grey);line-height:1.45}
+.scriptview{background:var(--soft);border-radius:9px;padding:10px;font-size:12.5px;line-height:1.5;white-space:pre-wrap;color:#555;max-height:90px;overflow:auto}
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(12,12,12,.86);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;cursor:zoom-out}
+.lb.open{display:flex}
+.lb img{max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
 .note{font-size:13px;color:#c64600;background:rgba(248,80,0,.07);border-radius:10px;padding:10px 12px;margin-top:12px}
 .revbox{margin-top:12px;display:none}
 .revbox.open{display:block}
@@ -106,7 +128,10 @@ textarea.script[readonly]{background:#fafafa;color:#555}
 
 <header class="top">
   <a href="index.html" aria-label="Brasero home"><svg class="logo-svg" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></a>
-  <a class="help" href="mailto:hello@brasero.studio">Need help?</a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <a class="btn btn--grad btn--sm" href="index.html#packages">+ Place a new order</a>
+    <a class="help" href="mailto:hello@brasero.studio">Need help?</a>
+  </div>
 </header>
 
 <div class="glow"></div>
@@ -148,10 +173,12 @@ textarea.script[readonly]{background:#fafafa;color:#555}
     </div>
 
     <h3 class="sec-h">Your decks</h3>
-    <div id="decks"></div>
+    <div id="decks" class="decks-grid"></div>
   </section>
 
 </main>
+
+<div class="lb" id="lb"><img id="lbImg" alt=""></div>
 
 <script>
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
@@ -160,13 +187,13 @@ const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>
 
 let CREDS={ref:'',email:''};
 
-const STATUS={
-  writing:      {pill:'pill--wait',label:'Writing script',  hint:"We're writing the script for this deck. Nothing to do yet — we'll email you the moment it's ready."},
-  script_review:{pill:'pill--act', label:'Your turn · script', hint:'Read the script below. Tweak anything you like, then approve it to move into design.'},
-  designing:    {pill:'pill--wait',label:'In design',       hint:'Script approved 🎉 — our designers are building this deck now.'},
-  design_review:{pill:'pill--act', label:'Your turn · design', hint:'Your design is ready. Approve it, or ask for a retouch and we’ll rework it.'},
-  revision:     {pill:'pill--wait',label:'Retouch in progress', hint:"We're applying your retouch. We'll send the new version for approval shortly."},
-  done:         {pill:'pill--done',label:'Approved',        hint:'This deck is approved and ready to post. 🔥'},
+const TAG={
+  writing:      ['pill--wait','Writing script'],
+  script_review:['pill--act', 'Your turn · script'],
+  designing:    ['pill--wait','In design'],
+  design_review:['pill--act', 'Your turn · design'],
+  revision:     ['pill--wait','Retouch in progress'],
+  done:         ['pill--done','Approved ✓'],
 };
 
 /* ---------- gate ---------- */
@@ -221,54 +248,72 @@ function render(o){
 
   const wrap=$('#decks');
   if(!o.decks.length){
+    wrap.className='';
     wrap.innerHTML='<div class="empty">Your decks will appear here as soon as we start production. We\'ll email you at every step. 🔥</div>';
     return;
   }
+  wrap.className='decks-grid';
   wrap.innerHTML=o.decks.map(deckHTML).join('');
   o.decks.forEach(bindDeck);
 }
 
 function deckHTML(d){
-  const st=STATUS[d.status]||STATUS.writing;
-  let body='';
-  if(d.status==='script_review'){
-    body=`<div class="deck__body">
+  const [pc,pl]=TAG[d.status]||TAG.writing;
+  const scriptApproved=['designing','design_review','revision','done'].includes(d.status);
+
+  // ---- stage 1: script ----
+  let s1;
+  if(d.status==='writing'){
+    s1=`<div class="stage pending"><div class="stage__h"><span class="num">1</span> Script</div>
+      <p class="stagemsg">✍️ We're writing the script for this deck. We'll email you the moment it's ready.</p></div>`;
+  } else if(d.status==='script_review'){
+    s1=`<div class="stage active"><div class="stage__h"><span class="num">1</span> Script · your turn</div>
+      <p class="stagemsg" style="margin-bottom:10px">Tweak anything you like, then approve it to move into design.</p>
       <textarea class="script" data-id="${d.id}">${esc(d.script)}</textarea>
-      <div class="actions"><button class="btn btn--grad" data-act="validate_script" data-id="${d.id}">Approve script ✓</button></div>
-    </div>`;
+      <div class="actions"><button class="btn btn--grad btn--sm" data-act="validate_script" data-id="${d.id}">Approve script ✓</button></div></div>`;
+  } else {
+    s1=`<div class="stage approved"><div class="stage__h"><span class="num">✓</span> Script · approved</div>
+      ${d.script?`<details><summary style="cursor:pointer;font-weight:700;font-size:12px;color:var(--grey)">View script</summary><div class="scriptview" style="margin-top:8px">${esc(d.script)}</div></details>`:'<p class="stagemsg">Approved.</p>'}</div>`;
+  }
+
+  // ---- stage 2: design ----
+  let s2;
+  if(!scriptApproved){
+    s2=`<div class="stage locked"><div class="stage__h"><span class="num">2</span> Design</div>
+      <p class="stagemsg">🔒 Unlocks once you approve the script.</p></div>`;
+  } else if(d.status==='designing'){
+    s2=`<div class="stage pending"><div class="stage__h"><span class="num">2</span> Design</div>
+      <p class="stagemsg">🎨 Script approved — our designers are building this deck now.</p></div>`;
   } else if(d.status==='design_review'){
-    body=`<div class="deck__body">
-      ${designHTML(d)}
+    s2=`<div class="stage active"><div class="stage__h"><span class="num">2</span> Design · your turn</div>
+      ${galleryHTML(d)}
       <div class="actions">
-        <button class="btn btn--grad" data-act="validate_design" data-id="${d.id}">Approve design ✓</button>
-        <button class="btn btn--ghost" data-act="toggle_rev" data-id="${d.id}">Request a retouch</button>
+        <button class="btn btn--grad btn--sm" data-act="validate_design" data-id="${d.id}">Approve ✓</button>
+        <button class="btn btn--ghost btn--sm" data-act="toggle_rev" data-id="${d.id}">Retouch</button>
       </div>
       <div class="revbox" id="rev-${d.id}">
-        <textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:90px"></textarea>
+        <textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:80px;margin-top:8px"></textarea>
         <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div>
-      </div>
-    </div>`;
+      </div></div>`;
   } else if(d.status==='revision'){
-    body = d.revision_note ? `<div class="note"><b>Your retouch:</b> ${esc(d.revision_note)}</div>` : '';
-  } else if(d.status==='done'){
-    body=`<div class="deck__body">
-      ${d.design_url?designHTML(d):''}
-      ${d.script?`<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--grey)">View script</summary><textarea class="script" readonly style="margin-top:10px">${esc(d.script)}</textarea></details>`:''}
-    </div>`;
-  } else if(d.script && d.status!=='writing'){
-    body=`<div class="deck__body"><textarea class="script" readonly>${esc(d.script)}</textarea></div>`;
+    s2=`<div class="stage pending"><div class="stage__h"><span class="num">2</span> Design</div>
+      <p class="stagemsg">✏️ Applying your retouch — we'll resend it for approval shortly.</p>
+      ${d.revision_note?`<div class="note" style="margin-top:10px"><b>Your retouch:</b> ${esc(d.revision_note)}</div>`:''}</div>`;
+  } else { // done
+    s2=`<div class="stage approved"><div class="stage__h"><span class="num">✓</span> Design · approved</div>
+      ${d.images.length?galleryHTML(d):'<p class="stagemsg">Approved & ready to post. 🔥</p>'}</div>`;
   }
+
   return `<div class="deck">
-    <div class="deck__top"><div class="deck__title">${esc(d.title)}</div><span class="pill ${st.pill}">${st.label}</span></div>
-    <p class="deck__hint">${st.hint}</p>
-    ${body}
+    <div class="deck__top"><div class="deck__title">${esc(d.title)}</div><span class="pill ${pc}">${pl}</span></div>
+    <div class="stages">${s1}${s2}</div>
   </div>`;
 }
 
-function designHTML(d){
-  const u=d.design_url; if(!u) return '';
-  const isImg=/\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(u);
-  return `<div class="design">${isImg?`<img src="${esc(u)}" alt="${esc(d.title)} design" onerror="this.parentNode.innerHTML='<a class=\\'dl\\' href=\\'${esc(u)}\\' target=_blank>Open the design ↗</a>'">`:`<a class="dl" href="${esc(u)}" target="_blank">Open the design ↗</a>`}</div>`;
+function galleryHTML(d){
+  const imgs=d.images||[]; if(!imgs.length) return '';
+  return `<p class="galcount">${imgs.length} image${imgs.length>1?'s':''}</p>
+    <div class="gal">${imgs.map(u=>`<img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}">`).join('')}</div>`;
 }
 
 /* ---------- actions ---------- */
@@ -301,6 +346,14 @@ async function onAction(el){
     render(dt.order);
   }catch(e){ alert('Network error.'); el.disabled=false; el.innerHTML=old; }
 }
+
+/* ---------- lightbox ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.matches&&t.matches('.gal img')){ $('#lbImg').src=t.dataset.full; $('#lb').classList.add('open'); }
+});
+$('#lb').addEventListener('click',()=>$('#lb').classList.remove('open'));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList.remove('open'); });
 
 /* ---------- boot: deep-link or saved session ---------- */
 (function(){

@@ -9,6 +9,7 @@ import { saveOrder, markPaid, saveOnboarding, sendTo, clientOrderEmail } from '.
 import orderHandler from '../api/order.js';
 import deckHandler from '../api/deck.js';
 import adminHandler from '../api/admin.js';
+import authHandler from '../api/auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -57,9 +58,11 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
     const m = s.metadata || {};
     markPaid(s.id, s.amount_total).catch(console.error);
     const to = s.customer_email || m.email;
+    const ref = s.id.slice(-8).toUpperCase();
+    const trackUrl = to ? `${SITE_URL}/track.html?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(to)}` : '';
     sendTo(to, 'Your Brasero order is confirmed 🎉', clientOrderEmail({
       name: m.name, planName: PLANS[m.plan]?.name || m.plan, billing: m.billing,
-      amountCents: s.amount_total, handle: m.handle, ref: s.id.slice(-8).toUpperCase(),
+      amountCents: s.amount_total, handle: m.handle, ref, trackUrl,
     })).catch(console.error);
     send(`💸 New ${m.plan || ''} order — ${m.name || s.customer_email}`,
       `<h2>Payment received</h2>
@@ -76,7 +79,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
 /* ===================== Normal middleware ===================== */
 app.use(cors({ origin: process.env.SITE_URL ? process.env.SITE_URL : true }));
-app.use(express.json({ limit: '2mb' })); // room for the small profile-photo data URL
+app.use(express.json({ limit: '14mb' })); // room for profile photo + compressed deck images
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
@@ -148,9 +151,10 @@ app.post('/api/onboarding', async (req, res) => {
   }
 });
 
-/* Order tracking (customer) + studio admin panel */
+/* Order tracking (customer) + Talent panel + auth */
 app.post('/api/order', orderHandler);
 app.post('/api/deck', deckHandler);
+app.post('/api/auth', authHandler);
 app.post('/api/admin', adminHandler);
 
 /* Optional: serve the static site from this same server (single deploy) */
