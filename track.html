@@ -361,6 +361,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
   const q=new URLSearchParams(location.search);
   const ref=q.get('ref'), email=q.get('email');
   if(ref&&email){ $('#ref').value=ref; $('#email').value=email; load(ref,email); return; }
+  if(q.has('login')) return;            // came from "Access your decks": always show the login form
   const saved=localStorage.getItem('brasero_track');
   if(saved){ try{ const c=JSON.parse(saved); if(c.ref&&c.email) load(c.ref,c.email,true); }catch(e){} }
 })();
