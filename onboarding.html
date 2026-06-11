@@ -83,6 +83,23 @@ h1.title{font-size:clamp(25px,3.6vw,38px);font-weight:900;letter-spacing:-.038em
 .done p{color:var(--grey);font-size:16px;line-height:1.55}
 .done .recap-mini{display:inline-flex;align-items:center;gap:10px;margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:9px 18px;font-size:14px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.05)}
 .done .recap-mini b{color:var(--orange)}
+/* order confirmation card */
+.oc-card{margin:26px auto 0;max-width:520px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.06)}
+.oc-head{display:flex;align-items:center;gap:13px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.oc-head img{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.oc-head .ph{width:46px;height:46px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
+.oc-head .who-t b{font-size:16px;font-weight:800;display:block;line-height:1.2}
+.oc-head .who-t span{font-size:13px;color:var(--grey)}
+.oc-badge{margin-left:auto;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;background:var(--grad);color:#fff;padding:5px 11px;border-radius:100px;flex-shrink:0}
+.oc-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 20px;font-size:14px}
+.oc-row span{color:var(--grey)}.oc-row b{font-weight:700}
+.oc-total{display:flex;justify-content:space-between;align-items:baseline;padding:14px 20px;border-top:1px solid var(--line)}
+.oc-total span{font-size:13px;color:var(--grey)}
+.oc-total b{font-size:24px;font-weight:900;letter-spacing:-.02em}
+.oc-next{margin:22px auto 0;max-width:520px;text-align:left}
+.oc-next h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--orange);margin-bottom:12px}
+.oc-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:11px;font-size:14px;color:#333;line-height:1.4}
+.oc-step .n{width:23px;height:23px;border-radius:7px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:11px;flex-shrink:0}
 
 @media(max-width:560px){.slabel{display:none}.sline{width:26px;margin:0 7px}.card{padding:20px}}
 </style>
@@ -233,11 +250,34 @@ function submit(){
   else { console.log('Onboarding submitted →',payload); }
   const first=order.name?(', '+order.name.split(' ')[0]):'';
   stepper.innerHTML='';
+  const sub=order.billing==='sub';
+  const ref=sid?sid.slice(-8).toUpperCase():'';
+  const av=order.photo?`<img src="${esc(order.photo)}" alt="">`:`<span class="ph">${(order.handle||'B').replace(/^@/,'').charAt(0).toUpperCase()}</span>`;
+  const amount=order.price!=null?('$'+order.price+(sub?' / mo':'')):'';
   view.innerHTML=`<div class="done">
     <div class="done__ic"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
-    <h2>You’re all set${first}! 🎉</h2>
-    <p>We’ve received your brief. Our team is on it — we’ll start crafting your decks and reach out${order.email?` at <b>${esc(order.email)}</b>`:''} shortly.</p>
-    ${order.planName?`<div class="recap-mini"><b>${esc(order.planName)}</b> pack · confirmed</div>`:''}
+    <h2>Order confirmed${first}! 🎉</h2>
+    <p>Payment received and your brief is in. Here's a recap${order.email?` — a copy goes to <b>${esc(order.email)}</b>`:''}.</p>
+
+    <div class="oc-card">
+      <div class="oc-head">
+        ${av}
+        <div class="who-t"><b>${esc(order.handle||order.name||'Your account')}</b><span>${esc(order.name||'')}</span></div>
+        ${order.planName?`<span class="oc-badge">${esc(order.planName)}</span>`:''}
+      </div>
+      ${amount?`<div class="oc-row"><span>Billing</span><b>${sub?'Subscription · monthly':'One-time payment'}</b></div>`:''}
+      ${order.email?`<div class="oc-row"><span>Email</span><b>${esc(order.email)}</b></div>`:''}
+      ${ref?`<div class="oc-row"><span>Order ref</span><b>#${ref}</b></div>`:''}
+      ${amount?`<div class="oc-total"><span>Total paid</span><b>${amount}</b></div>`:''}
+    </div>
+
+    <div class="oc-next">
+      <h3>What happens next</h3>
+      <div class="oc-step"><span class="n">1</span><div>We review your brief & Instagram, then map your hooks and strategy.</div></div>
+      <div class="oc-step"><span class="n">2</span><div>We write &amp; design your first decks in your brand style.</div></div>
+      <div class="oc-step"><span class="n">3</span><div>You receive your post-ready decks by email${order.email?` at <b>${esc(order.email)}</b>`:''}.</div></div>
+    </div>
+
     <div style="margin-top:28px"><a href="index.html" class="btn btn--grad">Back to home</a></div>
   </div>`;
   window.scrollTo({top:0,behavior:'smooth'});
