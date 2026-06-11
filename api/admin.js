@@ -1,6 +1,6 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
-  assignOrder, createManualOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
+  assignOrder, createManualOrder, populateOrderElements, orderState, orderRef, sendTo, reviewEmail, siteUrl,
   signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail } from './_lib.js';
 
 const pub = o => ({ ref: o.ref || orderRef(o.stripe_session_id), name: o.name, email: o.email, plan: o.plan, billing: o.billing || '', amount: o.amount || 0, instagram: o.instagram || '', phone: o.phone || '', addons: Array.isArray(o.addons) ? o.addons : [], talent_email: o.talent_email || '', created_at: o.created_at });
@@ -108,7 +108,14 @@ export default async function handler(req, res) {
     if (action === 'get') {
       if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
       if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
-      return res.json({ ok: true, order: pub(order), decks: await decksForOrder(order.id) });
+      let decks = await decksForOrder(order.id);
+      // Backfill: orders created before auto-population open empty — seed the full
+      // element list (plan decks + upsells) on first open so the talent fills directly.
+      if (!decks.length) {
+        await populateOrderElements(order.id, { plan: order.plan, addons: order.addons });
+        decks = await decksForOrder(order.id);
+      }
+      return res.json({ ok: true, order: pub(order), decks });
     }
 
     if (action === 'add_deck') {
