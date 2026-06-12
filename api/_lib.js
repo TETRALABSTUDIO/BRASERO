@@ -552,7 +552,7 @@ export const ADDONS = {
   story3:   { name: 'Story pack - 3 stories', amount: 10000 },
   story6:   { name: 'Story pack - 6 stories', amount: 15000 },
   story9:   { name: 'Story pack - 9 + 1 stories', amount: 19000 },
-  bundle:   { name: 'Mega Bundle - branding + 9 stories + 1 free', amount: 45900 },
+  bundle:   { name: 'Mega Bundle - branding + 9 stories + 1 free', amount: 35900 },
 };
 // Build Stripe line items for the selected add-ons (one-time price_data, mixes
 // fine with a recurring plan - Stripe invoices them once on the first invoice).

@@ -28,7 +28,7 @@ Le checkout Stripe est **dynamique** (`price_data` / `unit_amount`) : les montan
 | 6 stories | `story6` | **$150** |
 | 9 + 1 stories | `story9` | **$190** |
 | Pack branding (photo + bannières X/LinkedIn/Facebook + CTA) | `brand_full` | $210 |
-| Mega Bundle (branding + 9 + 1 stories) | `bundle` | $459 |
+| Mega Bundle (branding + 9 + 1 stories) | `bundle` | $359 |
 
 > Le **branding** n'est vendu **qu'en pack** ($210), plus d'éléments à l'unité.
 
