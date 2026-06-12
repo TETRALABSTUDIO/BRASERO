@@ -282,7 +282,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .brf__sep{height:1px;background:var(--line);margin:6px 0}
 /* full-page project brief (talent + owner) */
 #briefModal{padding:0}
-.briefpage{background:#faf8f4;width:100%;height:100%;max-width:none;border-radius:0;display:flex;flex-direction:column;overflow:hidden}
+.briefpage{background:#fff;width:100%;height:100%;max-width:none;border-radius:0;display:flex;flex-direction:column;overflow:hidden}
 .briefpage__top{display:flex;align-items:center;gap:16px;padding:16px 28px;border-bottom:1px solid var(--line);background:#fff;flex-shrink:0}
 .briefpage__id{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
 .briefpage__av{width:48px;height:48px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:900;font-size:18px;flex-shrink:0}
@@ -291,25 +291,23 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .briefpage__sub a{color:var(--orange);font-weight:700}
 .briefpage__sub .sep{color:#d7d2c8}
 .briefpage__topr{display:flex;align-items:center;gap:14px;flex-shrink:0}
-.briefpage__tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:5px 12px}
+.briefpage__tag{font-size:13px;font-weight:600;color:#b3ab9f}
 .briefpage__body{flex:1;overflow-y:auto;padding:26px 28px 44px}
-.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;grid-auto-flow:dense;max-width:980px;margin:0 auto}
-.bt{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 18px;display:flex;flex-direction:column;min-width:0}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:0 48px;grid-auto-flow:dense;max-width:960px;margin:0 auto}
+.bt{padding:24px 0;border-top:1px solid #efeae1;display:flex;flex-direction:column;min-width:0}
 .bt--1{grid-column:span 1}.bt--2{grid-column:span 2}.bt--4{grid-column:1 / -1}
-.bt__k{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--grey);margin-bottom:9px}
-.bt__v{font-size:15px;color:var(--ink);line-height:1.55;white-space:pre-wrap;word-break:break-word}
-.bt__v b{font-weight:800}
-.bt--accent{background:var(--grad);border:none;color:#fff;justify-content:flex-start}
-.bt--accent .bt__k{color:rgba(255,255,255,.82)}
-.bt--accent .bt__v{color:#fff;font-size:19px;font-weight:800;letter-spacing:-.01em}
-.bt--colors{padding-bottom:18px}
-.bt__colors{display:flex;gap:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);min-height:112px;flex:1}
-.bt__colors span{flex:1;display:flex;align-items:flex-end;justify-content:center;padding:11px 4px}
-.bt__colors b{font-size:10.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.36);padding:3px 8px;border-radius:100px;letter-spacing:.02em}
-.biglink{color:var(--orange);font-weight:700;text-decoration:none}
+.bt__k{font-size:13px;font-weight:600;color:#b3ab9f;margin-bottom:10px}
+.bt__v{font-size:16px;color:var(--ink);line-height:1.62;white-space:pre-wrap;word-break:break-word;font-weight:450}
+.bt__v b{font-weight:700}
+.bt--hl .bt__v{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.2;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.bt__colors{display:flex;gap:16px;flex-wrap:wrap}
+.bt__colors span{display:flex;flex-direction:column;gap:9px;align-items:flex-start}
+.bt__colors i{width:64px;height:64px;border-radius:16px;border:1px solid rgba(0,0,0,.06);display:block}
+.bt__colors b{font-size:12px;font-weight:600;color:#9a9286;letter-spacing:.01em}
+.biglink{color:var(--orange);font-weight:600;text-decoration:none}
 .biglink:hover{text-decoration:underline}
-.bempty{color:var(--grey);font-size:14.5px;text-align:center;padding:60px 20px}
-@media(max-width:760px){.bento{grid-template-columns:repeat(2,1fr)}.bt--2,.bt--4{grid-column:1 / -1}.briefpage__top{padding:14px 16px}.briefpage__body{padding:18px 14px 32px}.briefpage__nm{font-size:18px}}
+.bempty{color:var(--grey);font-size:15px;text-align:center;padding:72px 20px}
+@media(max-width:760px){.bento{grid-template-columns:repeat(2,1fr);gap:0 30px}.bt--2,.bt--4{grid-column:1 / -1}.briefpage__top{padding:14px 16px}.briefpage__body{padding:6px 16px 36px}.briefpage__nm{font-size:18px}}
 @media(max-width:440px){.bento{grid-template-columns:1fr}.bt--1{grid-column:1 / -1}}
 /* add-elements modal (owner) */
 .aecats{display:flex;flex-direction:column;gap:12px}
@@ -1731,7 +1729,7 @@ function renderBrief(){
   const val=(k)=>{
     const v=(k==='typo')?b.typo:b[k];
     if(k==='colors'){ const cols=String(v||'').split(',').map(s=>s.trim()).filter(c=>/^#?[0-9a-f]{3,8}$/i.test(c));
-      return `<div class="bt__colors">${cols.map(c=>{const hx=c[0]==='#'?c:'#'+c;return `<span style="background:${esc(hx)}"><b>${esc(hx)}</b></span>`;}).join('')}</div>`; }
+      return `<div class="bt__colors">${cols.map(c=>{const hx=c[0]==='#'?c:'#'+c;return `<span><i style="background:${esc(hx)}"></i><b>${esc(hx)}</b></span>`;}).join('')}</div>`; }
     if(k==='typo'){ let s=v?`<b>${esc(String(v))}</b>`:'<span style="color:var(--grey)">Imported font</span>';
       if(b.typo_file) s+=`<br><a class="biglink" href="${esc(b.typo_file)}" download="${esc(b.typo_file_name||'font')}">⬇ ${esc(b.typo_file_name||'font file')}</a>`;
       return s; }
@@ -1743,7 +1741,7 @@ function renderBrief(){
   // [key, label, span, extraClass] — span 1/2/4, optional accent/colors styling
   const TILES=[
     ['page','Page / brand',1,''],
-    ['goal','#1 goal',1,'bt--accent'],
+    ['goal','#1 goal',1,'bt--hl'],
     ['freq','Posting frequency',1,''],
     ['typo','Typography',1,''],
     ['niche','What the page is about',2,''],
