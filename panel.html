@@ -20,6 +20,8 @@ body.appmode{overflow:hidden}
 .aside{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line)}
 .aside__brand{height:78px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);flex-shrink:0}
 .aside__brand .logo{height:34px;color:var(--ink)}
+.brandlock{display:inline-flex;align-items:center;gap:8px}
+.brandlock .studio{font-weight:800;letter-spacing:-.02em;color:var(--ink);line-height:1}
 .aside__nav{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column}
 .navi{position:relative;display:flex;align-items:center;justify-content:center;gap:11px;height:78px;flex-shrink:0;width:100%;background:none;border:none;border-bottom:1px solid var(--line);cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.015em;transition:background .12s}
 .navi svg{width:24px;height:24px;flex-shrink:0}
@@ -250,7 +252,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 /* project board (master / detail), like the client tracker */
 /* full-screen app shell: sidebar (elements) · work (deliverables) · chat */
 .board{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:300px minmax(0,1fr) 360px;background:#fff}
-.board.chat-collapsed{grid-template-columns:300px minmax(0,1fr) 42px}
+.board.chat-collapsed{grid-template-columns:300px minmax(0,1fr) 38px}
 .board__list{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line);overflow:hidden}
 .side__brand{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .side__order{padding:15px 18px}
@@ -260,6 +262,12 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .oswitch{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
 .oswitch:hover{color:var(--orange);border-color:var(--orange)}
 .oswitch svg{width:16px;height:16px}
+/* brief modal rows */
+.brf{padding:11px 0;border-bottom:1px solid var(--line)}
+.brf:last-child{border-bottom:none}
+.brf__k{font-size:11.5px;font-weight:700;color:var(--grey)}
+.brf__v{font-size:14.5px;color:var(--ink);line-height:1.55;margin-top:3px;white-space:pre-wrap}
+.brf__sep{height:1px;background:var(--line);margin:6px 0}
 .side__order h2{font-size:17px;font-weight:900;letter-spacing:-.025em;line-height:1.15}
 .side__order .meta{color:var(--grey);font-size:12.5px;margin-top:4px;line-height:1.45}
 .side__listhead{padding:8px 18px 9px;font-size:13px;font-weight:700;color:var(--grey)}
@@ -484,12 +492,11 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .chat__panel{display:flex;flex-direction:column;flex:1;min-height:0}
 .board.chat-collapsed .chat__panel{display:none}
 .chat__rail{display:none}
-.board.chat-collapsed .chat__rail{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--soft);border:none;border-left:1px solid var(--line);cursor:pointer;font-family:inherit;font-weight:800;font-size:12px;letter-spacing:.04em;color:var(--ink);writing-mode:vertical-rl;transform:rotate(180deg);padding:18px 0}
+.board.chat-collapsed .chat__rail{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:100%;background:var(--soft);border:none;border-left:1px solid var(--line);border-radius:0;cursor:pointer;font-family:inherit;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--ink);writing-mode:vertical-rl;transform:rotate(180deg);padding:18px 0}
 .chat__rail:hover{color:var(--orange)}
-.chat__dot{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--grad);box-shadow:0 0 0 3px #fff;z-index:3;display:none}
-.board.chat-collapsed #chatDot:not(.hide){display:block}
-.chat__head .chat__dot{position:static;transform:none;display:inline-block;box-shadow:none;margin-left:7px;vertical-align:middle}
-.chat__head #chatDotHead.hide{display:none}
+.chat__dot{width:9px;height:9px;border-radius:50%;background:var(--grad);flex-shrink:0;display:inline-block}
+.chat__dot.hide{display:none}
+.chat__head .chat__dot{margin-left:7px;vertical-align:middle}
 .chat__head{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
 .chat__head b{font-size:15px;font-weight:900;letter-spacing:-.02em}
 .chat__sub{display:block;font-size:12px;color:var(--grey);margin-top:2px}
@@ -530,7 +537,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 
 <!-- ===== AUTH ===== -->
 <div id="auth" class="authwrap">
-  <svg class="logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg>
+  <div class="brandlock" style="margin-bottom:18px"><svg class="logo" viewBox="0 0 798 189" fill="none" style="height:30px;margin-bottom:0"><use href="#brasero-mark"/></svg><span class="studio" style="font-size:23px">Studio</span></div>
   <div id="authLogin">
     <p>Sign in to manage your projects.</p>
     <form id="loginForm">
@@ -563,7 +570,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
   <!-- ===== OWNER ADMIN SHELL ===== -->
   <div id="adminApp" class="adminapp hide">
     <aside class="aside">
-      <div class="aside__brand"><svg class="logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></div>
+      <div class="aside__brand"><div class="brandlock"><svg class="logo" viewBox="0 0 798 189" fill="none" style="height:27px"><use href="#brasero-mark"/></svg><span class="studio" style="font-size:21px">Studio</span></div></div>
       <nav class="aside__nav" id="adminNav">
         <button class="navi on" type="button" data-sec="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</button>
         <button class="navi" type="button" data-sec="projects"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Projects</button>
@@ -592,11 +599,14 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           <aside class="board__list">
             <div class="side__brand" style="gap:8px">
               <button class="b-ghost b-sm hide" id="toDash" type="button" title="Back to dashboard" style="flex-shrink:0">← Dashboard</button>
-              <svg class="logo" viewBox="0 0 798 189" fill="none" style="height:26px;color:var(--ink)"><use href="#brasero-mark"/></svg>
+              <div class="brandlock"><svg class="logo" viewBox="0 0 798 189" fill="none" style="height:22px;color:var(--ink)"><use href="#brasero-mark"/></svg><span class="studio" style="font-size:17px">Studio</span></div>
             </div>
             <div class="side__order switcher" id="switcher">
               <div class="side__order-top">
                 <h2 id="oName"></h2>
+                <button type="button" class="oswitch" id="briefBtn" title="View the brief" aria-label="View the brief">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+                </button>
                 <button type="button" class="oswitch" id="switcherBtn" title="Switch project" aria-label="Switch project">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
                 </button>
@@ -616,8 +626,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           </div>
           <!-- ===== conversation with the client (collapsible) ===== -->
           <aside class="board__chat" id="boardChat">
-            <span class="chat__dot hide" id="chatDot"></span>
-            <button type="button" class="chat__rail" id="chatOpen" title="Open messages">Messages</button>
+            <button type="button" class="chat__rail" id="chatOpen" title="Open messages"><span class="chat__dot hide" id="chatDot"></span><span class="chat__rail-l">Messages</span></button>
             <div class="chat__panel">
               <div class="chat__head">
                 <div><b>Messages<span class="chat__dot hide" id="chatDotHead"></span></b><span class="chat__sub">Talk to the client. Pick an element to reply about a specific asset.</span></div>
@@ -757,6 +766,14 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         </div>
       </form>
       <div id="tCreated" class="tcreated hide"></div>
+    </div>
+  </div>
+
+  <!-- Brief modal (talent + owner) -->
+  <div class="modal hide" id="briefModal">
+    <div class="modalc">
+      <div class="modalc__h"><h3>Project brief</h3><button type="button" class="mx" id="bmClose">✕</button></div>
+      <div id="briefBody"></div>
     </div>
   </div>
 </div>
@@ -1340,8 +1357,33 @@ async function openOrder(ref){
   const foot=document.querySelector('.side__foot'); if(foot) foot.style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   renderSideMe();
   SELDECK=null; renderBoard(d.decks||[]);
+  BRIEF=d.brief||null; CURORDER=d.order||null;
   MESSAGES=d.messages||[]; renderMessages(); setUnread(false); startMsgPoll();
 }
+/* ---------- project brief ---------- */
+let BRIEF=null, CURORDER=null;
+const BRIEF_LABELS={page:'Page / brand',handle:'Instagram',goal:'#1 goal',niche:'What the page is about',audience:'Target audience',style:'Brand vibe / inspo',notes:'Anything else'};
+function renderBrief(){
+  const b=BRIEF, o=CURORDER||{};
+  const top=[];
+  if(o.name) top.push(['Client',o.name]);
+  if(o.instagram) top.push(['Instagram',o.instagram]);
+  if(o.plan) top.push(['Pack',planName(o.plan)+' pack']);
+  const ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
+  if(o.addons&&o.addons.length) top.push(['Add-ons',o.addons.map(k=>ADDON_LBL[k]||k).join(', ')]);
+  const rowsTop=top.map(([k,v])=>`<div class="brf"><span class="brf__k">${esc(k)}</span><div class="brf__v">${esc(v)}</div></div>`).join('');
+  let rowsBrief='';
+  if(b&&typeof b==='object'&&Object.keys(b).length){
+    const order=['page','handle','goal','niche','audience','style','notes'];
+    const keys=[...order.filter(k=>b[k]),...Object.keys(b).filter(k=>!order.includes(k)&&b[k])];
+    rowsBrief=keys.map(k=>`<div class="brf"><span class="brf__k">${esc(BRIEF_LABELS[k]||k)}</span><div class="brf__v">${esc(String(b[k]))}</div></div>`).join('');
+  }
+  const empty=(!rowsTop&&!rowsBrief)?'<p style="color:var(--grey);font-size:13.5px">No brief was provided for this project.</p>':'';
+  $('#briefBody').innerHTML=rowsTop+(rowsBrief?`<div class="brf__sep"></div>${rowsBrief}`:'')+(rowsBrief?'':(rowsTop?'<p style="color:var(--grey);font-size:13px;margin-top:14px">No detailed brief was filled in.</p>':''))+empty;
+}
+$('#briefBtn').onclick=()=>{ renderBrief(); $('#briefModal').classList.remove('hide'); };
+$('#bmClose').onclick=()=>$('#briefModal').classList.add('hide');
+$('#briefModal').addEventListener('click',e=>{ if(e.target.id==='briefModal') $('#briefModal').classList.add('hide'); });
 /* talent profile pinned at the bottom of the project sidebar */
 function renderSideMe(){
   const el=$('#sideMe'); if(!el||!ME) return;
@@ -1507,9 +1549,16 @@ function bind(d){
   /* rich-text toolbar (applies to the focused slide) */
   det.querySelectorAll('[data-rt]').forEach(btn=>btn.addEventListener('mousedown',e=>{ e.preventDefault();
     const cmd=btn.dataset.rt;
-    if(cmd==='bold') document.execCommand('bold');
-    else if(cmd==='title') document.execCommand('formatBlock','<h4>');
-    else if(cmd==='mark'){ document.execCommand('hiliteColor','#ffe39a'); }
+    if(cmd==='bold'){ document.execCommand('bold',false,null); }
+    else if(cmd==='title'){
+      const cur=(document.queryCommandValue('formatBlock')||'').toLowerCase().replace(/[<>]/g,'');
+      document.execCommand('formatBlock',false,cur==='h4'?'div':'h4');
+    }
+    else if(cmd==='mark'){
+      try{ document.execCommand('styleWithCSS',false,true); }catch(_){}
+      if(!document.execCommand('hiliteColor',false,'#ffe39a')) document.execCommand('backColor',false,'#ffe39a');
+      try{ document.execCommand('styleWithCSS',false,false); }catch(_){}
+    }
   }));
   const slidesEl=det.querySelector('.slides[data-f="script"]');
   const addBtn=det.querySelector('[data-slide-add]');

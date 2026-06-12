@@ -138,7 +138,7 @@ export default async function handler(req, res) {
         const r = await populateOrderElements(order.id, { plan: order.plan, addons: order.addons });
         if (r.created) decks = await decksForOrder(order.id);
       }
-      return res.json({ ok: true, order: pub(order, isOwner), decks, messages: await listMessages(order.id) });
+      return res.json({ ok: true, order: pub(order, isOwner), brief: order.answers || null, decks, messages: await listMessages(order.id) });
     }
 
     if (action === 'messages') {
