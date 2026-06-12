@@ -296,10 +296,12 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .bento{display:grid;grid-template-columns:repeat(4,1fr);gap:0 48px;grid-auto-flow:dense;max-width:960px;margin:0 auto}
 .bt{padding:24px 0;border-top:1px solid #efeae1;display:flex;flex-direction:column;min-width:0}
 .bt--1{grid-column:span 1}.bt--2{grid-column:span 2}.bt--4{grid-column:1 / -1}
-.bt__k{font-size:13px;font-weight:600;color:#b3ab9f;margin-bottom:10px}
+.bt__k{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#b3ab9f;margin-bottom:11px}
+.bt__ic{width:17px;height:17px;flex-shrink:0}
 .bt__v{font-size:16px;color:var(--ink);line-height:1.62;white-space:pre-wrap;word-break:break-word;font-weight:450}
 .bt__v b{font-weight:700}
-.bt--hl .bt__v{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.2;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.bt__logo{display:inline-flex;padding:14px 16px;background:repeating-conic-gradient(#f1ece3 0% 25%,#fff 0% 50%) 0/16px 16px;border:1px solid var(--line);border-radius:14px}
+.bt__logo img{max-width:200px;max-height:86px;display:block;object-fit:contain}
 .bt__colors{display:flex;gap:16px;flex-wrap:wrap}
 .bt__colors span{display:flex;flex-direction:column;gap:9px;align-items:flex-start}
 .bt__colors i{width:64px;height:64px;border-radius:16px;border:1px solid rgba(0,0,0,.06);display:block}
@@ -661,6 +663,13 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .typo-file{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
 .typo-file button{border:none;background:none;color:#cfccc6;font-size:13px;cursor:pointer;padding:2px 4px}
 .typo-file button:hover{color:#c33}
+.logo-up{display:flex;flex-direction:column;gap:10px}
+.logo-btn{display:inline-flex;align-self:flex-start;align-items:center;gap:7px;border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:9px 14px;border-radius:10px;cursor:pointer}
+.logo-btn:hover{border-color:var(--orange);color:var(--orange)}
+.logo-prev{display:inline-flex;align-items:center;gap:11px;align-self:flex-start;padding:11px 13px;background:repeating-conic-gradient(#f1ece3 0 25%,#fff 0 50%) 0/16px 16px;border:1px solid var(--line);border-radius:11px}
+.logo-prev img{max-width:140px;max-height:60px;display:block;object-fit:contain}
+.logo-prev button{border:none;background:none;color:#b9b5ae;font-size:13px;cursor:pointer;padding:2px 4px}
+.logo-prev button:hover{color:#c33}
 .iglist{display:flex;flex-direction:column;gap:9px}
 .ig-add{display:flex;gap:8px}
 .ig-btn{flex-shrink:0;background:var(--grad);color:#fff;border:none;font-weight:700;font-size:13.5px;padding:0 18px;border-radius:10px;cursor:pointer}
@@ -935,6 +944,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           <div class="field"><label>Brand vibe</label><textarea id="npBStyle" style="min-height:64px" placeholder="Bold, high-contrast, warm accents, big type…"></textarea></div>
           <div class="field"><label>Brand colors</label><div id="npBColors" class="palette"></div></div>
           <div class="field"><label>Typography</label><div id="npBTypo" class="typo"></div></div>
+          <div class="field"><label>Brand logo <span style="font-weight:600;color:#bbb;font-size:12px">PNG or SVG · optional</span></label><div id="npBLogo" class="logo-up"></div></div>
           <div class="field"><label>Instagram inspiration</label><div id="npBInspo" class="iglist"></div></div>
           <div class="field"><label>Anything else to know?</label><textarea id="npBNotes" style="min-height:64px" placeholder="Tell us anything…"></textarea></div>
         </div>
@@ -1413,6 +1423,7 @@ async function openNewModal(order){
   const anv=(order&&order.answers)||{};
   initPalette($('#npBColors'), anv.colors||'');
   initTypo($('#npBTypo'), anv.typo||'', anv.typo_file||'', anv.typo_file_name||'');
+  initLogo($('#npBLogo'), anv.logo||'', anv.logo_name||'');
   initIgList($('#npBInspo'), anv.inspo||'');
   $('#npBilling').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.bill===NP.billing));
   $('#npTalent').innerHTML='<option value="">Unassigned</option>'+(TALENTS||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}" ${order&&(order.talent_email||'').toLowerCase()===(t.email||'').toLowerCase()?'selected':''}>${esc(t.name||t.email)}</option>`).join('');
@@ -1479,6 +1490,19 @@ function initIgList(wrap,csv){
   upd();
 }
 function igListVal(wrap){ return [...wrap.querySelectorAll('[data-ig]')].map(c=>c.dataset.ig).join(', '); }
+let NP_LOGO_FILE=null;   // {data, name} for an uploaded logo, reset on each modal open
+function initLogo(wrap,dataUrl,name){
+  NP_LOGO_FILE=dataUrl?{data:dataUrl,name:name||'logo'}:null;
+  wrap.innerHTML=`<label class="logo-btn">⬆ Upload logo<input type="file" accept="image/png,image/svg+xml,.png,.svg" hidden></label>
+    <div class="logo-prev ${NP_LOGO_FILE?'':'hide'}"><img src="${NP_LOGO_FILE?esc(NP_LOGO_FILE.data):''}" alt=""><button type="button" data-logo-del title="Remove">✕</button></div>`;
+  const file=wrap.querySelector('input[type=file]'),prev=wrap.querySelector('.logo-prev'),img=prev.querySelector('img');
+  file.addEventListener('change',async()=>{ const f=file.files[0]; if(!f) return;
+    if(!/png|svg/i.test(f.type)&&!/\.(png|svg)$/i.test(f.name)){ alert('Please upload a PNG or SVG file.'); file.value=''; return; }
+    if(f.size>2*1024*1024){ alert('Logo is too large (max 2 MB).'); file.value=''; return; }
+    const data=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f); });
+    NP_LOGO_FILE={data,name:f.name}; img.src=data; prev.classList.remove('hide'); });
+  wrap.querySelector('[data-logo-del]').addEventListener('click',()=>{ NP_LOGO_FILE=null; file.value=''; img.src=''; prev.classList.add('hide'); });
+}
 
 /* assemble the optional onboarding brief (same keys as the client onboarding flow) */
 function npBrief(){
@@ -1487,6 +1511,7 @@ function npBrief(){
     style:$('#npBStyle').value.trim(), notes:$('#npBNotes').value.trim(),
     colors:paletteVal($('#npBColors')), typo:($('#npBTypo .typo-name')||{}).value, inspo:igListVal($('#npBInspo')) };
   if(NP_TYPO_FILE){ b.typo_file=NP_TYPO_FILE.data; b.typo_file_name=NP_TYPO_FILE.name; }
+  if(NP_LOGO_FILE){ b.logo=NP_LOGO_FILE.data; b.logo_name=NP_LOGO_FILE.name; }
   Object.keys(b).forEach(k=>{ if(b[k]==null||b[k]==='') delete b[k]; });
   return Object.keys(b).length?b:null;
 }
@@ -1537,7 +1562,7 @@ $('#npFill').onclick=()=>{
   $('#npBPage').value=s.page; $('#npBGoal').value=s.goal;
   $('#npBNiche').value=s.niche; $('#npBAudience').value=s.audience;
   $('#npBStyle').value=s.style; $('#npBNotes').value=s.notes;
-  initPalette($('#npBColors'), s.colors); initTypo($('#npBTypo'), s.typo, '', ''); initIgList($('#npBInspo'), s.inspo);
+  initPalette($('#npBColors'), s.colors); initTypo($('#npBTypo'), s.typo, '', ''); initLogo($('#npBLogo'),'',''); initIgList($('#npBInspo'), s.inspo);
 };
 
 /* ---------- floating talent guide (step-by-step, zoomed dash mockups) ---------- */
@@ -1712,6 +1737,22 @@ async function openOrder(ref){
 /* ---------- project brief ---------- */
 let BRIEF=null, CURORDER=null;
 const BRIEF_LABELS={page:'Page / brand',handle:'Instagram',goal:'#1 goal',niche:'What the page is about',audience:'Target audience',freq:'Posting frequency',challenge:'Biggest challenge',style:'Brand vibe',colors:'Brand colors',typo:'Typography',inspo:'Instagram inspiration',notes:'Anything else'};
+/* line icons (orange-gradient stroke via #tgrad), one per brief field */
+const BRIEF_ICONS={
+  page:'<path d="M6 3h12v18l-6-4-6 4z"/>',
+  goal:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/>',
+  freq:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>',
+  typo:'<path d="M5 7V5h14v2M12 5v14M9 19h6"/>',
+  logo:'<rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20 16l-4.5-4.5L7 20"/>',
+  niche:'<path d="M9.5 18h5M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5.9 1.2 1 2.1h5c.1-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  audience:'<circle cx="9" cy="9" r="3"/><path d="M3.5 19c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/><path d="M16 6.5a3 3 0 0 1 0 5M20.5 19c0-2.3-1.3-3.8-3.3-4.3"/>',
+  colors:'<path d="M12 3.5s6 6 6 9.8a6 6 0 0 1-12 0C6 9.5 12 3.5 12 3.5z"/>',
+  style:'<path d="M12 3l1.7 4.8L18.5 9.5l-4.8 1.7L12 16l-1.7-4.8L5.5 9.5l4.8-1.7z"/>',
+  inspo:'<path d="M12 20l-1.1-1C6.6 15.1 4 12.7 4 9.8 4 7.6 5.7 6 7.8 6c1.3 0 2.5.6 3.2 1.6C11.7 6.6 12.9 6 14.2 6 16.3 6 18 7.6 18 9.8c0 2.9-2.6 5.3-6.9 9.2z"/>',
+  challenge:'<path d="M5 21V4M5 4h12l-2 3.5L17 11H5"/>',
+  notes:'<path d="M5 19h4L19 9l-4-4L5 15z"/><path d="M14 6l4 4"/>',
+  _d:'<circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/>',
+};
 function renderBrief(){
   const b=(BRIEF&&typeof BRIEF==='object')?BRIEF:{}, o=CURORDER||{};
   const ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
@@ -1735,15 +1776,18 @@ function renderBrief(){
       return s; }
     if(k==='inspo'){ return String(v||'').split(',').map(s=>s.trim()).filter(Boolean).map(u=>{const user=u.replace(/^@/,'');
       return `<a class="biglink" href="https://instagram.com/${esc(user)}" target="_blank" rel="noopener">${esc(u)}</a>`;}).join('&nbsp;&nbsp;·&nbsp;&nbsp;'); }
+    if(k==='logo'){ return `<div class="bt__logo"><img src="${esc(b.logo)}" alt="Brand logo"></div>`; }
     return esc(String(v||''));
   };
   const has=(k)=>k==='typo'?(b.typo||b.typo_file):b[k];
-  // [key, label, span, extraClass] — span 1/2/4, optional accent/colors styling
+  const icon=(k)=>`<svg class="bt__ic" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${BRIEF_ICONS[k]||BRIEF_ICONS._d}</svg>`;
+  // [key, label, span, extraClass] — span 1/2/4
   const TILES=[
     ['page','Page / brand',1,''],
-    ['goal','#1 goal',1,'bt--hl'],
+    ['goal','#1 goal',1,''],
     ['freq','Posting frequency',1,''],
     ['typo','Typography',1,''],
+    ['logo','Brand logo',1,''],
     ['niche','What the page is about',2,''],
     ['audience','Target audience',2,''],
     ['colors','Brand colors',2,'bt--colors'],
@@ -1752,10 +1796,10 @@ function renderBrief(){
     ['challenge','Biggest challenge',2,''],
     ['notes','Anything else',4,''],
   ];
-  const COVERED=new Set(TILES.map(t=>t[0]).concat('handle'));
+  const COVERED=new Set(TILES.map(t=>t[0]).concat('handle','logo_name'));
   Object.keys(b).filter(k=>!COVERED.has(k)&&!/_file(_name)?$/.test(k)&&b[k]).forEach(k=>TILES.push([k,BRIEF_LABELS[k]||k,2,'']));
   const tiles=TILES.filter(([k])=>has(k)).map(([k,label,span,cls])=>
-    `<div class="bt bt--${span} ${cls}"><div class="bt__k">${esc(label)}</div><div class="bt__v">${val(k)}</div></div>`).join('');
+    `<div class="bt bt--${span} ${cls}"><div class="bt__k">${icon(k)}<span>${esc(label)}</span></div><div class="bt__v">${val(k)}</div></div>`).join('');
   $('#briefBody').innerHTML=tiles?`<div class="bento">${tiles}</div>`:'<div class="bempty">No brief was filled in for this project yet.</div>';
 }
 $('#briefBtn').onclick=()=>{ renderBrief(); $('#briefModal').classList.remove('hide'); };

@@ -104,6 +104,14 @@ h1.title{font-size:clamp(25px,3.6vw,38px);font-weight:900;letter-spacing:-.038em
 .typo-file{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
 .typo-file button{border:none;background:none;color:#cfccc6;font-size:13px;cursor:pointer;padding:2px 4px}
 .typo-file button:hover{color:#c33}
+/* logo upload */
+.logo-up{display:flex;flex-direction:column;gap:11px}
+.logo-btn{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:11px 16px;border-radius:12px;cursor:pointer}
+.logo-btn:hover{border-color:var(--orange);color:var(--orange)}
+.logo-prev{display:inline-flex;align-items:center;gap:12px;align-self:flex-start;padding:12px 14px;background:repeating-conic-gradient(#f1ece3 0 25%,#fff 0 50%) 0/16px 16px;border:1px solid var(--line);border-radius:12px}
+.logo-prev img{max-width:150px;max-height:64px;display:block;object-fit:contain}
+.logo-prev button{border:none;background:none;color:#b9b5ae;font-size:14px;cursor:pointer;padding:2px 4px}
+.logo-prev button:hover{color:#c33}
 .hide{display:none!important}
 /* instagram inspiration list */
 .iglist{display:flex;flex-direction:column;gap:10px}
@@ -200,6 +208,7 @@ const STEPS=[
       {key:'style',label:'Brand vibe',type:'textarea',placeholder:'Bold, high-contrast, warm orange accents, big type…',required:false},
       {key:'colors',label:'Brand colors',type:'colors',required:false},
       {key:'typo',label:'Typography',type:'typo',required:false},
+      {key:'logo',label:'Brand logo',type:'logo',required:false},
       {key:'inspo',label:'Instagram inspiration',type:'iglist',max:5,required:false},
       {key:'notes',label:'Anything else we should know?',type:'textarea',placeholder:'Tell us anything…',required:false},
     ]},
@@ -275,6 +284,13 @@ function fieldHTML(f){
         <span class="typo-file ${fn?'':'hide'}"><b>${fn}</b><button type="button" data-typo-fdel title="Remove">✕</button></span>
       </div></div>`;
   }
+  else if(f.type==='logo'){
+    const cur=ans[f.key];
+    inner=`<div class="logo-up" data-k="${f.key}">
+      <label class="logo-btn">⬆ Upload logo<input type="file" accept="image/png,image/svg+xml,.png,.svg" hidden></label>
+      <div class="logo-prev ${cur?'':'hide'}"><img src="${cur?esc(cur):''}" alt=""><button type="button" data-logo-del title="Remove">✕</button></div>
+      <p class="ig-hint">PNG or SVG, used on your elements.</p></div>`;
+  }
   else if(f.type==='iglist'){
     const list=v?String(v).split(',').map(s=>s.trim()).filter(Boolean):[];
     inner=`<div class="iglist" data-k="${f.key}" data-max="${f.max||5}">
@@ -341,6 +357,15 @@ function render(){
       ans[key+'_file']=data; ans[key+'_file_name']=f.name; fileName.textContent=f.name; fileBox.classList.remove('hide'); });
     const fdel=t.querySelector('[data-typo-fdel]');
     fdel&&fdel.addEventListener('click',()=>{ delete ans[key+'_file']; delete ans[key+'_file_name']; file.value=''; fileName.textContent=''; fileBox.classList.add('hide'); });
+  });
+  view.querySelectorAll('.logo-up').forEach(w=>{
+    const key=w.dataset.k, file=w.querySelector('input[type=file]'), prev=w.querySelector('.logo-prev'), img=prev.querySelector('img');
+    file.addEventListener('change',async()=>{ const f=file.files[0]; if(!f) return;
+      if(!/png|svg/i.test(f.type)&&!/\.(png|svg)$/i.test(f.name)){ alert('Please upload a PNG or SVG file.'); file.value=''; return; }
+      if(f.size>2*1024*1024){ alert('Logo is too large (max 2 MB).'); file.value=''; return; }
+      const data=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f); });
+      ans[key]=data; ans[key+'_name']=f.name; img.src=data; prev.classList.remove('hide'); });
+    w.querySelector('[data-logo-del]').addEventListener('click',()=>{ delete ans[key]; delete ans[key+'_name']; file.value=''; img.src=''; prev.classList.add('hide'); });
   });
   view.querySelectorAll('.iglist').forEach(g=>{
     const key=g.dataset.k, max=Number(g.dataset.max)||5, input=g.querySelector('.ig-input'), chips=g.querySelector('.ig-chips'), hint=g.querySelector('.ig-hint');
