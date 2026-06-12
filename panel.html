@@ -297,6 +297,24 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 /* keep the three bottom bars' separators on the same line */
 .side__me,.chat__composer,.cmdbar{min-height:60px}
 .side__me,.chat__composer{align-items:center}
+/* element categories (sidebar level 1) */
+.catrow{width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background .15s}
+.catrow:hover{background:#fafafb}
+.catrow__ic{width:38px;height:38px;flex-shrink:0;border-radius:11px;background:rgba(248,80,0,.1);display:grid;place-items:center}
+.catrow__ic .ti,.catrow__ic svg{width:20px;height:20px}
+.catrow__l{display:flex;flex-direction:column;gap:2px;min-width:0;margin-right:auto}
+.catrow__n{font-size:14.5px;font-weight:900;letter-spacing:-.02em}
+.catrow__s{font-size:12px;color:var(--grey);font-weight:600}
+.catrow__chev{width:18px;height:18px;color:var(--grey);flex-shrink:0}
+.catrow--off{cursor:default}
+.catrow--off .catrow__ic{background:var(--soft)}
+.catrow--off .catrow__ic .ti,.catrow--off .catrow__ic svg{filter:grayscale(1);opacity:.45}
+.catrow--off .catrow__n{color:#9a9a9a}
+.catrow__add{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;font-size:18px;font-weight:700;color:var(--grey);cursor:pointer;line-height:1}
+.catrow__add:hover{background:var(--grad);color:#fff;border-color:transparent}
+.catback{width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:inherit;font-size:13px;font-weight:800;color:var(--grey)}
+.catback:hover{color:var(--orange)}
+.catback svg{width:16px;height:16px}
 .deckitem{width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:background .15s}
 .deckitem:hover{background:#fafafb;transform:none;box-shadow:none}
 .deckitem.sel{background:var(--soft);box-shadow:inset 3px 0 0 var(--orange)}
@@ -1343,7 +1361,12 @@ $('#switcherMenu').addEventListener('click',e=>{
   if(act){ $('#switcherMenu').classList.add('hide'); if(act.dataset.act==='new') openNewModal(); else if(act.dataset.act==='overview') backToOverview(); }
 });
 document.addEventListener('click',e=>{ if(!e.target.closest('#switcher')) $('#switcherMenu')?.classList.add('hide'); });
-$('#deckList').addEventListener('click',e=>{ const it=e.target.closest('[data-pick]'); if(!it) return; SELDECK=it.dataset.pick; renderDeckList(); renderDeckDetail(); });
+$('#deckList').addEventListener('click',e=>{
+  const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); addUpsellCategory(add.dataset.addcat); return; }
+  const back=e.target.closest('[data-catback]'); if(back){ CAT=null; SELDECK=null; renderSidebar(); renderDeckDetail(); return; }
+  const cat=e.target.closest('[data-cat]'); if(cat){ CAT=cat.dataset.cat; const inCat=decksOfCat(CAT); SELDECK=inCat[0]?inCat[0].id:null; renderSidebar(); renderDeckDetail(); return; }
+  const it=e.target.closest('[data-pick]'); if(it){ SELDECK=it.dataset.pick; renderSidebar(); renderDeckDetail(); }
+});
 $('#deckDetail').addEventListener('click',e=>{ const x=e.target.closest('[data-x]'); if(!x) return; x.closest('figure')?.remove(); const det=$('#deckDetail'), c=det.querySelector('[data-count]'); if(c) c.textContent=det.querySelectorAll('[data-imgs] img').length; });
 async function openOrder(ref){
   REF=ref.replace(/^#/,'');
@@ -1367,7 +1390,7 @@ async function openOrder(ref){
   $('#oDeadline').innerHTML=dlBadge(d.order,(d.decks||[]).length);
   const foot=document.querySelector('.side__foot'); if(foot) foot.style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   renderSideMe();
-  SELDECK=null; renderBoard(d.decks||[]);
+  SELDECK=null; CAT=null; renderBoard(d.decks||[]);
   BRIEF=d.brief||null; CURORDER=d.order||null;
   MESSAGES=d.messages||[]; renderMessages(); setUnread(false); startMsgPoll();
 }
@@ -1456,33 +1479,71 @@ function setChatCollapsed(c){ $('#board')?.classList.toggle('chat-collapsed',c);
 $('#chatToggle')?.addEventListener('click',()=>setChatCollapsed(true));
 $('#chatOpen')?.addEventListener('click',()=>setChatCollapsed(false));
 try{ if(localStorage.getItem(CHAT_KEY)) $('#board')?.classList.add('chat-collapsed'); }catch(e){}
-$('#addDeck').onclick=async()=>{ const title=prompt('Element title','New deck'); if(title===null) return; const d=await api('/api/admin',{action:'add_deck',ref:REF,title}); renderBoard(d.decks||[]); };
+$('#addDeck').onclick=async()=>{ const title=prompt('Element title','New element'); if(title===null) return; const d=await api('/api/admin',{action:'add_deck',ref:REF,title,type:CAT||'carousel'}); renderBoard(d.decks||[]); };
 
 /* ---------- decks ---------- */
 const PILL={writing:['pill--wait','Writing'],script_review:['pill--act','Script · awaiting client'],designing:['pill--act','Designing'],design_review:['pill--act','Design · awaiting client'],revision:['pill--act','Retouch requested'],done:['pill--done','Done ✓']};
-let DECKS=[], SELDECK=null;
+let DECKS=[], SELDECK=null, CAT=null;
+/* element categories shown in the sidebar (grouped by deck type) */
+const DECK_CATS=[
+  {key:'carousel',label:'Decks'},
+  {key:'story',label:'Stories'},
+  {key:'branding',label:'Branding'},
+];
+function decksOfCat(k){ return DECKS.filter(d=>(d.type||'carousel')===k); }
 function renderBoard(decks){
   DECKS=decks||[];
-  if(!DECKS.length){ $('#deckList').innerHTML=''; $('#deckDetail').innerHTML='<div class="empty">No elements yet. Add one to start.</div>'; return; }
-  if(!DECKS.some(d=>d.id===SELDECK)) SELDECK=DECKS[0].id;
-  renderDeckList(); renderDeckDetail();
+  if(!DECKS.length){ $('#deckList').innerHTML=''; $('#deckDetail').innerHTML='<div class="empty">No elements yet. Add one to start.</div>'; $('#deckCmd').innerHTML=''; return; }
+  if(CAT && !decksOfCat(CAT).length) CAT=null;                 // category emptied out
+  if(CAT){ const inCat=decksOfCat(CAT); if(!inCat.some(d=>d.id===SELDECK)) SELDECK=inCat[0]?inCat[0].id:null; }
+  renderSidebar(); renderDeckDetail();
 }
-function renderDeckList(){
-  $('#deckList').innerHTML=DECKS.map(d=>{
-    const [pc,pl]=PILL[d.status]||PILL.writing, ic=TYPE_ICON[d.type]||TYPE_ICON.carousel, sel=d.id===SELDECK?'sel':'';
-    return `<button type="button" class="deckitem ${sel}" data-pick="${d.id}">
-      <div class="deckitem__top"><span class="deckitem__title">${ic}<span>${esc(d.title)}</span></span></div>
-      <div class="miniprog"><i style="width:${DPCT[d.status]||10}%"></i></div>
-      <span class="pill ${pc} deckitem__pill">${pl}</span>
-    </button>`;
+function renderSidebar(){ if(CAT) renderCatList(CAT); else renderCategories(); }
+function renderCategories(){
+  $('#deckList').innerHTML=DECK_CATS.map(c=>{
+    const items=decksOfCat(c.key), n=items.length, ic=TYPE_ICON[c.key]||TYPE_ICON.carousel;
+    if(n){
+      const done=items.filter(d=>d.status==='done').length;
+      return `<button type="button" class="catrow" data-cat="${c.key}">
+        <span class="catrow__ic">${ic}</span>
+        <span class="catrow__l"><span class="catrow__n">${c.label}</span><span class="catrow__s">${n} element${n>1?'s':''} · ${done}/${n} done</span></span>
+        <svg class="catrow__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>`;
+    }
+    const add=(ME&&ME.is_owner)?`<span class="catrow__add" data-addcat="${c.key}" title="Add as an upsell">+</span>`:'';
+    return `<div class="catrow catrow--off">
+      <span class="catrow__ic">${ic}</span>
+      <span class="catrow__l"><span class="catrow__n">${c.label}</span><span class="catrow__s">Not in this offer</span></span>
+      ${add}</div>`;
   }).join('');
 }
+function deckItemHTML(d){
+  const [pc,pl]=PILL[d.status]||PILL.writing, ic=TYPE_ICON[d.type]||TYPE_ICON.carousel, sel=d.id===SELDECK?'sel':'';
+  return `<button type="button" class="deckitem ${sel}" data-pick="${d.id}">
+    <div class="deckitem__top"><span class="deckitem__title">${ic}<span>${esc(d.title)}</span></span></div>
+    <div class="miniprog"><i style="width:${DPCT[d.status]||10}%"></i></div>
+    <span class="pill ${pc} deckitem__pill">${pl}</span>
+  </button>`;
+}
+function renderCatList(cat){
+  const c=DECK_CATS.find(x=>x.key===cat), items=decksOfCat(cat);
+  $('#deckList').innerHTML=`<button type="button" class="catback" data-catback><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> ${c?c.label:'Categories'}</button>`
+    +items.map(deckItemHTML).join('');
+}
+function renderDeckList(){ renderSidebar(); }   // kept for any external callers
 function renderDeckDetail(){
   const d=DECKS.find(x=>x.id===SELDECK);
-  if(!d){ $('#deckDetail').innerHTML='<div class="empty">Select an element on the left.</div>'; $('#deckCmd').innerHTML=''; return; }
+  if(!d){ $('#deckDetail').innerHTML=`<div class="empty">${CAT?'Select an element on the left.':'Pick a category on the left to see its elements.'}</div>`; $('#deckCmd').innerHTML=''; return; }
   $('#deckDetail').innerHTML=detailHTML(d);
   $('#deckCmd').innerHTML=cmdHTML(d);
   bind(d);
+}
+async function addUpsellCategory(cat){
+  const lbl=cat==='story'?'a story pack (3 stories)':'a branding pack';
+  if(!confirm('Add '+lbl+' to this project? It is billed to the client as an upsell.')) return;
+  const r=await api('/api/admin',{action:'add_upsell',ref:REF,category:cat});
+  if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+  CAT=cat; SELDECK=null; renderBoard(r.decks||[]);
 }
 function imagesOf(d){ return Array.isArray(d.design_urls)&&d.design_urls.length?d.design_urls:(d.design_url?[d.design_url]:[]); }
 const T_INSTR={

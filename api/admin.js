@@ -1,6 +1,6 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
-  assignOrder, createManualOrder, populateOrderElements, orderState, orderRef, sendTo, reviewEmail, siteUrl,
+  assignOrder, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
   signToken, randomPassword, tempPassword, PLANS, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, messageNotifyEmail } from './_lib.js';
 
@@ -173,7 +173,20 @@ export default async function handler(req, res) {
       if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
       if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
       const existing = await decksForOrder(order.id);
-      await createDeck(order.id, { position: existing.length, title: b.title || `Deck ${existing.length + 1}` });
+      const t = ['carousel', 'story', 'branding'].includes(b.type) ? b.type : 'carousel';
+      await createDeck(order.id, { position: existing.length, title: b.title || `Deck ${existing.length + 1}`, type: t });
+      return res.json({ ok: true, decks: await decksForOrder(order.id) });
+    }
+
+    if (action === 'add_upsell') {
+      if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+      if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
+      const KEY = { story: 'story3', branding: 'brand_full' };
+      const key = KEY[b.category];
+      if (!key) return res.status(400).json({ ok: false, error: 'bad_category' });
+      const r = await addItemsToOrder(order.ref || b.ref, key);
+      if (r.error) return res.status(400).json({ ok: false, error: r.error });
       return res.json({ ok: true, decks: await decksForOrder(order.id) });
     }
 
