@@ -621,6 +621,16 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .expert{display:flex;align-items:center;gap:11px;min-width:0;margin-right:auto}
 .expert__av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #fff;box-shadow:0 5px 14px rgba(248,80,0,.22)}
 .expert__av--ph{display:grid;place-items:center;background:var(--grad);color:#fff;font-weight:900;font-size:15px}
+/* client Instagram avatar (img over initials; img removes itself on error → initials show) */
+.iav{position:relative;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--grad);color:#fff;font-weight:900;font-size:15px;overflow:hidden;flex-shrink:0;line-height:1}
+.iav::before{content:attr(data-ini)}
+.iav img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.iav--sm{width:30px;height:30px;font-size:12px}
+.iav--lg{width:48px;height:48px;font-size:18px}
+.iav--exp{width:42px;height:42px;font-size:15px;border:2px solid #fff;box-shadow:0 5px 14px rgba(248,80,0,.22)}
+.kc__head{display:flex;align-items:center;gap:10px;padding-right:28px}
+.kc__head .kc__n{padding-right:0}
+.rname{display:flex;align-items:center;gap:10px}
 .expert__info{display:flex;flex-direction:column;gap:2px;min-width:0}
 .expert__label{font-size:11.5px;font-weight:800;color:var(--orange)}
 .expert__name{font-size:15.5px;font-weight:900;letter-spacing:-.02em;display:flex;align-items:center;gap:7px;min-width:0}
@@ -1055,6 +1065,13 @@ const $=s=>document.querySelector(s);
 const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const initials=s=>{const p=(s||'').trim().split(/[\s@.]+/).filter(Boolean);return ((p[0]||'?')[0]+(p[1]?p[1][0]:'')).toUpperCase();};
 function avatar(t,size,extra){ return t.photo?`<img class="avatar ${size}" src="${esc(t.photo)}" ${extra||''}>`:`<div class="avatar ${size}" ${extra||''}>${esc(initials(t.name||t.email))}</div>`; }
+/* client avatar: Instagram profile photo (via /api/avatar) with an initials fallback if IG returns nothing */
+function igUser(s){ s=(s||'').toString().trim(); if(!s) return ''; const m=s.replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i); return (m?m[1]:s).replace(/^@/,'').trim(); }
+function clientAv(o,cls){
+  const nm=(o&&(o.name||o.instagram))||'Client', user=igUser(o&&(o.instagram||o.handle));
+  const img=user?`<img src="${API}/api/avatar?u=${encodeURIComponent(user)}" alt="" loading="lazy" onerror="this.remove()">`:'';
+  return `<span class="iav ${cls||''}" data-ini="${esc(initials(nm))}">${img}</span>`;
+}
 const PLAN_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
 const planName=p=>PLAN_NAMES[p]||p||'';
 let TOKEN=localStorage.getItem('brasero_session')||'', ME=null, REF='', ORDERS=[], TALENTS=[];
@@ -1260,7 +1277,7 @@ function projCard(o){
   const line=[c.done?`${c.done} done`:'',c.active?`${c.active} in progress`:'',c.todo?`${c.todo} to start`:''].filter(Boolean).join(' · ')||'No elements yet';
   return `<div class="kc" data-card="${esc(o.ref)}">
     <button class="kc__edit" data-stop data-edit="${esc(o.ref)}" title="Edit project">${EDIT_IC}</button>
-    <div class="kc__n">${esc(o.name||'Untitled')}</div>
+    <div class="kc__head">${clientAv(o,'iav--sm')}<div class="kc__n">${esc(o.name||'Untitled')}</div></div>
     <div class="kc__meta"><span class="swi__ref">#${esc(o.ref)}</span><span class="kc__pack">${esc(planName(o.plan)||'')}</span></div>
     ${chips?`<div class="kc__kinds">${chips}</div>`:''}
     ${total?`<div class="kc__prog"><div class="kc__bar"><i style="width:${pct}%"></i></div><span class="kc__progt">${line}</span></div>`:''}
@@ -1271,7 +1288,7 @@ function projCard(o){
 const EDIT_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1L20 7.5a2 2 0 0 0-2.8-2.8L4.8 17.5 4 20z"/></svg>';
 function projRow(o){
   return `<tr data-row="${esc(o.ref)}" class="clk"><td><span class="swi__ref">#${esc(o.ref)}</span></td>
-    <td><b>${esc(o.name||'-')}</b><div class="rsub">${esc(o.email||'')}</div></td>
+    <td><div class="rname">${clientAv(o,'iav--sm')}<div><b>${esc(o.name||'-')}</b><div class="rsub">${esc(o.email||'')}</div></div></div></td>
     <td>${esc(planName(o.plan)||'-')}</td>
     <td>${o.billing==='sub'?'Subscription':'One-time'}</td>
     <td class="amoney">${fmtMoney(o.amount)}</td>
@@ -1810,7 +1827,7 @@ function briefHTML(){
   if(o.plan) sub.push(`<span>${esc(planName(o.plan))} pack</span>`);
   if(o.addons&&o.addons.length) sub.push(`<span>+ ${esc(o.addons.map(k=>ADDON_LBL[k]||k).join(', '))}</span>`);
   if(ME&&ME.is_owner){ if(o.email) sub.push(`<a href="mailto:${esc(o.email)}">${esc(o.email)}</a>`); if(o.phone) sub.push(`<span>${esc(o.phone)}</span>`); }
-  const head=`<div class="briefin__head"><div class="briefpage__av">${esc(initials(nm))}</div>
+  const head=`<div class="briefin__head">${clientAv(o,'iav--lg')}
     <div style="min-width:0"><div class="briefpage__nm">${esc(nm)}</div>
       <div class="briefpage__sub">${sub.join('<span class="sep">·</span>')}</div></div></div>`;
   /* ---- body: a bento mosaic of tiles, varied sizes + visual accents ---- */
@@ -1870,7 +1887,7 @@ function fmtMsgTime(iso){ try{ const d=new Date(iso); return d.toLocaleDateStrin
 function renderExpert(){
   const el=$('#chatExpert'); if(!el) return;
   const nm=(CURORDER&&CURORDER.name)?CURORDER.name:'Client';
-  el.innerHTML=`<div class="expert__av expert__av--ph">${esc(initials(nm))}</div><div class="expert__info"><span class="expert__label">Client</span><b class="expert__name">${esc(nm)}<span class="chat__dot hide" id="chatDotHead"></span></b></div>`;
+  el.innerHTML=`${clientAv(CURORDER,'iav--exp')}<div class="expert__info"><span class="expert__label">Client</span><b class="expert__name">${esc(nm)}<span class="chat__dot hide" id="chatDotHead"></span></b></div>`;
 }
 function renderMessages(){
   const t=$('#chatThread'); if(!t) return;
