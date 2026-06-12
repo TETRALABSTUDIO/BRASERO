@@ -126,11 +126,17 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .waiting{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:30px 20px;min-height:calc(100vh - 230px)}
 .waiting__h{font-size:19px;font-weight:800;color:var(--ink)}
 .waiting__p{font-size:14.5px;color:var(--grey);line-height:1.55;max-width:42ch}
-.pan{width:144px;height:116px}
+.pan{width:172px;height:132px}
 .pan svg{width:100%;height:100%;overflow:visible}
-.pan .flame{transform-origin:54px 66px;animation:flick 1.05s ease-in-out infinite alternate}
-.pan .flame2{transform-origin:54px 64px;animation:flick .72s ease-in-out infinite alternate}
-@keyframes flick{0%{transform:scale(1,1) translateY(0)}100%{transform:scale(.9,1.14) translateY(-3px)}}
+.pan .flame{transform-origin:70px 78px;animation:flick 1s ease-in-out infinite alternate}
+.pan .flame--b{transform-origin:70px 76px;animation-duration:.72s}
+.pan .flame--c{transform-origin:70px 74px;animation-duration:.54s}
+@keyframes flick{0%{transform:scale(1,1) translateY(0)}100%{transform:scale(.86,1.16) translateY(-4px)}}
+.pan .scene{transform-origin:70px 84px;animation:sizzle 1.7s ease-in-out infinite}
+@keyframes sizzle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(1.4px) rotate(-1.2deg)}}
+.pan .steam1,.pan .steam2{transform-origin:center;opacity:0;animation:steam 2.4s ease-out infinite}
+.pan .steam2{animation-delay:1.2s}
+@keyframes steam{0%{opacity:0;transform:translateY(8px) scaleY(.6)}30%{opacity:.55}100%{opacity:0;transform:translateY(-16px) scaleY(1.15)}}
 .note-line{font-size:14px;color:var(--ink);line-height:1.55;margin-top:12px}
 .note-line b{color:var(--orange)}
 textarea.script{width:100%;min-height:150px;font-family:inherit;font-size:14px;line-height:1.6;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none;resize:vertical;color:var(--ink);margin-top:12px}
@@ -776,13 +782,27 @@ function detailBody(d){
     ${d.status==='revision'&&d.revision_note?`<p class="note-line"><b>Your retouch:</b> ${esc(d.revision_note)}</p>`:''}
   </div>`;
 }
-const PAN_SVG=`<div class="pan"><svg viewBox="0 0 120 100" fill="none" aria-hidden="true">
-  <defs><linearGradient id="flameG" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff1a00"/><stop offset=".55" stop-color="#ff5a00"/><stop offset="1" stop-color="#ffb300"/></linearGradient></defs>
-  <rect x="83" y="73" width="35" height="8" rx="4" fill="#2a2a2a"/>
-  <ellipse cx="54" cy="78" rx="35" ry="9" fill="#2a2a2a"/>
-  <ellipse cx="54" cy="76" rx="30" ry="6.5" fill="#171717"/>
-  <path class="flame" d="M54 26 C 70 44, 70 60, 54 70 C 38 60, 38 44, 54 26 Z" fill="url(#flameG)"/>
-  <path class="flame2" d="M54 42 C 63 52, 63 61, 54 68 C 45 61, 45 52, 54 42 Z" fill="#ffd766"/>
+const PAN_SVG=`<div class="pan"><svg viewBox="0 0 160 120" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="flameG" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff1a00"/><stop offset=".55" stop-color="#ff5a00"/><stop offset="1" stop-color="#ffb300"/></linearGradient>
+    <linearGradient id="flameG2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a00"/><stop offset="1" stop-color="#ffd766"/></linearGradient>
+  </defs>
+  <!-- steam wisps -->
+  <g stroke="#cdcdcd" stroke-width="3" stroke-linecap="round" fill="none">
+    <path class="steam1" d="M62 40 C 55 32, 69 28, 62 20"/>
+    <path class="steam2" d="M84 40 C 77 32, 91 28, 84 18"/>
+  </g>
+  <g class="scene">
+    <!-- brand flame cooking in the pan -->
+    <path class="flame flame--a" d="M70 30 C 92 52, 84 70, 70 79 C 56 70, 48 52, 70 30 Z" fill="url(#flameG)"/>
+    <path class="flame flame--b" d="M70 45 C 83 57, 78 69, 70 76 C 62 69, 57 57, 70 45 Z" fill="url(#flameG2)"/>
+    <path class="flame flame--c" d="M70 55 C 76 62, 74 70, 70 74 C 66 70, 64 62, 70 55 Z" fill="#ffe39a"/>
+    <!-- pan (side view) -->
+    <path class="pan__handle" d="M116 80 L150 73" stroke="#2a2a2a" stroke-width="8" stroke-linecap="round"/>
+    <path class="pan__bowl" d="M32 75 Q70 112 108 75 Z" fill="#1d1d1d"/>
+    <ellipse cx="70" cy="75" rx="38" ry="8.5" fill="#2a2a2a"/>
+    <ellipse cx="70" cy="74" rx="32" ry="6" fill="#0e0e0e"/>
+  </g>
 </svg></div>`;
 
 // horizontal command box: slide count + status + actions, stepper on its bottom edge
