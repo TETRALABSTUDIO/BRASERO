@@ -112,13 +112,19 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .board__detail{flex:1 1 auto;padding:28px 36px}
 .detail__head{margin-bottom:2px}
 .detail__title{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
-/* element tabs in the middle column (status / approved script) */
-.dtabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
-.dtab{display:inline-flex;align-items:center;gap:7px;max-width:230px;padding:9px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:13.5px;font-weight:800;letter-spacing:-.01em;color:var(--grey);cursor:pointer;background:var(--soft);transition:.15s}
-.dtab:hover{color:var(--ink);border-color:var(--orange)}
-.dtab.on{background:#fff;color:var(--ink);border-color:var(--orange);box-shadow:0 6px 16px rgba(248,80,0,.14)}
+/* element tabs in the middle column (status / approved script), Chrome-style connected to the content */
+.dtabs{display:flex;gap:4px;padding:8px 12px 0;background:var(--soft);overflow-x:auto;flex-shrink:0;position:sticky;top:0;z-index:6;scrollbar-width:none}
+.dtabs::-webkit-scrollbar{display:none}
+.dtabs.hide{display:none}
+.dtab{display:inline-flex;align-items:center;gap:7px;max-width:240px;padding:9px 11px 11px 14px;border:none;border-radius:11px 11px 0 0;font-family:inherit;font-size:13.5px;font-weight:800;letter-spacing:-.01em;color:var(--grey);cursor:pointer;white-space:nowrap;background:transparent;position:relative;flex-shrink:0}
+.dtab:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+.dtab.on{background:#fff;color:var(--ink)}
+.dtab.on::before,.dtab.on::after{content:"";position:absolute;bottom:0;width:9px;height:9px;background:#fff;pointer-events:none}
+.dtab.on::before{left:-9px;-webkit-mask-image:radial-gradient(circle at top left,transparent 9px,#000 9px);mask-image:radial-gradient(circle at top left,transparent 9px,#000 9px)}
+.dtab.on::after{right:-9px;-webkit-mask-image:radial-gradient(circle at top right,transparent 9px,#000 9px);mask-image:radial-gradient(circle at top right,transparent 9px,#000 9px)}
 .dtab .ti{width:15px;height:15px;flex-shrink:0}
 .dtab__l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtab__doc{font-size:13px}
 .board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .board__detail .gal figure{width:100%;height:auto;aspect-ratio:1080/1350}
 @media(max-width:980px){.board,.board.chat-collapsed{position:static;display:flex;flex-direction:column}.board__list{border-right:none;border-bottom:1px solid var(--line)}#deckList{max-height:46vh}.board__detail{padding:20px}.board__chat{border-left:none;border-top:1px solid var(--line)}.board.chat-collapsed .chat__panel{display:flex}.chat__rail{display:none!important}.chat__thread{max-height:360px}}
@@ -437,6 +443,7 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
         </div>
       </aside>
       <div class="board__right">
+        <div class="dtabs hide" id="deckTabs"></div>
         <div id="flash" class="flash hide"></div>
         <div class="board__detail" id="deckDetail"></div>
         <div class="cmdbar" id="deckCmd"></div>
@@ -800,8 +807,9 @@ function renderList(){ renderSidebar(); }
 
 function renderDetail(){
   const d=DECKS.find(x=>String(x.id)===String(SELECTED));
-  const det=$('#deckDetail'), cmd=$('#deckCmd');
-  if(!d){ det.innerHTML=`<div class="empty">${CAT?'Select an element on the left.':'Pick a category on the left to see its elements.'}</div>`; cmd.innerHTML=''; return; }
+  const det=$('#deckDetail'), cmd=$('#deckCmd'), tabsEl=$('#deckTabs');
+  if(!d){ det.innerHTML=`<div class="empty">${CAT?'Select an element on the left.':'Pick a category on the left to see its elements.'}</div>`; cmd.innerHTML=''; tabsEl.innerHTML=''; tabsEl.classList.add('hide'); return; }
+  if(hasApprovedScript(d)){ tabsEl.innerHTML=detailTabs(d); tabsEl.classList.remove('hide'); } else { tabsEl.innerHTML=''; tabsEl.classList.add('hide'); }
   det.innerHTML=detailBody(d);
   cmd.innerHTML=(hasApprovedScript(d)&&scriptView===d.id)?'':cmdBar(d);   // read-only script tab has no action bar
   bindDeck(d);
@@ -913,11 +921,10 @@ function detailTabs(d){
   </div>`;
 }
 function detailBody(d){
-  const tabs=detailTabs(d);
-  if(tabs && scriptView===d.id){   // read-only approved script, shown as a tab in the middle column
-    return tabs+`<p class="detail__instr">📄 <b>Approved script</b>, read-only now that it's in design.</p>`+slidesViewHTML(d.script);
+  if(hasApprovedScript(d) && scriptView===d.id){   // read-only approved script (selected via the Script tab)
+    return `<p class="detail__instr">📄 <b>Approved script</b>, read-only now that it's in design.</p>`+slidesViewHTML(d.script);
   }
-  const head=tabs?'':`<div class="detail__head"><div class="detail__title">${esc(d.title)}</div></div>`;
+  const head=hasApprovedScript(d)?'':`<div class="detail__head"><div class="detail__title">${esc(d.title)}</div></div>`;   // the tab already shows the title
   const n=NEXT[d.status];
   if(n){
     const instr=`<p class="detail__instr">${n[0]} <b>${n[1]}</b>, ${n[2]}</p>`;
@@ -932,10 +939,10 @@ function detailBody(d){
         </div>`;
     else if(d.status==='done')
       content=(d.images&&d.images.length)?galleryGrid(d):'';
-    return tabs+head+instr+content;
+    return head+instr+content;
   }
   const w=WAIT[d.status]||['','In progress','We\'re working on it, you\'ll get news very soon.'];
-  return tabs+head+`<div class="waiting">
+  return head+`<div class="waiting">
     ${PAN_SVG}
     <div class="waiting__h">${w[1]}</div>
     <p class="waiting__p">${w[2]}</p>
