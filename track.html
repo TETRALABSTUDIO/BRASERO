@@ -71,12 +71,8 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .side__order{padding:16px 20px}
 .side__hello{font-size:23px;font-weight:900;letter-spacing:-.03em}
 .side__badges{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
-.obadge--plan{gap:6px;font-weight:800}
-.obadge--plan .plan-ic{width:16px;height:16px;display:inline-grid;place-items:center}
-.obadge--plan .plan-ic svg{width:16px;height:16px}
-.oswitch{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
-.oswitch:hover{color:var(--orange);border-color:var(--orange)}
-.oswitch svg{width:16px;height:16px}
+.obadge--plan{padding:6px 13px}
+.obadge--plan .plan-logo{height:16px;width:auto;display:block}
 .side__foot{padding:14px 18px;border-top:1px solid var(--line)}
 #deckList{flex:1;min-height:0;overflow-y:auto;border-top:1px solid var(--line)}
 /* element categories (sidebar level 1) */
@@ -97,11 +93,6 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .catback{width:100%;text-align:left;font-family:inherit;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:13px 18px;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--grey)}
 .catback:hover{color:var(--orange)}
 .catback svg{width:16px;height:16px}
-/* brief modal rows */
-.brf{padding:11px 0;border-bottom:1px solid var(--line)}
-.brf:last-child{border-bottom:none}
-.brf__k{font-size:11.5px;font-weight:700;color:var(--grey)}
-.brf__v{font-size:14.5px;color:var(--ink);line-height:1.55;margin-top:3px;white-space:pre-wrap}
 .deckitem{width:100%;text-align:left;font-family:inherit;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:15px 18px;cursor:pointer;display:flex;flex-direction:column;gap:11px;transition:background .2s,box-shadow .2s}
 .deckitem:hover{background:#fafafb}
 .deckitem.sel{background:var(--soft);box-shadow:inset 3px 0 0 var(--orange)}
@@ -128,12 +119,11 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .waiting__p{font-size:14.5px;color:var(--grey);line-height:1.55;max-width:42ch}
 .pan{width:172px;height:132px}
 .pan svg{width:100%;height:100%;overflow:visible}
-.pan .flame{transform-origin:70px 78px;animation:flick 1s ease-in-out infinite alternate}
-.pan .flame--b{transform-origin:70px 76px;animation-duration:.72s}
-.pan .flame--c{transform-origin:70px 74px;animation-duration:.54s}
-@keyframes flick{0%{transform:scale(1,1) translateY(0)}100%{transform:scale(.86,1.16) translateY(-4px)}}
-.pan .scene{transform-origin:70px 84px;animation:sizzle 1.7s ease-in-out infinite}
-@keyframes sizzle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(1.4px) rotate(-1.2deg)}}
+.pan .flame{transform-origin:159px 384px;animation:flick 1s ease-in-out infinite alternate}
+.pan .flame--glow{opacity:.4;filter:blur(2.5px);animation-duration:1.35s}
+@keyframes flick{0%{transform:scale(1,1)}100%{transform:scale(.9,1.13) translateY(-14px)}}
+.pan .scene{transform-origin:80px 90px;animation:sizzle 1.7s ease-in-out infinite}
+@keyframes sizzle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(1.6px) rotate(-1.1deg)}}
 .pan .steam1,.pan .steam2{transform-origin:center;opacity:0;animation:steam 2.4s ease-out infinite}
 .pan .steam2{animation-delay:1.2s}
 @keyframes steam{0%{opacity:0;transform:translateY(8px) scaleY(.6)}30%{opacity:.55}100%{opacity:0;transform:translateY(-16px) scaleY(1.15)}}
@@ -343,9 +333,6 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
           <div class="side__badges">
             <span class="obadge">Order <b id="oref">#</b></span>
             <span class="obadge obadge--plan hide" id="oplan"></span>
-            <button type="button" class="oswitch hide" id="briefBtn" title="View your brief" aria-label="View your brief">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
-            </button>
           </div>
         </div>
         <div id="deckList"></div>
@@ -380,14 +367,6 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 </main>
 
 <div class="lb" id="lb"><img id="lbImg" alt=""><button type="button" class="btn btn--grad btn--sm lb__dl" id="lbDl">⬇ Download</button></div>
-
-<div class="modal" id="briefModal">
-  <div class="modal__card">
-    <button type="button" class="modal__x" id="bmClose" aria-label="Close">✕</button>
-    <h3>Your brief</h3>
-    <div id="briefBody"></div>
-  </div>
-</div>
 
 <div class="modal" id="addModal">
   <div class="modal__card">
@@ -521,9 +500,9 @@ function render(o){
   $('#helpFab').classList.remove('hide');
   $('#hello').innerHTML = o.name ? `Hi <span class="grad-text">${esc(o.name.split(' ')[0])}</span>` : 'Your <span class="grad-text">decks</span>';
   $('#oref').textContent = '#'+o.ref;
-  if(o.plan){ $('#oplan').innerHTML=`<span class="plan-ic">${OFFER_IC}</span>${esc(PLAN_NAMES[o.plan]||o.plan)}`; $('#oplan').classList.remove('hide'); }
+  if(o.plan && PLAN_LOGO[o.plan]){ $('#oplan').innerHTML=`<img class="plan-logo" src="assets/plans/${PLAN_LOGO[o.plan]}.svg" alt="${esc(PLAN_NAMES[o.plan]||o.plan)} pack">`; $('#oplan').classList.remove('hide'); }
+  else if(o.plan){ $('#oplan').textContent=(PLAN_NAMES[o.plan]||o.plan)+' pack'; $('#oplan').classList.remove('hide'); }
   else $('#oplan').classList.add('hide');
-  $('#briefBtn').classList.remove('hide');
 
   ORDER=o;
   DECKS=o.decks||[];
@@ -595,8 +574,8 @@ try{ if(localStorage.getItem(CHAT_KEY)) $('#board')?.classList.add('chat-collaps
 
 const DECK_PCT={writing:12,script_review:34,designing:58,design_review:80,revision:72,done:100};
 
-/* small offer emblem (flame, orange gradient) shown next to the plan name */
-const OFFER_IC=`<svg viewBox="0 0 24 24" fill="url(#tgrad)"><path d="M12.6 2c.4 3.3-1.7 4.8-1.7 7.2 0 1 .6 1.9 1.5 1.9 1 0 1.5-.9 1.5-2.3 1.8 1.7 2.9 3.9 2.9 6.1A6.8 6.8 0 1 1 5.8 14c0-1.8.7-3.4 1.9-4.6.2 1.1.9 1.8 1.8 1.8C8.9 7.4 11.5 5.3 12.6 2z"/></svg>`;
+/* real package wordmark logos shown in the order badge */
+const PLAN_LOGO={starter:'ember',flame:'flame',burst:'meteor'};
 /* group elements into categories (Decks / Stories / Branding), like the talent panel */
 const DECK_CATS=[{key:'carousel',label:'Decks'},{key:'story',label:'Stories'},{key:'branding',label:'Branding'}];
 let CAT=null;
@@ -647,7 +626,7 @@ function renderDetail(){
 
 /* sidebar navigation: categories → element list → back (event delegation, bound once) */
 $('#deckList').addEventListener('click',e=>{
-  const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); openAddModal(); return; }
+  const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); openAddModal({carousel:'decks',story:'stories',branding:'branding'}[add.dataset.addcat]); return; }
   const back=e.target.closest('[data-catback]'); if(back){ CAT=null; SELECTED=null; renderSidebar(); renderDetail(); return; }
   const cat=e.target.closest('[data-cat]'); if(cat){ CAT=cat.dataset.cat; const inCat=decksOfCat(CAT); SELECTED=inCat[0]?inCat[0].id:null; renderSidebar(); renderDetail(); return; }
   const it=e.target.closest('.deckitem'); if(it){ SELECTED=it.dataset.deck; renderSidebar(); renderDetail(); }
@@ -691,9 +670,9 @@ function renderAddBody(){
   wrap.innerHTML=`<button type="button" class="addback" data-back>← All elements</button>
     <div class="addsec__list">${g.items.map(optionHTML).join('')}</div>`;
 }
-function openAddModal(){
+function openAddModal(group){
   if(!CREDS.ref) return;
-  addCat=null;
+  addCat=(typeof group==='string'&&ADD_GROUPS.some(g=>g.key===group))?group:null;
   $('#addRef').textContent='#'+CREDS.ref;
   $('#addErr').textContent='';
   renderAddBody();
@@ -718,25 +697,6 @@ async function startAddon(item,btn){
 $('#addDecks').addEventListener('click',openAddModal);
 $('#addClose').addEventListener('click',closeAddModal);
 $('#addModal').addEventListener('click',e=>{ if(e.target.id==='addModal') closeAddModal(); });
-
-/* ---------- your brief ---------- */
-const BRIEF_LABELS={page:'Page / brand',handle:'Instagram',goal:'#1 goal',niche:'What the page is about',audience:'Target audience',style:'Brand vibe / inspo',notes:'Anything else'};
-function renderBrief(){
-  const o=ORDER||{}, b=o.answers;
-  const top=[];
-  if(o.instagram) top.push(['Instagram',o.instagram]);
-  if(o.plan) top.push(['Pack',(PLAN_NAMES[o.plan]||o.plan)+' pack']);
-  let rows=top.map(([k,v])=>`<div class="brf"><span class="brf__k">${esc(k)}</span><div class="brf__v">${esc(v)}</div></div>`).join('');
-  if(b&&typeof b==='object'&&Object.keys(b).length){
-    const order=['page','handle','goal','niche','audience','style','notes'];
-    const keys=[...order.filter(k=>b[k]),...Object.keys(b).filter(k=>!order.includes(k)&&b[k])];
-    rows+=keys.map(k=>`<div class="brf"><span class="brf__k">${esc(BRIEF_LABELS[k]||k)}</span><div class="brf__v">${esc(String(b[k]))}</div></div>`).join('');
-  }
-  $('#briefBody').innerHTML=rows||'<p style="color:var(--grey);font-size:13.5px">No brief on file for this order yet.</p>';
-}
-$('#briefBtn').addEventListener('click',()=>{ renderBrief(); $('#briefModal').classList.add('open'); });
-$('#bmClose').addEventListener('click',()=>$('#briefModal').classList.remove('open'));
-$('#briefModal').addEventListener('click',e=>{ if(e.target.id==='briefModal') $('#briefModal').classList.remove('open'); });
 $('#addPacks').addEventListener('click',e=>{
   const cat=e.target.closest('[data-cat]'); if(cat){ addCat=cat.dataset.cat; renderAddBody(); return; }
   if(e.target.closest('[data-back]')){ addCat=null; renderAddBody(); return; }
@@ -782,6 +742,8 @@ function detailBody(d){
     ${d.status==='revision'&&d.revision_note?`<p class="note-line"><b>Your retouch:</b> ${esc(d.revision_note)}</p>`:''}
   </div>`;
 }
+/* the real brand flame (from assets/favicon.svg) cooking inside the pan */
+const FAV_FLAME="M163.509 96.921C173.804 90.9775 173.804 76.1187 163.509 70.1752L145.8 59.9509C141.023 57.1925 135.136 57.1925 130.359 59.9509L96.7733 79.3413C91.9956 82.0996 86.1093 82.0996 81.3317 79.3412L62.0884 68.2311C51.7939 62.2876 51.7939 47.4288 62.0883 41.4853L130.359 2.06882C135.137 -0.689597 141.023 -0.689606 145.801 2.06879L229.57 50.4328C234.348 53.1912 237.291 58.2889 237.291 63.8057L237.291 153.221C237.291 160.404 229.514 164.894 223.293 161.302C217.071 157.71 209.295 162.2 209.295 169.384L209.295 251.221C209.295 262.026 220.992 268.78 230.35 263.377C234.693 260.87 237.369 256.236 237.369 251.22L237.368 177.894C237.368 172.377 240.311 167.28 245.089 164.521L294.443 136.026C304.738 130.083 317.606 137.512 317.606 149.399L317.606 296.735C317.606 302.251 314.663 307.349 309.885 310.108L166.524 392.877C161.747 395.635 155.86 395.635 151.083 392.877L7.72107 310.107C2.94341 307.349 0.000229603 302.251 0.000224304 296.734L0 149.129C-1.7563e-05 137.242 12.8681 129.812 23.1625 135.756L72.5155 164.25C77.2932 167.008 80.2363 172.106 80.2364 177.623L80.2373 250.41C80.2374 255.926 83.1805 261.024 87.9582 263.782L151.378 300.398C155.973 303.051 161.634 303.051 166.229 300.398C176.129 294.682 176.129 280.391 166.229 274.675L117.861 246.75C113.083 243.991 110.14 238.894 110.14 233.377L110.14 136.649C110.14 131.132 113.083 126.034 117.861 123.276L163.509 96.921Z";
 const PAN_SVG=`<div class="pan"><svg viewBox="0 0 160 120" fill="none" aria-hidden="true">
   <defs>
     <linearGradient id="flameG" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff1a00"/><stop offset=".55" stop-color="#ff5a00"/><stop offset="1" stop-color="#ffb300"/></linearGradient>
@@ -793,10 +755,10 @@ const PAN_SVG=`<div class="pan"><svg viewBox="0 0 160 120" fill="none" aria-hidd
     <path class="steam2" d="M84 40 C 77 32, 91 28, 84 18"/>
   </g>
   <g class="scene">
-    <!-- brand flame cooking in the pan -->
-    <path class="flame flame--a" d="M70 30 C 92 52, 84 70, 70 79 C 56 70, 48 52, 70 30 Z" fill="url(#flameG)"/>
-    <path class="flame flame--b" d="M70 45 C 83 57, 78 69, 70 76 C 62 69, 57 57, 70 45 Z" fill="url(#flameG2)"/>
-    <path class="flame flame--c" d="M70 55 C 76 62, 74 70, 70 74 C 66 70, 64 62, 70 55 Z" fill="#ffe39a"/>
+    <!-- glow behind -->
+    <g transform="translate(40.5 9) scale(0.186)"><g class="flame flame--glow"><path d="${FAV_FLAME}" fill="url(#flameG2)"/></g></g>
+    <!-- the brand flame -->
+    <g transform="translate(42.7 12) scale(0.172)"><g class="flame flame--a"><path d="${FAV_FLAME}" fill="url(#flameG)"/></g></g>
     <!-- pan (side view) -->
     <path class="pan__handle" d="M116 80 L150 73" stroke="#2a2a2a" stroke-width="8" stroke-linecap="round"/>
     <path class="pan__bowl" d="M32 75 Q70 112 108 75 Z" fill="#1d1d1d"/>
