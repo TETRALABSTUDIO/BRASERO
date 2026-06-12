@@ -6,7 +6,7 @@ import { findOrderByRefEmail, decksForOrder, publicOrder, getDeck, listMessages,
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
-    const { ref = '', email = '', action = '', body = '', deckId = '' } = req.body || {};
+    const { ref = '', email = '', action = '', body = '', deckId = '', images = [] } = req.body || {};
     if (!ref || !email) return res.status(400).json({ ok: false, error: 'missing' });
     const order = await findOrderByRefEmail(ref, email);
     if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
@@ -17,19 +17,21 @@ export default async function handler(req, res) {
 
     if (action === 'send_message') {
       const text = String(body || '').trim();
-      if (!text) return res.status(400).json({ ok: false, error: 'empty' });
+      const imgs = Array.isArray(images) ? images : [];
+      if (!text && !imgs.length) return res.status(400).json({ ok: false, error: 'empty' });
       let dk = null;
       if (deckId) { const d = await getDeck(deckId); if (d && d.order_id === order.id) dk = d; }   // ignore foreign ids
-      await addMessage(order.id, { deck_id: dk ? dk.id : null, sender: 'client', sender_name: order.name || 'Client', body: text });
+      await addMessage(order.id, { deck_id: dk ? dk.id : null, sender: 'client', sender_name: order.name || 'Client', body: text, images: imgs });
+      const notifyBody = text || `📎 ${imgs.length} image${imgs.length > 1 ? 's' : ''} attached`;
       // Notify the studio + the assigned talent.
       try {
         const about = dk ? dk.title : '';
         await send(`💬 New message · #${order.ref || ''}`,
-          `<p><b>From:</b> ${order.name || 'Client'} · ${order.email}</p>${about ? `<p><b>About:</b> ${about}</p>` : ''}<p>${text.replace(/</g, '&lt;')}</p>`);
+          `<p><b>From:</b> ${order.name || 'Client'} · ${order.email}</p>${about ? `<p><b>About:</b> ${about}</p>` : ''}<p>${notifyBody.replace(/</g, '&lt;')}</p>`);
         if (order.talent_email) {
           const talent = await getTalentByEmail(order.talent_email);
           await sendTo(order.talent_email, `💬 New message from ${order.name || 'your client'}`, messageNotifyEmail({
-            name: talent?.name, ref: order.ref, fromName: order.name || 'Client', body: text, about,
+            name: talent?.name, ref: order.ref, fromName: order.name || 'Client', body: notifyBody, about,
             ctaUrl: `${siteUrl(req)}/panel.html`, ctaLabel: 'Open the panel →',
           }));
         }

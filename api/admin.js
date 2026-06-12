@@ -155,16 +155,18 @@ export default async function handler(req, res) {
       if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
       if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
       const text = String(b.body || '').trim();
-      if (!text) return res.status(400).json({ ok: false, error: 'empty' });
+      const imgs = Array.isArray(b.images) ? b.images : [];
+      if (!text && !imgs.length) return res.status(400).json({ ok: false, error: 'empty' });
       let dk = null;
       if (b.deckId) { const dd = await getDeck(b.deckId); if (dd && dd.order_id === order.id) dk = dd; }
-      await addMessage(order.id, { deck_id: dk ? dk.id : null, sender: 'studio', sender_name: me.name || 'Brasero studio', body: text });
+      await addMessage(order.id, { deck_id: dk ? dk.id : null, sender: 'studio', sender_name: me.name || 'Brasero studio', body: text, images: imgs });
+      const notifyBody = text || `📎 ${imgs.length} image${imgs.length > 1 ? 's' : ''} attached`;
       // Notify the client by email (they reply from their tracker).
       try {
         if (order.email) {
           const trackUrl = `${siteUrl(req)}/track.html?ref=${encodeURIComponent(order.ref || '')}&email=${encodeURIComponent(order.email)}`;
           await sendTo(order.email, `💬 A message about your Brasero order #${order.ref || ''}`, messageNotifyEmail({
-            name: order.name, ref: order.ref, fromName: me.name || 'Brasero studio', body: text, about: dk ? dk.title : '',
+            name: order.name, ref: order.ref, fromName: me.name || 'Brasero studio', body: notifyBody, about: dk ? dk.title : '',
             ctaUrl: trackUrl, ctaLabel: 'Open the conversation →',
           }));
         }

@@ -616,6 +616,17 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .msg__meta{font-size:11px;color:var(--grey);font-weight:600;padding:0 4px}
 .msg__about{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:var(--orange);background:rgba(248,80,0,.1);border:1px solid rgba(248,80,0,.2);border-radius:100px;padding:2px 9px}
 .msg__about .ti{width:13px;height:13px}
+.msg__imgs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.msg--studio .msg__imgs{justify-content:flex-end}
+.msg__img{display:block;width:74px;height:74px;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#fff}
+.msg__img img{width:100%;height:100%;object-fit:cover;display:block}
+.chat__clip{flex-shrink:0;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--grey);cursor:pointer;transition:.15s}
+.chat__clip:hover{color:var(--orange);border-color:var(--orange)}
+.chat__clip svg{width:17px;height:17px}
+.chat__atts{display:flex;flex-wrap:wrap;gap:8px}
+.chat__atts .att{position:relative;width:54px;height:54px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.chat__atts .att img{width:100%;height:100%;object-fit:cover;display:block}
+.chat__atts .att button{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:10px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
 .chat__composer{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
 .chat__input{width:100%;font-family:inherit;font-size:14px;line-height:1.5;padding:11px 14px;border:1px solid var(--line);border-radius:14px;background:var(--soft);outline:none;color:var(--ink);resize:none;min-height:64px;max-height:170px}
 .chat__input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.1);background:#fff}
@@ -840,11 +851,13 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
               <div class="chat__thread" id="chatThread"></div>
               <form class="chat__composer" id="chatForm">
                 <textarea id="chatInput" class="chat__input" placeholder="Write a message…" rows="2" maxlength="4000"></textarea>
+                <div class="chat__atts hide" id="chatAtts"></div>
                 <div class="chat__send-row">
                   <div class="assetpick" id="assetPick">
                     <button type="button" class="assetpick__btn" id="assetBtn" title="What is this about?"><span class="assetpick__cur" id="assetCur">General</span><svg class="assetpick__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
                     <div class="assetpick__menu hide" id="assetMenu"></div>
                   </div>
+                  <label class="chat__clip" id="chatClip" title="Attach images"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7-7l8.6-8.6a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.6 1.6 0 0 1-2.3-2.3l7.8-7.8"/></svg><input type="file" id="chatFiles" accept="image/*" multiple hidden></label>
                   <button class="b-grad b-sm" id="chatSend" type="submit">Send</button>
                 </div>
               </form>
@@ -1832,7 +1845,9 @@ function renderMessages(){
     const cls=m.sender==='studio'?'msg--studio':'msg--client';
     const about=m.deck_id?`<span class="msg__about">${TYPE_ICON[deckTypeById(m.deck_id)]||''} ${esc(deckTitleById(m.deck_id)||'Element')}</span>`:'';
     const who=esc(m.sender_name||(m.sender==='studio'?'You':'Client'));
-    return `<div class="msg ${cls}">${about}<div class="msg__bubble">${esc(m.body)}</div><span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}</span></div>`;
+    const bubble=m.body?`<div class="msg__bubble">${esc(m.body)}</div>`:'';
+    const imgs=(m.images&&m.images.length)?`<div class="msg__imgs">${m.images.map(u=>`<a class="msg__img" href="${esc(u)}" target="_blank" rel="noopener" title="Open full size"><img src="${esc(u)}" alt="attachment"></a>`).join('')}</div>`:'';
+    return `<div class="msg ${cls}">${about}${bubble}${imgs}<span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}</span></div>`;
   }).join('');
   t.scrollTop=t.scrollHeight;
 }
@@ -1850,14 +1865,27 @@ function renderAssetMenu(){
 $('#assetBtn')?.addEventListener('click',e=>{ e.stopPropagation(); renderAssetMenu(); $('#assetMenu').classList.toggle('hide'); });
 $('#assetMenu')?.addEventListener('click',e=>{ const o=e.target.closest('[data-asset]'); if(!o) return; chatAsset=o.dataset.asset; renderAssetCur(); $('#assetMenu').classList.add('hide'); });
 document.addEventListener('click',e=>{ if(!e.target.closest('#assetPick')) $('#assetMenu')?.classList.add('hide'); });
+let chatImgs=[];   // staged attachments before sending
+function renderAtts(){
+  const w=$('#chatAtts'); if(!w) return;
+  if(!chatImgs.length){ w.classList.add('hide'); w.innerHTML=''; return; }
+  w.classList.remove('hide');
+  w.innerHTML=chatImgs.map((u,i)=>`<div class="att"><img src="${u}" alt=""><button type="button" data-att="${i}" title="Remove">✕</button></div>`).join('');
+}
+$('#chatFiles')?.addEventListener('change',async e=>{
+  const files=[...e.target.files]; e.target.value='';
+  for(const f of files){ if(chatImgs.length>=8){ alert('Up to 8 images per message.'); break; } if(!/^image\//.test(f.type)) continue; const u=await compress(f); if(u) chatImgs.push(u); }
+  renderAtts();
+});
+$('#chatAtts')?.addEventListener('click',e=>{ const b=e.target.closest('[data-att]'); if(!b) return; chatImgs.splice(Number(b.dataset.att),1); renderAtts(); });
 $('#chatForm').addEventListener('submit',async e=>{
   e.preventDefault();
-  const input=$('#chatInput'), body=input.value.trim(); if(!body||!REF) return;
-  const deckId=chatAsset||'';
+  const input=$('#chatInput'), body=input.value.trim(); if((!body&&!chatImgs.length)||!REF) return;
+  const deckId=chatAsset||'', images=chatImgs.slice();
   const btn=$('#chatSend'); btn.disabled=true;
   try{
-    const r=await api('/api/admin',{action:'send_message',ref:REF,body,deckId});
-    if(r.ok){ MESSAGES=r.messages||MESSAGES; input.value=''; chatAsset=''; renderAssetCur(); renderMessages(); }
+    const r=await api('/api/admin',{action:'send_message',ref:REF,body,deckId,images});
+    if(r.ok){ MESSAGES=r.messages||MESSAGES; input.value=''; chatAsset=''; chatImgs=[]; renderAtts(); renderAssetCur(); renderMessages(); }
   }catch(err){}
   finally{ btn.disabled=false; }
 });

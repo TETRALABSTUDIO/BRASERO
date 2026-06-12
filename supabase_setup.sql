@@ -106,9 +106,12 @@ create table if not exists messages (
   deck_id     uuid references decks(id) on delete set null,  -- optional: the asset this message is about
   sender      text,                                          -- 'client' | 'studio'
   sender_name text,
-  body        text
+  body        text,
+  images      jsonb default '[]'::jsonb                       -- attached image refs (data URLs / links)
 );
 create index if not exists messages_order_idx on messages (order_id, created_at);
+-- existing databases: add the attachments column if it isn't there yet
+alter table messages add column if not exists images jsonb default '[]'::jsonb;
 
 alter table messages enable row level security;
 -- Backend uses the SERVICE ROLE key (bypasses RLS); keep RLS on so the thread

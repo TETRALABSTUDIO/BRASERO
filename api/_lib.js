@@ -163,7 +163,7 @@ export async function getDeck(deckId) {
 /* ---- Messages: one client <-> studio thread per order, optionally about an asset ---- */
 const pubMessage = m => ({
   id: m.id, deck_id: m.deck_id || null, sender: m.sender, sender_name: m.sender_name || '',
-  body: m.body || '', created_at: m.created_at,
+  body: m.body || '', images: Array.isArray(m.images) ? m.images : [], created_at: m.created_at,
 });
 
 export async function listMessages(orderId) {
@@ -174,12 +174,14 @@ export async function listMessages(orderId) {
   return (data || []).map(pubMessage);
 }
 
-export async function addMessage(orderId, { deck_id, sender, sender_name, body }) {
+export async function addMessage(orderId, { deck_id, sender, sender_name, body, images }) {
   if (!STORE || !orderId) return null;
   const text = String(body || '').trim().slice(0, 4000);
-  if (!text) return null;
+  // keep only safe image refs (data:image URLs or http URLs), max 8 per message
+  const imgs = Array.isArray(images) ? images.filter(u => typeof u === 'string' && /^(data:image\/|https?:)/.test(u)).slice(0, 8) : [];
+  if (!text && !imgs.length) return null;
   const row = { order_id: orderId, deck_id: deck_id || null, sender: sender === 'studio' ? 'studio' : 'client',
-    sender_name: String(sender_name || '').slice(0, 120), body: text };
+    sender_name: String(sender_name || '').slice(0, 120), body: text, images: imgs };
   if (MEM) { const m = { id: uid(), created_at: new Date().toISOString(), ...row }; MEM.messages.push(m); return pubMessage(m); }
   const { data, error } = await db.from('messages').insert(row).select('*').maybeSingle();
   if (error) { console.error('addMessage', error); return null; }
