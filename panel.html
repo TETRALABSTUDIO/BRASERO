@@ -101,6 +101,14 @@ body.appmode{overflow:hidden}
 .kc__foot{display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap}
 .kc__items{font-size:12px;font-weight:700;color:var(--grey)}
 .kc__assign{margin-top:11px;padding-top:11px;border-top:1px solid var(--line)}
+.kc__kinds{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.kc__kind{display:inline-flex;align-items:center;gap:5px;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-size:12px;color:var(--grey)}
+.kc__kind b{color:var(--ink);font-weight:800}
+.kc__kind .ti{width:14px;height:14px}
+.kc__prog{margin-top:10px}
+.kc__bar{height:5px;border-radius:100px;background:var(--soft);overflow:hidden}
+.kc__bar i{display:block;height:100%;background:var(--grad);border-radius:100px;transition:width .3s}
+.kc__progt{display:block;font-size:11.5px;font-weight:700;color:var(--grey);margin-top:6px}
 .kc:hover{cursor:pointer}
 .passign{width:100%;padding:7px 10px;font-size:12.5px;font-weight:700;border-radius:9px;background:var(--soft);cursor:pointer}
 .passign--none{color:var(--grey)}
@@ -598,6 +606,42 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .assetopt__ic .ti{width:20px;height:20px}
 .assetopt__ic--g{font-size:15px;font-weight:900;color:var(--grey)}
 @media(max-width:820px){.topnav__in{padding:12px 18px}.main{padding:20px 18px 90px}.kanban{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+/* ===== visual-identity widgets (project modal) ===== */
+.palette{display:flex;flex-direction:column;gap:10px}
+.pal-rows{display:flex;flex-direction:column;gap:9px}
+.pal-row{display:flex;align-items:center;gap:10px}
+.pal-pick{width:42px!important;height:42px;flex-shrink:0;border:1px solid var(--line);border-radius:11px;background:none;padding:4px;cursor:pointer}
+.pal-pick::-webkit-color-swatch{border:none;border-radius:7px}
+.pal-pick::-webkit-color-swatch-wrapper{padding:0}
+.pal-hex{width:92px!important;flex-shrink:0;text-transform:uppercase;font-weight:700;letter-spacing:.03em}
+.pal-rgb{font-size:12px;font-weight:700;color:var(--grey);white-space:nowrap}
+.pal-del{margin-left:auto;border:none;background:none;color:#cfccc6;font-size:13px;padding:6px 8px;cursor:pointer;border-radius:8px}
+.pal-del:hover{color:#c33;background:var(--soft);transform:none}
+.pal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pal-add{border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:8px 13px;border-radius:10px;cursor:pointer}
+.pal-add:hover{border-color:var(--orange);color:var(--orange);transform:none}
+.pal-presets{display:flex;gap:7px;flex-wrap:wrap}
+.pal-preset{display:inline-flex;padding:4px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+.pal-preset:hover{border-color:var(--orange);transform:none}
+.pal-preset i{width:17px;height:17px;display:block}
+.pal-preset i:first-child{border-radius:5px 0 0 5px}.pal-preset i:last-child{border-radius:0 5px 5px 0}
+.typo{display:flex;flex-direction:column;gap:10px}
+.typo-import{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.typo-btn{display:inline-flex;align-items:center;gap:7px;border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:9px 14px;border-radius:10px;cursor:pointer}
+.typo-btn:hover{border-color:var(--orange);color:var(--orange)}
+.typo-file{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
+.typo-file button{border:none;background:none;color:#cfccc6;font-size:13px;cursor:pointer;padding:2px 4px}
+.typo-file button:hover{color:#c33}
+.iglist{display:flex;flex-direction:column;gap:9px}
+.ig-add{display:flex;gap:8px}
+.ig-btn{flex-shrink:0;background:var(--grad);color:#fff;border:none;font-weight:700;font-size:13.5px;padding:0 18px;border-radius:10px;cursor:pointer}
+.ig-btn:disabled{opacity:.4;cursor:not-allowed}
+.ig-chips{display:flex;flex-wrap:wrap;gap:7px}
+.ig-chip{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:6px 12px;font-size:13px;font-weight:700}
+.ig-chip button{border:none;background:none;color:#b9b5ae;font-size:12px;cursor:pointer;padding:0;line-height:1}
+.ig-chip button:hover{color:#c33}
+.ig-hint{font-size:12px;color:var(--grey);font-weight:600}
+.hide{display:none!important}
 </style>
 </head>
 <body>
@@ -859,7 +903,10 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           </div>
           <div class="field"><label>What is the page about?</label><textarea id="npBNiche" style="min-height:64px" placeholder="Niche, topics and angle…"></textarea></div>
           <div class="field"><label>Target audience</label><textarea id="npBAudience" style="min-height:64px" placeholder="Ideal follower: age, stage, what they want…"></textarea></div>
-          <div class="field"><label>Brand vibe / inspo</label><textarea id="npBStyle" style="min-height:64px" placeholder="Bold, high-contrast, warm accents… + reference links"></textarea></div>
+          <div class="field"><label>Brand vibe</label><textarea id="npBStyle" style="min-height:64px" placeholder="Bold, high-contrast, warm accents, big type…"></textarea></div>
+          <div class="field"><label>Brand colors</label><div id="npBColors" class="palette"></div></div>
+          <div class="field"><label>Typography</label><div id="npBTypo" class="typo"></div></div>
+          <div class="field"><label>Instagram inspiration</label><div id="npBInspo" class="iglist"></div></div>
           <div class="field"><label>Anything else to know?</label><textarea id="npBNotes" style="min-height:64px" placeholder="Tell us anything…"></textarea></div>
         </div>
 
@@ -1117,12 +1164,21 @@ function assignSelect(o){
   const opts=(ADMIN.talents||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}" ${(o.talent_email||'').toLowerCase()===(t.email||'').toLowerCase()?'selected':''}>${esc(t.name||t.email)}</option>`).join('');
   return `<select class="passign ${o.talent_email?'':'passign--none'}" data-assign="${esc(o.ref)}"><option value="">Unassigned</option>${opts}</select>`;
 }
+function kindChips(kinds){
+  const map=[['carousel',kinds&&kinds.carousel,'deck'],['story',kinds&&kinds.story,'story'],['branding',kinds&&kinds.branding,'branding']];
+  return map.filter(([k,n])=>n>0).map(([k,n,lbl])=>`<span class="kc__kind" title="${n} ${lbl}${n>1?'s':''}">${TYPE_ICON[k]||''}<b>${n}</b></span>`).join('');
+}
 function projCard(o){
+  const c=o.counts||{done:0,active:0,todo:0}, total=o.items||0, pct=total?Math.round(c.done/total*100):0;
+  const chips=kindChips(o.kinds);
+  const line=[c.done?`${c.done} done`:'',c.active?`${c.active} in progress`:'',c.todo?`${c.todo} to start`:''].filter(Boolean).join(' · ')||'No elements yet';
   return `<div class="kc" data-card="${esc(o.ref)}">
     <button class="kc__edit" data-stop data-edit="${esc(o.ref)}" title="Edit project">${EDIT_IC}</button>
     <div class="kc__n">${esc(o.name||'Untitled')}</div>
     <div class="kc__meta"><span class="swi__ref">#${esc(o.ref)}</span><span class="kc__pack">${esc(planName(o.plan)||'')}</span></div>
-    <div class="kc__foot">${dlBadge(o,o.kinds)}<span class="kc__items">${o.items||0} element${o.items===1?'':'s'}</span></div>
+    ${chips?`<div class="kc__kinds">${chips}</div>`:''}
+    ${total?`<div class="kc__prog"><div class="kc__bar"><i style="width:${pct}%"></i></div><span class="kc__progt">${line}</span></div>`:''}
+    <div class="kc__foot">${dlBadge(o,o.kinds)}<span class="kc__items">${total} element${total===1?'':'s'}</span></div>
     <div class="kc__assign" data-stop>${assignSelect(o)}</div>
   </div>`;
 }
@@ -1322,6 +1378,10 @@ async function openNewModal(order){
     NP.plan='burst'; NP.billing='once'; NP.branding=false; NP.story=null; NP.bundle=false;
     $('#npDecks').value=NP_PLANS.burst.decks;
   }
+  const anv=(order&&order.answers)||{};
+  initPalette($('#npBColors'), anv.colors||'');
+  initTypo($('#npBTypo'), anv.typo||'', anv.typo_file||'', anv.typo_file_name||'');
+  initIgList($('#npBInspo'), anv.inspo||'');
   $('#npBilling').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.bill===NP.billing));
   $('#npTalent').innerHTML='<option value="">Unassigned</option>'+(TALENTS||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}" ${order&&(order.talent_email||'').toLowerCase()===(t.email||'').toLowerCase()?'selected':''}>${esc(t.name||t.email)}</option>`).join('');
   $('#newModal').querySelector('.modalc__h h3').textContent=order?'Edit project':'New project';
@@ -1330,12 +1390,72 @@ async function openNewModal(order){
   renderNp();
   $('#newModal').classList.remove('hide'); setTimeout(()=>$('#npName').focus(),30);
 }
+/* ===== reusable visual-identity widgets (shared with the client onboarding) ===== */
+let NP_TYPO_FILE=null;   // {data, name} for an imported font, reset on each modal open
+function wHexToRgb(h){ h=(h||'').replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join(''); const n=parseInt(h||'0',16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function wNormHex(h){ h=(h||'').trim(); if(!h)return''; if(h[0]!=='#')h='#'+h; if(/^#[0-9a-f]{3}$/i.test(h))h='#'+h.slice(1).split('').map(x=>x+x).join(''); return /^#[0-9a-f]{6}$/i.test(h)?h.toLowerCase():''; }
+function wColorRow(c){ c=wNormHex(c)||'#888888'; const [r,g,b]=wHexToRgb(c);
+  return `<div class="pal-row" data-pal-row><input type="color" class="pal-pick" value="${c}"><input type="text" class="pal-hex" value="${c}" maxlength="7" spellcheck="false" autocomplete="off"><span class="pal-rgb">R ${r} · G ${g} · B ${b}</span><button type="button" class="pal-del" data-pal-del title="Remove">✕</button></div>`; }
+function initPalette(wrap,csv){
+  const max=5, vals=csv?String(csv).split(',').map(s=>s.trim()).filter(Boolean):[];
+  const presets=[['#ff5a00','#111111','#f4f1ec'],['#1d4ed8','#0b1220','#ffffff'],['#16a34a','#052e16','#f0fdf4'],['#db2777','#1f1147','#fff1f7']];
+  wrap.innerHTML=`<div class="pal-rows">${(vals.length?vals:['#ff5a00','#111111','#f4f1ec']).map(wColorRow).join('')}</div>
+    <div class="pal-foot"><button type="button" class="pal-add" data-pal-add>+ Add color</button>
+      <div class="pal-presets">${presets.map(p=>`<button type="button" class="pal-preset" data-preset="${p.join(',')}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</button>`).join('')}</div></div>`;
+  const rows=()=>[...wrap.querySelectorAll('[data-pal-row]')];
+  const upd=()=>{ const a=wrap.querySelector('[data-pal-add]'); if(a)a.style.display=rows().length>=max?'none':''; };
+  const wire=row=>{ const pick=row.querySelector('.pal-pick'),hex=row.querySelector('.pal-hex'),rgb=row.querySelector('.pal-rgb');
+    const setRgb=c=>{ const [r,g,b]=wHexToRgb(c); rgb.textContent=`R ${r} · G ${g} · B ${b}`; };
+    pick.addEventListener('input',()=>{ hex.value=pick.value; setRgb(pick.value); });
+    hex.addEventListener('input',()=>{ const n=wNormHex(hex.value); if(n){ pick.value=n; setRgb(n); } });
+    hex.addEventListener('blur',()=>{ const n=wNormHex(hex.value); hex.value=n||pick.value; });
+    hex.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); hex.blur(); } });
+    row.querySelector('[data-pal-del]').addEventListener('click',()=>{ if(rows().length<=1)return; row.remove(); upd(); }); };
+  rows().forEach(wire);
+  wrap.querySelector('[data-pal-add]').addEventListener('click',()=>{ if(rows().length>=max)return; const t=document.createElement('div'); t.innerHTML=wColorRow('#888888'); const row=t.firstElementChild; wrap.querySelector('.pal-rows').appendChild(row); wire(row); upd(); });
+  wrap.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{ wrap.querySelector('.pal-rows').innerHTML=b.dataset.preset.split(',').map(wColorRow).join(''); rows().forEach(wire); upd(); }));
+  upd();
+}
+function paletteVal(wrap){ return [...wrap.querySelectorAll('.pal-pick')].map(i=>i.value).join(', '); }
+function initTypo(wrap,name,fileData,fileName){
+  NP_TYPO_FILE=fileData?{data:fileData,name:fileName||'font'}:null;
+  wrap.innerHTML=`<input type="text" class="typo-name" value="${esc(name||'')}" placeholder="Font name, e.g. Satoshi, Playfair Display…" autocomplete="off">
+    <div class="typo-import"><label class="typo-btn">⬆ Import font file<input type="file" accept=".ttf,.otf,.woff,.woff2" hidden></label>
+      <span class="typo-file ${NP_TYPO_FILE?'':'hide'}"><b>${esc(NP_TYPO_FILE?NP_TYPO_FILE.name:'')}</b><button type="button" data-typo-fdel title="Remove">✕</button></span></div>`;
+  const file=wrap.querySelector('input[type=file]'),box=wrap.querySelector('.typo-file'),nm=box.querySelector('b');
+  wrap.querySelector('.typo-name').addEventListener('keydown',e=>{ if(e.key==='Enter') e.preventDefault(); });
+  file.addEventListener('change',async()=>{ const f=file.files[0]; if(!f)return;
+    if(f.size>1024*1024){ alert('Font file is too large (max 1 MB). Just type the font name instead.'); file.value=''; return; }
+    const data=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(f); });
+    NP_TYPO_FILE={data,name:f.name}; nm.textContent=f.name; box.classList.remove('hide'); });
+  wrap.querySelector('[data-typo-fdel]').addEventListener('click',()=>{ NP_TYPO_FILE=null; file.value=''; nm.textContent=''; box.classList.add('hide'); });
+}
+function igChip(u){ return `<span class="ig-chip" data-ig="${esc(u)}">${esc(u)}<button type="button" data-ig-del title="Remove">✕</button></span>`; }
+function igNormalize(s){ s=(s||'').trim(); if(!s)return''; const m=s.replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i); return m?('@'+m[1].replace(/^@/,'')):('@'+s.replace(/^@/,'')); }
+function initIgList(wrap,csv){
+  const max=5, list=csv?String(csv).split(',').map(s=>s.trim()).filter(Boolean):[];
+  wrap.innerHTML=`<div class="ig-add"><input type="text" class="ig-input" placeholder="instagram.com/page or @handle" autocomplete="off"><button type="button" class="ig-btn" data-ig-add>Add</button></div>
+    <div class="ig-chips">${list.map(igChip).join('')}</div><p class="ig-hint"></p>`;
+  const input=wrap.querySelector('.ig-input'),chips=wrap.querySelector('.ig-chips'),hint=wrap.querySelector('.ig-hint');
+  const items=()=>[...chips.querySelectorAll('[data-ig]')].map(c=>c.dataset.ig);
+  const upd=()=>{ const n=items().length; wrap.querySelector('[data-ig-add]').disabled=n>=max; hint.textContent=n>=max?`Maximum ${max} accounts.`:`Add up to ${max} accounts.`; };
+  const add=()=>{ const u=igNormalize(input.value); if(!u||u==='@'){ input.value=''; return; }
+    if(!items().includes(u)&&items().length<max){ chips.insertAdjacentHTML('beforeend',igChip(u)); upd(); } input.value=''; input.focus(); };
+  wrap.querySelector('[data-ig-add]').addEventListener('click',add);
+  input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); add(); } });
+  chips.addEventListener('click',e=>{ const d=e.target.closest('[data-ig-del]'); if(!d)return; d.closest('[data-ig]').remove(); upd(); });
+  upd();
+}
+function igListVal(wrap){ return [...wrap.querySelectorAll('[data-ig]')].map(c=>c.dataset.ig).join(', '); }
+
 /* assemble the optional onboarding brief (same keys as the client onboarding flow) */
 function npBrief(){
   const b={ page:$('#npBPage').value.trim(), handle:$('#npIg').value.trim(), goal:$('#npBGoal').value.trim(),
     niche:$('#npBNiche').value.trim(), audience:$('#npBAudience').value.trim(),
-    style:$('#npBStyle').value.trim(), notes:$('#npBNotes').value.trim() };
-  Object.keys(b).forEach(k=>{ if(!b[k]) delete b[k]; });
+    style:$('#npBStyle').value.trim(), notes:$('#npBNotes').value.trim(),
+    colors:paletteVal($('#npBColors')), typo:($('#npBTypo .typo-name')||{}).value, inspo:igListVal($('#npBInspo')) };
+  if(NP_TYPO_FILE){ b.typo_file=NP_TYPO_FILE.data; b.typo_file_name=NP_TYPO_FILE.name; }
+  Object.keys(b).forEach(k=>{ if(b[k]==null||b[k]==='') delete b[k]; });
   return Object.keys(b).length?b:null;
 }
 /* one-click random but coherent sample case, handy to test the flow fast */
@@ -1343,32 +1463,38 @@ const NP_SAMPLES=[
   {name:'Nina Park',ig:'@wealthnotes',phone:'+1 415 555 0142',page:'Wealth Notes',goal:'Sales / leads',
    niche:'Personal finance for millennials: budgeting, index investing and money mindset, no jargon.',
    audience:'25–38 y/o professionals starting to invest, want to build wealth but feel overwhelmed by finance content.',
-   style:'Clean, high-contrast, deep green + cream, big bold type, lots of negative space. Refs: @humphreytalks, @her.first.100k',
+   style:'Clean, high-contrast, big bold type, lots of negative space.',
+   colors:'#0f5132, #f4f1ec, #111111', typo:'Bold sans (Satoshi)', inspo:'@humphreytalks, @her.first.100k',
    notes:'Tone should feel reassuring and expert, never salesy. Avoid stock-photo vibes.'},
   {name:'Marcus Hale',ig:'@hale.strength',phone:'+1 312 555 0188',page:'Hale Strength',goal:'Followers growth',
    niche:'Strength training and fat-loss for busy men over 30: minimalist programs, science-backed.',
    audience:'30–45 y/o men, desk jobs, limited time, tired of fitness fads and want a no-BS plan.',
-   style:'Dark, gritty, orange + charcoal, bold condensed type, before/after energy. Refs: @jeffnippard',
+   style:'Dark, gritty, bold condensed type, before/after energy.',
+   colors:'#f87000, #1a1a1a, #f4f1ec', typo:'Condensed bold (Anton)', inspo:'@jeffnippard',
    notes:'Lots of myth-busting hooks. Keep it motivational but practical, science citations welcome.'},
   {name:'Sofia Rinaldi',ig:'@glow.lab',phone:'+44 7700 900321',page:'Glow Lab',goal:'Saves & shares',
    niche:'Evidence-based skincare: ingredient breakdowns, routine building, debunking trends.',
    audience:'20–35 y/o women confused by skincare marketing, want science not hype.',
-   style:'Soft pastel, glossy, rounded type, dermatology-meets-editorial. Refs: @drmamina, @theordinary',
+   style:'Soft pastel, glossy, rounded type, dermatology-meets-editorial.',
+   colors:'#f7c8d0, #ffffff, #3a2e3a', typo:'Rounded serif', inspo:'@drmamina, @theordinary',
    notes:'Every claim must be backed. Carousel-friendly, saveable “cheat sheet” formats.'},
   {name:'Daniel Osei',ig:'@buildwithdan',phone:'+1 646 555 0173',page:'Build with Dan',goal:'Reach & virality',
    niche:'Indie SaaS and bootstrapping: building in public, growth tactics, founder lessons.',
    audience:'Aspiring and early-stage indie founders, 22–40, devs and designers going solo.',
-   style:'Modern tech, electric blue + black, mono accents, clean grid. Refs: @levelsio, @marc_louvion',
+   style:'Modern tech, mono accents, clean grid.',
+   colors:'#1d4ed8, #0b1220, #ffffff', typo:'Mono accents (Space Grotesk)', inspo:'@levelsio, @marc_louvion',
    notes:'Hooky contrarian takes do well. Keep it honest and a bit edgy.'},
   {name:'Camille Mercier',ig:'@maison.mercier',phone:'+33 6 12 34 56 78',page:'Maison Mercier',goal:'Sales / leads',
    niche:'Boutique interior design studio: small-space styling, mood boards, client transformations.',
    audience:'28–50 urban homeowners and renters who want a designer look on a realistic budget.',
-   style:'Warm editorial, terracotta + off-white, serif headlines, magazine layouts. Refs: @studiomcgee',
+   style:'Warm editorial, serif headlines, magazine layouts.',
+   colors:'#c1654a, #f3ece2, #2a211c', typo:'Editorial serif (Playfair Display)', inspo:'@studiomcgee',
    notes:'Showcase transformations. Aspirational but attainable, soft warm tone.'},
   {name:'Priya Nair',ig:'@calm.code',phone:'+1 206 555 0119',page:'Calm Code',goal:'Followers growth',
    niche:'Mindful productivity for knowledge workers: focus systems, anti-burnout, deep work.',
    audience:'24–40 overworked professionals and students who feel scattered and want calm focus.',
-   style:'Minimal, muted sage + sand, airy type, lots of breathing room. Refs: @aliabdaal',
+   style:'Minimal, airy type, lots of breathing room.',
+   colors:'#7c9473, #e7e0d3, #2f3a2e', typo:'Minimal sans', inspo:'@aliabdaal',
    notes:'Calming, not hustle-culture. Practical frameworks people can apply same day.'},
 ];
 $('#npFill').onclick=()=>{
@@ -1379,6 +1505,7 @@ $('#npFill').onclick=()=>{
   $('#npBPage').value=s.page; $('#npBGoal').value=s.goal;
   $('#npBNiche').value=s.niche; $('#npBAudience').value=s.audience;
   $('#npBStyle').value=s.style; $('#npBNotes').value=s.notes;
+  initPalette($('#npBColors'), s.colors); initTypo($('#npBTypo'), s.typo, '', ''); initIgList($('#npBInspo'), s.inspo);
 };
 
 /* ---------- floating talent guide (step-by-step, zoomed dash mockups) ---------- */

@@ -13,6 +13,8 @@ const pub = (o, isOwner) => ({
 });
 // Count the board's elements per type, so the panel can compute deadlines + prefill the editor.
 const kindsOf = dk => { const k = { carousel: 0, story: 0, branding: 0 }; for (const d of dk) { const t = d.type || 'carousel'; k[t] = (k[t] || 0) + 1; } return k; };
+// done = approved, todo = not started (writing), active = anything in between (review/designing/revision).
+const countsOf = dk => { const c = { done: 0, active: 0, todo: 0 }; for (const d of dk) { const s = d.status || 'writing'; if (s === 'done') c.done++; else if (s === 'writing') c.todo++; else c.active++; } return c; };
 
 // Talent panel API. Authenticated by the Talent session token (Authorization: Bearer …).
 // Talents see only orders assigned to them; owners see all + manage the team.
@@ -27,7 +29,7 @@ export default async function handler(req, res) {
   const isOwner = !!me.is_owner;
   const owns = order => isOwner || (order.talent_email || '').toLowerCase() === me.email.toLowerCase();
   // Enrich a list of order rows with per-project state + element count (used by the panel board/list).
-  const enrich = async rows => Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length, kinds: kindsOf(dk) }; }));
+  const enrich = async rows => Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length, kinds: kindsOf(dk), counts: countsOf(dk) }; }));
 
   try {
     const b = req.body || {};
@@ -47,7 +49,7 @@ export default async function handler(req, res) {
       const paid = all.filter(o => o.status === 'paid');
       const orders = await Promise.all(paid.map(async o => {
         const dk = await decksForOrder(o.id);
-        return { ...pub(o, true), status: o.status, onboarding_at: o.onboarding_at || null, state: orderState(dk), items: dk.length, kinds: kindsOf(dk) };
+        return { ...pub(o, true), status: o.status, onboarding_at: o.onboarding_at || null, state: orderState(dk), items: dk.length, kinds: kindsOf(dk), counts: countsOf(dk) };
       }));
       const leads = all.filter(o => o.status !== 'paid').map(o => ({
         ref: o.ref || '', name: o.name || '', email: o.email || '', plan: o.plan || '', billing: o.billing || '',
