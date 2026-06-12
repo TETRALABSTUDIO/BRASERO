@@ -333,6 +333,22 @@ img,svg{display:block}
 .compare__cta p{font-size:15px;color:var(--grey);margin-bottom:16px;font-weight:600}
 @media(max-width:760px){.ctable{grid-template-columns:1.15fr .85fr 1fr}.cHead,.cRow{padding:11px 12px;font-size:13px;gap:7px}.cBrasero{margin-top:0}.cBrasero .cHead{height:80px}.cBrasero .cHead svg{height:28px}}
 
+/* mobile : stacked comparison cards (replaces the squashed 3-col table) */
+.cmp-mobile{display:none}
+.cmpcard{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff}
+.cmpcard__head{padding:15px 18px;font-size:14px;font-weight:800;letter-spacing:-.01em;color:#8a8a8a;background:#f4f1ea;display:flex;align-items:center}
+.cmpcard ul{list-style:none}
+.cmpcard li{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 18px;border-top:1px solid var(--line);font-size:14px;line-height:1.3}
+.cmpcard li .k{color:#5a5a5a;font-weight:600}
+.cmpcard li .v{font-weight:800;text-align:right;flex-shrink:0;max-width:50%}
+.cmpcard--diy li .v{color:#a2a2a2;font-weight:600}
+.cmpcard--br{border:2px solid var(--orange);box-shadow:0 24px 54px rgba(248,80,0,.18)}
+.cmpcard--br .cmpcard__head{background:var(--grad);justify-content:center;padding:18px}
+.cmpcard--br .cmpcard__head svg{height:30px;filter:brightness(0) invert(1)}
+.cmpcard--br li .k{color:#333}
+.cmpcard--br li .v{color:var(--ink)}
+.cmpcard--br li .v em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;margin-left:4px}
+
 /* ===== PROCESS (light) zig-zag ===== */
 .process{padding:116px 0}
 .process__head{text-align:center;max-width:680px;margin:0 auto 60px}
@@ -725,16 +741,9 @@ html{overflow-x:hidden}
   .cstats{display:grid;grid-template-columns:1fr 1fr;gap:18px 14px}
   .cmore{gap:30px;margin-top:36px}
 
-  /* comparison table : 3 readable columns that wrap, no overflow */
-  .ctable{grid-template-columns:1.3fr .92fr 1fr}
-  .cHead,.cRow{padding:9px 8px;font-size:11.5px;gap:5px;line-height:1.22}
-  .cHead{height:auto;min-height:54px}
-  .cRow{min-height:54px}
-  .cBrasero{margin-top:0}
-  .cBrasero .cHead{height:auto;min-height:62px}
-  .cBrasero .cHead svg{height:24px}
-  .cAmateur .x,.cBrasero .ck{width:13px;height:13px}
-  .cBrasero em{display:block;margin-left:0;margin-top:1px}
+  /* comparison : drop the squashed grid, use stacked cards */
+  .compare .ctable{display:none}
+  .cmp-mobile{display:flex;flex-direction:column;gap:16px;margin-top:2px}
 
   /* packages : keep the badge inside the card */
   .plan__badge{top:16px;right:16px;font-size:10px;padding:5px 10px;letter-spacing:.03em}
@@ -750,8 +759,7 @@ html{overflow-x:hidden}
   .hslide{width:132px}
   .cstack--big{width:208px;height:272px}
   .cstack--big .cstack__card{width:150px}
-  .ctable{grid-template-columns:1.25fr .9fr 1fr}
-  .cHead,.cRow{font-size:10.5px;padding:8px 6px}
+  .cmpcard li{font-size:13px;padding:12px 14px}
 }
 </style>
 </head>
@@ -971,6 +979,9 @@ html{overflow-x:hidden}
         <div class="cRow"><svg class="ck" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Live in your client space</div>
       </div>
     </div>
+
+    <!-- mobile : same data as .ctable, stacked vertically (built by JS) -->
+    <div class="cmp-mobile reveal" id="cmpMobile" aria-hidden="true"></div>
 
     <div class="compare__cta reveal">
       <p>Stop guessing. Start converting.</p>
@@ -1473,6 +1484,22 @@ renderMinis();
   burger.addEventListener('click',()=>setOpen(!menu.classList.contains('open')));
   menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setOpen(false)));
   document.addEventListener('click',e=>{ if(menu.classList.contains('open')&&!menu.contains(e.target)&&!burger.contains(e.target)) setOpen(false); });
+})();
+
+/* build the stacked mobile comparison cards from the desktop table (single source of truth) */
+(function(){
+  const t=document.querySelector('#compare .ctable'), host=document.getElementById('cmpMobile');
+  if(!t||!host) return;
+  const crit=[...t.querySelectorAll('.cCrit .cRow')];
+  const diy=[...t.querySelectorAll('.cAmateur .cRow')];
+  const br=[...t.querySelectorAll('.cBrasero .cRow')];
+  const val=el=>{ const c=el.cloneNode(true); c.querySelectorAll('svg').forEach(s=>s.remove()); return c.innerHTML.trim(); };
+  const li=(k,v)=>`<li><span class="k">${k}</span><span class="v">${v}</span></li>`;
+  let a='',b='';
+  crit.forEach((c,i)=>{ const k=c.textContent.trim(); a+=li(k,val(diy[i])); b+=li(k,val(br[i])); });
+  host.innerHTML=
+    `<div class="cmpcard cmpcard--diy"><div class="cmpcard__head">Doing it yourself</div><ul>${a}</ul></div>`
+   +`<div class="cmpcard cmpcard--br"><div class="cmpcard__head"><svg viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></div><ul>${b}</ul></div>`;
 })();
 function renderFan(dir){
   const d=decks[curDeck];
