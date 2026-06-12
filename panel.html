@@ -1091,7 +1091,7 @@ $('#setupForm').addEventListener('submit',async e=>{
 
 async function boot(){
   const d=await api('/api/admin',{action:'list'});
-  if(!d.ok) return;
+  if(!d.ok){ $('#auth').classList.remove('hide'); return; }   // invalid/expired session → show login
   ME=d.me; ORDERS=d.orders||[];
   if(ME.must_reset){ showReset(); return; }
   $('#auth').classList.add('hide'); $('#app').classList.remove('hide');
@@ -1099,13 +1099,14 @@ async function boot(){
   if(ME.is_owner){
     const dash=await api('/api/admin',{action:'dashboard'});
     if(dash.ok){ ADMIN={orders:dash.orders||[],leads:dash.leads||[],talents:dash.talents||[]}; ORDERS=ADMIN.orders; TALENTS=ADMIN.talents; }
-    showAdmin('dashboard');
-  } else {
-    // talents jump straight to a project (last opened, else first)
-    const last=localStorage.getItem('brasero_last_ref');
-    const target=(last&&ORDERS.some(o=>o.ref===last))?last:(ORDERS[0]&&ORDERS[0].ref);
-    if(target) openOrder(target);
   }
+  // restore exactly where we were before the refresh (project + tab, or admin section)
+  const nav=localStorage.getItem('brasero_nav')||'';
+  const last=localStorage.getItem('brasero_last_ref');
+  const canOrder=!!(last&&ORDERS.some(o=>o.ref===last));
+  if(nav==='order'&&canOrder){ openOrder(last,true); }
+  else if(ME.is_owner){ showAdmin(SECS.includes(nav)?nav:'dashboard'); }
+  else { const target=canOrder?last:(ORDERS[0]&&ORDERS[0].ref); if(target) openOrder(target,true); }
 }
 function renderProfile(){
   $('#meAvatar').innerHTML=avatar(ME,'lg');
@@ -1139,6 +1140,7 @@ function talentChip(email){ if(!email) return '<span class="tchip tchip--none">U
 const SECS=['dashboard','projects','talents','crm'];
 function showAdmin(sec){ stopMsgPoll(); document.body.classList.remove('appmode'); $('#detail').classList.add('hide'); $('#adminApp').classList.remove('hide'); renderAdminMe(); navTo(sec||'dashboard'); }
 function navTo(sec){
+  try{ localStorage.setItem('brasero_nav',sec); }catch(e){}   // remember the section across refresh
   $('#adminNav').querySelectorAll('.navi').forEach(b=>b.classList.toggle('on',b.dataset.sec===sec));
   SECS.forEach(s=>$('#sec-'+s).classList.toggle('hide',s!==sec));
   if(sec==='dashboard') renderDashboard();
@@ -1737,11 +1739,11 @@ $('#deckList').addEventListener('click',e=>{
   const it=e.target.closest('[data-pick]'); if(it){ openTab({kind:'deck',id:it.dataset.pick}); }
 });
 $('#deckDetail').addEventListener('click',e=>{ const x=e.target.closest('[data-x]'); if(!x) return; x.closest('figure')?.remove(); const det=$('#deckDetail'), c=det.querySelector('[data-count]'); if(c) c.textContent=det.querySelectorAll('[data-imgs] img').length; });
-async function openOrder(ref){
+async function openOrder(ref, restore){
   REF=ref.replace(/^#/,'');
   const d=await api('/api/admin',{action:'get',ref:REF});
   if(!d.ok){ alert(d.error==='forbidden'?'Not your project.':'Order not found'); return; }
-  try{ localStorage.setItem('brasero_last_ref',REF); }catch(e){}
+  try{ localStorage.setItem('brasero_last_ref',REF); localStorage.setItem('brasero_nav','order'); }catch(e){}
   $('#adminApp').classList.add('hide'); $('#detail').classList.remove('hide');
   document.body.classList.add('appmode');
   $('#toDash').classList.toggle('hide',!(ME&&ME.is_owner));
@@ -1763,6 +1765,7 @@ async function openOrder(ref){
   BRIEF=d.brief||null; CURORDER=d.order||null;
   TABS=[{kind:'brief'}]; ATAB='brief';   // land on the brief tab when a project opens
   renderBoard(d.decks||[]);
+  if(restore){ const tab=localStorage.getItem('brasero_last_tab')||''; if(tab.indexOf('deck:')===0){ const id=tab.slice(5); if((d.decks||[]).some(x=>String(x.id)===id)) openTab({kind:'deck',id}); } }
   chatAsset=''; renderExpert();
   MESSAGES=d.messages||[]; renderMessages(); renderAssetCur(); setUnread(false); startMsgPoll();
 }
@@ -1952,6 +1955,7 @@ let TABS=[], ATAB=null;
 const BRIEF_TAB_ICON=`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>`;
 function tabKey(t){ return t.kind==='brief'?'brief':'deck:'+t.id; }
 function renderTabs(){
+  try{ localStorage.setItem('brasero_last_tab',ATAB||'brief'); }catch(e){}   // remember the active tab across refresh
   const el=$('#boardTabs'); if(!el) return;
   if(!TABS.length){ el.classList.add('hide'); el.innerHTML=''; return; }
   el.classList.remove('hide');
@@ -2338,7 +2342,8 @@ function compress(file, max=1280, q=0.72){
   });
 }
 
-if(TOKEN && !SETUP_TOKEN){ boot().catch(()=>{}); }
+// with a saved session, hide the login immediately so it doesn't flash on refresh
+if(TOKEN && !SETUP_TOKEN){ $('#auth').classList.add('hide'); boot().catch(()=>$('#auth').classList.remove('hide')); }
 </script>
 </body>
 </html>
