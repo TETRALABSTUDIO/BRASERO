@@ -766,13 +766,13 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
   const TUT=[
     { tag:'Step 1', title:'Your deliverables are here',
       body:'On the left, every card is one piece of your order: carousels, stories and branding. Click a card to open it.',
-      vis:`<div style="width:100%;max-width:196px;display:flex;flex-direction:column;gap:8px">
-        <div style="background:#fff;border:2px solid var(--orange);border-radius:12px;padding:9px 11px;box-shadow:0 8px 18px rgba(248,80,0,.16)">
+      vis:`<div style="width:100%;max-width:214px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
+        <div style="padding:10px 13px;border-left:3px solid var(--orange);background:var(--soft)">
           <div style="font-weight:800;font-size:12px;margin-bottom:7px">Carousel 1</div>
-          <div style="height:5px;border-radius:3px;background:#eee;overflow:hidden"><i style="display:block;width:34%;height:100%;background:var(--grad)"></i></div>
-          <div style="margin-top:7px">${pill('Validate script','var(--orange)','rgba(248,80,0,.12)')}</div></div>
-        <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;opacity:.7;font-weight:800;font-size:12px">Story 1</div>
-        <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;opacity:.5;font-weight:800;font-size:12px">Profile photo</div></div>` },
+          <div style="height:5px;border-radius:3px;background:#eaeaea;overflow:hidden;margin-bottom:8px"><i style="display:block;width:34%;height:100%;background:var(--grad)"></i></div>
+          ${pill('Validate script','var(--orange)','rgba(248,80,0,.12)')}</div>
+        <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Story 1</div>
+        <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Profile photo</div></div>` },
     { tag:'Step 2', title:'Approve the script',
       body:'We write the copy first. Read it, edit anything you like right in the box, then “Approve script ✓” to send it into design.',
       vis:`<div style="width:100%;max-width:224px">

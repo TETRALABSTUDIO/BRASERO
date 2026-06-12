@@ -167,6 +167,11 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .side__listhead{padding:6px 18px 9px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey)}
 .side__foot{padding:14px 16px;border-top:1px solid var(--line)}
 #deckList{flex:1;min-height:0;overflow-y:auto;border-top:1px solid var(--line)}
+.side__me{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+.side__me .avatar.sm{width:36px;height:36px;font-size:13px;flex-shrink:0}
+.side__me-info{display:flex;flex-direction:column;gap:3px;min-width:0;margin-right:auto}
+.side__me-name{font-size:13.5px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.side__me .rolebadge{align-self:flex-start;font-size:9px;padding:2px 8px}
 .deckitem{width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:background .15s}
 .deckitem:hover{background:#fafafb;transform:none;box-shadow:none}
 .deckitem.sel{background:var(--soft);box-shadow:inset 3px 0 0 var(--orange)}
@@ -431,6 +436,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
             <div class="side__listhead">Elements</div>
             <div id="deckList"></div>
             <div class="side__foot"><button class="b-grad b-sm" id="addDeck" style="width:100%">+ Add element</button></div>
+            <div class="side__me" id="sideMe"></div>
           </aside>
           <div class="board__right">
             <div class="board__detail" id="deckDetail"></div>
@@ -859,13 +865,13 @@ const pill=(txt,col,bg)=>`<span style="font-size:10.5px;font-weight:800;color:${
 const TUT=[
   { tag:'Step 1', title:'All your elements are here',
     body:'On the left, every card is one element of the order: carousels, stories and branding. Click one to open it on the right.',
-    vis:`<div style="width:100%;max-width:196px;display:flex;flex-direction:column;gap:8px">
-      <div style="background:#fff;border:2px solid var(--orange);border-radius:12px;padding:9px 11px;box-shadow:0 8px 18px rgba(248,80,0,.16)">
-        <div style="font-weight:800;font-size:12px;margin-bottom:7px">▢ Deck 1</div>
-        <div style="height:5px;border-radius:3px;background:#eee;overflow:hidden"><i style="display:block;width:18%;height:100%;background:var(--grad)"></i></div>
-        <div style="margin-top:7px">${pill('Writing','var(--wait)','var(--waitbg)')}</div></div>
-      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;opacity:.7;font-weight:800;font-size:12px">▢ Story 1</div>
-      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;opacity:.5;font-weight:800;font-size:12px">◐ Profile photo</div></div>` },
+    vis:`<div style="width:100%;max-width:214px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
+      <div style="padding:10px 13px;border-left:3px solid var(--orange);background:var(--soft)">
+        <div style="font-weight:800;font-size:12px;margin-bottom:7px">Deck 1</div>
+        <div style="height:5px;border-radius:3px;background:#eaeaea;overflow:hidden;margin-bottom:8px"><i style="display:block;width:18%;height:100%;background:var(--grad)"></i></div>
+        ${pill('Writing','var(--wait)','var(--waitbg)')}</div>
+      <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Story 1</div>
+      <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Profile photo</div></div>` },
   { tag:'Step 2', title:'Write the script',
     body:'Type the post copy in the box, then “Send script →” forwards it to the client for approval. “Save draft” keeps it private.',
     vis:`<div style="width:100%;max-width:224px">
@@ -941,16 +947,23 @@ async function openOrder(ref){
   const o=d.order, ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
   const meta=[
     o.plan?planName(o.plan)+' pack':'',
-    o.billing==='sub'?'subscription':'one-time',
+    o.billing?(o.billing==='sub'?'subscription':'one-time'):'',     // owner-only fields are absent for talents
     o.amount?'$'+Math.round(o.amount/100).toLocaleString('en-US'):'',
     o.email, o.phone, o.instagram,
     (o.addons&&o.addons.length)?'+ '+o.addons.map(k=>ADDON_LBL[k]||k).join(', '):''
   ].filter(Boolean).join(' · ');
   $('#oMeta').textContent=meta;
   $('#oDeadline').innerHTML=dlBadge(d.order,(d.decks||[]).length);
-  $('#addDeck').style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
+  const foot=document.querySelector('.side__foot'); if(foot) foot.style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
+  renderSideMe();
   SELDECK=null; renderBoard(d.decks||[]);
   MESSAGES=d.messages||[]; renderMessages();
+}
+/* talent profile pinned at the bottom of the project sidebar */
+function renderSideMe(){
+  const el=$('#sideMe'); if(!el||!ME) return;
+  el.innerHTML=`${avatar(ME,'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name||ME.email.split('@')[0])}</span><span class="rolebadge ${ME.is_owner?'owner':'talent'}">${ME.is_owner?'Owner':'Talent'}</span></div><button class="b-ghost b-sm" id="sideLogout" type="button">Sign out</button>`;
+  $('#sideLogout').onclick=doLogout;
 }
 
 /* ---------- conversation with the client ---------- */

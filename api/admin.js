@@ -4,7 +4,13 @@ import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOr
   signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, messageNotifyEmail } from './_lib.js';
 
-const pub = o => ({ ref: o.ref || orderRef(o.stripe_session_id), name: o.name, email: o.email, plan: o.plan, billing: o.billing || '', amount: o.amount || 0, instagram: o.instagram || '', phone: o.phone || '', addons: Array.isArray(o.addons) ? o.addons : [], talent_email: o.talent_email || '', created_at: o.created_at });
+// Talents never receive the client's price or contact details (email/phone/amount/billing).
+const pub = (o, isOwner) => ({
+  ref: o.ref || orderRef(o.stripe_session_id), name: o.name, plan: o.plan,
+  instagram: o.instagram || '', addons: Array.isArray(o.addons) ? o.addons : [],
+  talent_email: o.talent_email || '', created_at: o.created_at,
+  ...(isOwner ? { email: o.email, phone: o.phone || '', amount: o.amount || 0, billing: o.billing || '' } : {}),
+});
 
 // Talent panel API. Authenticated by the Talent session token (Authorization: Bearer …).
 // Talents see only orders assigned to them; owners see all + manage the team.
@@ -26,7 +32,7 @@ export default async function handler(req, res) {
     /* ----- order list (scoped) + per-project state ----- */
     if (action === 'list') {
       const rows = isOwner ? await adminListOrders() : await ordersForTalent(me.email);
-      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o), state: orderState(dk), items: dk.length }; }));
+      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
       return res.json({ ok: true, me: { email: me.email, name: me.name || '', is_owner: isOwner, photo: me.photo || '' }, orders });
     }
 
@@ -65,7 +71,7 @@ export default async function handler(req, res) {
       if (String(b.email || '').toLowerCase() === me.email.toLowerCase()) return res.status(400).json({ ok: false, error: 'self' });
       const r = await deleteTalent(b.email);
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
-      return res.json({ ok: true, talents: await listTalents(), orders: (await adminListOrders()).map(pub) });
+      return res.json({ ok: true, talents: await listTalents(), orders: (await adminListOrders()).map(o => pub(o, isOwner)) });
     }
     if (action === 'assign_order') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
@@ -83,7 +89,7 @@ export default async function handler(req, res) {
           }));
         } catch (e) { console.error('assign email', e); }
       }
-      return res.json({ ok: true, orders: (await adminListOrders()).map(pub) });
+      return res.json({ ok: true, orders: (await adminListOrders()).map(o => pub(o, isOwner)) });
     }
     if (action === 'create_order') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
@@ -100,7 +106,7 @@ export default async function handler(req, res) {
         } catch (e) { console.error('assign email', e); }
       }
       const rows = await adminListOrders();
-      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o), state: orderState(dk), items: dk.length }; }));
+      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
       return res.json({ ok: true, ref: r.ref, orders });
     }
 
@@ -118,7 +124,7 @@ export default async function handler(req, res) {
         const r = await populateOrderElements(order.id, { plan: order.plan, addons: order.addons });
         if (r.created) decks = await decksForOrder(order.id);
       }
-      return res.json({ ok: true, order: pub(order), decks, messages: await listMessages(order.id) });
+      return res.json({ ok: true, order: pub(order, isOwner), decks, messages: await listMessages(order.id) });
     }
 
     if (action === 'messages') {
