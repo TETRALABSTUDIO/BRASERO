@@ -177,10 +177,15 @@ h1.title{font-size:clamp(28px,3.6vw,40px);font-weight:900;letter-spacing:-.04em;
 .oc-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:11px;font-size:14px;color:#333;line-height:1.4}
 .oc-step .n{width:23px;height:23px;border-radius:7px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:11px;flex-shrink:0}
 
-/* done state : drop the rail, center everything */
-body.is-done .layout{grid-template-columns:1fr}
-body.is-done .rail{display:none}
-body.is-done .main{padding-top:72px}
+/* done + locked states : drop the rail, center everything */
+body.is-done .layout,body.is-locked .layout{grid-template-columns:1fr}
+body.is-done .rail,body.is-locked .rail{display:none}
+body.is-done .main,body.is-locked .main{padding-top:72px}
+/* verifying state */
+.verify{display:flex;flex-direction:column;align-items:center;gap:16px;padding:14vh 0;color:var(--grey);text-align:center}
+.verify__sp{width:34px;height:34px;border-radius:50%;border:3px solid rgba(0,0,0,.1);border-top-color:var(--orange);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.verify p{font-size:15px;font-weight:600}
 
 /* ===== responsive ===== */
 @media(max-width:880px){
@@ -268,6 +273,8 @@ const STEPS=[
 ];
 
 const order=JSON.parse(sessionStorage.getItem('brasero_order')||'{}');
+/* the Stripe Checkout session id — proof of payment, set on the success redirect */
+let SID=new URLSearchParams(location.search).get('session_id')||order.sessionId||'';
 const ans={};
 /* prefill the handle + niche from the info entered at checkout */
 if(order.handle) ans.handle=order.handle+' · Instagram';
@@ -459,15 +466,13 @@ function back(){collect();if(step>0){step--;render();window.scrollTo({top:0,beha
 function submit(){
   document.body.classList.add('is-done');
   bar.style.width='100%';stepcount.textContent='';
-  const sid=new URLSearchParams(location.search).get('session_id')||'';
-  const payload={order,answers:ans,sessionId:sid,submittedAt:new Date().toISOString()};
+  const payload={order,answers:ans,sessionId:SID,submittedAt:new Date().toISOString()};
   sessionStorage.setItem('brasero_onboarding',JSON.stringify(payload));
-  if(API!==null){ fetch(API+'/api/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(console.error); }
-  else { console.log('Onboarding submitted →',payload); }
+  fetch(API+'/api/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(console.error);
   const first=order.name?(', '+order.name.split(' ')[0]):'';
   stepper.innerHTML='';
   const sub=order.billing==='sub';
-  const ref=sid?sid.slice(-8).toUpperCase():'';
+  const ref=order.ref||(SID?SID.slice(-8).toUpperCase():'');
   const av=order.photo?`<img src="${esc(order.photo)}" alt="">`:`<span class="ph">${(order.handle||'B').replace(/^@/,'').charAt(0).toUpperCase()}</span>`;
   const amount=order.price!=null?('$'+order.price+(sub?' / mo':'')):'';
   view.innerHTML=`<div class="done">
@@ -499,7 +504,48 @@ function submit(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-render();
+/* ---- payment gate : the form only unlocks for a genuinely paid Stripe session ---- */
+function renderLock(kind){
+  document.body.classList.remove('is-done');
+  document.body.classList.add('is-locked');
+  stepper.innerHTML='';stepcount.textContent='';bar.style.width='0%';
+  const isErr=kind==='error';
+  view.innerHTML=`<div class="done">
+    <div class="done__ic" style="background:#111;box-shadow:0 14px 34px rgba(0,0,0,.18)">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    </div>
+    <h2>${isErr?'Couldn’t verify your payment':'Payment required'}</h2>
+    <p>${isErr
+      ? 'We couldn’t confirm your order right now. Please check your connection and try again in a moment.'
+      : 'This onboarding form unlocks only after a completed purchase, so your brief always stays tied to a paid order. Pick a plan to get started.'}</p>
+    <div style="margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      ${isErr?'<button class="btn btn--grad" id="lk-retry">Try again</button>':''}
+      <a class="btn ${isErr?'btn--ghost':'btn--grad'}" href="index.html#pricing">See plans →</a>
+    </div>
+  </div>`;
+  const rt=document.getElementById('lk-retry');rt&&rt.addEventListener('click',()=>{document.body.classList.remove('is-locked');boot();});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function boot(){
+  view.innerHTML='<div class="verify"><div class="verify__sp"></div><p>Verifying your payment…</p></div>';
+  try{
+    const r=await fetch(API+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:SID})});
+    const d=await r.json();
+    if(d&&d.paid&&d.order){
+      /* server is the source of truth for plan/price/email; keep the client avatar */
+      Object.keys(d.order).forEach(k=>{ if(d.order[k]!=null&&d.order[k]!=='') order[k]=d.order[k]; });
+      SID=d.order.sessionId||SID;
+      sessionStorage.setItem('brasero_order',JSON.stringify(order));
+      document.body.classList.remove('is-locked');
+      render();
+    } else {
+      renderLock('unpaid');
+    }
+  }catch(e){ console.error(e); renderLock('error'); }
+}
+
+boot();
 </script>
 </body>
 </html>

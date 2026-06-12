@@ -621,7 +621,7 @@ function igUser(s){ s=(s||'').toString().trim(); if(!s) return ''; const m=s.rep
 function renderProfile(o){
   const user=igUser(o.instagram||o.handle), nm=o.name||'Client', av=$('#oAvatar');
   av.innerHTML='';
-  if(user){ const img=new Image(); img.alt=''; img.onerror=()=>{ av.innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`; }; img.src='https://unavatar.io/instagram/'+encodeURIComponent(user)+'?fallback=false'; av.appendChild(img); }
+  if(user){ const img=new Image(); img.alt=''; img.onerror=()=>{ av.innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`; }; img.src=API+'/api/avatar?u='+encodeURIComponent(user); av.appendChild(img); }
   else av.innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`;
   $('#oName').textContent=nm;
   const ig=$('#oIg'); if(user){ ig.textContent='@'+user; ig.style.display=''; } else { ig.textContent=''; ig.style.display='none'; }

@@ -1,9 +1,19 @@
-import { send, saveOnboarding } from './_lib.js';
+import { send, saveOnboarding, verifyPaidSession, onboardingDone } from './_lib.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
-    const { order = {}, answers = {}, sessionId = '' } = req.body || {};
+    const { order: clientOrder = {}, answers = {}, sessionId = '' } = req.body || {};
+
+    // SECURITY: only accept a brief tied to a genuinely paid Stripe session.
+    const paid = await verifyPaidSession(sessionId);
+    if (!paid) return res.status(402).json({ ok: false, error: 'payment_required' });
+
+    // Anti-duplicate: a brief was already filed for this order — don't re-email/re-save.
+    if (await onboardingDone(sessionId)) return res.json({ ok: true, already: true });
+
+    // Trust the server-verified order for client/plan details; keep client answers.
+    const order = { ...clientOrder, ...paid };
     try { await saveOnboarding({ sessionId, email: order.email, handle: order.handle, answers }); }
     catch (e) { console.error('saveOnboarding failed', e); }
     const rows = Object.entries(answers)

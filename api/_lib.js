@@ -119,6 +119,63 @@ export async function markPaid(sessionId, amount) {
   return data;
 }
 
+// Look up a stored order (DB or in-memory demo) by its Stripe session id.
+export async function findOrderBySession(sessionId) {
+  if (!STORE || !sessionId) return null;
+  if (MEM) return MEM.orders.find(o => o.stripe_session_id === sessionId) || null;
+  const { data } = await db.from('orders').select('*').eq('stripe_session_id', sessionId).maybeSingle();
+  return data || null;
+}
+
+// Trusted order shape used by the onboarding page + its emails (server is the
+// single source of truth; never trust client-supplied prices/plan/email).
+function onboardingOrder(ord, s) {
+  const m = (s && s.metadata) || {};
+  const plan = (ord && ord.plan) || m.plan || '';
+  const billing = (ord && ord.billing) || m.billing || '';
+  const amountCents = (s && s.amount_total != null) ? s.amount_total
+    : (ord && ord.amount != null ? ord.amount : null);
+  const sid = (s && s.id) || (ord && ord.stripe_session_id) || '';
+  return {
+    sessionId: sid,
+    ref: orderRef(sid),
+    name: (ord && ord.name) || m.name || '',
+    email: (ord && ord.email) || (s && s.customer_email) || m.email || '',
+    handle: (ord && ord.handle) || m.handle || '',
+    instagram: (ord && ord.instagram) || m.instagram || '',
+    niche: (ord && ord.niche) || m.niche || '',
+    plan,
+    planName: (PLANS[plan] && PLANS[plan].name) || plan || '',
+    billing,
+    price: amountCents != null ? Math.round(amountCents) / 100 : null,
+  };
+}
+
+// True if a brief has already been submitted for this session (anti-duplicate).
+export async function onboardingDone(sessionId) {
+  if (!db || !sessionId) return false;
+  const { data } = await db.from('orders').select('onboarding_at').eq('stripe_session_id', sessionId).maybeSingle();
+  return !!(data && data.onboarding_at);
+}
+
+// SECURITY GATE — returns the trusted order only if the Stripe Checkout session
+// is genuinely paid, else null. Used to gate the onboarding page + submission so
+// nobody can send a brief without paying. Accepts a locally-stored paid order
+// (webhook already ran / demo / manual) or confirms live with Stripe otherwise.
+export async function verifyPaidSession(sessionId) {
+  if (!sessionId) return null;
+  const ord = await findOrderBySession(sessionId);
+  if (ord && ord.status === 'paid') return onboardingOrder(ord, null);
+  // Ask Stripe directly — covers the race before the webhook marks the order paid.
+  if (process.env.STRIPE_SECRET_KEY && /^cs_/.test(sessionId)) {
+    try {
+      const s = await stripe.checkout.sessions.retrieve(sessionId);
+      if (s && (s.payment_status === 'paid' || s.status === 'complete')) return onboardingOrder(ord, s);
+    } catch (e) { console.error('verifyPaidSession', e.message); }
+  }
+  return null;
+}
+
 /* ---- Order tracking + deck workflow ---- */
 
 // Look up a paid order by its public ref + email (the customer's credentials).
