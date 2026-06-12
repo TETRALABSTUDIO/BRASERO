@@ -628,6 +628,18 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .iav--sm{width:30px;height:30px;font-size:12px}
 .iav--lg{width:48px;height:48px;font-size:18px}
 .iav--exp{width:42px;height:42px;font-size:15px;border:2px solid #fff;box-shadow:0 5px 14px rgba(248,80,0,.22)}
+.iav--xl{width:74px;height:74px;font-size:26px;border:2px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.13)}
+/* client profile card in the board sidebar (social-profile style) */
+.cprofile{display:flex;flex-direction:column;align-items:center;text-align:center}
+.cprofile__av{margin-bottom:13px}
+.cprofile__name{font-size:18px;font-weight:900;letter-spacing:-.025em;line-height:1.2}
+.cprofile__ig{font-size:13.5px;color:var(--grey);font-weight:600;margin-top:3px}
+.cprofile .side__badges{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.cprofile__row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:13px}
+.obadge{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:7px 13px}
+.obadge b{font-weight:900}
+.obadge--plan{padding:6px 12px}
+.obadge--plan .plan-logo{height:16px;width:auto;display:block}
 .kc__head{display:flex;align-items:center;gap:10px;padding-right:28px}
 .kc__head .kc__n{padding-right:0}
 .rname{display:flex;align-items:center;gap:10px}
@@ -854,8 +866,13 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
               <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:34px;color:var(--ink)"><use href="#brasero-studio"/></svg>
             </div>
             <div class="side__order switcher" id="switcher">
-              <div class="side__order-top">
-                <h2 id="oName"></h2>
+              <div class="cprofile">
+                <div class="cprofile__av" id="oAvatar"></div>
+                <h2 class="cprofile__name" id="oName"></h2>
+                <div class="cprofile__ig" id="oIg"></div>
+                <div class="side__badges" id="oBadges"></div>
+              </div>
+              <div class="cprofile__row">
                 <button type="button" class="oswitch" id="briefBtn" title="View the brief" aria-label="View the brief">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
                 </button>
@@ -863,8 +880,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
                 </button>
               </div>
-              <div class="meta" id="oMeta"></div>
-              <div id="oDeadline" style="margin-top:9px"></div>
+              <div id="oDeadline" style="margin-top:11px"></div>
               <div class="switcher__menu hide" id="switcherMenu"></div>
             </div>
             <div id="deckList"></div>
@@ -1073,6 +1089,7 @@ function clientAv(o,cls){
   return `<span class="iav ${cls||''}" data-ini="${esc(initials(nm))}">${img}</span>`;
 }
 const PLAN_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
+const PLAN_LOGO={starter:'ember',flame:'flame',burst:'meteor'};
 const planName=p=>PLAN_NAMES[p]||p||'';
 let TOKEN=localStorage.getItem('brasero_session')||'', ME=null, REF='', ORDERS=[], TALENTS=[];
 let ADMIN={orders:[],leads:[],talents:[]};
@@ -1777,16 +1794,15 @@ async function openOrder(ref, restore){
   document.body.classList.add('appmode');
   $('#toDash').classList.toggle('hide',!(ME&&ME.is_owner));
   renderSwitcher();
-  $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
-  const o=d.order, ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
-  const meta=[
-    o.plan?planName(o.plan)+' pack':'',
-    o.billing?(o.billing==='sub'?'subscription':'one-time'):'',     // owner-only fields are absent for talents
-    o.amount?'$'+Math.round(o.amount/100).toLocaleString('en-US'):'',
-    o.email, o.phone, o.instagram,
-    (o.addons&&o.addons.length)?'+ '+o.addons.map(k=>ADDON_LBL[k]||k).join(', '):''
-  ].filter(Boolean).join(' · ');
-  $('#oMeta').textContent=meta;
+  const o=d.order;
+  $('#oAvatar').innerHTML=clientAv(o,'iav--xl');
+  $('#oName').textContent=o.name||o.email||'Client';
+  const user=igUser(o.instagram||o.handle), ig=$('#oIg');
+  if(user){ ig.textContent='@'+user; ig.style.display=''; } else { ig.textContent=''; ig.style.display='none'; }
+  const badges=[`<span class="obadge"><b>#${esc(o.ref)}</b></span>`];
+  if(o.plan && PLAN_LOGO[o.plan]) badges.push(`<span class="obadge obadge--plan"><img class="plan-logo" src="assets/plans/${PLAN_LOGO[o.plan]}.svg" alt="${esc(planName(o.plan))} pack"></span>`);
+  else if(o.plan) badges.push(`<span class="obadge">${esc(planName(o.plan))} pack</span>`);
+  $('#oBadges').innerHTML=badges.join('');
   $('#oDeadline').innerHTML=dlBadge(d.order,kindsOfDecks(d.decks));
   const foot=document.querySelector('.side__foot'); if(foot) foot.style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   renderSideMe();
