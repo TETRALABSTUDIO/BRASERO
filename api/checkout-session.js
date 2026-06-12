@@ -13,6 +13,7 @@ export default async function handler(req, res) {
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         customer_email: email || undefined,
+        allow_promotion_codes: true,          // show the "Add promotion code" field
         line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero — ${it.name}` } } }],
         success_url: `${SITE}/track.html?ref=${ar}&email=${em}&addon=1`,
         cancel_url: `${SITE}/track.html?ref=${ar}&email=${em}`,
@@ -53,6 +54,7 @@ export default async function handler(req, res) {
     const session = await stripe.checkout.sessions.create({
       mode,
       customer_email: email || undefined,
+      allow_promotion_codes: true,          // show the "Add promotion code" field
       line_items,
       success_url: isAddon
         ? `${SITE}/track.html?ref=${ar}&email=${em}&addon=1`

@@ -146,6 +146,7 @@ a{color:inherit;text-decoration:none}
 .recap__addon b{margin-left:auto;font-weight:800}
 .recap__total{margin-top:14px}
 .recap__fine{font-size:11px;color:var(--grey);margin-top:8px;line-height:1.45}
+.recap__promo{font-size:12px;color:var(--grey);font-weight:600;text-align:center;margin-top:11px}
 .linkbtn{background:none;border:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--grey);cursor:pointer;padding:10px;width:100%}
 
 @media(max-width:860px){.co{grid-template-columns:1fr}.recap{order:-1}}
@@ -391,7 +392,8 @@ function renderRecap(){
       <div class="recap__row recap__total"><span>Total${sub?' due today':''}</span><div class="tot"><b>${fmt(total)}</b></div></div>
       ${sub?`<p class="recap__fine">Then ${fmt(price())}/mo. Add-ons are billed once.</p>`:''}
     `:''}
-    ${recapBtn?`<button type="button" class="btn btn--grad pay" id="recap-cta">${recapBtn.label}</button>`:''}`;
+    ${recapBtn?`<button type="button" class="btn btn--grad pay" id="recap-cta">${recapBtn.label}</button>
+    <p class="recap__promo">🎁 Got a promo code? Add it on the secure payment page.</p>`:''}`;
   document.querySelectorAll('.bill button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.m;renderRecap();updatePayBtn();}));
   if(recapBtn){const b=document.getElementById('recap-cta');if(b)b.addEventListener('click',recapBtn.fn);}
 }
