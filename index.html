@@ -67,6 +67,17 @@ img,svg{display:block}
 .nav__links a:hover{color:var(--orange)}
 .nav__cta{padding:12px 22px;font-size:15px}
 .nav__actions{display:flex;align-items:center;gap:12px}
+/* mobile hamburger + dropdown menu (hidden on desktop) */
+.nav__burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;border:none;background:none;cursor:pointer;padding:0;margin-left:2px;flex-shrink:0}
+.nav__burger span{display:block;width:22px;height:2.4px;border-radius:3px;background:var(--ink);margin:0 auto;transition:transform .28s ease,opacity .2s ease}
+.nav__burger.open span:nth-child(1){transform:translateY(7.4px) rotate(45deg)}
+.nav__burger.open span:nth-child(2){opacity:0}
+.nav__burger.open span:nth-child(3){transform:translateY(-7.4px) rotate(-45deg)}
+.nav__menu{display:none;position:absolute;top:100%;left:0;right:0;background:var(--cream);border-bottom:1px solid var(--line);box-shadow:0 24px 40px rgba(0,0,0,.10);padding:8px 18px 20px;flex-direction:column;z-index:30;transform:translateY(-10px);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.22,.7,.3,1),opacity .25s ease}
+.nav__menu.open{transform:none;opacity:1;pointer-events:auto}
+.nav__menu a:not(.btn){font-size:18px;font-weight:700;color:var(--ink);padding:15px 6px;border-bottom:1px solid var(--line)}
+.nav__menu-cta{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.nav__menu-cta .btn{width:100%;justify-content:center;padding:15px;font-size:16px}
 /* language selector : round flag pastilles */
 .langsel{display:flex;align-items:center;gap:7px;padding-right:4px}
 .langsel__opt{width:26px;height:26px;border-radius:50%;padding:0;border:none;background:none;cursor:pointer;position:relative;opacity:.5;filter:grayscale(.35);transition:opacity .2s,transform .2s,filter .2s;display:grid;place-items:center}
@@ -74,7 +85,7 @@ img,svg{display:block}
 .langsel__opt:hover{opacity:.9;transform:translateY(-1px)}
 .langsel__opt.is-active{opacity:1;filter:none}
 .langsel__opt.is-active::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--orange)}
-@media(max-width:880px){.nav__links{display:none}.nav__track{display:none}}
+@media(max-width:880px){.nav__links{display:none}.nav__actions .nav__cta{display:none}.nav__actions{margin-left:auto;gap:8px}.nav__burger{display:flex}.nav__menu{display:flex}}
 @media(max-width:520px){.langsel__opt{width:23px;height:23px}.langsel__opt svg{width:20px;height:20px}}
 
 /* ===== HERO ===== */
@@ -678,19 +689,30 @@ html{overflow-x:hidden}
   .wrap,.hero__grid{padding-left:18px;padding-right:18px}
   .nav__in{padding:13px 18px;gap:12px}
   .nav__cta{padding:10px 15px;font-size:13px}
-  .hero h1{font-size:clamp(34px,8.6vw,48px)}
-  .hero__lead{font-size:16px}
+  .hero{padding-top:22px;padding-bottom:56px}
+  .hero__social{margin-bottom:20px;padding:6px 14px 6px 7px}
+  .hero h1{font-size:clamp(40px,11.4vw,58px);line-height:.95;margin-bottom:18px}
+  .hero__lead{font-size:17px;font-weight:500;line-height:1.45;margin-bottom:24px}
+  .hero__by{margin-bottom:22px}
   .hero__by-txt{white-space:normal}
-  .hero__actions{gap:10px}
-  .hero__actions .btn--grad{font-size:16px;padding:15px 24px}
+  .hero__actions{gap:11px;width:100%}
+  .hero__actions .btn{flex:1;justify-content:center;min-width:0}
+  .hero__actions .btn--grad{font-size:16px;padding:16px 18px}
+  .hero__actions .btn--text{padding:14px 12px}
 
-  /* hero visual : tighten the fanned card stack so it fits the screen */
-  .hstack{height:354px;margin-top:4px}
-  .hslide{width:148px}
-  .hslide.s2{--tx:-86%;--ty:-58%}
-  .hslide.s1{--tx:-50%;--ty:-50%}
-  .hslide.s3{--tx:-14%;--ty:-42%}
-  .hslide .fb h4{font-size:17px}
+  /* hero visual : clean centered fan of decks */
+  .hstack{height:392px;margin-top:18px}
+  .hslide{width:166px}
+  .hslide.s2{--tx:-92%;--ty:-66%;--rot:rotate(-12deg)}
+  .hslide.s1{--tx:-50%;--ty:-50%;--rot:rotate(-2deg)}
+  .hslide.s3{--tx:-8%;--ty:-34%;--rot:rotate(11deg)}
+  .hslide .fb h4{font-size:18px}
+  /* bring back one credibility chip, nicely tucked */
+  .hchip{display:flex;padding:9px 13px;border-radius:13px}
+  .hchip--tl{display:none}
+  .hchip--br{bottom:6%;right:0;animation:none}
+  .hchip .ic{width:30px;height:30px}
+  .hchip b{font-size:14px}.hchip small{font-size:10px}
 
   /* collection : shrink big fan + side arrows so they sit on one row */
   .collection{padding:64px 0}
@@ -755,6 +777,16 @@ html{overflow-x:hidden}
       </div>
       <a href="track.html?login=1" class="btn btn--ghost-light nav__cta nav__track">Access your decks</a>
       <a href="#packages" class="btn btn--black nav__cta"><span class="btn-decks"><i></i><i></i><i></i></span>Go to packages</a>
+    </div>
+    <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__menu" id="navMenu">
+    <a href="#collection">Collection</a>
+    <a href="#process">How it works</a>
+    <a href="#testimonials">Testimonials</a>
+    <div class="nav__menu-cta">
+      <a href="track.html?login=1" class="btn btn--ghost-light">Access your decks</a>
+      <a href="#packages" class="btn btn--grad"><span class="btn-decks"><i></i><i></i><i></i></span>Go to packages</a>
     </div>
   </div>
 </nav>
@@ -1428,6 +1460,16 @@ renderMinis();
   opts.forEach(o=>o.addEventListener('click',()=>setLang(o.dataset.lang)));
   let saved; try{ saved=localStorage.getItem('brasero_lang'); }catch(e){}
   setLang(saved&&opts.some(o=>o.dataset.lang===saved)?saved:'en');
+})();
+
+/* mobile hamburger menu */
+(function(){
+  const burger=document.getElementById('navBurger'), menu=document.getElementById('navMenu');
+  if(!burger||!menu) return;
+  function setOpen(on){ burger.classList.toggle('open',on); menu.classList.toggle('open',on); burger.setAttribute('aria-expanded',on?'true':'false'); }
+  burger.addEventListener('click',()=>setOpen(!menu.classList.contains('open')));
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setOpen(false)));
+  document.addEventListener('click',e=>{ if(menu.classList.contains('open')&&!menu.contains(e.target)&&!burger.contains(e.target)) setOpen(false); });
 })();
 function renderFan(dir){
   const d=decks[curDeck];
