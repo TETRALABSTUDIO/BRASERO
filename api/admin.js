@@ -71,6 +71,13 @@ export default async function handler(req, res) {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
       return res.json({ ok: true, talents: await listTalents() });
     }
+    // Owner one-click account switch: mint a session token for a talent account.
+    if (action === 'login_as') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      const t = await getTalentByEmail(b.email);
+      if (!t) return res.status(404).json({ ok: false, error: 'not_found' });
+      return res.json({ ok: true, token: signToken({ email: t.email }) });
+    }
     if (action === 'create_talent') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
       // Quick create: generate a temporary password, the talent changes it on first login.

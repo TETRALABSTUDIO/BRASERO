@@ -350,6 +350,20 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .side__me-info{display:flex;flex-direction:column;gap:3px;min-width:0;margin-right:auto}
 .side__me-name{font-size:13.5px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .side__me .rolebadge{align-self:flex-start;font-size:9px;padding:2px 8px}
+/* account switcher (owner): two small pills + dropdown of accounts */
+.acctsw{position:relative;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.acctsw__ic{width:30px;height:30px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
+.acctsw__ic:hover{color:var(--orange);border-color:var(--orange)}
+.acctsw__ic svg{width:15px;height:15px}
+.acctsw__menu{position:absolute;bottom:calc(100% + 8px);right:0;z-index:40;background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:0 18px 44px rgba(0,0,0,.18);padding:6px;min-width:212px;max-height:50vh;overflow-y:auto}
+.acctsw__menu.hide{display:none}
+.acctsw__row{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;border-radius:9px;padding:8px 9px;cursor:pointer;font-family:inherit}
+.acctsw__row .avatar{width:30px;height:30px;font-size:12px;border:2px solid #fff;box-shadow:none;flex-shrink:0}
+.acctsw__row:hover{background:var(--soft)}
+.acctsw__row-i{display:flex;flex-direction:column;gap:1px;min-width:0}
+.acctsw__row-n{font-size:13.5px;font-weight:800;letter-spacing:-.01em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acctsw__row-r{font-size:10.5px;font-weight:700;color:var(--grey)}
+.acctsw__loading{padding:10px 12px;font-size:13px;color:var(--grey)}
 /* project switcher (sidebar top) */
 .switcher{position:relative;flex:1;min-width:0}
 .switcher__btn{display:flex;align-items:center;gap:8px;width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;font-family:inherit;text-align:left}
@@ -1202,9 +1216,40 @@ function navTo(sec){
   else if(sec==='crm') renderCRMSection();
 }
 $('#adminNav').addEventListener('click',e=>{ const b=e.target.closest('.navi'); if(b) navTo(b.dataset.sec); });
+/* profile actions: small sign-out pill + (owner) an up-arrow that opens a talent-account switcher */
+const ACCT_UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 12l6-6 6 6"/></svg>';
+const ACCT_OUT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>';
+function meActions(logoutId){
+  const sw=(ME&&ME.is_owner)?`<button type="button" class="acctsw__ic" data-acct-menu title="Switch to another account">${ACCT_UP}</button>`:'';
+  return `<div class="acctsw">${sw}<button type="button" class="acctsw__ic" id="${logoutId}" title="Sign out">${ACCT_OUT}</button><div class="acctsw__menu hide" data-acct-list></div></div>`;
+}
+function wireAcct(root,logoutId){
+  $('#'+logoutId).onclick=doLogout;
+  const btn=root.querySelector('[data-acct-menu]'), menu=root.querySelector('[data-acct-list]');
+  if(!btn||!menu) return;
+  btn.onclick=async e=>{ e.stopPropagation();
+    if(!menu.classList.contains('hide')){ menu.classList.add('hide'); return; }
+    document.querySelectorAll('[data-acct-list]').forEach(m=>m.classList.add('hide'));
+    menu.innerHTML='<div class="acctsw__loading">Loading…</div>'; menu.classList.remove('hide');
+    let list=(TALENTS&&TALENTS.length)?TALENTS:[];
+    if(!list.length){ try{ const r=await api('/api/admin',{action:'list_talents'}); if(r.ok){ TALENTS=r.talents||[]; list=TALENTS; } }catch(_){} }
+    const rows=list.filter(t=>t.email!==ME.email).map(t=>`<button type="button" class="acctsw__row" data-acct="${esc(t.email)}">${avatar(t,'xs')}<span class="acctsw__row-i"><span class="acctsw__row-n">${esc(t.name||t.email)}</span><span class="acctsw__row-r">${t.is_owner?'Owner':'Talent'}</span></span></button>`).join('');
+    menu.innerHTML=rows||'<div class="acctsw__loading">No other accounts.</div>';
+  };
+  menu.onclick=e=>{ const r=e.target.closest('[data-acct]'); if(r) loginAs(r.dataset.acct); };
+}
+async function loginAs(email){
+  try{ const r=await api('/api/admin',{action:'login_as',email});
+    if(r&&r.ok&&r.token){ localStorage.setItem('brasero_session',r.token);
+      try{ localStorage.removeItem('brasero_last_ref'); localStorage.removeItem('brasero_nav'); localStorage.removeItem('brasero_last_tab'); }catch(_){}
+      location.reload();
+    } else alert('Could not switch account.'); }
+  catch(e){ alert('Could not switch account.'); }
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('.acctsw')) document.querySelectorAll('[data-acct-list]').forEach(m=>m.classList.add('hide')); });
 function renderAdminMe(){ const el=$('#adminMe'); if(!el||!ME) return;
-  el.innerHTML=`${avatar(ME,'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name||ME.email.split('@')[0])}</span><span class="rolebadge owner">Owner</span></div><button class="b-ghost b-sm" id="adminLogout" type="button">Sign out</button>`;
-  $('#adminLogout').onclick=doLogout; }
+  el.innerHTML=`${avatar(ME,'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name||ME.email.split('@')[0])}</span><span class="rolebadge owner">Owner</span></div>${meActions('adminLogout')}`;
+  wireAcct(el,'adminLogout'); }
 
 /* ----- dashboard: period, KPIs, revenue curve, offers pie ----- */
 let DPERIOD='6m';
@@ -1896,8 +1941,8 @@ $('#bmClose').onclick=()=>$('#briefModal').classList.add('hide');
 /* talent profile pinned at the bottom of the project sidebar */
 function renderSideMe(){
   const el=$('#sideMe'); if(!el||!ME) return;
-  el.innerHTML=`${avatar(ME,'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name||ME.email.split('@')[0])}</span><span class="rolebadge ${ME.is_owner?'owner':'talent'}">${ME.is_owner?'Owner':'Talent'}</span></div><button class="b-ghost b-sm" id="sideLogout" type="button">Sign out</button>`;
-  $('#sideLogout').onclick=doLogout;
+  el.innerHTML=`${avatar(ME,'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name||ME.email.split('@')[0])}</span><span class="rolebadge ${ME.is_owner?'owner':'talent'}">${ME.is_owner?'Owner':'Talent'}</span></div>${meActions('sideLogout')}`;
+  wireAcct(el,'sideLogout');
 }
 
 /* ---------- conversation with the client ---------- */
