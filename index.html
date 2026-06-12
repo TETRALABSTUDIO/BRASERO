@@ -196,7 +196,7 @@ img,svg{display:block}
 
 /* ===== COLLECTION (dark) ===== */
 .collection{padding:118px 0 14px;overflow:visible;position:relative;background:transparent;isolation:isolate;z-index:1}
-.collection::before{content:"";position:absolute;inset:0 0 -96px 0;background:var(--black);transform:skewY(-6deg);transform-origin:left;z-index:-1}   /* dark band is tilted; its slanted bottom edge carries into the next section */
+.collection::before{content:"";position:absolute;inset:0 0 -80px 0;background:var(--black);transform:skewY(-3deg);transform-origin:left;z-index:-1}   /* dark band is tilted; its slanted bottom edge carries into the next section, clearing the mini fans */
 .collection>.wrap{position:relative}
 .cwrap{display:grid;grid-template-columns:1.22fr .78fr;gap:54px;align-items:center}
 .cright{order:-1;position:relative}
@@ -205,7 +205,7 @@ img,svg{display:block}
 .cleft .collection__head .lead{margin-top:18px;max-width:430px}
 .cstats{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:0}
 .cright{display:flex;align-items:center;justify-content:center;gap:10px}
-.cfan{flex:1;display:flex;justify-content:center;align-items:center;overflow:visible;transform:translateY(96px)}
+.cfan{flex:1;display:flex;justify-content:center;align-items:center;overflow:visible;transform:translateY(20px)}
 .cfan__nav{border:none;background:none;color:#b4b4b4;display:grid;place-items:center;cursor:pointer;transition:color .2s,transform .2s;flex-shrink:0;padding:8px}
 .cfan__nav:hover{color:var(--orange);transform:translateY(-1px)}
 .cfan__nav svg{width:32px;height:32px}
