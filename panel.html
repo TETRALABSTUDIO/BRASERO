@@ -400,17 +400,22 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .deckitem__pill{align-self:flex-start}
 .board__right{display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:#fff}
 /* middle-column tabs (Brief + open elements), Chrome-style */
-.tabs{display:flex;gap:3px;padding:9px 12px 0;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex-shrink:0;position:sticky;top:0;z-index:6;scrollbar-width:none}
+.tabs{display:flex;gap:4px;padding:8px 10px 0;background:var(--soft);overflow-x:auto;flex-shrink:0;position:sticky;top:0;z-index:6;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tabs.hide{display:none}
-.tab{display:inline-flex;align-items:center;gap:7px;padding:9px 9px 9px 12px;border:1px solid transparent;border-bottom:none;border-radius:11px 11px 0 0;font-size:13px;font-weight:700;color:var(--grey);cursor:pointer;white-space:nowrap;background:var(--soft);position:relative;top:1px;flex-shrink:0}
-.tab:hover{color:var(--ink)}
-.tab.on{background:#fff;color:var(--ink);border-color:var(--line)}
+.tab{display:inline-flex;align-items:center;gap:7px;padding:9px 9px 11px 13px;border:none;border-radius:11px 11px 0 0;font-size:13px;font-weight:700;color:var(--grey);cursor:pointer;white-space:nowrap;background:transparent;position:relative;flex-shrink:0}
+.tab:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+/* active tab: white, flush with the white content below, corners curve into it */
+.tab.on{background:#fff;color:var(--ink)}
+.tab.on:hover{background:#fff}
+.tab.on::before,.tab.on::after{content:"";position:absolute;bottom:0;width:9px;height:9px;background:#fff;pointer-events:none}
+.tab.on::before{left:-9px;-webkit-mask-image:radial-gradient(circle at top left,transparent 9px,#000 9px);mask-image:radial-gradient(circle at top left,transparent 9px,#000 9px)}
+.tab.on::after{right:-9px;-webkit-mask-image:radial-gradient(circle at top right,transparent 9px,#000 9px);mask-image:radial-gradient(circle at top right,transparent 9px,#000 9px)}
 .tab__ic{display:inline-flex;flex-shrink:0}
 .tab__ic .ti{width:15px;height:15px}
 .tab__l{overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .tab__x{border:none;background:none;color:#bbb;font-size:11px;cursor:pointer;padding:3px 4px;border-radius:6px;flex-shrink:0;line-height:1}
-.tab__x:hover{color:#c33;background:rgba(0,0,0,.06)}
+.tab__x:hover{color:#c33;background:rgba(0,0,0,.08)}
 /* inline brief (rendered in the middle column instead of an overlay) */
 .briefin{container-type:inline-size}
 .briefin__head{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #efeae1}
