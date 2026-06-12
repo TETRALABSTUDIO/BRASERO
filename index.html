@@ -700,17 +700,17 @@ html{overflow-x:hidden}
   .hero__actions .btn--grad{font-size:16px;padding:16px 18px}
   .hero__actions .btn--text{padding:14px 12px}
 
-  /* hero visual : clean centered fan of decks */
-  .hstack{height:392px;margin-top:18px}
+  /* hero visual : clean staggered fan of decks (mirrors desktop) */
+  .hstack{height:368px;margin-top:6px}
   .hslide{width:166px}
-  .hslide.s2{--tx:-92%;--ty:-66%;--rot:rotate(-12deg)}
-  .hslide.s1{--tx:-50%;--ty:-50%;--rot:rotate(-2deg)}
-  .hslide.s3{--tx:-8%;--ty:-34%;--rot:rotate(11deg)}
+  .hslide.s2{--tx:-95%;--ty:-72%;--rot:rotate(-12deg)}
+  .hslide.s1{--tx:-50%;--ty:-50%;--rot:rotate(-1deg)}
+  .hslide.s3{--tx:-5%;--ty:-28%;--rot:rotate(12deg)}
   .hslide .fb h4{font-size:18px}
   /* bring back one credibility chip, nicely tucked */
   .hchip{display:flex;padding:9px 13px;border-radius:13px}
   .hchip--tl{display:none}
-  .hchip--br{bottom:6%;right:0;animation:none}
+  .hchip--br{bottom:3%;right:2%;animation:none}
   .hchip .ic{width:30px;height:30px}
   .hchip b{font-size:14px}.hchip small{font-size:10px}
 
@@ -735,6 +735,9 @@ html{overflow-x:hidden}
   .cBrasero .cHead svg{height:24px}
   .cAmateur .x,.cBrasero .ck{width:13px;height:13px}
   .cBrasero em{display:block;margin-left:0;margin-top:1px}
+
+  /* packages : keep the badge inside the card */
+  .plan__badge{top:16px;right:16px;font-size:10px;padding:5px 10px;letter-spacing:.03em}
 
   /* section heads tighter */
   .h-lg{font-size:clamp(30px,8vw,44px)}
