@@ -265,18 +265,20 @@ img,svg{display:block}
 .cstack:hover .cstack__hint{opacity:1}
 
 /* ===== collection : 3 smaller fanned decks (horizontal row) ===== */
-.cmore{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;gap:46px;flex-wrap:wrap;margin-top:64px}
+.cmore{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;gap:72px;flex-wrap:wrap;margin-top:64px}
 .cmini{position:relative;cursor:pointer;outline:none}
 .cmini .cstack--mini{width:230px;height:300px;margin:0}
 .cstack--mini .cstack__card{width:158px;border-radius:14px;bottom:30px}
-.cmini__veil{position:absolute;inset:-10px -6px -28px;border-radius:20px;background:linear-gradient(to top,rgba(0,0,0,.9) 6%,rgba(0,0,0,.45) 34%,rgba(0,0,0,0) 66%);pointer-events:none;z-index:6;transition:opacity .3s}
-.cmini:hover .cmini__veil{opacity:.78}
-.cmini__meta{position:absolute;left:0;right:0;bottom:4px;z-index:7;text-align:center;pointer-events:none}
-.cmini__meta b{display:block;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em}
-.cmini__meta span{display:block;margin-top:2px;font-size:12px;font-weight:700;color:var(--orange)}
+.cstack--mini .cstack__hint{display:none}
+.cmini__veil{position:absolute;inset:-10px -6px -28px;border-radius:20px;background:linear-gradient(to top,var(--black) 4%,rgba(12,12,12,.55) 30%,rgba(12,12,12,0) 62%);pointer-events:none;z-index:6;transition:opacity .3s}
+.cmini:hover .cmini__veil{opacity:.7}
+.cmini__more{position:absolute;left:0;right:0;bottom:6px;z-index:7;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:800;letter-spacing:.01em;color:#fff;pointer-events:none;transition:color .2s}
+.cmini__more svg{width:14px;height:14px;color:var(--orange);transition:transform .2s}
+.cmini:hover .cmini__more{color:var(--orange)}
+.cmini:hover .cmini__more svg{transform:translateX(3px)}
 .cmini:focus-visible{box-shadow:0 0 0 2px var(--orange);border-radius:18px}
-@media(max-width:900px){.cmore{gap:30px;margin-top:48px}.cmini .cstack--mini{width:200px;height:262px}.cstack--mini .cstack__card{width:138px}}
-@media(max-width:560px){.cmore{gap:22px}}
+@media(max-width:900px){.cmore{gap:48px;margin-top:48px}.cmini .cstack--mini{width:200px;height:262px}.cstack--mini .cstack__card{width:138px}}
+@media(max-width:560px){.cmore{gap:34px}}
 
 /* deck overlay */
 .cov{position:fixed;inset:0;background:rgba(8,8,8,.92);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;gap:22px;z-index:70;padding:24px}
@@ -1322,7 +1324,7 @@ function renderMinis(){
     return `<div class="cmini" role="button" tabindex="0" data-deck="${di}" aria-label="Open ${d.h} deck">`
       +`<div class="cstack cstack--mini">${fanHTML(deckSlides[di])}</div>`
       +`<div class="cmini__veil"></div>`
-      +`<div class="cmini__meta"><b>${d.h}</b><span>${d.s}</span></div></div>`;
+      +`<div class="cmini__more">View more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>`;
   }).join('');
   cmore.querySelectorAll('.cmini').forEach(el=>{
     const di=+el.dataset.deck;
