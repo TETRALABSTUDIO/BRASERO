@@ -1333,26 +1333,41 @@ $('#npFill').onclick=()=>{
 
 /* ---------- floating talent guide (step-by-step, zoomed dash mockups) ---------- */
 const pill=(txt,col,bg)=>`<span style="font-size:10.5px;font-weight:800;color:${col};background:${bg};border-radius:100px;padding:3px 10px;white-space:nowrap">${txt}</span>`;
+const G_CATS=`<div style="width:100%;max-width:220px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
+  <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-left:3px solid var(--orange);background:var(--soft)">
+    <span style="width:28px;height:28px;border-radius:8px;background:rgba(248,80,0,.1);display:grid;place-items:center"><svg style="width:16px;height:16px" viewBox="0 0 140 94"><use href="#ic-decks"/></svg></span>
+    <span style="flex:1;min-width:0"><b style="font-size:12px;display:block;letter-spacing:-.02em">Decks</b><span style="font-size:10px;color:var(--grey)">6 elements</span></span><span style="color:var(--grey)">›</span></div>
+  <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-top:1px solid var(--line)">
+    <span style="width:28px;height:28px;border-radius:8px;background:rgba(248,80,0,.1);display:grid;place-items:center"><svg style="width:15px;height:15px" viewBox="0 0 134 122"><use href="#ic-story"/></svg></span>
+    <span style="flex:1;min-width:0"><b style="font-size:12px;display:block;letter-spacing:-.02em">Stories</b><span style="font-size:10px;color:var(--grey)">3 elements</span></span><span style="color:var(--grey)">›</span></div>
+  <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-top:1px solid var(--line)">
+    <span style="width:28px;height:28px;border-radius:8px;background:var(--soft);display:grid;place-items:center"><svg style="width:16px;height:16px;filter:grayscale(1);opacity:.5" viewBox="0 0 120 120"><use href="#ic-brand"/></svg></span>
+    <span style="flex:1;min-width:0"><b style="font-size:12px;display:block;color:#9a9a9a;letter-spacing:-.02em">Branding</b><span style="font-size:10px;color:var(--grey)">Not in the offer</span></span>
+    <span style="width:22px;height:22px;border-radius:7px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px">+</span></div></div>`;
 const TUT=[
-  { tag:'Step 1', title:'All your elements are here',
-    body:'On the left, every card is one element of the order: carousels, stories and branding. Click one to open it on the right.',
-    vis:`<div style="width:100%;max-width:214px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
-      <div style="padding:10px 13px;border-left:3px solid var(--orange);background:var(--soft)">
-        <div style="font-weight:800;font-size:12px;margin-bottom:7px">Deck 1</div>
-        <div style="height:5px;border-radius:3px;background:#eaeaea;overflow:hidden;margin-bottom:8px"><i style="display:block;width:18%;height:100%;background:var(--grad)"></i></div>
-        ${pill('Writing','var(--wait)','var(--waitbg)')}</div>
-      <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Story 1</div>
-      <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Profile photo</div></div>` },
-  { tag:'Step 2', title:'Write the script',
-    body:'Type the post copy in the box, then “Send script →” forwards it to the client for approval. “Save draft” keeps it private.',
+  { tag:'Step 1', title:'Switch projects & read the brief',
+    body:'Top-left shows the project you are on. Use the switch icon to jump between projects, and the brief icon to see exactly what the client wants. Owners also get a Dashboard button back to the overview.',
+    vis:`<div style="width:100%;max-width:222px;border:1px solid var(--line);border-radius:13px;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07);padding:13px 14px">
+      <div style="display:flex;align-items:flex-start;gap:7px">
+        <div style="flex:1;min-width:0"><b style="font-size:12.5px;letter-spacing:-.02em">#A1B2 · Nina Park</b><div style="font-size:10.5px;color:var(--grey);margin-top:3px">Flame pack · 6 elements</div></div>
+        <span style="width:27px;height:27px;border-radius:8px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#6b6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
+        <span style="width:27px;height:27px;border-radius:8px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#6b6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></span></div>
+      <div style="margin-top:11px;font-size:10px;color:var(--grey);text-align:center">📄 brief · ⇄ switch project</div></div>` },
+  { tag:'Step 2', title:'Elements grouped by type',
+    body:'The board is split into Decks, Stories and Branding. Open a category to fill its elements. A greyed category is not in the offer; the + lets owners add more elements, with no charge.',
+    vis:G_CATS },
+  { tag:'Step 3', title:'Write the script in slides',
+    body:'Open an element and write the copy slide by slide. Format with Title, Bold and Highlight, add or remove slides, then Send script → for the client to approve.',
     vis:`<div style="width:100%;max-width:224px">
-      <div style="font-weight:900;font-size:13px;margin-bottom:7px">Deck 1</div>
-      <div style="background:#fff;border:1px solid var(--line);border-radius:10px;height:62px;padding:9px;font-size:11px;color:#b2b2b2">Write the post script / copy…</div>
-      <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:9px">
-        <span style="font-size:10px;font-weight:800;border:1px solid var(--line);border-radius:100px;padding:5px 11px">Save draft</span>
-        ${pill('Send script →','#fff','var(--grad)')}</div></div>` },
-  { tag:'Step 3', title:'Add the design',
-    body:'Once the script is approved, the element switches to design. Upload up to 10 images and send them to the client.',
+      <div style="display:flex;gap:5px;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:800;background:var(--soft);border-radius:7px;padding:5px 9px">Title</span>
+        <span style="font-size:10px;font-weight:800;background:var(--soft);border-radius:7px;padding:5px 10px">B</span>
+        <span style="font-size:10px;font-weight:800;background:var(--soft);border-radius:7px;padding:5px 9px"><mark style="background:#ffe39a">H</mark></span></div>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px;line-height:1.5">
+        <b style="font-size:12px;display:block;margin-bottom:3px">Slide 1</b>Stop believing these <mark style="background:#ffe39a">3 money myths</mark>…</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:9px"><span style="font-size:10px;font-weight:800;color:var(--grey)">+ Add slide</span>${pill('Send script →','#fff','var(--grad)')}</div></div>` },
+  { tag:'Step 4', title:'Upload the design',
+    body:'Once the script is approved the element switches to design. Drop up to 10 images, then Send design → to the client.',
     vis:`<div style="width:100%;max-width:224px">
       <div style="font-size:10px;color:var(--grey);font-weight:700;margin-bottom:7px">2/10 images</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
@@ -1360,17 +1375,21 @@ const TUT=[
         <div style="aspect-ratio:1;border-radius:9px;background:linear-gradient(160deg,#1a1a1a,#0a0a0a)"></div>
         <div style="aspect-ratio:1;border-radius:9px;border:1.5px dashed var(--line);display:grid;place-items:center;font-size:9px;font-weight:800;color:var(--grey);text-align:center;line-height:1.2">+ Add</div></div>
       <div style="display:flex;justify-content:flex-end;margin-top:9px">${pill('Send design →','#fff','var(--grad)')}</div></div>` },
-  { tag:'Step 4', title:'The client reviews',
-    body:'The client approves the design, or requests a retouch. They get the number of retouches included in their offer, and the same applies to add-on elements. Once those are used up, ask them to contact us directly instead of retouching further.',
+  { tag:'Step 5', title:'The client reviews',
+    body:'The client approves, or requests a retouch (limited to what their offer includes). When the script and design are both approved, the element turns Done ✓.',
     vis:`<div style="display:flex;flex-direction:column;gap:10px;align-items:center">
       ${pill('Design · awaiting client','#2563eb','rgba(37,99,235,.12)')}
       <div style="font-size:18px;color:var(--grey);line-height:1">↓</div>
       <div style="display:flex;gap:8px">${pill('Done ✓','var(--ok)','var(--okbg)')}${pill('Retouch requested','var(--wait)','var(--waitbg)')}</div></div>` },
-  { tag:'Step 5', title:'Element done 🎉',
-    body:'When everything is approved the element turns “Done ✓”. Repeat for each element until the whole order is complete.',
-    vis:`<div style="display:grid;place-items:center;gap:12px">
-      <div style="width:66px;height:66px;border-radius:50%;background:var(--okbg);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
-      ${pill('Done ✓','var(--ok)','var(--okbg)')}</div>` },
+  { tag:'Step 6', title:'Chat with the client',
+    body:'Talk to the client in the panel on the right. Pick an element so they know which asset you mean. The orange dot tells you when a new message lands, even when the chat is collapsed.',
+    vis:`<div style="width:100%;max-width:222px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
+      <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-bottom:1px solid var(--line)">
+        <span style="width:30px;height:30px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:900;font-size:12px">NP</span>
+        <span><span style="font-size:9.5px;font-weight:800;color:var(--orange)">Client</span><b style="display:block;font-size:12px;letter-spacing:-.02em">Nina Park</b></span></div>
+      <div style="padding:11px;background:var(--soft);display:flex;flex-direction:column;gap:6px">
+        <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;color:var(--orange);background:rgba(248,80,0,.1);border:1px solid rgba(248,80,0,.2);border-radius:100px;padding:2px 7px"><svg style="width:11px;height:11px" viewBox="0 0 140 94"><use href="#ic-decks"/></svg>Deck 1</span>
+        <span style="align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;border-bottom-left-radius:4px;padding:7px 10px;font-size:11px;max-width:88%">Love slide 2, can we punch up the hook?</span></div></div>` },
 ];
 let TUTI=0;
 function renderTut(){

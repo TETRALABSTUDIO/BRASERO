@@ -975,24 +975,29 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
 (function(){
   const $=s=>document.querySelector(s);
   const pill=(txt,col,bg)=>`<span style="font-size:10.5px;font-weight:800;color:${col};background:${bg};border-radius:100px;padding:3px 10px;white-space:nowrap">${txt}</span>`;
+  const G_CATS=`<div style="width:100%;max-width:220px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
+    <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-left:3px solid var(--orange);background:var(--soft)">
+      <span style="width:28px;height:28px;border-radius:8px;background:rgba(248,80,0,.1);display:grid;place-items:center"><svg style="width:16px;height:16px" viewBox="0 0 140 94"><use href="#ic-decks"/></svg></span>
+      <span style="flex:1;min-width:0"><b style="font-size:12px;display:block;letter-spacing:-.02em">Decks</b><span style="font-size:10px;color:var(--grey)">6 elements</span></span><span style="color:var(--grey)">›</span></div>
+    <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-top:1px solid var(--line)">
+      <span style="width:28px;height:28px;border-radius:8px;background:rgba(248,80,0,.1);display:grid;place-items:center"><svg style="width:15px;height:15px" viewBox="0 0 134 122"><use href="#ic-story"/></svg></span>
+      <span style="flex:1;min-width:0"><b style="font-size:12px;display:block;letter-spacing:-.02em">Stories</b><span style="font-size:10px;color:var(--grey)">3 elements</span></span><span style="color:var(--grey)">›</span></div>
+    <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-top:1px solid var(--line)">
+      <span style="width:28px;height:28px;border-radius:8px;background:var(--soft);display:grid;place-items:center"><svg style="width:16px;height:16px;filter:grayscale(1);opacity:.5" viewBox="0 0 120 120"><use href="#ic-brand"/></svg></span>
+      <span style="flex:1;min-width:0"><b style="font-size:12px;display:block;color:#9a9a9a;letter-spacing:-.02em">Branding</b><span style="font-size:10px;color:var(--grey)">Not in your order</span></span>
+      <span style="width:22px;height:22px;border-radius:7px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px">+</span></div></div>`;
   const TUT=[
-    { tag:'Step 1', title:'Your deliverables are here',
-      body:'On the left, every card is one piece of your order: carousels, stories and branding. Click a card to open it.',
-      vis:`<div style="width:100%;max-width:214px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
-        <div style="padding:10px 13px;border-left:3px solid var(--orange);background:var(--soft)">
-          <div style="font-weight:800;font-size:12px;margin-bottom:7px">Carousel 1</div>
-          <div style="height:5px;border-radius:3px;background:#eaeaea;overflow:hidden;margin-bottom:8px"><i style="display:block;width:34%;height:100%;background:var(--grad)"></i></div>
-          ${pill('Validate script','var(--orange)','rgba(248,80,0,.12)')}</div>
-        <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Story 1</div>
-        <div style="padding:12px 13px;border-top:1px solid var(--line);font-weight:800;font-size:12px;color:#9a9a9a">Profile photo</div></div>` },
+    { tag:'Step 1', title:'Your order, grouped by type',
+      body:'On the left your order is split into Decks, Stories and Branding. Open a category to see each piece. The + on a greyed one lets you add it to your order anytime.',
+      vis:G_CATS },
     { tag:'Step 2', title:'Approve the script',
       body:'We write the copy first. Read it, edit anything you like right in the box, then “Approve script ✓” to send it into design.',
       vis:`<div style="width:100%;max-width:224px">
         <div style="font-weight:900;font-size:13px;margin-bottom:7px">Carousel 1</div>
-        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;height:60px;padding:9px;font-size:11px;color:#555;line-height:1.4">Slide 1: Stop believing these 3 myths…</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;height:60px;padding:9px;font-size:11px;color:#555;line-height:1.4">Slide 1: Stop believing these 3 money myths…</div>
         <div style="display:flex;justify-content:flex-end;margin-top:9px">${pill('Approve script ✓','#fff','var(--grad)')}</div></div>` },
     { tag:'Step 3', title:'Approve the design',
-      body:'Once the visuals are ready, review them. If you love it, “Approve ✓”. If something is off, “Request a retouch” and tell us what to change.',
+      body:'Once the visuals are ready, review them. Love it? “Approve ✓”. Something off? “Request a retouch” and tell us what to change.',
       vis:`<div style="width:100%;max-width:224px">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px">
           <div style="aspect-ratio:1;border-radius:9px;background:linear-gradient(160deg,#ffd9c4,#fff3ec)"></div>
@@ -1002,16 +1007,25 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
           <span style="font-size:10px;font-weight:800;border:1px solid var(--line);border-radius:100px;padding:5px 11px">Request a retouch</span>
           ${pill('Approve ✓','#fff','var(--grad)')}</div></div>` },
     { tag:'Step 4', title:'Retouches',
-      body:'You get the number of retouches included in your offer, and the same on any add-on you bought. Once those are used up, just reply to us or email contact@braserodecks.com and we will sort it out.',
+      body:'You get the retouches included in your offer, and the same on any add-on you bought. Once those are used up, just message your expert in the chat and we will sort it out.',
       vis:`<div style="display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center">
         ${pill('Request a retouch','var(--orange)','rgba(248,80,0,.12)')}
         <div style="font-size:18px;color:var(--grey);line-height:1">↓</div>
-        <div style="font-size:11.5px;color:var(--grey);max-width:200px;line-height:1.4">Included in your offer. Need more? Contact us directly.</div></div>` },
-    { tag:'Step 5', title:'Download & post 🎉',
-      body:'When you approve, the piece turns “Approved ✓” and a Download button appears in the bar. Grab your files and post.',
+        <div style="font-size:11.5px;color:var(--grey);max-width:200px;line-height:1.4">Included in your offer. Need more? Just ask in the chat.</div></div>` },
+    { tag:'Step 5', title:'Your dedicated expert',
+      body:'On the right you can chat with the designer handling your project. Tag a specific element so they know exactly what you mean, and you will see a dot when they reply.',
+      vis:`<div style="width:100%;max-width:222px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.07)">
+        <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-bottom:1px solid var(--line)">
+          <span style="width:30px;height:30px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:900;font-size:12px">M</span>
+          <span><span style="font-size:9.5px;font-weight:800;color:var(--orange)">Your dedicated expert</span><b style="display:block;font-size:12px;letter-spacing:-.02em">Maya</b></span></div>
+        <div style="padding:11px;background:var(--soft);display:flex;flex-direction:column;gap:6px">
+          <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;color:var(--orange);background:rgba(248,80,0,.1);border:1px solid rgba(248,80,0,.2);border-radius:100px;padding:2px 7px"><svg style="width:11px;height:11px" viewBox="0 0 140 94"><use href="#ic-decks"/></svg>Deck 1</span>
+          <span style="align-self:flex-end;background:var(--grad);color:#fff;border-radius:12px;border-bottom-right-radius:4px;padding:7px 10px;font-size:11px;max-width:88%">Can slide 2 be a bit punchier?</span></div></div>` },
+    { tag:'Step 6', title:'Add-ons & download 🎉',
+      body:'Need more? “Add to your order” anytime: extra decks, stories or branding. When a piece is approved it turns “Approved ✓” and a Download button appears, grab your files and post.',
       vis:`<div style="display:grid;place-items:center;gap:12px">
         <div style="width:66px;height:66px;border-radius:50%;background:rgba(22,163,74,.12);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
-        ${pill('Approved ✓','#15803d','rgba(22,163,74,.12)')}</div>` },
+        <div style="display:flex;gap:8px">${pill('Approved ✓','#15803d','rgba(22,163,74,.12)')}${pill('⬇ Download','#fff','var(--grad)')}</div></div>` },
   ];
   let i=0;
   function renderTut(){

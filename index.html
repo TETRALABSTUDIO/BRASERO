@@ -417,6 +417,29 @@ img,svg{display:block}
 .trk__btn{margin-left:auto;font-size:10px;font-weight:800;color:#fff;background:var(--grad);padding:5px 12px;border-radius:100px}
 .trk__prog{height:5px;border-radius:100px;background:#e6e2da;overflow:hidden}
 .trk__prog i{display:block;height:100%;width:70%;background:var(--grad);border-radius:100px}
+/* categorized board + dedicated-expert chat */
+.trk__cat{display:flex;align-items:center;gap:8px;background:#f7f4ef;border:1px solid var(--line);border-radius:9px;padding:8px 9px}
+.trk__cat.on{background:#fff;border-color:rgba(248,80,0,.3);box-shadow:inset 3px 0 0 var(--orange)}
+.trk__catic{width:26px;height:26px;border-radius:7px;background:rgba(248,80,0,.1);display:grid;place-items:center;flex-shrink:0}
+.trk__catic svg{width:15px;height:15px}
+.trk__catl{display:flex;flex-direction:column;line-height:1.15;margin-right:auto;min-width:0}
+.trk__catl b{font-size:10.5px;font-weight:800;color:#333}
+.trk__catl span{font-size:8.5px;color:#9a9a9a;font-weight:600}
+.trk__chev{color:#bcb6aa;font-size:13px}
+.trk__cat--off{opacity:.78}
+.trk__cat--off .trk__catic{background:#eceae5}
+.trk__cat--off .trk__catic svg{filter:grayscale(1);opacity:.5}
+.trk__cat--off .trk__catl b{color:#9a9a9a}
+.trk__add{width:18px;height:18px;border-radius:6px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px}
+.trk__expert{display:flex;align-items:center;gap:8px}
+.trk__av{width:26px;height:26px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:900;font-size:10px;flex-shrink:0}
+.trk__einfo{display:flex;flex-direction:column;line-height:1.2}
+.trk__einfo em{font-size:8px;font-weight:800;font-style:normal;color:var(--orange)}
+.trk__einfo b{font-size:11px;font-weight:900;letter-spacing:-.02em}
+.trk__chat{display:flex;flex-direction:column;gap:5px}
+.trk__tag{align-self:flex-start;display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:800;color:#c64600;background:rgba(248,80,0,.12);border-radius:100px;padding:2px 7px}
+.trk__tag svg{width:10px;height:10px}
+.trk__msg{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:9px;border-bottom-left-radius:3px;padding:6px 9px;font-size:9.5px;color:#444;line-height:1.35}
 @keyframes trkGrow{0%,100%{width:34%}50%{width:90%}}
 @keyframes slideOn{0%,100%{background:#fff;border-color:var(--line)}16%,28%{background:#f87000;border-color:transparent}}
 .ui--track .trk__item.on .trk__bar i{animation:trkGrow 3.6s ease-in-out infinite}
@@ -869,30 +892,35 @@ img,svg{display:block}
           <div class="step__tagrow"><span>Ready-to-post</span><span>In your client space</span><span>Performance review</span></div>
         </div>
         <div class="ui ui--track">
-          <div class="ui__bar"><i></i><i></i><i></i><span class="ui__title">Order tracker</span><span class="ui__chip">live</span></div>
+          <div class="ui__bar"><i></i><i></i><i></i><span class="ui__title">Your client space</span><span class="ui__chip">live</span></div>
           <div class="trk">
             <div class="trk__list">
-              <div class="trk__item on">
-                <div class="trk__row"><span class="trk__t">Deck 01</span><span class="trk__pill trk__pill--act">Validate</span></div>
-                <div class="trk__bar"><i></i></div>
+              <div class="trk__cat on">
+                <span class="trk__catic"><svg viewBox="0 0 140 94"><use href="#ic-decks"/></svg></span>
+                <span class="trk__catl"><b>Decks</b><span>6 elements</span></span>
+                <span class="trk__chev">›</span>
               </div>
-              <div class="trk__item">
-                <div class="trk__row"><span class="trk__t">Deck 02</span><span class="trk__pill trk__pill--wait">In design</span></div>
-                <div class="trk__bar"><i style="width:42%"></i></div>
+              <div class="trk__cat">
+                <span class="trk__catic"><svg viewBox="0 0 134 122"><use href="#ic-story"/></svg></span>
+                <span class="trk__catl"><b>Stories</b><span>3 elements</span></span>
+                <span class="trk__chev">›</span>
               </div>
-              <div class="trk__item">
-                <div class="trk__row"><span class="trk__t">Deck 03</span><span class="trk__pill trk__pill--done">Done</span></div>
-                <div class="trk__bar"><i style="width:100%"></i></div>
-              </div>
-              <div class="trk__item">
-                <div class="trk__row"><span class="trk__t">Deck 04</span><span class="trk__pill trk__pill--wait">Writing</span></div>
-                <div class="trk__bar"><i style="width:22%"></i></div>
+              <div class="trk__cat trk__cat--off">
+                <span class="trk__catic"><svg viewBox="0 0 120 120"><use href="#ic-brand"/></svg></span>
+                <span class="trk__catl"><b>Branding</b><span>Add-on</span></span>
+                <span class="trk__add">+</span>
               </div>
             </div>
             <div class="trk__detail">
-              <div class="trk__slides"><i></i><i></i><i></i><i></i></div>
+              <div class="trk__expert">
+                <span class="trk__av">M</span>
+                <span class="trk__einfo"><em>Your dedicated expert</em><b>Maya</b></span>
+              </div>
+              <div class="trk__chat">
+                <span class="trk__tag"><svg viewBox="0 0 140 94"><use href="#ic-decks"/></svg>Deck 1</span>
+                <span class="trk__msg">Slide 2 is ready, take a look 👀</span>
+              </div>
               <div class="trk__foot"><span class="trk__pill trk__pill--act">Validate design</span><span class="trk__btn">Approve ✓</span></div>
-              <div class="trk__prog"><i></i></div>
             </div>
           </div>
         </div>
@@ -1137,6 +1165,34 @@ img,svg{display:block}
       <path d="M570.363 166.394C542.003 166.394 521.718 145.734 521.718 116.81C521.718 87.5102 541.439 67.0381 569.8 67.0381C599.287 67.0381 617.693 86.3833 617.693 116.998V124.323L549.515 124.698C551.206 137.094 558.155 142.916 570.926 142.916C581.82 142.916 589.52 138.972 591.586 132.211H618.069C614.688 153.059 596.094 166.394 570.363 166.394ZM569.987 90.5153C558.53 90.5153 552.145 95.5864 549.891 106.855H588.957C588.957 96.9011 581.632 90.5153 569.987 90.5153Z" fill="currentColor"/>
       <path d="M686.283 70.0431V97.2767H677.08C660.552 97.2767 650.598 104.602 650.598 123.196V163.952H621.674V70.231H648.907L650.41 84.1295C654.354 74.9264 662.618 68.7284 675.202 68.7284C678.583 68.7284 682.339 69.1041 686.283 70.0431Z" fill="currentColor"/>
       <path d="M679.94 116.81C679.94 87.1346 701.727 67.2259 731.778 67.2259C761.641 67.2259 783.428 87.1346 783.428 116.81C783.428 146.485 761.641 166.206 731.778 166.206C701.727 166.206 679.94 146.485 679.94 116.81ZM709.052 116.622C709.052 130.896 718.255 140.287 731.778 140.287C745.113 140.287 754.316 130.896 754.316 116.622C754.316 102.536 745.113 93.1447 731.778 93.1447C718.255 93.1447 709.052 102.536 709.052 116.622Z" fill="currentColor"/>
+    </g>
+    <linearGradient id="dk0" x1="82.6852" y1="23.2616" x2="144.942" y2="56.7839" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="dk1" x1="42.4506" y1="25.4119" x2="104.707" y2="58.9343" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="dk2" x1="0.863029" y1="38.8498" x2="63.1196" y2="72.3722" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="st0" x1="79.1164" y1="32.1117" x2="146.563" y2="57.2837" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="st1" x1="40.5461" y1="33.959" x2="107.68" y2="58.8614" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="st2" x1="0.82578" y1="47.0273" x2="68.2719" y2="72.1992" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="br0" x1="1.71946" y1="34.7584" x2="107.3" y2="110.559" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="br1" x1="1.71946" y1="34.7584" x2="107.3" y2="110.559" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="br2" x1="11.0912" y1="100.697" x2="100.027" y2="164.547" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="br3" x1="29.3415" y1="38.0439" x2="84.1506" y2="77.3935" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <mask id="brmask" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120"><circle cx="60" cy="60" r="60" fill="url(#br0)"/></mask>
+    <g id="ic-decks">
+      <rect opacity="0.19" x="81.8221" y="0.000427246" width="60.2301" height="80.3069" rx="10.7554" transform="rotate(15 81.8221 0.000427246)" fill="url(#dk0)"/>
+      <rect opacity="0.6" x="41.5875" y="2.15076" width="60.2301" height="80.3069" rx="10.7554" fill="url(#dk1)"/>
+      <rect y="15.5887" width="60.2301" height="80.3069" rx="10.7554" transform="rotate(-15 0 15.5887)" fill="url(#dk2)"/>
+    </g>
+    <g id="ic-story">
+      <rect opacity="0.19" x="78.2906" y="0.000366211" width="57.6306" height="110.861" rx="10.2911" transform="rotate(15 78.2906 0.000366211)" fill="url(#st0)"/>
+      <rect opacity="0.6" x="39.7253" y="1.84766" width="57.2784" height="110.861" rx="10.2911" fill="url(#st1)"/>
+      <rect y="14.9159" width="57.6306" height="110.861" rx="10.2911" transform="rotate(-15 0 14.9159)" fill="url(#st2)"/>
+    </g>
+    <g id="ic-brand">
+      <g mask="url(#brmask)">
+        <circle opacity="0.19" cx="60" cy="60" r="60" fill="url(#br1)"/>
+        <path d="M110.725 121.959C110.725 149.872 88.0969 172.5 60.1839 172.5C32.2708 172.5 9.64282 149.872 9.64282 121.959C9.64282 94.046 32.2708 71.418 60.1839 71.418C88.0969 71.418 110.725 94.046 110.725 121.959Z" fill="url(#br2)"/>
+        <path d="M90.7436 51.1474C90.7436 68.3496 76.7985 82.2948 59.5962 82.2948C42.394 82.2948 28.4489 68.3496 28.4489 51.1474C28.4489 33.9452 42.394 20 59.5962 20C76.7985 20 90.7436 33.9452 90.7436 51.1474Z" fill="url(#br3)"/>
+      </g>
     </g>
   </defs>
 </svg>
