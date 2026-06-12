@@ -18,46 +18,76 @@ body.appmode{overflow:hidden}
 .adminapp{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:250px minmax(0,1fr);background:#fff}
 .adminapp.hide{display:none}
 .aside{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line)}
-.aside__brand{padding:18px 20px;border-bottom:1px solid var(--line)}
-.aside__brand .logo{height:23px;color:var(--ink)}
-.aside__nav{flex:1;min-height:0;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:3px}
-.navi{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:none;border-radius:11px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;color:var(--grey);letter-spacing:-.01em;transition:background .12s,color .12s}
-.navi svg{width:18px;height:18px;flex-shrink:0;color:var(--grey)}
-.navi:hover{background:var(--soft);color:var(--ink)}
-.navi.on{background:var(--soft);color:var(--ink)}
-.navi.on svg{color:var(--orange)}
+.aside__brand{padding:22px 22px;border-bottom:1px solid var(--line)}
+.aside__brand .logo{height:25px;color:var(--ink)}
+.aside__nav{flex:1;min-height:0;overflow-y:auto;padding:16px 12px;display:flex;flex-direction:column;gap:6px}
+.navi{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:none;border-radius:13px;padding:14px 15px;cursor:pointer;font-family:inherit;font-size:15.5px;font-weight:800;color:var(--ink);letter-spacing:-.015em;transition:background .12s}
+.navi svg{width:23px;height:23px;flex-shrink:0}
+.navi:hover{background:var(--soft)}
+.navi.on{background:var(--soft)}
 .aside__foot{padding:14px;border-top:1px solid var(--line)}
 .aside__foot .side__me{padding:12px 4px 0;border:none}
-.amain{min-height:0;overflow-y:auto;padding:28px 34px 70px;background:#fff}
+.amain{min-height:0;overflow-y:auto;padding:30px 36px 70px;background:#fff}
 .sec.hide{display:none}
-.sechead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}
-.sechead h2{font-size:26px;font-weight:900;letter-spacing:-.035em}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:22px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
-.kpi__l{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--grey)}
-.kpi__v{font-size:28px;font-weight:900;letter-spacing:-.03em;margin-top:6px}
-.kpi__s{font-size:12px;color:var(--grey);font-weight:600;margin-top:3px}
-.panels{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
-@media(max-width:920px){.panels{grid-template-columns:1fr}.adminapp{grid-template-columns:200px minmax(0,1fr)}}
-.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
-.panel h3{font-size:15px;font-weight:900;letter-spacing:-.02em;margin-bottom:16px}
-.bars{display:flex;align-items:flex-end;gap:10px;height:150px}
-.bars .bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px;height:100%}
-.bars .bar i{width:100%;max-width:30px;background:var(--grad);border-radius:6px 6px 0 0;min-height:3px;transition:height .4s}
-.bars .bar small{font-size:10px;color:var(--grey);font-weight:700}
-.bars .bar b{font-size:10.5px;font-weight:800}
-.tbl{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;overflow-x:auto}
-.tbl table{width:100%;border-collapse:collapse;font-size:13.5px}
-.tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--grey);font-weight:800;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap}
-.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+.sechead h2{font-size:27px;font-weight:900;letter-spacing:-.035em}
+.sechead .muted{color:var(--grey);font-weight:600;font-size:14px}
+/* period selector */
+.period{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:3px}
+.period button{background:none;border:none;border-radius:100px;padding:7px 14px;font-size:13px;font-weight:700;color:var(--grey)}
+.period button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+/* KPI cards with icon */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 18px;display:flex;gap:14px;align-items:flex-start}
+.kpi__ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(248,80,0,.1);flex-shrink:0}
+.kpi__ic svg{width:22px;height:22px}
+.kpi__l{font-size:13.5px;font-weight:600;color:var(--grey)}
+.kpi__v{font-size:27px;font-weight:900;letter-spacing:-.03em;margin-top:5px;line-height:1}
+.kpi__s{font-size:12.5px;color:var(--grey);font-weight:600;margin-top:5px}
+.panels{display:grid;grid-template-columns:1.45fr 1fr;gap:16px}
+@media(max-width:980px){.panels{grid-template-columns:1fr}}
+@media(max-width:920px){.adminapp{grid-template-columns:210px minmax(0,1fr)}}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
+.panel h3{font-size:16px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.panel .ph-sub{font-size:12.5px;color:var(--grey);font-weight:600;margin-bottom:14px}
+/* line / area chart */
+.linec{width:100%;height:auto;display:block;overflow:visible}
+.linec .axl{font-size:10px;fill:var(--grey);font-weight:600}
+/* pie */
+.pierow{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.pie{width:128px;height:128px;flex:0 0 128px;border-radius:50%}
+.pie.empty{background:#eee}
+.pielegend{display:flex;flex-direction:column;gap:9px;font-size:13px}
+.pielegend .row{display:flex;align-items:center;gap:9px;font-weight:600}
+.pielegend i{width:11px;height:11px;border-radius:4px;flex-shrink:0}
+.pielegend b{margin-left:auto;font-weight:800}
+/* tables */
+.tbl{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-size:12.5px;color:var(--grey);font-weight:600;padding:13px 15px;border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap}
+.tbl td{padding:13px 15px;border-bottom:1px solid var(--line);white-space:nowrap}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr.clk{cursor:pointer}
 .tbl tr.clk:hover td{background:var(--soft)}
-.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.filters input,.filters select{width:auto;min-width:160px}
-.lead-stage{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:100px;background:var(--waitbg);color:var(--wait);white-space:nowrap}
-.tbl .swi__ref{color:var(--grey);font-weight:700;font-size:12px}
-.emptyrow{text-align:center;color:var(--grey);padding:26px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.filters input,.filters select{width:auto;min-width:170px}
+.lead-stage{font-size:12px;font-weight:700;padding:4px 11px;border-radius:100px;background:var(--waitbg);color:var(--wait);white-space:nowrap}
+.tbl .swi__ref,.pcard .swi__ref{color:var(--grey);font-weight:700;font-size:12.5px}
+.emptyrow{text-align:center;color:var(--grey);padding:28px}
+/* projects kanban */
+.kboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.kboard{grid-template-columns:1fr}}
+.kcolh{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:800;margin:2px 4px 12px}
+.kcolh .dot{width:9px;height:9px;border-radius:50%}
+.kcolh .c{margin-left:auto;color:var(--grey);font-weight:700}
+.kcards{display:flex;flex-direction:column;gap:12px;min-height:60px}
+.kc{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px 16px;cursor:pointer;transition:.15s}
+.kc:hover{border-color:rgba(248,80,0,.5);box-shadow:0 10px 26px rgba(0,0,0,.07);transform:translateY(-1px)}
+.kc__n{font-weight:900;font-size:15.5px;letter-spacing:-.02em}
+.kc__sub{font-size:12.5px;color:var(--grey);margin-top:3px}
+.kc__foot{display:flex;align-items:center;gap:8px;margin-top:13px;flex-wrap:wrap}
+.kc__pack{font-size:12px;font-weight:700;color:var(--grey)}
+.knone{color:var(--grey);font-size:13px;padding:8px 4px}
 input,textarea,button,select{font-family:inherit}
 input,textarea,select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;width:100%;font-size:14px}
 textarea{min-height:120px;resize:vertical;line-height:1.55}
@@ -208,7 +238,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .side__order{padding:15px 18px}
 .side__order h2{font-size:17px;font-weight:900;letter-spacing:-.025em;line-height:1.15}
 .side__order .meta{color:var(--grey);font-size:12.5px;margin-top:4px;line-height:1.45}
-.side__listhead{padding:6px 18px 9px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey)}
+.side__listhead{padding:8px 18px 9px;font-size:13px;font-weight:700;color:var(--grey)}
 .side__foot{padding:14px 16px;border-top:1px solid var(--line)}
 #deckList{flex:1;min-height:0;overflow-y:auto;border-top:1px solid var(--line)}
 .side__me{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
@@ -488,11 +518,11 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
     <aside class="aside">
       <div class="aside__brand"><svg class="logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></div>
       <nav class="aside__nav" id="adminNav">
-        <button class="navi on" type="button" data-sec="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</button>
-        <button class="navi" type="button" data-sec="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Projects</button>
-        <button class="navi" type="button" data-sec="talents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg> Talents</button>
-        <button class="navi" type="button" data-sec="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg> Orders</button>
-        <button class="navi" type="button" data-sec="crm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg> CRM</button>
+        <button class="navi on" type="button" data-sec="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</button>
+        <button class="navi" type="button" data-sec="projects"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Projects</button>
+        <button class="navi" type="button" data-sec="talents"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg> Talents</button>
+        <button class="navi" type="button" data-sec="orders"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg> Orders</button>
+        <button class="navi" type="button" data-sec="crm"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg> CRM</button>
       </nav>
       <div class="aside__foot">
         <button class="b-grad b-sm" id="newProject" type="button" style="width:100%">+ New project</button>
@@ -778,45 +808,82 @@ function renderAdminMe(){ const el=$('#adminMe'); if(!el||!ME) return;
   el.innerHTML=`${avatar(ME,'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name||ME.email.split('@')[0])}</span><span class="rolebadge owner">Owner</span></div><button class="b-ghost b-sm" id="adminLogout" type="button">Sign out</button>`;
   $('#adminLogout').onclick=doLogout; }
 
-function barsHTML(data){
-  const max=Math.max(1,...data.map(d=>d.value));
-  return `<div class="bars">${data.map(d=>`<div class="bar"><b>${d.top||''}</b><i style="height:${Math.round(d.value/max*100)}%"></i><small>${esc(d.label)}</small></div>`).join('')}</div>`;
+/* ----- dashboard: period, KPIs, revenue curve, offers pie ----- */
+let DPERIOD='6m';
+const PERIODS=[['30d','30 days'],['90d','90 days'],['6m','6 months'],['12m','12 months'],['all','All']];
+function periodCutoff(){ const now=new Date(); if(DPERIOD==='30d') return Date.now()-30*864e5; if(DPERIOD==='90d') return Date.now()-90*864e5; if(DPERIOD==='6m'){ const d=new Date(now); d.setMonth(d.getMonth()-6); return d.getTime(); } if(DPERIOD==='12m'){ const d=new Date(now); d.setMonth(d.getMonth()-12); return d.getTime(); } return 0; }
+function ordersInPeriod(){ const c=periodCutoff(); return ADMIN.orders.filter(o=> !c || (o.created_at && new Date(o.created_at).getTime()>=c)); }
+function revSeries(orders){
+  const now=new Date();
+  if(DPERIOD==='30d'){
+    const out=[]; for(let i=5;i>=0;i--){ const end=now.getTime()-i*5*864e5; out.push({start:end-5*864e5,end,label:new Date(end).toLocaleDateString('en-US',{month:'short',day:'numeric'}),value:0}); }
+    orders.forEach(o=>{ const t=new Date(o.created_at).getTime(); const b=out.find(x=>t>x.start&&t<=x.end); if(b) b.value+=(o.amount||0); });
+    return out.map(b=>({label:b.label,value:b.value}));
+  }
+  const months=DPERIOD==='90d'?3:DPERIOD==='12m'?12:6, out=[];
+  for(let i=months-1;i>=0;i--){ const d=new Date(now.getFullYear(),now.getMonth()-i,1); out.push({key:d.getFullYear()+'-'+d.getMonth(),label:d.toLocaleDateString('en-US',{month:'short'}),value:0}); }
+  orders.forEach(o=>{ const d=new Date(o.created_at); const k=d.getFullYear()+'-'+d.getMonth(); const m=out.find(x=>x.key===k); if(m) m.value+=(o.amount||0); });
+  return out.map(m=>({label:m.label,value:m.value}));
 }
-function revByMonth(orders){
-  const now=new Date(), out=[];
-  for(let i=5;i>=0;i--){ const dt=new Date(now.getFullYear(),now.getMonth()-i,1); out.push({key:dt.getFullYear()+'-'+dt.getMonth(),label:dt.toLocaleDateString('en-US',{month:'short'}),value:0}); }
-  orders.forEach(o=>{ if(!o.created_at) return; const d=new Date(o.created_at); const k=d.getFullYear()+'-'+d.getMonth(); const m=out.find(x=>x.key===k); if(m) m.value+=(o.amount||0); });
-  return out.map(m=>({label:m.label,value:m.value,top:m.value?fmtMoney(m.value):''}));
+function lineChart(series){
+  const W=600,H=150,pad=10,max=Math.max(1,...series.map(s=>s.value)),n=series.length;
+  const xs=i=> n<=1?W/2:pad+i*(W-2*pad)/(n-1), ys=v=>H-(v/max)*(H-24)-8;
+  const pts=series.map((s,i)=>[xs(i),ys(s.value)]);
+  if(!pts.length) return '<div class="ph-sub">No data.</div>';
+  const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=`M${pts[0][0].toFixed(1)} ${H} `+pts.map(p=>'L'+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')+` L${pts[n-1][0].toFixed(1)} ${H} Z`;
+  const dots=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.4" fill="#fff" stroke="url(#tgrad)" stroke-width="2.2"/>`).join('');
+  const labels=series.map((s,i)=>`<text class="axl" x="${xs(i).toFixed(1)}" y="${H+14}" text-anchor="middle">${esc(s.label)}</text>`).join('');
+  return `<svg class="linec" viewBox="0 0 ${W} ${H+20}" preserveAspectRatio="xMidYMid meet">
+    <defs><linearGradient id="areaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f87000" stop-opacity=".22"/><stop offset="1" stop-color="#f87000" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#areaG)"/><path d="${line}" fill="none" stroke="url(#tgrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}</svg>`;
 }
+function planPie(orders){
+  const colors={starter:'#f9a857',flame:'#f87000',burst:'#cf3500'}, names={starter:'Ember',flame:'Flame',burst:'Meteor'};
+  const counts={}; orders.forEach(o=>{ const p=o.plan||'other'; counts[p]=(counts[p]||0)+1; });
+  const total=orders.length, segs=Object.keys(counts).map(p=>({name:names[p]||p,n:counts[p],color:colors[p]||'#c9c9c9'})).sort((a,b)=>b.n-a.n);
+  if(!total) return '<div class="pierow"><div class="pie empty"></div><div class="pielegend"><span style="color:var(--grey)">No orders in this period.</span></div></div>';
+  let acc=0; const stops=segs.map(s=>{ const a=acc/total*360,b=(acc+s.n)/total*360; acc+=s.n; return `${s.color} ${a.toFixed(1)}deg ${b.toFixed(1)}deg`; });
+  const legend=segs.map(s=>`<div class="row"><i style="background:${s.color}"></i>${esc(s.name)}<b>${s.n} · ${Math.round(s.n/total*100)}%</b></div>`).join('');
+  return `<div class="pierow"><div class="pie" style="background:conic-gradient(${stops.join(',')})"></div><div class="pielegend">${legend}</div></div>`;
+}
+const KPI_IC={
+  rev:'<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  proj:'<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+  tal:'<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg>',
+  lead:'<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>',
+};
+function kpiCard(t,l,v,s){ return `<div class="kpi"><div class="kpi__ic">${KPI_IC[t]||''}</div><div><div class="kpi__l">${l}</div><div class="kpi__v">${v}</div><div class="kpi__s">${s}</div></div></div>`; }
 function renderDashboard(){
-  const O=ADMIN.orders, L=ADMIN.leads, T=(ADMIN.talents||[]).filter(t=>!t.is_owner);
+  const O=ordersInPeriod(), L=ADMIN.leads, T=(ADMIN.talents||[]).filter(t=>!t.is_owner);
   const active=O.filter(o=>o.state!=='done').length, done=O.filter(o=>o.state==='done').length;
   const revenue=O.reduce((s,o)=>s+(o.amount||0),0);
-  const counts={todo:0,progress:0,done:0}; O.forEach(o=>counts[o.state||'todo']++);
   $('#sec-dashboard').innerHTML=`
-    <div class="sechead"><h2>Dashboard</h2></div>
+    <div class="sechead"><h2>Dashboard</h2>
+      <div class="period" id="dperiod">${PERIODS.map(([k,l])=>`<button type="button" data-p="${k}" class="${DPERIOD===k?'on':''}">${l}</button>`).join('')}</div>
+    </div>
     <div class="kpis">
-      <div class="kpi"><div class="kpi__l">Revenue</div><div class="kpi__v">${fmtMoney(revenue)}</div><div class="kpi__s">${O.length} paid order${O.length===1?'':'s'}</div></div>
-      <div class="kpi"><div class="kpi__l">Active projects</div><div class="kpi__v">${active}</div><div class="kpi__s">${done} completed</div></div>
-      <div class="kpi"><div class="kpi__l">Talents</div><div class="kpi__v">${T.length}</div><div class="kpi__s">in the studio</div></div>
-      <div class="kpi"><div class="kpi__l">Leads</div><div class="kpi__v">${L.length}</div><div class="kpi__s">unpaid / abandoned</div></div>
+      ${kpiCard('rev','Revenue',fmtMoney(revenue),O.length+' paid order'+(O.length===1?'':'s'))}
+      ${kpiCard('proj','Active projects',active,done+' completed')}
+      ${kpiCard('tal','Talents',T.length,'in the studio')}
+      ${kpiCard('lead','Leads',L.length,'unpaid / abandoned')}
     </div>
     <div class="panels">
-      <div class="panel"><h3>Revenue · last 6 months</h3>${barsHTML(revByMonth(O))}</div>
-      <div class="panel"><h3>Projects by status</h3><div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">${donut(counts)}<div class="legend"><span><i style="background:#dc2626"></i>${counts.todo} to start</span><span><i style="background:#2563eb"></i>${counts.progress} in progress</span><span><i style="background:#16a34a"></i>${counts.done} completed</span></div></div></div>
+      <div class="panel"><h3>Revenue</h3><div class="ph-sub">Paid orders over the selected period</div>${lineChart(revSeries(O))}</div>
+      <div class="panel"><h3>Offers split</h3><div class="ph-sub">Packages bought in this period</div>${planPie(O)}</div>
     </div>`;
+  $('#dperiod').addEventListener('click',e=>{ const b=e.target.closest('[data-p]'); if(b){ DPERIOD=b.dataset.p; renderDashboard(); } });
 }
 
-let PF={q:'',talent:'',status:''};
-function projRowsHTML(){
-  const rows=ADMIN.orders.filter(o=>
-    (!PF.q || (o.ref+' '+(o.name||'')+' '+(o.plan||'')).toLowerCase().includes(PF.q)) &&
-    (!PF.talent || (o.talent_email||'')===PF.talent) &&
-    (!PF.status || (o.state||'todo')===PF.status));
-  if(!rows.length) return '<tr><td colspan="5" class="emptyrow">No projects match.</td></tr>';
-  return rows.map(o=>`<tr class="clk" data-open="${esc(o.ref)}"><td><b>${esc(o.name||'Untitled')}</b> <span class="swi__ref">#${esc(o.ref)}</span></td><td>${esc(planName(o.plan)||'-')}</td><td>${esc(talentName(o.talent_email))}</td><td>${spill(o.state)}</td><td>${dlBadge(o,o.items)}</td></tr>`).join('');
+/* ----- projects: kanban with search + talent filter ----- */
+let PF={q:'',talent:''};
+function projCard(o){ return `<button class="kc" data-open="${esc(o.ref)}"><div class="kc__n">${esc(o.name||'Untitled')}</div><div class="kc__sub"><span class="swi__ref">#${esc(o.ref)}</span> · ${esc(talentName(o.talent_email))}</div><div class="kc__foot"><span class="kc__pack">${esc(planName(o.plan)||'')}</span>${dlBadge(o,o.items)}</div></button>`; }
+function renderKboard(){
+  const list=ADMIN.orders.filter(o=> (!PF.q||(o.ref+' '+(o.name||'')+' '+(o.plan||'')).toLowerCase().includes(PF.q)) && (!PF.talent||(o.talent_email||'')===PF.talent));
+  $('#kboard').innerHTML=['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st);
+    return `<div><div class="kcolh"><span class="dot" style="background:${col}"></span>${l}<span class="c">${items.length}</span></div><div class="kcards">${items.map(projCard).join('')||'<div class="knone">No projects</div>'}</div></div>`; }).join('');
+  $('#kboard').querySelectorAll('[data-open]').forEach(r=>r.onclick=()=>openOrder(r.dataset.open));
 }
-function bindProjRows(){ $('#sec-projects').querySelectorAll('[data-open]').forEach(r=>r.onclick=()=>openOrder(r.dataset.open)); }
 function renderProjectsSection(){
   const talents=[...new Set(ADMIN.orders.map(o=>o.talent_email).filter(Boolean))];
   $('#sec-projects').innerHTML=`
@@ -824,14 +891,12 @@ function renderProjectsSection(){
     <div class="filters">
       <input id="pfq" placeholder="Search projects…" value="${esc(PF.q)}">
       <select id="pftalent"><option value="">All talents</option>${talents.map(t=>`<option value="${esc(t)}" ${PF.talent===t?'selected':''}>${esc(talentName(t))}</option>`).join('')}</select>
-      <select id="pfstatus"><option value="">All statuses</option>${['todo','progress','done'].map(s=>`<option value="${s}" ${PF.status===s?'selected':''}>${STATE[s][1]}</option>`).join('')}</select>
     </div>
-    <div class="tbl"><table><thead><tr><th>Project</th><th>Pack</th><th>Talent</th><th>Status</th><th>Deadline</th></tr></thead><tbody id="projRows">${projRowsHTML()}</tbody></table></div>`;
-  $('#pfq').oninput=e=>{ PF.q=e.target.value.trim().toLowerCase(); $('#projRows').innerHTML=projRowsHTML(); bindProjRows(); };
-  $('#pftalent').onchange=e=>{ PF.talent=e.target.value; $('#projRows').innerHTML=projRowsHTML(); bindProjRows(); };
-  $('#pfstatus').onchange=e=>{ PF.status=e.target.value; $('#projRows').innerHTML=projRowsHTML(); bindProjRows(); };
+    <div class="kboard" id="kboard"></div>`;
+  $('#pfq').oninput=e=>{ PF.q=e.target.value.trim().toLowerCase(); renderKboard(); };
+  $('#pftalent').onchange=e=>{ PF.talent=e.target.value; renderKboard(); };
   $('#sec-projects').querySelector('[data-newproj]').onclick=openNewModal;
-  bindProjRows();
+  renderKboard();
 }
 function renderOrdersSection(){
   const O=ADMIN.orders;
