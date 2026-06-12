@@ -76,6 +76,45 @@ h1.title{font-size:clamp(25px,3.6vw,38px);font-weight:900;letter-spacing:-.038em
 .opt.sel{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(248,80,0,.28)}
 .opt .dot{width:17px;height:17px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;transition:.18s}
 .opt.sel .dot{border-color:#fff;background:radial-gradient(circle at center,#fff 0 34%,transparent 38%)}
+/* color palette picker (swatch + hex + rgb per row) */
+.palette{display:flex;flex-direction:column;gap:11px}
+.pal-rows{display:flex;flex-direction:column;gap:9px}
+.pal-row{display:flex;align-items:center;gap:11px}
+.pal-pick{width:44px;height:44px;flex-shrink:0;border:1px solid var(--line);border-radius:12px;background:none;padding:4px;cursor:pointer}
+.pal-pick::-webkit-color-swatch{border:none;border-radius:8px}
+.pal-pick::-webkit-color-swatch-wrapper{padding:0}
+.pal-hex{width:96px!important;flex-shrink:0;text-transform:uppercase;font-weight:700;letter-spacing:.03em}
+.pal-rgb{font-size:12.5px;font-weight:700;color:var(--grey);white-space:nowrap}
+.pal-del{margin-left:auto;border:none;background:none;color:#cfccc6;font-size:14px;padding:6px 8px;cursor:pointer;border-radius:8px}
+.pal-del:hover{color:#c33;background:var(--soft)}
+.pal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pal-add{border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.18s}
+.pal-add:hover{border-color:var(--orange);color:var(--orange)}
+.pal-presets{display:flex;gap:8px;flex-wrap:wrap}
+.pal-preset{display:inline-flex;padding:4px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;transition:.18s}
+.pal-preset:hover{border-color:var(--orange)}
+.pal-preset i{width:18px;height:18px;display:block}
+.pal-preset i:first-child{border-radius:5px 0 0 5px}
+.pal-preset i:last-child{border-radius:0 5px 5px 0}
+/* typography: name + import font file */
+.typo{display:flex;flex-direction:column;gap:11px}
+.typo-import{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.typo-btn{display:inline-flex;align-items:center;gap:7px;border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:9px 15px;border-radius:10px;cursor:pointer;transition:.18s}
+.typo-btn:hover{border-color:var(--orange);color:var(--orange)}
+.typo-file{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
+.typo-file button{border:none;background:none;color:#cfccc6;font-size:13px;cursor:pointer;padding:2px 4px}
+.typo-file button:hover{color:#c33}
+.hide{display:none!important}
+/* instagram inspiration list */
+.iglist{display:flex;flex-direction:column;gap:10px}
+.ig-add{display:flex;gap:9px}
+.ig-btn{flex-shrink:0;background:var(--grad);color:#fff;border:none;font-weight:700;font-size:14px;padding:0 20px;border-radius:12px;cursor:pointer}
+.ig-btn:disabled{opacity:.4;cursor:not-allowed}
+.ig-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ig-chip{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:7px 13px;font-size:13.5px;font-weight:700}
+.ig-chip button{border:none;background:none;color:#b9b5ae;font-size:13px;cursor:pointer;padding:0;line-height:1}
+.ig-chip button:hover{color:#c33}
+.ig-hint{font-size:12.5px;color:var(--grey);font-weight:600}
 .actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
 
 /* done */
@@ -155,19 +194,22 @@ const STEPS=[
       {key:'freq',label:'How often do you want to post?',type:'choice',options:['1–2 / week','3–4 / week','Daily'],required:true},
       {key:'challenge',label:'Biggest content challenge today?',type:'textarea',placeholder:'Running out of ideas, low saves, inconsistent look…',required:false},
     ]},
-  {tag:'Step 3 · Your brand',short:'Brand',title:['Make it ','unmistakably',' yours.'],
-    sub:'The look, the feel, the references, the more you share, the sharper your decks.',
+  {tag:'Step 3 · Visual identity',short:'Visual',title:['Make it ','unmistakably',' yours.'],
+    sub:'Colors, type and references, the more you share, the sharper your decks.',
     fields:[
-      {key:'style',label:'Describe your brand vibe',type:'textarea',placeholder:'Bold, high-contrast, warm orange accents, big type…',required:false},
-      {key:'inspo',label:'Accounts or posts you love',type:'textarea',placeholder:'Paste 1–3 links for inspiration…',required:false},
+      {key:'style',label:'Brand vibe',type:'textarea',placeholder:'Bold, high-contrast, warm orange accents, big type…',required:false},
+      {key:'colors',label:'Brand colors',type:'colors',required:false},
+      {key:'typo',label:'Typography',type:'typo',required:false},
+      {key:'inspo',label:'Instagram inspiration',type:'iglist',max:5,required:false},
       {key:'notes',label:'Anything else we should know?',type:'textarea',placeholder:'Tell us anything…',required:false},
     ]},
 ];
 
 const order=JSON.parse(sessionStorage.getItem('brasero_order')||'{}');
 const ans={};
-/* prefill the handle from the Instagram info imported at checkout */
+/* prefill the handle + niche from the info entered at checkout */
 if(order.handle) ans.handle=order.handle+' · Instagram';
+if(order.niche) ans.niche=order.niche;
 let step=0;
 const view=document.getElementById('view'),bar=document.getElementById('bar'),
       stepper=document.getElementById('stepper'),stepcount=document.getElementById('stepcount');
@@ -191,6 +233,22 @@ function whoHTML(){
   return `<div class="who">${av}<div><b>${esc(order.handle||'Your account')}</b><span>Imported from Instagram</span></div></div>`;
 }
 
+/* ---- color helpers ---- */
+function hexToRgb(h){ h=(h||'').replace('#',''); if(h.length===3) h=h.split('').map(x=>x+x).join(''); const n=parseInt(h||'0',16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function normHex(h){ h=(h||'').trim(); if(!h) return ''; if(h[0]!=='#') h='#'+h;
+  if(/^#[0-9a-f]{3}$/i.test(h)) h='#'+h.slice(1).split('').map(x=>x+x).join('');
+  return /^#[0-9a-f]{6}$/i.test(h)?h.toLowerCase():''; }
+function colorRowHTML(c){ c=normHex(c)||'#888888'; const [r,g,b]=hexToRgb(c);
+  return `<div class="pal-row" data-pal-row>
+    <input type="color" class="pal-pick" value="${esc(c)}">
+    <input type="text" class="pal-hex" value="${esc(c)}" maxlength="7" spellcheck="false" autocomplete="off">
+    <span class="pal-rgb">R ${r} · G ${g} · B ${b}</span>
+    <button type="button" class="pal-del" data-pal-del title="Remove">✕</button>
+  </div>`; }
+function igChipHTML(u){ return `<span class="ig-chip" data-ig="${esc(u)}">${esc(u)}<button type="button" data-ig-del title="Remove">✕</button></span>`; }
+function igNorm(s){ s=(s||'').trim(); if(!s) return ''; const m=s.replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i);
+  return m?('@'+m[1].replace(/^@/,'')):('@'+s.replace(/^@/,'')); }
+
 function fieldHTML(f){
   const v=ans[f.key]||'';
   const optTag=f.required?'':'<span class="opt-tag">optional</span>';
@@ -198,6 +256,32 @@ function fieldHTML(f){
   if(f.type==='textarea') inner=`<textarea data-k="${f.key}" placeholder="${esc(f.placeholder)}">${esc(v)}</textarea>`;
   else if(f.type==='choice')
     inner=`<div class="opts" data-k="${f.key}">${f.options.map(o=>`<button type="button" class="opt ${v===o?'sel':''}" data-v="${esc(o)}"><span class="dot"></span>${o}</button>`).join('')}</div>`;
+  else if(f.type==='colors'){
+    const cur=v?String(v).split(',').map(s=>s.trim()).filter(Boolean):[];
+    const vals=cur.length?cur:['#ff5a00','#111111','#f4f1ec'];
+    const presets=[['#ff5a00','#111111','#f4f1ec'],['#1d4ed8','#0b1220','#ffffff'],['#16a34a','#052e16','#f0fdf4'],['#db2777','#1f1147','#fff1f7']];
+    const presetH=presets.map(p=>`<button type="button" class="pal-preset" data-preset="${esc(p.join(','))}" title="${esc(p.join(', '))}">${p.map(c=>`<i style="background:${esc(c)}"></i>`).join('')}</button>`).join('');
+    inner=`<div class="palette" data-k="${f.key}" data-max="5">
+      <div class="pal-rows">${vals.map(colorRowHTML).join('')}</div>
+      <div class="pal-foot"><button type="button" class="pal-add" data-pal-add>+ Add color</button>
+        <div class="pal-presets">${presetH}</div></div></div>`;
+  }
+  else if(f.type==='typo'){
+    const fn=esc(ans[f.key+'_file_name']||'');
+    inner=`<div class="typo" data-k="${f.key}">
+      <input type="text" class="typo-name" value="${esc(v)}" placeholder="Font name, e.g. Satoshi, Playfair Display…" autocomplete="off">
+      <div class="typo-import">
+        <label class="typo-btn">⬆ Import font file<input type="file" accept=".ttf,.otf,.woff,.woff2" hidden></label>
+        <span class="typo-file ${fn?'':'hide'}"><b>${fn}</b><button type="button" data-typo-fdel title="Remove">✕</button></span>
+      </div></div>`;
+  }
+  else if(f.type==='iglist'){
+    const list=v?String(v).split(',').map(s=>s.trim()).filter(Boolean):[];
+    inner=`<div class="iglist" data-k="${f.key}" data-max="${f.max||5}">
+      <div class="ig-add"><input type="text" class="ig-input" placeholder="instagram.com/page or @handle" autocomplete="off"><button type="button" class="ig-btn" data-ig-add>Add</button></div>
+      <div class="ig-chips">${list.map(igChipHTML).join('')}</div>
+      <p class="ig-hint">Add up to ${f.max||5} accounts.</p></div>`;
+  }
   else inner=`<input data-k="${f.key}" type="text" value="${esc(v)}" placeholder="${esc(f.placeholder)}" autocomplete="off">`;
   return `<div class="field" data-field="${f.key}"><label>${f.label}${optTag}</label>${inner}</div>`;
 }
@@ -224,13 +308,65 @@ function render(){
       o.classList.add('sel');grp.closest('.field').classList.remove('err');
     }));
   });
+  view.querySelectorAll('.palette').forEach(p=>{
+    const key=p.dataset.k, max=Number(p.dataset.max)||5;
+    const rows=()=>[...p.querySelectorAll('[data-pal-row]')];
+    const sync=()=>{ ans[key]=rows().map(r=>r.querySelector('.pal-pick').value).join(', '); };
+    const upd=()=>{ const add=p.querySelector('[data-pal-add]'); if(add) add.style.display=rows().length>=max?'none':''; };
+    const wire=row=>{
+      const pick=row.querySelector('.pal-pick'), hex=row.querySelector('.pal-hex'), rgb=row.querySelector('.pal-rgb');
+      const setRgb=c=>{ const [r,g,b]=hexToRgb(c); rgb.textContent=`R ${r} · G ${g} · B ${b}`; };
+      pick.addEventListener('input',()=>{ hex.value=pick.value; setRgb(pick.value); sync(); });
+      hex.addEventListener('input',()=>{ const n=normHex(hex.value); if(n){ pick.value=n; setRgb(n); sync(); } });
+      hex.addEventListener('blur',()=>{ const n=normHex(hex.value); hex.value=n||pick.value; });
+      row.querySelector('[data-pal-del]').addEventListener('click',()=>{ if(rows().length<=1) return; row.remove(); sync(); upd(); });
+    };
+    rows().forEach(wire);
+    const addBtn=p.querySelector('[data-pal-add]');
+    addBtn&&addBtn.addEventListener('click',()=>{ if(rows().length>=max) return;
+      const tmp=document.createElement('div'); tmp.innerHTML=colorRowHTML('#888888');
+      const row=tmp.firstElementChild; p.querySelector('.pal-rows').appendChild(row); wire(row); sync(); upd(); });
+    p.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
+      p.querySelector('.pal-rows').innerHTML=b.dataset.preset.split(',').map(colorRowHTML).join('');
+      rows().forEach(wire); sync(); upd(); }));
+    sync(); upd();
+  });
+  view.querySelectorAll('.typo').forEach(t=>{
+    const key=t.dataset.k, name=t.querySelector('.typo-name'), file=t.querySelector('input[type=file]'),
+      fileBox=t.querySelector('.typo-file'), fileName=fileBox.querySelector('b');
+    name.addEventListener('input',()=>{ ans[key]=name.value.trim(); });
+    file.addEventListener('change',async()=>{ const f=file.files[0]; if(!f) return;
+      if(f.size>1024*1024){ alert('Font file is too large (max 1 MB). Just type the font name instead.'); file.value=''; return; }
+      const data=await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(f); });
+      ans[key+'_file']=data; ans[key+'_file_name']=f.name; fileName.textContent=f.name; fileBox.classList.remove('hide'); });
+    const fdel=t.querySelector('[data-typo-fdel]');
+    fdel&&fdel.addEventListener('click',()=>{ delete ans[key+'_file']; delete ans[key+'_file_name']; file.value=''; fileName.textContent=''; fileBox.classList.add('hide'); });
+  });
+  view.querySelectorAll('.iglist').forEach(g=>{
+    const key=g.dataset.k, max=Number(g.dataset.max)||5, input=g.querySelector('.ig-input'), chips=g.querySelector('.ig-chips'), hint=g.querySelector('.ig-hint');
+    const list=()=>[...chips.querySelectorAll('[data-ig]')].map(c=>c.dataset.ig);
+    const sync=()=>{ ans[key]=list().join(', '); };
+    const upd=()=>{ const n=list().length; g.querySelector('[data-ig-add]').disabled=n>=max; if(hint) hint.textContent=n>=max?`Maximum ${max} accounts added.`:`Add up to ${max} accounts.`; };
+    const add=()=>{ const u=igNorm(input.value); if(!u||u==='@'){ input.value=''; return; }
+      if(!list().includes(u)&&list().length<max){ chips.insertAdjacentHTML('beforeend',igChipHTML(u)); sync(); upd(); }
+      input.value=''; input.focus(); };
+    g.querySelector('[data-ig-add]').addEventListener('click',add);
+    input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); add(); } });
+    chips.addEventListener('click',e=>{ const d=e.target.closest('[data-ig-del]'); if(!d) return; d.closest('[data-ig]').remove(); sync(); upd(); });
+    sync(); upd();
+  });
   view.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('input',()=>el.closest('.field').classList.remove('err')));
   const nb=document.getElementById('next');nb&&nb.addEventListener('click',next);
   const bb=document.getElementById('back');bb&&bb.addEventListener('click',back);
   const first=view.querySelector('input,textarea');first&&first.focus();
 }
 
-function collect(){view.querySelectorAll('input,textarea').forEach(el=>{ans[el.dataset.k]=el.value.trim();});}
+function collect(){
+  view.querySelectorAll('input,textarea').forEach(el=>{ if(el.dataset.k) ans[el.dataset.k]=el.value.trim(); });
+  view.querySelectorAll('.palette').forEach(p=>{ if(p.dataset.k) ans[p.dataset.k]=[...p.querySelectorAll('.pal-pick')].map(i=>i.value).join(', '); });
+  view.querySelectorAll('.typo').forEach(t=>{ const nm=t.querySelector('.typo-name'); if(t.dataset.k&&nm) ans[t.dataset.k]=nm.value.trim(); });
+  view.querySelectorAll('.iglist').forEach(g=>{ if(g.dataset.k) ans[g.dataset.k]=[...g.querySelectorAll('[data-ig]')].map(c=>c.dataset.ig).join(', '); });
+}
 function validate(){
   collect();let ok=true,firstErr=null;
   STEPS[step].fields.forEach(f=>{

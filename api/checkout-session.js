@@ -3,7 +3,7 @@ import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId, addonLineI
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { plan, billing, name, email, handle, instagram, addon_ref, addons, addon_item } = req.body || {};
+    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item } = req.body || {};
     const SITE = siteUrl(req);
 
     // Tracker upsell: add one catalogue item (carousels / stories / branding) to an existing order.
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
       cancel_url: isAddon
         ? `${SITE}/track.html?ref=${ar}&email=${em}`
         : `${SITE}/checkout.html?plan=${plan}&billing=${billing}`,
-      metadata: { plan, billing, name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', addon_ref: addon_ref || '', addons: addOns.join(',') },
+      metadata: { plan, billing, name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '', addon_ref: addon_ref || '', addons: addOns.join(',') },
     });
 
     // For a brand-new order, store it (pending). Add-ons attach to an existing

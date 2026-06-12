@@ -267,8 +267,10 @@ export default async function handler(req, res) {
       const patch = isScript
         ? { status: 'script_review', ...(b.script != null ? { script: b.script } : {}) }
         : { status: 'design_review', ...(Array.isArray(b.images) ? { design_urls: b.images.filter(Boolean).slice(0, 10) } : {}) };
+      if (b.title != null) patch.title = b.title;
       await patchDeck(deck.id, patch);
 
+      const deckTitle = b.title != null ? b.title : deck.title;
       // Email the customer that they have something to validate.
       if (deckOrder.email) {
         const ref = deckOrder.ref || orderRef(deckOrder.stripe_session_id);
@@ -276,7 +278,7 @@ export default async function handler(req, res) {
         try {
           await sendTo(deckOrder.email,
             isScript ? 'Your Brasero script is ready to review 👀' : 'Your Brasero design is ready to review 👀',
-            reviewEmail({ name: deckOrder.name, kind: isScript ? 'script' : 'design', deckTitle: deck.title, ref, url }));
+            reviewEmail({ name: deckOrder.name, kind: isScript ? 'script' : 'design', deckTitle, ref, url }));
         } catch (e) { console.error('review email', e); }
       }
       return res.json({ ok: true, decks: await decksForOrder(deck.order_id) });

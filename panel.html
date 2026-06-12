@@ -1552,7 +1552,7 @@ async function openOrder(ref){
 }
 /* ---------- project brief ---------- */
 let BRIEF=null, CURORDER=null;
-const BRIEF_LABELS={page:'Page / brand',handle:'Instagram',goal:'#1 goal',niche:'What the page is about',audience:'Target audience',style:'Brand vibe / inspo',notes:'Anything else'};
+const BRIEF_LABELS={page:'Page / brand',handle:'Instagram',goal:'#1 goal',niche:'What the page is about',audience:'Target audience',freq:'Posting frequency',challenge:'Biggest challenge',style:'Brand vibe',colors:'Brand colors',typo:'Typography',inspo:'Instagram inspiration',notes:'Anything else'};
 function renderBrief(){
   const b=BRIEF, o=CURORDER||{};
   const top=[];
@@ -1564,9 +1564,21 @@ function renderBrief(){
   const rowsTop=top.map(([k,v])=>`<div class="brf"><span class="brf__k">${esc(k)}</span><div class="brf__v">${esc(v)}</div></div>`).join('');
   let rowsBrief='';
   if(b&&typeof b==='object'&&Object.keys(b).length){
-    const order=['page','handle','goal','niche','audience','style','notes'];
-    const keys=[...order.filter(k=>b[k]),...Object.keys(b).filter(k=>!order.includes(k)&&b[k])];
-    rowsBrief=keys.map(k=>`<div class="brf"><span class="brf__k">${esc(BRIEF_LABELS[k]||k)}</span><div class="brf__v">${esc(String(b[k]))}</div></div>`).join('');
+    const order=['page','handle','goal','niche','audience','freq','challenge','style','colors','typo','inspo','notes'];
+    const hidden=k=>/_file(_name)?$/.test(k);   // never print raw data-URLs / file meta
+    const show=k=>b[k]||(k==='typo'&&b.typo_file);
+    const keys=[...order.filter(show),...Object.keys(b).filter(k=>!order.includes(k)&&b[k]&&!hidden(k))];
+    const briefVal=(k,v)=>{
+      if(k==='colors'){ const cols=String(v).split(',').map(s=>s.trim()).filter(c=>/^#?[0-9a-f]{3,8}$/i.test(c));
+        if(cols.length) return `<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">${cols.map(c=>`<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><i style="width:16px;height:16px;border-radius:5px;border:1px solid var(--line);background:${esc(c)}"></i>${esc(c)}</span>`).join('')}</div>`; }
+      if(k==='typo'){ let s=v?esc(String(v)):'';
+        if(b.typo_file) s+=`${s?' · ':''}<a href="${esc(b.typo_file)}" download="${esc(b.typo_file_name||'font')}" style="color:var(--orange);font-weight:700">⬇ ${esc(b.typo_file_name||'font file')}</a>`;
+        return s; }
+      if(k==='inspo'){ return String(v).split(',').map(s=>s.trim()).filter(Boolean).map(u=>{ const user=u.replace(/^@/,'');
+        return `<a href="https://instagram.com/${esc(user)}" target="_blank" rel="noopener" style="color:var(--orange);font-weight:700">${esc(u)}</a>`; }).join(', '); }
+      return esc(String(v));
+    };
+    rowsBrief=keys.map(k=>`<div class="brf"><span class="brf__k">${esc(BRIEF_LABELS[k]||k)}</span><div class="brf__v">${briefVal(k,k==='typo'?b.typo:b[k])}</div></div>`).join('');
   }
   const empty=(!rowsTop&&!rowsBrief)?'<p style="color:var(--grey);font-size:13.5px">No brief was provided for this project.</p>':'';
   $('#briefBody').innerHTML=rowsTop+(rowsBrief?`<div class="brf__sep"></div>${rowsBrief}`:'')+(rowsBrief?'':(rowsTop?'<p style="color:var(--grey);font-size:13px;margin-top:14px">No detailed brief was filled in.</p>':''))+empty;
@@ -1917,6 +1929,16 @@ function bind(d){
   if(slidesEl) slidesEl.addEventListener('click',e=>{ const del=e.target.closest('[data-slide-del]'); if(!del) return;
     if(slidesEl.querySelectorAll('[data-slide]').length<=1){ del.closest('.slide').querySelector('[data-slide-body]').innerHTML=''; return; }
     del.closest('.slide').remove(); renumberSlides(det); });
+  /* title stays editable at any status: persist on blur (covers approved decks with no Save button) */
+  const titleEl=det.querySelector('[data-f="title"]');
+  if(titleEl) titleEl.addEventListener('blur',async()=>{
+    const t=titleEl.value.trim();
+    if(!t){ titleEl.value=d.title||''; return; }
+    if(t===(d.title||'')) return;
+    try{ const r=await api('/api/admin',{action:'save_deck',ref:REF,deckId:d.id,title:t});
+      if(r&&r.ok){ d.title=t; const dd=DECKS.find(x=>x.id===d.id); if(dd) dd.title=t; renderSidebar(); }
+    }catch(e){}
+  });
   const file=det.querySelector('[data-file]');
   if(file) file.onchange=async e=>{
     const adder=det.querySelector('.adder'); const slots=10-det.querySelectorAll('[data-imgs] img').length;

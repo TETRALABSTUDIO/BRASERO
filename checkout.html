@@ -188,6 +188,7 @@ a{color:inherit;text-decoration:none}
         <div id="igresult"></div>
         <p class="ig-note">Click <b>Add</b> to import your profile photo &amp; @handle from Instagram.</p>
       </div>
+      <div class="field"><label>Your niche</label><input name="niche" required placeholder="e.g. personal finance, fitness, real estate"></div>
       <div class="field"><label>Phone (optional)</label><input name="phone" placeholder="+1 555 …"></div>
       <button type="submit" class="btn btn--grad pay">Continue to payment →</button>
       <p class="note">Next step: secure payment via Stripe.</p>
@@ -407,7 +408,7 @@ document.getElementById('contact').addEventListener('submit',async e=>{
   // if they typed a handle but didn't hit Add, import on the fly
   if(!ig && u) ig=await addInstagram(u);
   const order={plan:key,planName:plan.name,billing:mode,price:price(),
-    name:fd.get('name'),email:fd.get('email'),instagram,
+    name:fd.get('name'),email:fd.get('email'),instagram,niche:fd.get('niche'),
     handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone')};
   sessionStorage.setItem('brasero_order',JSON.stringify(order));
   showAddons(order); // step 2 → upsell add-ons, then payment
@@ -446,7 +447,7 @@ async function proceedToPayment(order){
     const btn=document.getElementById('recap-cta');if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
     try{
       const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({plan:key,billing:mode,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,addons:order.addons})});
+        body:JSON.stringify({plan:key,billing:mode,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,niche:order.niche,addons:order.addons})});
       const d=await r.json();
       if(d.url){location.href=d.url;return;}
       throw new Error(d.error||'No checkout URL');
