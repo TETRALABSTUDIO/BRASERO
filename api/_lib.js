@@ -204,8 +204,11 @@ export async function patchDeck(deckId, patch) {
 export async function adminListOrders() {
   if (MEM) return MEM.orders.filter(o => o.status === 'paid');
   if (!db) return [];
+  // select '*' so the enriched list carries the full brief (answers, instagram, addons,
+  // phone, amount, billing) — the owner edit modal prefills from these, and a stripped
+  // list would wipe them on every save/reopen.
   const { data } = await db.from('orders')
-    .select('id,ref,stripe_session_id,name,email,plan,status,talent_email,created_at')
+    .select('*')
     .eq('status', 'paid').order('created_at', { ascending: false }).limit(200);
   return data || [];
 }

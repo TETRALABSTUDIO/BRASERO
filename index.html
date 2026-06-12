@@ -1307,7 +1307,7 @@ function covGo(n){ const len=deckSlides[covDeck].length; covIdx=(covIdx+n+len)%l
 document.getElementById('covNext').addEventListener('click',e=>{ e.stopPropagation(); covGo(1); });
 document.getElementById('covPrev').addEventListener('click',e=>{ e.stopPropagation(); covGo(-1); });
 document.getElementById('covClose').addEventListener('click',closeCov);
-cov.addEventListener('click',e=>{ if(e.target===cov) closeCov(); });
+/* backdrop click intentionally does NOT close the overlay (use ✕ or Esc) */
 document.addEventListener('keydown',e=>{ if(!cov.classList.contains('open')) return; if(e.key==='Escape') closeCov(); else if(e.key==='ArrowRight') covGo(1); else if(e.key==='ArrowLeft') covGo(-1); });
 
 /* packages: floating mini deck-cards visualizing each plan's volume */

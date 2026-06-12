@@ -135,6 +135,10 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .slide__view{padding:2px;font-size:15px;line-height:1.6;color:var(--ink)}
 .slide__view h4{font-size:17px;font-weight:900;letter-spacing:-.02em;margin:2px 0 6px}
 .slide__view mark{background:#ffe39a;color:inherit;padding:0 2px;border-radius:3px}
+.slide__edit{min-height:46px;padding:10px 12px;font-size:15px;line-height:1.6;color:var(--ink);outline:none;border:1px solid var(--line);border-radius:11px;background:#fff;transition:border .2s,box-shadow .2s}
+.slide__edit:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.10)}
+.slide__edit h4{font-size:17px;font-weight:900;letter-spacing:-.02em;margin:2px 0 6px}
+.slide__edit mark{background:#ffe39a;color:inherit;padding:0 2px;border-radius:3px}
 .slide__empty{color:#c4c4c4}
 .revbox{margin-top:14px;display:none}
 .revbox.open{display:block}
@@ -484,6 +488,16 @@ function slidesViewHTML(script){
   return `<div class="slides">${parseSlides(script).map((h,i)=>{ const c=sanitizeSlide(h);
     return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i+1}</span></div><div class="slide__view">${c||'<span class="slide__empty">Empty</span>'}</div></div>`; }).join('')}</div>`;
 }
+/* editable slides: the client can tweak the copy directly, then approve */
+function slidesEditHTML(script){
+  return `<div class="slides" data-edit-slides>${parseSlides(script).map((h,i)=>{ const c=sanitizeSlide(h);
+    return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i+1}</span></div><div class="slide__edit" contenteditable="true" data-slide-body>${c}</div></div>`; }).join('')}</div>`;
+}
+function gatherEditedScript(){
+  const bodies=document.querySelectorAll('[data-edit-slides] [data-slide-body]');
+  if(!bodies.length) return undefined;
+  return JSON.stringify([...bodies].map(x=>sanitizeSlide(x.innerHTML)));
+}
 
 let CREDS={ref:'',email:''};
 let DECKS=[];
@@ -807,7 +821,7 @@ async function startAddon(item,btn){
 
 $('#addDecks').addEventListener('click',openAddModal);
 $('#addClose').addEventListener('click',closeAddModal);
-$('#addModal').addEventListener('click',e=>{ if(e.target.id==='addModal') closeAddModal(); });
+/* backdrop click intentionally does NOT close the modal */
 $('#addPacks').addEventListener('click',e=>{
   const cat=e.target.closest('[data-cat]'); if(cat){ addCat=cat.dataset.cat; renderAddBody(); return; }
   if(e.target.closest('[data-back]')){ addCat=null; renderAddBody(); return; }
@@ -816,7 +830,7 @@ $('#addPacks').addEventListener('click',e=>{
 
 // states where the CLIENT must act → instruction line under the deck name
 const NEXT={
-  script_review:['📝','Validate script','review the slides below, then approve to start the design. Want changes? Message us in the chat.'],
+  script_review:['📝','Review &amp; edit the script','tweak any slide directly below, then approve it to start the design.'],
   design_review:['👀','Validate design','review your design below, then approve it or request a retouch.'],
   done:['🎉','All done','your carousel is ready, download it from the bar below.']
 };
@@ -834,7 +848,7 @@ function detailBody(d){
     const instr=`<p class="detail__instr">${n[0]} <b>${n[1]}</b>, ${n[2]}</p>`;
     let content='';
     if(d.status==='script_review')
-      content=slidesViewHTML(d.script);
+      content=slidesEditHTML(d.script);
     else if(d.status==='design_review')
       content=`${galleryGrid(d)}
         <div class="revbox" id="rev-${d.id}">
@@ -943,6 +957,7 @@ async function onAction(el){
   if(act==='download_deck'){ downloadDeck(id,el); return; }
   const payload={...CREDS,deckId:id,action:act};
   if(act==='validate_script'){
+    const sc=gatherEditedScript(); if(sc!=null) payload.script=sc;   // send the client's edits
     if(!confirm('Approve this script and move it into design?')) return;
   }
   if(act==='validate_design'){ if(!confirm('Approve this design as final?')) return; }
