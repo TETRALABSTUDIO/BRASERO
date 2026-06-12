@@ -1087,12 +1087,11 @@ const $=s=>document.querySelector(s);
 const esc=s=>(s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const initials=s=>{const p=(s||'').trim().split(/[\s@.]+/).filter(Boolean);return ((p[0]||'?')[0]+(p[1]?p[1][0]:'')).toUpperCase();};
 function avatar(t,size,extra){ return t.photo?`<img class="avatar ${size}" src="${esc(t.photo)}" ${extra||''}>`:`<div class="avatar ${size}" ${extra||''}>${esc(initials(t.name||t.email))}</div>`; }
-/* client avatar: Instagram profile photo (via /api/avatar) with an initials fallback if IG returns nothing */
+/* client avatar: gradient initials disc (Instagram auto-fetch isn't reliably possible) */
 function igUser(s){ s=(s||'').toString().trim(); if(!s) return ''; const m=s.replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i); return (m?m[1]:s).replace(/^@/,'').trim(); }
 function clientAv(o,cls){
-  const nm=(o&&(o.name||o.instagram))||'Client', user=igUser(o&&(o.instagram||o.handle));
-  const img=user?`<img src="${API}/api/avatar?u=${encodeURIComponent(user)}" alt="" loading="lazy" onerror="this.remove()">`:'';
-  return `<span class="iav ${cls||''}" data-ini="${esc(initials(nm))}">${img}</span>`;
+  const nm=(o&&(o.name||o.instagram))||'Client';
+  return `<span class="iav ${cls||''}" data-ini="${esc(initials(nm))}"></span>`;
 }
 const PLAN_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
 const PLAN_LOGO={starter:'ember',flame:'flame',burst:'meteor'};

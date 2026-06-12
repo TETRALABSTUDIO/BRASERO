@@ -619,10 +619,8 @@ $('#logout').addEventListener('click',logout);
 /* ---------- profile card (avatar from the Instagram @, name, handle) ---------- */
 function igUser(s){ s=(s||'').toString().trim(); if(!s) return ''; const m=s.replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i); return (m?m[1]:s).replace(/^@/,'').trim(); }
 function renderProfile(o){
-  const user=igUser(o.instagram||o.handle), nm=o.name||'Client', av=$('#oAvatar');
-  av.innerHTML='';
-  if(user){ const img=new Image(); img.alt=''; img.onerror=()=>{ av.innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`; }; img.src=API+'/api/avatar?u='+encodeURIComponent(user); av.appendChild(img); }
-  else av.innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`;
+  const nm=o.name||'Client', user=igUser(o.instagram||o.handle);
+  $('#oAvatar').innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`;
   $('#oName').textContent=nm;
   const ig=$('#oIg'); if(user){ ig.textContent='@'+user; ig.style.display=''; } else { ig.textContent=''; ig.style.display='none'; }
 }
