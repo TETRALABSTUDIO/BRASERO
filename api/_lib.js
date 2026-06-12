@@ -63,6 +63,10 @@ export const MEM = db ? null : {
     { id: 'ord-done', ref: 'DONE9001', stripe_session_id: 'sess_done', status: 'paid',
       plan: 'burst', billing: 'sub', name: 'Leo Marchand', email: 'leo@example.com',
       talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
+    // unpaid lead (abandoned checkout) — shows up in the CRM
+    { id: 'ord-lead', ref: 'LEAD0001', stripe_session_id: 'sess_lead', status: 'pending',
+      plan: 'flame', billing: 'once', name: 'Marc Abandon', email: 'marc@lead.com', instagram: '@marc',
+      amount: 24000, created_at: new Date(Date.now() - 2 * 864e5).toISOString() },
   ],
   decks: [
     { id: 'dk-1', order_id: 'ord-demo', position: 0, status: 'script_review',
@@ -203,6 +207,14 @@ export async function adminListOrders() {
   const { data } = await db.from('orders')
     .select('id,ref,stripe_session_id,name,email,plan,status,talent_email,created_at')
     .eq('status', 'paid').order('created_at', { ascending: false }).limit(200);
+  return data || [];
+}
+
+// Every order, any status (paid + pending/abandoned) — for the owner dashboard + CRM.
+export async function listAllOrders() {
+  if (MEM) return MEM.orders.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  if (!db) return [];
+  const { data } = await db.from('orders').select('*').order('created_at', { ascending: false }).limit(500);
   return data || [];
 }
 

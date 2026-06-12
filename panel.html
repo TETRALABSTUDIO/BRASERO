@@ -13,7 +13,51 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Satoshi',system-ui,sans-serif;background:#f3f3f5;color:var(--ink);-webkit-font-smoothing:antialiased}
 body.appmode{overflow:hidden}
-body.appmode #profilePill{display:none}
+#profilePill{display:none}
+/* ===== owner admin shell ===== */
+.adminapp{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:250px minmax(0,1fr);background:#fff}
+.adminapp.hide{display:none}
+.aside{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line)}
+.aside__brand{padding:18px 20px;border-bottom:1px solid var(--line)}
+.aside__brand .logo{height:23px;color:var(--ink)}
+.aside__nav{flex:1;min-height:0;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:3px}
+.navi{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:none;border-radius:11px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;color:var(--grey);letter-spacing:-.01em;transition:background .12s,color .12s}
+.navi svg{width:18px;height:18px;flex-shrink:0;color:var(--grey)}
+.navi:hover{background:var(--soft);color:var(--ink)}
+.navi.on{background:var(--soft);color:var(--ink)}
+.navi.on svg{color:var(--orange)}
+.aside__foot{padding:14px;border-top:1px solid var(--line)}
+.aside__foot .side__me{padding:12px 4px 0;border:none}
+.amain{min-height:0;overflow-y:auto;padding:28px 34px 70px;background:#fff}
+.sec.hide{display:none}
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.sechead h2{font-size:26px;font-weight:900;letter-spacing:-.035em}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.kpi__l{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--grey)}
+.kpi__v{font-size:28px;font-weight:900;letter-spacing:-.03em;margin-top:6px}
+.kpi__s{font-size:12px;color:var(--grey);font-weight:600;margin-top:3px}
+.panels{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+@media(max-width:920px){.panels{grid-template-columns:1fr}.adminapp{grid-template-columns:200px minmax(0,1fr)}}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
+.panel h3{font-size:15px;font-weight:900;letter-spacing:-.02em;margin-bottom:16px}
+.bars{display:flex;align-items:flex-end;gap:10px;height:150px}
+.bars .bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px;height:100%}
+.bars .bar i{width:100%;max-width:30px;background:var(--grad);border-radius:6px 6px 0 0;min-height:3px;transition:height .4s}
+.bars .bar small{font-size:10px;color:var(--grey);font-weight:700}
+.bars .bar b{font-size:10.5px;font-weight:800}
+.tbl{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--grey);font-weight:800;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.clk{cursor:pointer}
+.tbl tr.clk:hover td{background:var(--soft)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filters input,.filters select{width:auto;min-width:160px}
+.lead-stage{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:100px;background:var(--waitbg);color:var(--wait);white-space:nowrap}
+.tbl .swi__ref{color:var(--grey);font-weight:700;font-size:12px}
+.emptyrow{text-align:center;color:var(--grey);padding:26px}
 input,textarea,button,select{font-family:inherit}
 input,textarea,select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;width:100%;font-size:14px}
 textarea{min-height:120px;resize:vertical;line-height:1.55}
@@ -439,30 +483,49 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 
 <!-- ===== APP ===== -->
 <div id="app" class="app hide">
-  <header class="topnav">
-    <div class="topnav__in">
-      <svg class="logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg>
-      <div class="tabs hide" id="tabs">
-        <button class="on" data-tab="projects">Projects</button>
-        <button data-tab="team">Team</button>
+  <!-- ===== OWNER ADMIN SHELL ===== -->
+  <div id="adminApp" class="adminapp hide">
+    <aside class="aside">
+      <div class="aside__brand"><svg class="logo" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></div>
+      <nav class="aside__nav" id="adminNav">
+        <button class="navi on" type="button" data-sec="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</button>
+        <button class="navi" type="button" data-sec="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Projects</button>
+        <button class="navi" type="button" data-sec="talents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg> Talents</button>
+        <button class="navi" type="button" data-sec="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg> Orders</button>
+        <button class="navi" type="button" data-sec="crm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg> CRM</button>
+      </nav>
+      <div class="aside__foot">
+        <button class="b-grad b-sm" id="newProject" type="button" style="width:100%">+ New project</button>
+        <div class="side__me" id="adminMe"></div>
       </div>
-    </div>
-  </header>
-
-  <main class="main">
-    <div id="vProjects">
-      <div id="overview">
-        <div class="toolbar">
-          <h2>Projects</h2>
-          <div class="right">
-            <button class="b-grad b-sm hide" id="newProject">+ New project</button>
-            <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="#999" stroke-width="2" stroke-linecap="round"/></svg><input id="search" placeholder="Search projects…"></div>
-            <div class="vswitch" id="vswitch"><button data-v="kanban">Kanban</button><button data-v="list">List</button></div>
-          </div>
+    </aside>
+    <main class="amain">
+      <section class="sec" id="sec-dashboard"></section>
+      <section class="sec hide" id="sec-projects"></section>
+      <section class="sec hide" id="sec-talents">
+        <div class="sechead"><h2>Talents</h2></div>
+        <div class="addcard">
+          <h3>Invite a Talent</h3>
+          <p style="font-size:13px;color:var(--grey);margin:-6px 0 14px">They'll get an email to set their own password, name &amp; photo.</p>
+          <form id="talentForm">
+            <div class="grid2">
+              <div class="field"><label>Name (optional)</label><input id="tName" placeholder="Jane Doe"></div>
+              <div class="field"><label>Email</label><input id="tEmail" type="email" placeholder="jane@brasero.studio" required></div>
+            </div>
+            <label style="display:flex;align-items:center;gap:7px;margin:0 0 14px"><input type="checkbox" id="tOwner" style="width:auto"> Make owner</label><br>
+            <button class="b-grad" type="submit">Send invite →</button>
+            <span class="err" id="tErr" style="display:inline-block;margin-left:10px"></span>
+          </form>
         </div>
-        <div id="projects"></div>
-      </div>
-      <div id="detail" class="hide">
+        <div class="tgrid" id="teamGrid"></div>
+      </section>
+      <section class="sec hide" id="sec-orders"></section>
+      <section class="sec hide" id="sec-crm"></section>
+    </main>
+  </div>
+
+  <!-- ===== PROJECT BOARD (owner + talent) ===== -->
+  <div id="detail" class="hide">
         <div class="board" id="board">
           <aside class="board__list">
             <div class="side__brand">
@@ -505,27 +568,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
             </div>
           </aside>
         </div>
-      </div>
-    </div>
-
-    <div id="vTeam" class="hide">
-      <div class="toolbar"><h2>Team &amp; assignments</h2></div>
-      <div class="addcard">
-        <h3>Invite a Talent</h3>
-        <p style="font-size:13px;color:var(--grey);margin:-6px 0 14px">They'll get an email to set their own password, name &amp; photo.</p>
-        <form id="talentForm">
-          <div class="grid2">
-            <div class="field"><label>Name (optional)</label><input id="tName" placeholder="Jane Doe"></div>
-            <div class="field"><label>Email</label><input id="tEmail" type="email" placeholder="jane@brasero.studio" required></div>
-          </div>
-          <label style="display:flex;align-items:center;gap:7px;margin:0 0 14px"><input type="checkbox" id="tOwner" style="width:auto"> Make owner</label><br>
-          <button class="b-grad" type="submit">Send invite →</button>
-          <span class="err" id="tErr" style="display:inline-block;margin-left:10px"></span>
-        </form>
-      </div>
-      <div class="tgrid" id="teamGrid"></div>
-    </div>
-  </main>
+  </div>
 
   <!-- fixed profile pill (bottom-left) -->
   <div class="ppill" id="profilePill">
@@ -643,11 +686,10 @@ function avatar(t,size,extra){ return t.photo?`<img class="avatar ${size}" src="
 const PLAN_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
 const planName=p=>PLAN_NAMES[p]||p||'';
 let TOKEN=localStorage.getItem('brasero_session')||'', ME=null, REF='', ORDERS=[], TALENTS=[];
+let ADMIN={orders:[],leads:[],talents:[]};
 const SETUP_TOKEN=new URLSearchParams(location.search).get('setup');
 let SETUP_PHOTO='';
 if(SETUP_TOKEN){ document.getElementById('authLogin').classList.add('hide'); document.getElementById('authSetup').classList.remove('hide'); }
-let VIEW=localStorage.getItem('brasero_view')||'kanban'; if(VIEW==='grid') VIEW='kanban';
-let DVIEW='cards';
 
 async function api(path,body){
   const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json',...(TOKEN?{'Authorization':'Bearer '+TOKEN}:{})},body:JSON.stringify(body)});
@@ -693,14 +735,16 @@ async function boot(){
   ME=d.me; ORDERS=d.orders||[];
   $('#auth').classList.add('hide'); $('#app').classList.remove('hide');
   renderProfile();
-  $('#tabs').classList.toggle('hide',!ME.is_owner);
-  $('#newProject').classList.toggle('hide',!ME.is_owner);
-  setView(VIEW); renderProjects();
-  // land straight on a project (last opened, else first); the overview stays
-  // reachable from the switcher menu ("View all projects").
-  const last=localStorage.getItem('brasero_last_ref');
-  const target=(last&&ORDERS.some(o=>o.ref===last))?last:(ORDERS[0]&&ORDERS[0].ref);
-  if(target) openOrder(target);
+  if(ME.is_owner){
+    const dash=await api('/api/admin',{action:'dashboard'});
+    if(dash.ok){ ADMIN={orders:dash.orders||[],leads:dash.leads||[],talents:dash.talents||[]}; ORDERS=ADMIN.orders; TALENTS=ADMIN.talents; }
+    showAdmin('dashboard');
+  } else {
+    // talents jump straight to a project (last opened, else first)
+    const last=localStorage.getItem('brasero_last_ref');
+    const target=(last&&ORDERS.some(o=>o.ref===last))?last:(ORDERS[0]&&ORDERS[0].ref);
+    if(target) openOrder(target);
+  }
 }
 function renderProfile(){
   $('#meAvatar').innerHTML=avatar(ME,'lg');
@@ -710,25 +754,102 @@ function renderProfile(){
 }
 
 /* ---------- profile self-edit ---------- */
-$('#editName').onclick=async()=>{ const name=prompt('Your name', ME.name||''); if(name===null) return; const r=await api('/api/admin',{action:'update_me',name}); if(r.ok){ ME=r.me; renderProfile(); } };
-$('#mePhoto').onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const photo=await compress(f,512,0.8); const r=await api('/api/admin',{action:'update_me',photo}); if(r.ok){ ME=r.me; renderProfile(); } e.target.value=''; };
+$('#editName').onclick=async()=>{ const name=prompt('Your name', ME.name||''); if(name===null) return; const r=await api('/api/admin',{action:'update_me',name}); if(r.ok){ ME=r.me; renderProfile(); renderAdminMe(); } };
 
-/* ---------- tabs ---------- */
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
-  const team=b.dataset.tab==='team';
-  $('#vTeam').classList.toggle('hide',!team);
-  $('#vProjects').classList.toggle('hide',team);
-  if(team) loadTeam();
-});
-
-/* ---------- projects overview ---------- */
+/* ========== OWNER ADMIN SHELL ========== */
 const STATE={todo:['todo','To start','#dc2626'],progress:['progress','In progress','#2563eb'],done:['done','Completed','#16a34a']};
-$('#search').oninput=renderProjects;
-$('#vswitch').querySelectorAll('button').forEach(b=>b.onclick=()=>setView(b.dataset.v,true));
-function setView(v,render){ VIEW=v; localStorage.setItem('brasero_view',v); $('#vswitch').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); if(render) renderProjects(); }
-function filtered(){ const q=$('#search').value.trim().toLowerCase(); return ORDERS.filter(o=>!q||(o.ref+' '+(o.name||'')+' '+(o.email||'')+' '+(o.plan||'')).toLowerCase().includes(q)); }
 function spill(st){ const [c,l]=STATE[st]||STATE.todo; return `<span class="spill ${c}">${l}</span>`; }
+const fmtMoney=c=>'$'+Math.round((c||0)/100).toLocaleString('en-US');
+const fmtDate=s=>{ if(!s) return '-'; try{ return new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){ return '-'; } };
+function talentName(email){ if(!email) return 'Unassigned'; const t=(ADMIN.talents||[]).find(x=>(x.email||'').toLowerCase()===email.toLowerCase()); return t?(t.name||t.email):email; }
+const SECS=['dashboard','projects','talents','orders','crm'];
+function showAdmin(sec){ document.body.classList.remove('appmode'); $('#detail').classList.add('hide'); $('#adminApp').classList.remove('hide'); renderAdminMe(); navTo(sec||'dashboard'); }
+function navTo(sec){
+  $('#adminNav').querySelectorAll('.navi').forEach(b=>b.classList.toggle('on',b.dataset.sec===sec));
+  SECS.forEach(s=>$('#sec-'+s).classList.toggle('hide',s!==sec));
+  if(sec==='dashboard') renderDashboard();
+  else if(sec==='projects') renderProjectsSection();
+  else if(sec==='talents') loadTeam();
+  else if(sec==='orders') renderOrdersSection();
+  else if(sec==='crm') renderCRMSection();
+}
+$('#adminNav').addEventListener('click',e=>{ const b=e.target.closest('.navi'); if(b) navTo(b.dataset.sec); });
+function renderAdminMe(){ const el=$('#adminMe'); if(!el||!ME) return;
+  el.innerHTML=`${avatar(ME,'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name||ME.email.split('@')[0])}</span><span class="rolebadge owner">Owner</span></div><button class="b-ghost b-sm" id="adminLogout" type="button">Sign out</button>`;
+  $('#adminLogout').onclick=doLogout; }
+
+function barsHTML(data){
+  const max=Math.max(1,...data.map(d=>d.value));
+  return `<div class="bars">${data.map(d=>`<div class="bar"><b>${d.top||''}</b><i style="height:${Math.round(d.value/max*100)}%"></i><small>${esc(d.label)}</small></div>`).join('')}</div>`;
+}
+function revByMonth(orders){
+  const now=new Date(), out=[];
+  for(let i=5;i>=0;i--){ const dt=new Date(now.getFullYear(),now.getMonth()-i,1); out.push({key:dt.getFullYear()+'-'+dt.getMonth(),label:dt.toLocaleDateString('en-US',{month:'short'}),value:0}); }
+  orders.forEach(o=>{ if(!o.created_at) return; const d=new Date(o.created_at); const k=d.getFullYear()+'-'+d.getMonth(); const m=out.find(x=>x.key===k); if(m) m.value+=(o.amount||0); });
+  return out.map(m=>({label:m.label,value:m.value,top:m.value?fmtMoney(m.value):''}));
+}
+function renderDashboard(){
+  const O=ADMIN.orders, L=ADMIN.leads, T=(ADMIN.talents||[]).filter(t=>!t.is_owner);
+  const active=O.filter(o=>o.state!=='done').length, done=O.filter(o=>o.state==='done').length;
+  const revenue=O.reduce((s,o)=>s+(o.amount||0),0);
+  const counts={todo:0,progress:0,done:0}; O.forEach(o=>counts[o.state||'todo']++);
+  $('#sec-dashboard').innerHTML=`
+    <div class="sechead"><h2>Dashboard</h2></div>
+    <div class="kpis">
+      <div class="kpi"><div class="kpi__l">Revenue</div><div class="kpi__v">${fmtMoney(revenue)}</div><div class="kpi__s">${O.length} paid order${O.length===1?'':'s'}</div></div>
+      <div class="kpi"><div class="kpi__l">Active projects</div><div class="kpi__v">${active}</div><div class="kpi__s">${done} completed</div></div>
+      <div class="kpi"><div class="kpi__l">Talents</div><div class="kpi__v">${T.length}</div><div class="kpi__s">in the studio</div></div>
+      <div class="kpi"><div class="kpi__l">Leads</div><div class="kpi__v">${L.length}</div><div class="kpi__s">unpaid / abandoned</div></div>
+    </div>
+    <div class="panels">
+      <div class="panel"><h3>Revenue · last 6 months</h3>${barsHTML(revByMonth(O))}</div>
+      <div class="panel"><h3>Projects by status</h3><div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">${donut(counts)}<div class="legend"><span><i style="background:#dc2626"></i>${counts.todo} to start</span><span><i style="background:#2563eb"></i>${counts.progress} in progress</span><span><i style="background:#16a34a"></i>${counts.done} completed</span></div></div></div>
+    </div>`;
+}
+
+let PF={q:'',talent:'',status:''};
+function projRowsHTML(){
+  const rows=ADMIN.orders.filter(o=>
+    (!PF.q || (o.ref+' '+(o.name||'')+' '+(o.plan||'')).toLowerCase().includes(PF.q)) &&
+    (!PF.talent || (o.talent_email||'')===PF.talent) &&
+    (!PF.status || (o.state||'todo')===PF.status));
+  if(!rows.length) return '<tr><td colspan="5" class="emptyrow">No projects match.</td></tr>';
+  return rows.map(o=>`<tr class="clk" data-open="${esc(o.ref)}"><td><b>${esc(o.name||'Untitled')}</b> <span class="swi__ref">#${esc(o.ref)}</span></td><td>${esc(planName(o.plan)||'-')}</td><td>${esc(talentName(o.talent_email))}</td><td>${spill(o.state)}</td><td>${dlBadge(o,o.items)}</td></tr>`).join('');
+}
+function bindProjRows(){ $('#sec-projects').querySelectorAll('[data-open]').forEach(r=>r.onclick=()=>openOrder(r.dataset.open)); }
+function renderProjectsSection(){
+  const talents=[...new Set(ADMIN.orders.map(o=>o.talent_email).filter(Boolean))];
+  $('#sec-projects').innerHTML=`
+    <div class="sechead"><h2>Projects</h2><button class="b-grad b-sm" data-newproj type="button">+ New project</button></div>
+    <div class="filters">
+      <input id="pfq" placeholder="Search projects…" value="${esc(PF.q)}">
+      <select id="pftalent"><option value="">All talents</option>${talents.map(t=>`<option value="${esc(t)}" ${PF.talent===t?'selected':''}>${esc(talentName(t))}</option>`).join('')}</select>
+      <select id="pfstatus"><option value="">All statuses</option>${['todo','progress','done'].map(s=>`<option value="${s}" ${PF.status===s?'selected':''}>${STATE[s][1]}</option>`).join('')}</select>
+    </div>
+    <div class="tbl"><table><thead><tr><th>Project</th><th>Pack</th><th>Talent</th><th>Status</th><th>Deadline</th></tr></thead><tbody id="projRows">${projRowsHTML()}</tbody></table></div>`;
+  $('#pfq').oninput=e=>{ PF.q=e.target.value.trim().toLowerCase(); $('#projRows').innerHTML=projRowsHTML(); bindProjRows(); };
+  $('#pftalent').onchange=e=>{ PF.talent=e.target.value; $('#projRows').innerHTML=projRowsHTML(); bindProjRows(); };
+  $('#pfstatus').onchange=e=>{ PF.status=e.target.value; $('#projRows').innerHTML=projRowsHTML(); bindProjRows(); };
+  $('#sec-projects').querySelector('[data-newproj]').onclick=openNewModal;
+  bindProjRows();
+}
+function renderOrdersSection(){
+  const O=ADMIN.orders;
+  const rows=O.length?O.map(o=>`<tr class="clk" data-open="${esc(o.ref)}"><td><span class="swi__ref">#${esc(o.ref)}</span></td><td><b>${esc(o.name||'-')}</b></td><td>${esc(o.email||'-')}</td><td>${esc(planName(o.plan)||'-')}</td><td>${o.billing==='sub'?'Subscription':'One-time'}</td><td class="amoney">${fmtMoney(o.amount)}</td><td>${fmtDate(o.created_at)}</td><td>${spill(o.state)}</td></tr>`).join(''):'<tr><td colspan="8" class="emptyrow">No orders yet.</td></tr>';
+  $('#sec-orders').innerHTML=`
+    <div class="sechead"><h2>Orders</h2><span style="color:var(--grey);font-weight:700;font-size:14px">${O.length} paid · ${fmtMoney(O.reduce((s,o)=>s+(o.amount||0),0))} total</span></div>
+    <div class="tbl"><table><thead><tr><th>Ref</th><th>Client</th><th>Email</th><th>Pack</th><th>Billing</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  $('#sec-orders').querySelectorAll('[data-open]').forEach(r=>r.onclick=()=>openOrder(r.dataset.open));
+}
+function renderCRMSection(){
+  const L=ADMIN.leads;
+  const stage=l=>l.onboarded?'Onboarded · unpaid':'Abandoned checkout';
+  const rows=L.length?L.map(l=>`<tr><td><b>${esc(l.name||'-')}</b></td><td>${esc(l.email||'-')}</td><td>${esc(l.handle||'-')}</td><td>${esc(planName(l.plan)||'-')}</td><td class="amoney">${l.amount?fmtMoney(l.amount):'-'}</td><td><span class="lead-stage">${stage(l)}</span></td><td>${fmtDate(l.created_at)}</td></tr>`).join(''):'<tr><td colspan="7" class="emptyrow">No leads yet. Unpaid or abandoned checkouts will show here.</td></tr>';
+  $('#sec-crm').innerHTML=`
+    <div class="sechead"><h2>CRM · Leads</h2><span style="color:var(--grey);font-weight:700;font-size:14px">${L.length} lead${L.length===1?'':'s'}</span></div>
+    <p style="color:var(--grey);font-size:13.5px;margin:-10px 0 18px">People who filled the checkout but didn't complete payment (abandoned cart or failed payment).</p>
+    <div class="tbl"><table><thead><tr><th>Name</th><th>Email</th><th>Handle</th><th>Pack</th><th>Est. value</th><th>Stage</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
 
 /* type icons (orange gradient) + per-deck progress */
 const TYPE_ICON={
@@ -751,14 +872,6 @@ function dlBadge(o,items){
   return `<span class="dl ${late?'late':(h<24?'soon':'')}">⏱ ${late?'Overdue '+t:t+' left'}</span>`;
 }
 
-function pcard(o){ return `<button class="pcard" data-open="${esc(o.ref)}"><div class="r">#${esc(o.ref)}</div><div class="n">${esc(o.name||o.email||'')}</div><div class="dlrow">${dlBadge(o)}</div><div class="foot"><span class="plan">${esc(planName(o.plan))}</span>${spill(o.state)}</div></button>`; }
-function renderProjects(){
-  const list=filtered(), wrap=$('#projects');
-  if(!list.length){ wrap.className=''; wrap.innerHTML='<div class="placeholder">No projects yet.</div>'; return; }
-  if(VIEW==='list'){ wrap.className='plist'; wrap.innerHTML=list.map(o=>`<button class="prow" data-open="${esc(o.ref)}"><span class="r">#${esc(o.ref)}</span><span class="n">${esc(o.name||o.email||'')}</span><span class="plan">${esc(planName(o.plan))}</span>${dlBadge(o)}${spill(o.state)}</button>`).join(''); }
-  else { wrap.className='kanban'; wrap.innerHTML=['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st); return `<div class="kcol"><div class="kcol__h"><span class="dot" style="background:${col}"></span>${l}<span class="c">${items.length}</span></div>${items.map(pcard).join('')||'<div class="none" style="color:var(--grey);font-size:12.5px;padding:6px">No projects</div>'}</div>`; }).join(''); }
-  wrap.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openOrder(el.dataset.open));
-}
 
 /* ---------- new project (owner) ---------- */
 /* ----- new-project pricing model (mirrors checkout, prices re-enforced server-side) ----- */
@@ -993,14 +1106,14 @@ $('#npForm').addEventListener('submit',async e=>{
       decks:Number($('#npDecks').value)||0, addons:npSelectedAddonKeys(),
       answers:npBrief(), talentEmail:$('#npTalent').value||null});
     if(!r.ok){ $('#npErr').textContent='Could not create ('+(r.error||'error')+').'; return; }
-    ORDERS=r.orders||ORDERS; $('#newModal').classList.add('hide'); renderProjects();
+    ORDERS=r.orders||ORDERS; ADMIN.orders=ORDERS; $('#newModal').classList.add('hide');
     if(r.ref) openOrder(r.ref);
   }catch(e){ $('#npErr').textContent='Network error.'; }
   finally{ btn.disabled=false; btn.textContent=old; }
 });
 
 /* ---------- detail ---------- */
-function backToOverview(){ $('#detail').classList.add('hide'); $('#overview').classList.remove('hide'); document.body.classList.remove('appmode'); REF=''; }
+function backToOverview(){ REF=''; showAdmin('projects'); }
 /* ---------- project switcher (sidebar dropdown) ---------- */
 function renderSwitcher(){
   const cur=ORDERS.find(o=>o.ref===REF);
@@ -1032,7 +1145,7 @@ async function openOrder(ref){
   const d=await api('/api/admin',{action:'get',ref:REF});
   if(!d.ok){ alert(d.error==='forbidden'?'Not your project.':'Order not found'); return; }
   try{ localStorage.setItem('brasero_last_ref',REF); }catch(e){}
-  $('#overview').classList.add('hide'); $('#detail').classList.remove('hide');
+  $('#adminApp').classList.add('hide'); $('#detail').classList.remove('hide');
   document.body.classList.add('appmode');
   renderSwitcher();
   $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);

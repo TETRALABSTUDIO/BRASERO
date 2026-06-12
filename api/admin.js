@@ -1,5 +1,5 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
-  adminListOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
+  adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
   assignOrder, createManualOrder, populateOrderElements, orderState, orderRef, sendTo, reviewEmail, siteUrl,
   signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, messageNotifyEmail } from './_lib.js';
@@ -34,6 +34,23 @@ export default async function handler(req, res) {
       const rows = isOwner ? await adminListOrders() : await ordersForTalent(me.email);
       const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
       return res.json({ ok: true, me: { email: me.email, name: me.name || '', is_owner: isOwner, photo: me.photo || '' }, orders });
+    }
+
+    /* ----- owner dashboard: all projects + leads + talents ----- */
+    if (action === 'dashboard') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      const all = await listAllOrders();
+      const paid = all.filter(o => o.status === 'paid');
+      const orders = await Promise.all(paid.map(async o => {
+        const dk = await decksForOrder(o.id);
+        return { ...pub(o, true), status: o.status, onboarding_at: o.onboarding_at || null, state: orderState(dk), items: dk.length };
+      }));
+      const leads = all.filter(o => o.status !== 'paid').map(o => ({
+        ref: o.ref || '', name: o.name || '', email: o.email || '', plan: o.plan || '', billing: o.billing || '',
+        amount: o.amount || 0, status: o.status || 'pending', handle: o.instagram || o.handle || '',
+        created_at: o.created_at, onboarded: !!o.onboarding_at,
+      }));
+      return res.json({ ok: true, orders, leads, talents: await listTalents() });
     }
 
     /* ----- self profile (any talent) ----- */
