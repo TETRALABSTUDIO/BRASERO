@@ -261,8 +261,8 @@ export const ITEMS = {
   deck6:     { name: '6 carousels',          amount: 24000, type: 'carousel', count: 6 },
   deck9:     { name: '9 carousels + 1 free', amount: 35000, type: 'carousel', count: 10 },
   story3:    { name: '3 stories',            amount: 10000, type: 'story',    count: 3 },
-  story6:    { name: '6 stories',            amount: 22000, type: 'story',    count: 6 },
-  story9:    { name: '9 stories + 1 free',   amount: 33000, type: 'story',    count: 10 },
+  story6:    { name: '6 stories',            amount: 15000, type: 'story',    count: 6 },
+  story9:    { name: '9 stories + 1 free',   amount: 19000, type: 'story',    count: 10 },
   brand_full:{ name: 'Branding pack',        amount: 21000, type: 'branding' },
   brand_pfp: { name: 'Profile photo',        amount: 6000,  type: 'branding' },
   brand_x:   { name: 'X / Twitter banner',   amount: 7000,  type: 'branding' },
@@ -550,8 +550,8 @@ export function amountFor(plan, billing) {
 export const ADDONS = {
   branding: { name: 'Social media branding',  amount: 21000 },
   story3:   { name: 'Story pack - 3 stories', amount: 10000 },
-  story6:   { name: 'Story pack - 6 stories', amount: 22000 },
-  story9:   { name: 'Story pack - 9 + 1 stories', amount: 33000 },
+  story6:   { name: 'Story pack - 6 stories', amount: 15000 },
+  story9:   { name: 'Story pack - 9 + 1 stories', amount: 19000 },
   bundle:   { name: 'Mega Bundle - branding + 9 stories + 1 free', amount: 45900 },
 };
 // Build Stripe line items for the selected add-ons (one-time price_data, mixes

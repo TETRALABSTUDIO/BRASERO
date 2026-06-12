@@ -440,6 +440,13 @@ img,svg{display:block}
 .trk__tag{align-self:flex-start;display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:800;color:#c64600;background:rgba(248,80,0,.12);border-radius:100px;padding:2px 7px}
 .trk__tag svg{width:10px;height:10px}
 .trk__msg{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:9px;border-bottom-left-radius:3px;padding:6px 9px;font-size:9.5px;color:#444;line-height:1.35}
+/* taller process assets */
+.pstep .ui{min-height:320px}
+.ui--track .trk{height:100%}
+.ui--track .trk__list,.ui--track .trk__detail{min-height:256px}
+.ui--track .trk__list{justify-content:space-between}
+.ui--track .trk__cat{padding:12px 11px}
+@media(max-width:820px){.pstep .ui{min-height:0}.ui--track .trk__list,.ui--track .trk__detail{min-height:0}}
 @keyframes trkGrow{0%,100%{width:34%}50%{width:90%}}
 @keyframes slideOn{0%,100%{background:#fff;border-color:var(--line)}16%,28%{background:#f87000;border-color:transparent}}
 .ui--track .trk__item.on .trk__bar i{animation:trkGrow 3.6s ease-in-out infinite}

@@ -7,6 +7,45 @@ Tant que la constante `API` du front est **vide**, tout fonctionne en mode **dé
 
 ---
 
+## 0. Tarifs & Stripe (source de vérité = `api/_lib.js`)
+
+Le checkout Stripe est **dynamique** (`price_data` / `unit_amount`) : les montants envoyés à Stripe viennent **directement du code**. Pour changer un prix, on édite `api/_lib.js` — **rien à recréer dans Stripe** pour les packs et les add-ons.
+
+### Packs (`PLANS`) — paiement unique ; abonnement = −10 %
+| Pack | Clé | Une fois | Abonnement / mois |
+|------|-----|---------|-------------------|
+| Ember | `starter` | $120 | $108 |
+| Flame | `flame` | $240 | $216 |
+| Meteor | `burst` | $350 | $315 |
+
+### Add-ons / éléments en upsell (`ITEMS` + `ADDONS`) — paiement unique
+| Élément | Clé | Prix |
+|---------|-----|------|
+| 3 carousels | `deck3` | $120 |
+| 6 carousels | `deck6` | $240 |
+| 9 + 1 carousels | `deck9` | $350 |
+| 3 stories | `story3` | $100 |
+| 6 stories | `story6` | **$150** |
+| 9 + 1 stories | `story9` | **$190** |
+| Pack branding (photo + bannières X/LinkedIn/Facebook + CTA) | `brand_full` | $210 |
+| Mega Bundle (branding + 9 + 1 stories) | `bundle` | $459 |
+
+> Le **branding** n'est vendu **qu'en pack** ($210), plus d'éléments à l'unité.
+
+### Variables d'environnement Stripe
+| Variable | Requis | Rôle |
+|----------|--------|------|
+| `STRIPE_SECRET_KEY` | ✅ | Clé secrète (`sk_live_...` ou `sk_test_...`) |
+| `STRIPE_WEBHOOK_SECRET` | recommandé | Signe le webhook `checkout.session.completed` (active la commande payée + l'email) |
+| `SITE_URL` | ✅ en prod | URL publique du site (redirections success / cancel) |
+| `STRIPE_PRICE_EMBER_ONCE` / `_SUB` | optionnel | Price ID Stripe réel pour Ember (sinon prix dynamique) |
+| `STRIPE_PRICE_FLAME_ONCE` / `_SUB` | optionnel | idem Flame |
+| `STRIPE_PRICE_METEOR_ONCE` / `_SUB` | optionnel | idem Meteor |
+
+Pour des **produits/prix fixes** dans Stripe (mieux pour la compta) : crée 6 Prices dans le dashboard (Ember / Flame / Meteor × once / sub) et colle leurs `price_...` dans les variables ci-dessus. Sinon laisse vide → tout est facturé au montant du code. Les **add-ons** restent toujours en prix dynamique (pas de Price ID à créer).
+
+---
+
 ## 1. Lancer en local (test)
 
 ### a. Le front
@@ -89,7 +128,7 @@ Le front (HTML + `assets/`) est servi en statique, et le backend tourne en **Ser
 ### Stripe en live
 1. Bascule sur les **clés live** (`sk_live_...`).
 2. Crée un **webhook** sur https://dashboard.stripe.com/webhooks pointant vers `https://TON-BACKEND/webhook`, évènement `checkout.session.completed` → copie le `whsec_...` live dans l'env.
-3. Vérifie tes **prix** : ils sont définis côté serveur dans `server/server.js` (`PLANS`) — Starter 120$, Flame 240$, Burst 290$, abonnement = −10%.
+3. Vérifie tes **prix** : ils sont définis côté serveur dans `api/_lib.js` (`PLANS`, `ITEMS`, `ADDONS`) — voir le tableau « Tarifs » ci-dessous. Abonnement = −10%.
 
 ---
 
