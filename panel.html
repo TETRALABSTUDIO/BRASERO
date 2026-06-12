@@ -20,12 +20,11 @@ body.appmode{overflow:hidden}
 .aside{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line)}
 .aside__brand{height:78px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);flex-shrink:0}
 .aside__brand .logo{height:34px;color:var(--ink)}
-.aside__nav{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column}
-.navi{position:relative;display:flex;align-items:center;justify-content:center;gap:11px;height:78px;flex-shrink:0;width:100%;background:none;border:none;border-bottom:1px solid var(--line);cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.015em;transition:background .12s}
-.navi svg{width:24px;height:24px;flex-shrink:0}
+.aside__nav{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding:14px 12px}
+.navi{position:relative;display:flex;align-items:center;gap:12px;height:44px;flex-shrink:0;width:100%;background:none;border:none;border-radius:11px;cursor:pointer;font-family:inherit;font-size:14.5px;font-weight:700;color:#3d3d3d;letter-spacing:-.01em;padding:0 12px;transition:background .12s,color .12s}
+.navi svg{width:20px;height:20px;flex-shrink:0}
 .navi:hover{background:var(--soft)}
-.navi.on{background:var(--soft)}
-.navi.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad)}
+.navi.on{background:var(--soft);color:var(--ink);font-weight:800}
 .aside__foot{padding:14px;border-top:1px solid var(--line)}
 .aside__foot .side__me{padding:12px 4px 0;border:none}
 .amain{min-height:0;overflow-y:auto;padding:30px 36px 70px;background:#fff}
@@ -82,9 +81,16 @@ body.appmode{overflow:hidden}
 .kcolh .dot{width:9px;height:9px;border-radius:50%}
 .kcolh .c{margin-left:auto;color:var(--grey);font-weight:700}
 .kcards{display:flex;flex-direction:column;gap:12px;min-height:60px}
-.kc{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px 16px;cursor:pointer;transition:.15s}
+.kc{position:relative;display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px 16px;cursor:pointer;transition:.15s}
 .kc:hover{border-color:rgba(248,80,0,.5);box-shadow:0 10px 26px rgba(0,0,0,.07);transform:translateY(-1px)}
-.kc__n{font-weight:900;font-size:15.5px;letter-spacing:-.02em}
+.kc__n{font-weight:900;font-size:15.5px;letter-spacing:-.02em;padding-right:30px}
+.kc__edit{position:absolute;top:11px;right:11px;width:28px;height:28px;border-radius:8px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0;opacity:0;transition:opacity .12s,color .12s}
+.kc:hover .kc__edit{opacity:1}
+.kc__edit:hover{color:var(--orange);border-color:var(--orange)}
+.kc__edit svg{width:15px;height:15px}
+.iconbtn{width:30px;height:30px;border-radius:8px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
+.iconbtn:hover{color:var(--orange);border-color:var(--orange)}
+.iconbtn svg{width:16px;height:16px}
 .kc__sub{font-size:12.5px;color:var(--grey);margin-top:6px}
 .tchip{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
 .tchip .avatar{width:19px;height:19px;font-size:8px;border:none;box-shadow:none;flex-shrink:0}
@@ -875,6 +881,36 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
     </div>
   </div>
 
+  <!-- Edit project modal (owner) -->
+  <div class="modal hide" id="editModal">
+    <div class="modalc">
+      <div class="modalc__h"><h3>Edit project</h3><button type="button" class="mx" id="eoClose">✕</button></div>
+      <form id="editForm">
+        <input type="hidden" id="eoRef">
+        <div class="np-sec__t" style="margin-bottom:12px">Client</div>
+        <div class="grid2">
+          <div class="field"><label>Client name</label><input id="eoName" placeholder="Nina Park"></div>
+          <div class="field"><label>Email</label><input id="eoEmail" type="email" placeholder="nina@brand.com"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Instagram handle</label><input id="eoIg" placeholder="@brand"></div>
+          <div class="field"><label>Phone</label><input id="eoPhone" placeholder="+1 555 …"></div>
+        </div>
+        <div class="np-sec__t" style="margin:6px 0 12px">Offer</div>
+        <div class="grid2">
+          <div class="field"><label>Pack</label><select id="eoPlan"><option value="starter">Ember</option><option value="flame">Flame</option><option value="burst">Meteor</option></select></div>
+          <div class="field"><label>Billing</label><select id="eoBilling"><option value="once">One-time</option><option value="sub">Subscription</option></select></div>
+        </div>
+        <div class="field"><label>Assigned talent</label><select id="eoTalent"><option value="">Unassigned</option></select></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap">
+          <button class="b-grad" type="submit" id="eoSave">Save changes</button>
+          <button class="b-del b-sm" type="button" id="eoDelete">Delete project</button>
+          <span class="err" id="eoErr" style="margin-top:0"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Add elements modal (owner) -->
   <div class="modal hide" id="addElemModal">
     <div class="modalc">
@@ -1094,12 +1130,14 @@ function assignSelect(o){
 }
 function projCard(o){
   return `<div class="kc" data-card="${esc(o.ref)}">
+    <button class="kc__edit" data-stop data-edit="${esc(o.ref)}" title="Edit project">${EDIT_IC}</button>
     <div class="kc__n">${esc(o.name||'Untitled')}</div>
     <div class="kc__meta"><span class="swi__ref">#${esc(o.ref)}</span><span class="kc__pack">${esc(planName(o.plan)||'')}</span></div>
     <div class="kc__foot">${dlBadge(o,o.items)}<span class="kc__items">${o.items||0} element${o.items===1?'':'s'}</span></div>
     <div class="kc__assign" data-stop>${assignSelect(o)}</div>
   </div>`;
 }
+const EDIT_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1L20 7.5a2 2 0 0 0-2.8-2.8L4.8 17.5 4 20z"/></svg>';
 function projRow(o){
   return `<tr data-row="${esc(o.ref)}" class="clk"><td><span class="swi__ref">#${esc(o.ref)}</span></td>
     <td><b>${esc(o.name||'-')}</b><div class="rsub">${esc(o.email||'')}</div></td>
@@ -1108,19 +1146,54 @@ function projRow(o){
     <td class="amoney">${fmtMoney(o.amount)}</td>
     <td data-stop>${assignSelect(o)}</td>
     <td>${dlBadge(o,o.items)}</td>
-    <td>${spill(o.state)}</td></tr>`;
+    <td>${spill(o.state)}</td>
+    <td data-stop><button class="iconbtn" data-edit="${esc(o.ref)}" title="Edit project">${EDIT_IC}</button></td></tr>`;
 }
 function renderProjectsBody(){
   const list=sortProjects(filteredProjects()), body=$('#pbody');
   if(PF.view==='list'){
-    const rows=list.length?list.map(projRow).join(''):'<tr><td colspan="8" class="emptyrow">No projects.</td></tr>';
-    body.innerHTML=`<div class="tbl"><table><thead><tr><th>Ref</th><th>Client</th><th>Pack</th><th>Billing</th><th>Amount</th><th>Talent</th><th>Deadline</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const rows=list.length?list.map(projRow).join(''):'<tr><td colspan="9" class="emptyrow">No projects.</td></tr>';
+    body.innerHTML=`<div class="tbl"><table><thead><tr><th>Ref</th><th>Client</th><th>Pack</th><th>Billing</th><th>Amount</th><th>Talent</th><th>Deadline</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
   } else {
     body.innerHTML=`<div class="kboard">`+['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st);
       return `<div><div class="kcolh"><span class="dot" style="background:${col}"></span>${l}<span class="c">${items.length}</span></div><div class="kcards">${items.map(projCard).join('')||'<div class="knone">No projects</div>'}</div></div>`; }).join('')+`</div>`;
   }
   bindProjects();
 }
+/* ----- edit / delete a project (owner) ----- */
+function openEditOrder(ref){
+  const o=(ADMIN.orders||[]).find(x=>x.ref===ref); if(!o) return;
+  $('#eoRef').value=ref;
+  $('#eoName').value=o.name||''; $('#eoEmail').value=o.email||''; $('#eoIg').value=o.instagram||''; $('#eoPhone').value=o.phone||'';
+  $('#eoPlan').value=o.plan||'flame'; $('#eoBilling').value=o.billing||'once';
+  $('#eoTalent').innerHTML='<option value="">Unassigned</option>'+(ADMIN.talents||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}" ${(o.talent_email||'').toLowerCase()===(t.email||'').toLowerCase()?'selected':''}>${esc(t.name||t.email)}</option>`).join('');
+  $('#eoErr').textContent='';
+  $('#editModal').classList.remove('hide'); setTimeout(()=>$('#eoName').focus(),30);
+}
+$('#eoClose').onclick=()=>$('#editModal').classList.add('hide');
+$('#editModal').addEventListener('click',e=>{ if(e.target.id==='editModal') $('#editModal').classList.add('hide'); });
+$('#editForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const ref=$('#eoRef').value; const btn=$('#eoSave'); $('#eoErr').textContent='';
+  btn.disabled=true; const old=btn.textContent; btn.innerHTML='<span class="spin"></span>';
+  try{
+    const r=await api('/api/admin',{action:'update_order',ref,
+      name:$('#eoName').value.trim(), email:$('#eoEmail').value.trim(), instagram:$('#eoIg').value.trim(),
+      phone:$('#eoPhone').value.trim(), plan:$('#eoPlan').value, billing:$('#eoBilling').value, talent_email:$('#eoTalent').value||null});
+    if(!r.ok){ $('#eoErr').textContent='Could not save ('+(r.error||'error')+').'; return; }
+    ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders;
+    $('#editModal').classList.add('hide'); renderProjectsSection();
+  }catch(err){ $('#eoErr').textContent='Network error.'; }
+  finally{ btn.disabled=false; btn.textContent=old; }
+});
+$('#eoDelete').onclick=async()=>{
+  const ref=$('#eoRef').value;
+  if(!confirm('Delete project #'+ref+'?\n\nThis permanently removes the order, all its elements and messages. This cannot be undone.')) return;
+  const r=await api('/api/admin',{action:'delete_order',ref});
+  if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+  ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders;
+  try{ if(localStorage.getItem('brasero_last_ref')===ref) localStorage.removeItem('brasero_last_ref'); }catch(e){}
+  $('#editModal').classList.add('hide'); renderProjectsSection();
+};
 function bindProjects(){
   $('#pbody').querySelectorAll('[data-card]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-stop]')) return; openOrder(el.dataset.card); });
   $('#pbody').querySelectorAll('tr[data-row]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-stop]')) return; openOrder(el.dataset.row); });
@@ -1128,6 +1201,7 @@ function bindProjects(){
     const r=await api('/api/admin',{action:'assign_order',ref:s.dataset.assign,talentEmail:s.value||null});
     if(r.ok){ ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders; renderProjectsBody(); }
   });
+  $('#pbody').querySelectorAll('[data-edit]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openEditOrder(b.dataset.edit); });
 }
 function renderProjectsSection(){
   const talents=[...new Set(ADMIN.orders.map(o=>o.talent_email).filter(Boolean))];

@@ -454,6 +454,36 @@ export async function assignOrder(ref, talentEmail) {
   return { ok: true };
 }
 
+// Owner: edit a project's client + offer details.
+export async function updateOrder(ref, patch = {}) {
+  const order = await findOrderByRef(ref);
+  if (!order) return { error: 'not_found' };
+  const p = {};
+  for (const k of ['name', 'email', 'instagram', 'handle', 'phone', 'plan', 'billing']) {
+    if (patch[k] !== undefined) p[k] = patch[k] === '' ? null : patch[k];
+  }
+  if (patch.talent_email !== undefined) p.talent_email = patch.talent_email ? String(patch.talent_email).trim().toLowerCase() : null;
+  if (!Object.keys(p).length) return { ok: true, order };
+  if (MEM) { Object.assign(order, p); return { ok: true, order }; }
+  const { error } = await db.from('orders').update(p).eq('id', order.id);
+  if (error) return { error: 'db' };
+  return { ok: true };
+}
+
+// Owner: delete a project (its decks + messages cascade on delete).
+export async function deleteOrder(ref) {
+  const order = await findOrderByRef(ref);
+  if (!order) return { error: 'not_found' };
+  if (MEM) {
+    MEM.orders = MEM.orders.filter(o => o.id !== order.id);
+    MEM.decks = MEM.decks.filter(d => d.order_id !== order.id);
+    if (MEM.messages) MEM.messages = MEM.messages.filter(m => m.order_id !== order.id);
+    return { ok: true };
+  }
+  await db.from('orders').delete().eq('id', order.id);
+  return { ok: true };
+}
+
 // Aggregate the decks into an overall progress phase for the tracker UI.
 export function orderProgress(decks) {
   const STEPS = ['Onboarding', 'Scripts', 'Script approval', 'Design', 'Final approval', 'Delivered'];

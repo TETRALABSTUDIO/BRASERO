@@ -1,6 +1,6 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
-  assignOrder, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
+  assignOrder, updateOrder, deleteOrder, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
   signToken, randomPassword, tempPassword, PLANS, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, messageNotifyEmail } from './_lib.js';
 
@@ -188,6 +188,19 @@ export default async function handler(req, res) {
       const r = await addItemsToOrder(order.ref || b.ref, key);
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
       return res.json({ ok: true, decks: await decksForOrder(order.id) });
+    }
+
+    if (action === 'update_order') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      const r = await updateOrder(b.ref, b);
+      if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      return res.json({ ok: true, orders: await enrich(await adminListOrders()) });
+    }
+    if (action === 'delete_order') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      const r = await deleteOrder(b.ref);
+      if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      return res.json({ ok: true, orders: await enrich(await adminListOrders()) });
     }
 
     // Owner adds a catalogue item (the same packs the client can buy) directly, no charge.
