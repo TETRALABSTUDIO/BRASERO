@@ -1807,26 +1807,31 @@ function slidesViewHTML(script){
 function renumberSlides(det){ det.querySelectorAll('.slides [data-slide] .slide__n').forEach((el,i)=>el.textContent='Slide '+(i+1)); }
 /* owner autofill: build N starter slides from the project brief + client info (no AI, fully editable) */
 function buildScaffoldSlides(n,b,o){
-  b=b||{}; o=o||{};
-  const niche=b.niche||b.page||o.name||'your topic';
-  const goal=b.goal||'grow the page';
-  const audience=b.audience||'your audience';
-  let handle=b.handle||o.instagram||o.handle||'';
-  if(handle&&handle[0]!=='@') handle='@'+handle;
+  b=b||{};
+  // Subject = the page THEME, never the client's name. Stay generic when no brief.
+  const niche=(b.niche||'').trim();
+  const topic=niche||'[your topic]';
+  const audience=(b.audience||'').trim()||'most people';
+  const goal=(b.goal||'').trim();
+  // CTA keyword: a single word to comment / DM. Derived from the theme, else a generic default.
+  let kw=niche?niche.split(/\s+/)[0].toUpperCase().replace(/[^A-Z0-9]/g,''):'';
+  if(kw.length<2) kw='INFO';
+  const tp=`<mark>${esc(topic)}</mark>`;
   const mk=(t,body)=>`<h4>${esc(t)}</h4>${body}`;
-  const hl=s=>`<mark>${esc(s)}</mark>`;
-  const slides=[mk('Hook',`Stop scrolling if you care about ${hl(niche)}.`)];
-  const bodies=[
-    ['The problem',`Most ${esc(audience)} struggle with ${hl(niche)} because no one explains it simply.`],
-    ['Why it matters',`If the goal is to ${hl(goal)}, this is the part everyone skips.`],
-    ['Quick tip',`One thing ${esc(audience)} can do today to move toward ${hl(goal)}.`],
-    ['Myth vs truth',`The myth: ___. The truth about ${hl(niche)}: ___.`],
-    ['Proof',`A quick example that shows this works for ${esc(audience)}.`],
-    ['Step by step',`Break ${hl(goal)} into 3 simple steps the audience can follow.`],
+  // Each body is 2-3 sentences (varying) so slides read like real copy, not stubs.
+  const pool=[
+    ['The real problem',`Most people approach ${tp} the wrong way from day one. They copy what everyone else does and wonder why nothing changes. The fix is simpler than you think.`],
+    ['Why it matters',`This is the part almost everyone skips. Get it right and ${tp} finally clicks for ${esc(audience)}.`],
+    ['The big mistake',`Mistake number one: trying to do everything at once. It feels productive, but it splits your focus and slows you down. Pick one thing and go all in.`],
+    ['Quick win',`Try this today, it takes five minutes. Small actions repeated daily beat big plans you never start.`],
+    ['The truth no one says',`Here's what nobody tells you about ${tp}. The people winning aren't more talented, they're just more consistent. That's the whole game.`],
+    ['Do this instead',`Stop chasing shortcuts and nail the basics first. Master the fundamentals and ${tp} gets easier every week. Everything else follows from there.`],
+    ['Keep it simple',`Break ${goal?`<mark>${esc(goal)}</mark>`:'your goal'} into three steps you can repeat. Keep it boring, keep it consistent, and let the results stack up.`],
   ];
+  const slides=[mk('Hook',`Stop scrolling if ${tp} actually matters to you. What you're about to read changes how you think about it.`)];
   const mid=Math.max(0,n-(n>=2?2:1));
-  for(let i=0;i<mid;i++){ const [t,bd]=bodies[i%bodies.length]; slides.push(mk(t,bd)); }
-  if(n>=2) slides.push(mk('Call to action',`Follow ${handle?hl(handle):'the page'} for more on ${hl(niche)}. Save this for later.`));
+  for(let i=0;i<mid;i++){ const [t,bd]=pool[i%pool.length]; slides.push(mk(t,bd)); }
+  if(n>=2) slides.push(mk('Call to action',`Want the full breakdown? Comment <mark>${esc(kw)}</mark> below or send it to me in a DM and I'll get it to you. Save this so you don't lose it.`));
   return slides.slice(0,n);
 }
 function fillScaffold(det,slidesEl,n){
