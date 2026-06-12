@@ -530,9 +530,16 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .chat__dot{width:9px;height:9px;border-radius:50%;background:var(--grad);flex-shrink:0;display:inline-block}
 .chat__dot.hide{display:none}
 .chat__head .chat__dot{margin-left:7px;vertical-align:middle}
-.chat__head{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.chat__head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
 .chat__head b{font-size:15px;font-weight:900;letter-spacing:-.02em}
 .chat__sub{display:block;font-size:12px;color:var(--grey);margin-top:2px}
+/* chat header: the client */
+.expert{display:flex;align-items:center;gap:11px;min-width:0;margin-right:auto}
+.expert__av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #fff;box-shadow:0 5px 14px rgba(248,80,0,.22)}
+.expert__av--ph{display:grid;place-items:center;background:var(--grad);color:#fff;font-weight:900;font-size:15px}
+.expert__info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.expert__label{font-size:11.5px;font-weight:800;color:var(--orange)}
+.expert__name{font-size:15.5px;font-weight:900;letter-spacing:-.02em;display:flex;align-items:center;gap:7px;min-width:0}
 .chat__collapse{margin-left:auto;flex-shrink:0;background:var(--soft);border:1px solid var(--line);border-radius:9px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;font-size:14px;color:var(--grey);font-family:inherit;padding:0}
 .chat__collapse:hover{color:var(--orange);border-color:var(--orange)}
 .chat__thread{flex:1;min-height:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--soft)}
@@ -545,9 +552,27 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .msg--client .msg__bubble{background:#fff;border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:5px}
 .msg__meta{font-size:11px;color:var(--grey);font-weight:600;padding:0 4px}
 .msg__about{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:var(--orange);background:rgba(248,80,0,.1);border:1px solid rgba(248,80,0,.2);border-radius:100px;padding:2px 9px}
-.chat__composer{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}
-.chat__asset{flex:0 0 auto;width:auto;max-width:160px;font-size:13px;padding:9px 11px;border-radius:100px;background:var(--soft)}
-.chat__input{flex:1;min-width:120px;font-size:14px;padding:10px 14px;border-radius:100px;background:var(--soft)}
+.msg__about .ti{width:13px;height:13px}
+.chat__composer{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+.chat__input{width:100%;font-family:inherit;font-size:14px;line-height:1.5;padding:11px 14px;border:1px solid var(--line);border-radius:14px;background:var(--soft);outline:none;color:var(--ink);resize:none;min-height:64px;max-height:170px}
+.chat__input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.1);background:#fff}
+.chat__send-row{display:flex;align-items:center;gap:8px}
+.chat__send-row .b-grad{flex-shrink:0}
+.assetpick{position:relative;flex:1;min-width:0}
+.assetpick__btn{display:flex;align-items:center;gap:6px;width:100%;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);padding:9px 12px;border:1px solid var(--line);border-radius:100px;background:var(--soft);cursor:pointer;text-align:left}
+.assetpick__btn:hover{border-color:var(--orange)}
+.assetpick__cur{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap}
+.assetpick__cur>span{overflow:hidden;text-overflow:ellipsis}
+.assetpick__cur .ti{width:16px;height:16px;flex-shrink:0}
+.assetpick__chev{width:15px;height:15px;color:var(--grey);flex-shrink:0}
+.assetpick__menu{position:absolute;bottom:calc(100% + 6px);left:0;right:0;z-index:20;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 44px rgba(0,0,0,.18);padding:6px;max-height:42vh;overflow-y:auto}
+.assetpick__menu.hide{display:none}
+.assetopt{display:flex;align-items:center;gap:9px;width:100%;text-align:left;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--ink);background:none;border:none;border-radius:9px;padding:8px 10px;cursor:pointer}
+.assetopt:hover,.assetopt.on{background:var(--soft)}
+.assetopt>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.assetopt__ic{width:24px;height:24px;flex-shrink:0;display:grid;place-items:center}
+.assetopt__ic .ti{width:20px;height:20px}
+.assetopt__ic--g{font-size:15px;font-weight:900;color:var(--grey)}
 @media(max-width:820px){.topnav__in{padding:12px 18px}.main{padding:20px 18px 90px}.kanban{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -703,14 +728,19 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
             <button type="button" class="chat__rail" id="chatOpen" title="Open messages"><span class="chat__dot hide" id="chatDot"></span><span class="chat__rail-l">Messages</span></button>
             <div class="chat__panel">
               <div class="chat__head">
-                <div><b>Messages<span class="chat__dot hide" id="chatDotHead"></span></b><span class="chat__sub">Talk to the client. Pick an element to reply about a specific asset.</span></div>
+                <div class="expert" id="chatExpert"></div>
                 <button type="button" class="chat__collapse" id="chatToggle" title="Hide chat">⟩</button>
               </div>
               <div class="chat__thread" id="chatThread"></div>
               <form class="chat__composer" id="chatForm">
-                <select id="chatAsset" class="chat__asset" title="What is this about?"><option value="">General</option></select>
-                <input id="chatInput" class="chat__input" placeholder="Write a message…" autocomplete="off" maxlength="4000">
-                <button class="b-grad b-sm" id="chatSend" type="submit">Send</button>
+                <textarea id="chatInput" class="chat__input" placeholder="Write a message…" rows="2" maxlength="4000"></textarea>
+                <div class="chat__send-row">
+                  <div class="assetpick" id="assetPick">
+                    <button type="button" class="assetpick__btn" id="assetBtn" title="What is this about?"><span class="assetpick__cur" id="assetCur">General</span><svg class="assetpick__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+                    <div class="assetpick__menu hide" id="assetMenu"></div>
+                  </div>
+                  <button class="b-grad b-sm" id="chatSend" type="submit">Send</button>
+                </div>
               </form>
             </div>
           </aside>
@@ -1446,7 +1476,8 @@ async function openOrder(ref){
   renderSideMe();
   SELDECK=null; CAT=null; renderBoard(d.decks||[]);
   BRIEF=d.brief||null; CURORDER=d.order||null;
-  MESSAGES=d.messages||[]; renderMessages(); setUnread(false); startMsgPoll();
+  chatAsset=''; renderExpert();
+  MESSAGES=d.messages||[]; renderMessages(); renderAssetCur(); setUnread(false); startMsgPoll();
 }
 /* ---------- project brief ---------- */
 let BRIEF=null, CURORDER=null;
@@ -1481,34 +1512,55 @@ function renderSideMe(){
 
 /* ---------- conversation with the client ---------- */
 let MESSAGES=[];
+let chatAsset='';   // selected element id for the next message ('' = general)
 function deckTitleById(id){ const d=DECKS.find(x=>String(x.id)===String(id)); return d?d.title:''; }
+function deckTypeById(id){ const d=DECKS.find(x=>String(x.id)===String(id)); return d?(d.type||'carousel'):'carousel'; }
 function fmtMsgTime(iso){ try{ const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+/* chat header: the client this order is for */
+function renderExpert(){
+  const el=$('#chatExpert'); if(!el) return;
+  const nm=(CURORDER&&CURORDER.name)?CURORDER.name:'Client';
+  el.innerHTML=`<div class="expert__av expert__av--ph">${esc(initials(nm))}</div><div class="expert__info"><span class="expert__label">Client</span><b class="expert__name">${esc(nm)}<span class="chat__dot hide" id="chatDotHead"></span></b></div>`;
+}
 function renderMessages(){
   const t=$('#chatThread'); if(!t) return;
-  if(!MESSAGES.length){ t.innerHTML='<div class="chat__empty">No messages yet. Say hi or share an update with the client.</div>'; }
+  const nm=(CURORDER&&CURORDER.name)?CURORDER.name:'the client';
+  if(!MESSAGES.length){ t.innerHTML=`<div class="chat__empty">Chat directly with <b>${esc(nm)}</b> about this order. Pick an element to reply about a specific asset.</div>`; }
   else t.innerHTML=MESSAGES.map(m=>{
     const cls=m.sender==='studio'?'msg--studio':'msg--client';
-    const about=m.deck_id?`<span class="msg__about">↳ ${esc(deckTitleById(m.deck_id)||'Element')}</span>`:'';
+    const about=m.deck_id?`<span class="msg__about">${TYPE_ICON[deckTypeById(m.deck_id)]||''} ${esc(deckTitleById(m.deck_id)||'Element')}</span>`:'';
     const who=esc(m.sender_name||(m.sender==='studio'?'You':'Client'));
     return `<div class="msg ${cls}">${about}<div class="msg__bubble">${esc(m.body)}</div><span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}</span></div>`;
   }).join('');
   t.scrollTop=t.scrollHeight;
-  const sel=$('#chatAsset'); if(sel){ const cur=sel.value;
-    sel.innerHTML='<option value="">General</option>'+DECKS.map(d=>`<option value="${esc(d.id)}">${esc(d.title)}</option>`).join('');
-    if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
-  }
 }
+/* custom element picker (shows the deck/story/branding icon) */
+function renderAssetCur(){
+  const cur=$('#assetCur'); if(!cur) return;
+  if(!chatAsset||!DECKS.some(d=>String(d.id)===String(chatAsset))){ chatAsset=''; cur.innerHTML='General'; return; }
+  cur.innerHTML=`${TYPE_ICON[deckTypeById(chatAsset)]||''}<span>${esc(deckTitleById(chatAsset))}</span>`;
+}
+function renderAssetMenu(){
+  const gen=`<button type="button" class="assetopt ${chatAsset?'':'on'}" data-asset=""><span class="assetopt__ic assetopt__ic--g">＃</span><span>General</span></button>`;
+  const rows=DECKS.map(d=>`<button type="button" class="assetopt ${String(d.id)===String(chatAsset)?'on':''}" data-asset="${esc(d.id)}"><span class="assetopt__ic">${TYPE_ICON[d.type]||TYPE_ICON.carousel}</span><span>${esc(d.title)}</span></button>`).join('');
+  $('#assetMenu').innerHTML=gen+rows;
+}
+$('#assetBtn')?.addEventListener('click',e=>{ e.stopPropagation(); renderAssetMenu(); $('#assetMenu').classList.toggle('hide'); });
+$('#assetMenu')?.addEventListener('click',e=>{ const o=e.target.closest('[data-asset]'); if(!o) return; chatAsset=o.dataset.asset; renderAssetCur(); $('#assetMenu').classList.add('hide'); });
+document.addEventListener('click',e=>{ if(!e.target.closest('#assetPick')) $('#assetMenu')?.classList.add('hide'); });
 $('#chatForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const input=$('#chatInput'), body=input.value.trim(); if(!body||!REF) return;
-  const deckId=$('#chatAsset').value||'';
+  const deckId=chatAsset||'';
   const btn=$('#chatSend'); btn.disabled=true;
   try{
     const r=await api('/api/admin',{action:'send_message',ref:REF,body,deckId});
-    if(r.ok){ MESSAGES=r.messages||MESSAGES; input.value=''; renderMessages(); }
+    if(r.ok){ MESSAGES=r.messages||MESSAGES; input.value=''; chatAsset=''; renderAssetCur(); renderMessages(); }
   }catch(err){}
   finally{ btn.disabled=false; }
 });
+/* Enter sends, Shift+Enter makes a new line */
+$('#chatInput')?.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); $('#chatForm').requestSubmit(); } });
 /* ---------- live chat: poll for new client messages, refresh instantly ---------- */
 let MSGPOLL=null;
 function setUnread(on){ $('#chatDot')?.classList.toggle('hide',!on); $('#chatDotHead')?.classList.toggle('hide',!on); }
