@@ -266,6 +266,23 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .brf__k{font-size:11.5px;font-weight:700;color:var(--grey)}
 .brf__v{font-size:14.5px;color:var(--ink);line-height:1.55;margin-top:3px;white-space:pre-wrap}
 .brf__sep{height:1px;background:var(--line);margin:6px 0}
+/* add-elements modal (owner) */
+.aecats{display:flex;flex-direction:column;gap:12px}
+.aecat{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
+.aecat:hover{border-color:var(--orange);box-shadow:0 12px 26px rgba(248,80,0,.12);transform:translateY(-1px)}
+.aecat__vis{width:80px;height:60px;border-radius:11px;flex-shrink:0;background:rgba(248,80,0,.08);display:grid;place-items:center}
+.aecat__vis svg{width:38px;height:38px}
+.aecat__body{margin-right:auto;display:flex;flex-direction:column;gap:3px}
+.aecat__body b{font-size:16px;font-weight:900;letter-spacing:-.02em}
+.aecat__body span{font-size:12.5px;color:var(--grey);font-weight:600}
+.aecat__chev{width:20px;height:20px;color:var(--grey);flex-shrink:0}
+.aeback{background:none;border:none;font-family:inherit;font-size:13px;font-weight:800;color:var(--grey);cursor:pointer;padding:4px 0;margin-bottom:10px}
+.aeback:hover{color:var(--orange)}
+.aelist{display:flex;flex-direction:column;gap:9px}
+.aeitem{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 16px;cursor:pointer;font-size:14.5px;font-weight:800;letter-spacing:-.01em;transition:border .15s,box-shadow .15s}
+.aeitem:hover{border-color:var(--orange);box-shadow:0 8px 20px rgba(248,80,0,.1)}
+.aeitem__add{font-size:12.5px;font-weight:800;color:var(--orange);flex-shrink:0}
+.aeitem.on{opacity:.6;pointer-events:none}
 .side__order h2{font-size:17px;font-weight:900;letter-spacing:-.025em;line-height:1.15}
 .side__order .meta{color:var(--grey);font-size:12.5px;margin-top:4px;line-height:1.45}
 .side__listhead{padding:8px 18px 9px;font-size:13px;font-weight:700;color:var(--grey)}
@@ -595,7 +612,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 
 <!-- ===== AUTH ===== -->
 <div id="auth" class="authwrap">
-  <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:42px"><use href="#brasero-studio"/></svg>
+  <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:54px"><use href="#brasero-studio"/></svg>
   <div id="authLogin">
     <p>Sign in to manage your projects.</p>
     <form id="loginForm">
@@ -628,7 +645,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
   <!-- ===== OWNER ADMIN SHELL ===== -->
   <div id="adminApp" class="adminapp hide">
     <aside class="aside">
-      <div class="aside__brand"><svg class="logo" viewBox="0 0 798 220" fill="none" style="height:36px"><use href="#brasero-studio"/></svg></div>
+      <div class="aside__brand"><svg class="logo" viewBox="0 0 798 220" fill="none" style="height:46px"><use href="#brasero-studio"/></svg></div>
       <nav class="aside__nav" id="adminNav">
         <button class="navi on" type="button" data-sec="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</button>
         <button class="navi" type="button" data-sec="projects"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Projects</button>
@@ -657,7 +674,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           <aside class="board__list">
             <div class="side__brand" style="gap:8px">
               <button class="b-ghost b-sm hide" id="toDash" type="button" title="Back to dashboard" style="flex-shrink:0">← Dashboard</button>
-              <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:28px;color:var(--ink)"><use href="#brasero-studio"/></svg>
+              <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:34px;color:var(--ink)"><use href="#brasero-studio"/></svg>
             </div>
             <div class="side__order switcher" id="switcher">
               <div class="side__order-top">
@@ -823,6 +840,15 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         </div>
       </form>
       <div id="tCreated" class="tcreated hide"></div>
+    </div>
+  </div>
+
+  <!-- Add elements modal (owner) -->
+  <div class="modal hide" id="addElemModal">
+    <div class="modalc">
+      <div class="modalc__h"><h3>Add elements</h3><button type="button" class="mx" id="aeClose">✕</button></div>
+      <p style="font-size:13px;color:var(--grey);margin:-8px 0 16px">The same packs a client can add, added straight to this order, no charge.</p>
+      <div id="aeBody"></div>
     </div>
   </div>
 
@@ -1390,7 +1416,7 @@ $('#switcherMenu').addEventListener('click',e=>{
 });
 document.addEventListener('click',e=>{ if(!e.target.closest('#switcher')) $('#switcherMenu')?.classList.add('hide'); });
 $('#deckList').addEventListener('click',e=>{
-  const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); addUpsellCategory(add.dataset.addcat); return; }
+  const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); openAddElems({carousel:'decks',story:'stories',branding:'branding'}[add.dataset.addcat]); return; }
   const back=e.target.closest('[data-catback]'); if(back){ CAT=null; SELDECK=null; renderSidebar(); renderDeckDetail(); return; }
   const cat=e.target.closest('[data-cat]'); if(cat){ CAT=cat.dataset.cat; const inCat=decksOfCat(CAT); SELDECK=inCat[0]?inCat[0].id:null; renderSidebar(); renderDeckDetail(); return; }
   const it=e.target.closest('[data-pick]'); if(it){ SELDECK=it.dataset.pick; renderSidebar(); renderDeckDetail(); }
@@ -1507,7 +1533,7 @@ function setChatCollapsed(c){ $('#board')?.classList.toggle('chat-collapsed',c);
 $('#chatToggle')?.addEventListener('click',()=>setChatCollapsed(true));
 $('#chatOpen')?.addEventListener('click',()=>setChatCollapsed(false));
 try{ if(localStorage.getItem(CHAT_KEY)) $('#board')?.classList.add('chat-collapsed'); }catch(e){}
-$('#addDeck').onclick=async()=>{ const title=prompt('Element title','New element'); if(title===null) return; const d=await api('/api/admin',{action:'add_deck',ref:REF,title,type:CAT||'carousel'}); renderBoard(d.decks||[]); };
+$('#addDeck').onclick=()=>openAddElems(CAT?({carousel:'decks',story:'stories',branding:'branding'}[CAT]):null);
 
 /* ---------- decks ---------- */
 const PILL={writing:['pill--wait','Writing'],script_review:['pill--act','Script · awaiting client'],designing:['pill--act','Designing'],design_review:['pill--act','Design · awaiting client'],revision:['pill--act','Retouch requested'],done:['pill--done','Done ✓']};
@@ -1566,13 +1592,37 @@ function renderDeckDetail(){
   $('#deckCmd').innerHTML=cmdHTML(d);
   bind(d);
 }
-async function addUpsellCategory(cat){
-  const lbl=cat==='story'?'a story pack (3 stories)':'a branding pack';
-  if(!confirm('Add '+lbl+' to this project? It is billed to the client as an upsell.')) return;
-  const r=await api('/api/admin',{action:'add_upsell',ref:REF,category:cat});
-  if(!r.ok){ alert('Error: '+(r.error||'')); return; }
-  CAT=cat; SELDECK=null; renderBoard(r.decks||[]);
+/* ---------- owner: add elements (same packs the client can buy, added free) ---------- */
+const AE_GROUPS=[
+  {key:'decks', title:'Carousels', sub:'Swipeable carousel decks', icon:'carousel', cat:'carousel', items:[
+    {key:'deck3',label:'3 Decks'},{key:'deck6',label:'6 Decks'},{key:'deck9',label:'9 Decks +1 free'}]},
+  {key:'stories', title:'Stories', sub:'Vertical 9:16 story sets', icon:'story', cat:'story', items:[
+    {key:'story3',label:'3 Stories'},{key:'story6',label:'6 Stories'},{key:'story9',label:'9 Stories +1 free'}]},
+  {key:'branding', title:'Branding', sub:'Profile photo, banners & CTAs', icon:'branding', cat:'branding', items:[
+    {key:'brand_full',label:'Full branding pack'},{key:'brand_pfp',label:'Profile photo'},{key:'brand_x',label:'X / Twitter banner'},
+    {key:'brand_li',label:'LinkedIn banner'},{key:'brand_fb',label:'Facebook banner'},{key:'brand_cta',label:'LinkedIn CTA'}]},
+];
+let aeCat=null;
+function renderAE(){
+  const b=$('#aeBody');
+  if(!aeCat){ b.innerHTML=`<div class="aecats">${AE_GROUPS.map(g=>`<button type="button" class="aecat" data-aecat="${g.key}"><span class="aecat__vis">${TYPE_ICON[g.icon]}</span><span class="aecat__body"><b>${g.title}</b><span>${g.sub}</span></span><svg class="aecat__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>`).join('')}</div>`; return; }
+  const g=AE_GROUPS.find(x=>x.key===aeCat);
+  b.innerHTML=`<button type="button" class="aeback" data-aeback>← All elements</button><div class="aelist">${g.items.map(it=>`<button type="button" class="aeitem" data-aeitem="${it.key}"><span>${it.label}</span><span class="aeitem__add">+ Add</span></button>`).join('')}</div>`;
 }
+function openAddElems(group){ aeCat=AE_GROUPS.some(g=>g.key===group)?group:null; renderAE(); $('#addElemModal').classList.remove('hide'); }
+$('#aeClose').onclick=()=>$('#addElemModal').classList.add('hide');
+$('#addElemModal').addEventListener('click',e=>{ if(e.target.id==='addElemModal') $('#addElemModal').classList.add('hide'); });
+$('#aeBody').addEventListener('click',async e=>{
+  const back=e.target.closest('[data-aeback]'); if(back){ aeCat=null; renderAE(); return; }
+  const cat=e.target.closest('[data-aecat]'); if(cat){ aeCat=cat.dataset.aecat; renderAE(); return; }
+  const it=e.target.closest('[data-aeitem]'); if(!it) return;
+  const key=it.dataset.aeitem; it.classList.add('on'); it.querySelector('.aeitem__add').textContent='Adding…';
+  const r=await api('/api/admin',{action:'add_item',ref:REF,key});
+  if(!r.ok){ alert('Error: '+(r.error||'')); it.classList.remove('on'); it.querySelector('.aeitem__add').textContent='+ Add'; return; }
+  $('#addElemModal').classList.add('hide');
+  CAT=key.startsWith('story')?'story':key.startsWith('brand')?'branding':'carousel'; SELDECK=null;
+  renderBoard(r.decks||[]);
+});
 function imagesOf(d){ return Array.isArray(d.design_urls)&&d.design_urls.length?d.design_urls:(d.design_url?[d.design_url]:[]); }
 const T_INSTR={
   writing:'✍️ Write the script for this element, then send it to the client for approval.',

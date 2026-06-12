@@ -190,6 +190,16 @@ export default async function handler(req, res) {
       return res.json({ ok: true, decks: await decksForOrder(order.id) });
     }
 
+    // Owner adds a catalogue item (the same packs the client can buy) directly, no charge.
+    if (action === 'add_item') {
+      if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+      if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
+      const r = await addItemsToOrder(order.ref || b.ref, b.key);
+      if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      return res.json({ ok: true, decks: await decksForOrder(order.id) });
+    }
+
     /* ----- deck-scoped (ownership checked via the deck's order) ----- */
     const deck = b.deckId ? await getDeck(b.deckId) : null;
     if (!deck) return res.status(404).json({ ok: false, error: 'deck_not_found' });
