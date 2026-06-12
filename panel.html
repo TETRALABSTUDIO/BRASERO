@@ -18,17 +18,18 @@ body.appmode{overflow:hidden}
 .adminapp{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:250px minmax(0,1fr);background:#fff}
 .adminapp.hide{display:none}
 .aside{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line)}
-.aside__brand{padding:22px 22px;border-bottom:1px solid var(--line)}
-.aside__brand .logo{height:25px;color:var(--ink)}
-.aside__nav{flex:1;min-height:0;overflow-y:auto;padding:16px 12px;display:flex;flex-direction:column;gap:6px}
-.navi{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:none;border-radius:13px;padding:14px 15px;cursor:pointer;font-family:inherit;font-size:15.5px;font-weight:800;color:var(--ink);letter-spacing:-.015em;transition:background .12s}
-.navi svg{width:23px;height:23px;flex-shrink:0}
+.aside__brand{height:78px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);flex-shrink:0}
+.aside__brand .logo{height:34px;color:var(--ink)}
+.aside__nav{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column}
+.navi{position:relative;display:flex;align-items:center;justify-content:center;gap:11px;height:78px;flex-shrink:0;width:100%;background:none;border:none;border-bottom:1px solid var(--line);cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.015em;transition:background .12s}
+.navi svg{width:24px;height:24px;flex-shrink:0}
 .navi:hover{background:var(--soft)}
 .navi.on{background:var(--soft)}
+.navi.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad)}
 .aside__foot{padding:14px;border-top:1px solid var(--line)}
 .aside__foot .side__me{padding:12px 4px 0;border:none}
 .amain{min-height:0;overflow-y:auto;padding:30px 36px 70px;background:#fff}
-.sec.hide{display:none}
+.asec.hide{display:none}
 .sechead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:24px}
 .sechead h2{font-size:27px;font-weight:900;letter-spacing:-.035em}
 .sechead .muted{color:var(--grey);font-weight:600;font-size:14px}
@@ -84,7 +85,11 @@ body.appmode{overflow:hidden}
 .kc{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px 16px;cursor:pointer;transition:.15s}
 .kc:hover{border-color:rgba(248,80,0,.5);box-shadow:0 10px 26px rgba(0,0,0,.07);transform:translateY(-1px)}
 .kc__n{font-weight:900;font-size:15.5px;letter-spacing:-.02em}
-.kc__sub{font-size:12.5px;color:var(--grey);margin-top:3px}
+.kc__sub{font-size:12.5px;color:var(--grey);margin-top:6px}
+.tchip{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
+.tchip .avatar{width:19px;height:19px;font-size:8px;border:none;box-shadow:none;flex-shrink:0}
+.tchip__n{color:#3d3d3d;font-weight:700}
+.tchip--none{color:var(--grey);font-weight:600}
 .kc__foot{display:flex;align-items:center;gap:8px;margin-top:13px;flex-wrap:wrap}
 .kc__pack{font-size:12px;font-weight:700;color:var(--grey)}
 .knone{color:var(--grey);font-size:13px;padding:8px 4px}
@@ -104,7 +109,7 @@ button[disabled]{opacity:.45;pointer-events:none;transform:none}
 
 /* auth */
 .authwrap{max-width:390px;margin:13vh auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:0 18px 50px rgba(0,0,0,.08)}
-.authwrap .logo{height:30px;margin-bottom:16px;color:var(--ink)}
+.authwrap .logo{height:38px;margin-bottom:18px;color:var(--ink)}
 .authwrap p{color:var(--grey);font-size:13.5px;margin-bottom:20px}
 .setupav{display:grid;place-items:center;cursor:pointer;margin:0 auto 16px;width:76px;height:76px;border-radius:50%;background:var(--soft);border:2px dashed var(--line);overflow:hidden}
 .setupav:hover{border-color:var(--orange)}
@@ -191,7 +196,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .prow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 16px;cursor:pointer;transition:.15s;text-align:left;width:100%}
 .prow:hover{border-color:rgba(248,80,0,.5)}
 .prow .r{font-weight:900;min-width:90px}.prow .n{flex:1;color:var(--grey);font-size:13.5px}.prow .plan{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--grey)}
-.spill{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;padding:4px 10px;border-radius:100px;white-space:nowrap}
+.spill{font-size:12px;font-weight:700;padding:4px 11px;border-radius:100px;white-space:nowrap}
 .spill.progress{background:rgba(37,99,235,.10);color:var(--c-prog)}.spill.done{background:rgba(22,163,74,.11);color:var(--c-done)}.spill.todo{background:rgba(220,38,38,.10);color:var(--c-todo)}
 
 /* detail */
@@ -211,7 +216,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .pill--wait{background:var(--waitbg);color:var(--wait)}.pill--act{background:rgba(248,80,0,.12);color:#c64600}.pill--done{background:var(--okbg);color:var(--ok)}
 .stage{border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:12px;background:#fff}
 .stage.locked{background:var(--soft);opacity:.85}.stage.approved{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.04)}
-.stage__h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);margin-bottom:10px}
+.stage__h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--grey);margin-bottom:10px}
 .stage__h .num{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;color:#fff;background:var(--grad)}
 .stage.locked .stage__h .num{background:#cbcbcb}.stage.approved .stage__h .num{background:var(--ok)}
 .lockmsg{color:var(--grey);font-size:13px}
@@ -247,7 +252,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .side__me-name{font-size:13.5px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .side__me .rolebadge{align-self:flex-start;font-size:9px;padding:2px 8px}
 /* project switcher (sidebar top) */
-.switcher{position:relative;width:100%}
+.switcher{position:relative;flex:1;min-width:0}
 .switcher__btn{display:flex;align-items:center;gap:8px;width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;font-family:inherit;text-align:left}
 .switcher__btn:hover{border-color:var(--orange)}
 .switcher__cur{flex:1;min-width:0;font-size:14px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -320,7 +325,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .tscript{margin-top:14px}
 .tscript summary{cursor:pointer;font-weight:700;font-size:12.5px;color:var(--grey)}
 .board__detail .imgcount{font-size:11.5px;color:var(--grey);font-weight:700;margin-top:14px}
-.board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:11px;margin-top:10px}
+.board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px;margin-top:12px}
 .board__detail .gal figure{position:relative;aspect-ratio:1080/1350;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
 .board__detail .gal figure img{width:100%;height:100%;object-fit:cover;display:block}
 .board__detail .gal .x{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:12px;display:grid;place-items:center;padding:0;line-height:1;cursor:pointer}
@@ -338,11 +343,15 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .cmdprog i{display:block;height:100%;background:var(--grad);transition:width .6s cubic-bezier(.4,0,.2,1)}
 
 /* team */
-.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.tcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:14px}
-.tcard__top{display:flex;align-items:center;gap:13px}
-.tcard .nm{font-weight:900;font-size:16px;letter-spacing:-.02em}
-.tcard .em{font-size:12.5px;color:var(--grey);word-break:break-all}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.tcard{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.tcard__banner{height:90px;background:var(--grad);background-size:cover;background-position:center}
+.tcard__av{display:block;width:66px;height:66px;margin:-36px 0 0 20px;border-radius:50%;border:3px solid #fff;overflow:hidden;cursor:pointer;position:relative;z-index:1;box-shadow:0 6px 16px rgba(0,0,0,.16)}
+.tcard__av .avatar{width:100%;height:100%;font-size:23px;border:none}
+.tcard__body{padding:10px 20px 20px;display:flex;flex-direction:column;gap:14px}
+.tcard__id{display:flex;align-items:flex-start;gap:10px}
+.tcard .nm{font-weight:900;font-size:17px;letter-spacing:-.02em}
+.tcard .em{font-size:12.5px;color:var(--grey);word-break:break-all;margin-top:2px}
 .tcard__mid{display:flex;align-items:center;gap:16px}
 .donut{width:84px;height:84px;flex:0 0 84px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center}
 .donut.empty{background:#eee}
@@ -351,13 +360,20 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .donut .hole span{font-size:8px;color:var(--grey);text-transform:uppercase;letter-spacing:.03em;margin-top:1px}
 .legend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600}
 .legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:7px;vertical-align:0}
-.sec{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--grey);margin-bottom:7px}
+.sec{font-size:12.5px;font-weight:700;color:var(--grey);margin-bottom:8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:4px 6px 4px 11px;font-size:12px;font-weight:700}
 .chip button{width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;font-size:11px;display:grid;place-items:center;padding:0;line-height:1}
 .chip button:hover{background:#c33}
 .tcard .none{font-size:12.5px;color:var(--grey)}
 .addcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.05);margin-bottom:18px}
+.tcreated{margin-top:16px;border:1px solid rgba(22,163,74,.3);background:rgba(22,163,74,.05);border-radius:14px;padding:16px}
+.tcreated.hide{display:none}
+.tcreated__h{font-weight:900;font-size:15px;margin-bottom:6px}
+.tcreated p{font-size:13px;color:var(--grey);margin-bottom:12px}
+.cred{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.cred span{font-size:12px;color:var(--grey);min-width:130px}
+.cred code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;font-weight:700;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px}
 .addcard h3{font-size:16px;font-weight:900;letter-spacing:-.02em;margin-bottom:14px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
@@ -375,7 +391,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .modalc--wide{max-width:660px}
 .np-sec{margin-bottom:20px}
 .np-sec+.np-sec{padding-top:18px;border-top:1px solid var(--line)}
-.np-sec__t{font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.np-sec__t{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .np-opt{font-size:10px;font-weight:800;letter-spacing:.02em;text-transform:none;color:#9a9a9a;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:2px 8px}
 .np-fill{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;text-transform:none;letter-spacing:0;color:var(--orange);background:rgba(248,80,0,.08);border:1px solid rgba(248,80,0,.25);border-radius:100px;padding:5px 11px}
 .np-fill:hover{background:rgba(248,80,0,.14)}
@@ -509,6 +525,13 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
       <button class="b-grad" id="setupBtn" style="width:100%" type="submit">Create my account →</button>
     </form>
   </div>
+  <div id="authReset" class="hide">
+    <p>Welcome! Set a new password to secure your account.</p>
+    <form id="resetForm">
+      <div class="field"><label>New password</label><input id="resetPass" type="password" placeholder="At least 6 characters" autocomplete="new-password" required></div>
+      <button class="b-grad" id="resetBtn" style="width:100%" type="submit">Save &amp; continue →</button>
+    </form>
+  </div>
   <div class="err" id="authErr"></div>
 </div>
 
@@ -531,27 +554,28 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
       </div>
     </aside>
     <main class="amain">
-      <section class="sec" id="sec-dashboard"></section>
-      <section class="sec hide" id="sec-projects"></section>
-      <section class="sec hide" id="sec-talents">
+      <section class="asec" id="sec-dashboard"></section>
+      <section class="asec hide" id="sec-projects"></section>
+      <section class="asec hide" id="sec-talents">
         <div class="sechead"><h2>Talents</h2></div>
         <div class="addcard">
-          <h3>Invite a Talent</h3>
-          <p style="font-size:13px;color:var(--grey);margin:-6px 0 14px">They'll get an email to set their own password, name &amp; photo.</p>
+          <h3>Create a talent account</h3>
+          <p style="font-size:13px;color:var(--grey);margin:-6px 0 14px">We generate a temporary password to share with them. They change it on first login.</p>
           <form id="talentForm">
             <div class="grid2">
               <div class="field"><label>Name (optional)</label><input id="tName" placeholder="Jane Doe"></div>
               <div class="field"><label>Email</label><input id="tEmail" type="email" placeholder="jane@brasero.studio" required></div>
             </div>
             <label style="display:flex;align-items:center;gap:7px;margin:0 0 14px"><input type="checkbox" id="tOwner" style="width:auto"> Make owner</label><br>
-            <button class="b-grad" type="submit">Send invite →</button>
+            <button class="b-grad" type="submit">Create account →</button>
             <span class="err" id="tErr" style="display:inline-block;margin-left:10px"></span>
           </form>
+          <div id="tCreated" class="tcreated hide"></div>
         </div>
         <div class="tgrid" id="teamGrid"></div>
       </section>
-      <section class="sec hide" id="sec-orders"></section>
-      <section class="sec hide" id="sec-crm"></section>
+      <section class="asec hide" id="sec-orders"></section>
+      <section class="asec hide" id="sec-crm"></section>
     </main>
   </div>
 
@@ -559,7 +583,8 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
   <div id="detail" class="hide">
         <div class="board" id="board">
           <aside class="board__list">
-            <div class="side__brand">
+            <div class="side__brand" style="gap:8px">
+              <button class="b-ghost b-sm hide" id="toDash" type="button" title="Back to dashboard" style="flex-shrink:0">← Dashboard</button>
               <div class="switcher" id="switcher">
                 <button type="button" class="switcher__btn" id="switcherBtn">
                   <span class="switcher__cur" id="switcherCur">Project</span>
@@ -764,6 +789,7 @@ async function boot(){
   const d=await api('/api/admin',{action:'list'});
   if(!d.ok) return;
   ME=d.me; ORDERS=d.orders||[];
+  if(ME.must_reset){ showReset(); return; }
   $('#auth').classList.add('hide'); $('#app').classList.remove('hide');
   renderProfile();
   if(ME.is_owner){
@@ -784,6 +810,17 @@ function renderProfile(){
   const rb=$('#roleBadge'); rb.textContent=ME.is_owner?'Owner':'Talent'; rb.className='rolebadge '+(ME.is_owner?'owner':'talent');
 }
 
+/* ---------- first-login password reset ---------- */
+function showReset(){ $('#app').classList.add('hide'); $('#auth').classList.remove('hide'); $('#authLogin').classList.add('hide'); $('#authSetup').classList.add('hide'); $('#authReset').classList.remove('hide'); setTimeout(()=>$('#resetPass').focus(),30); }
+$('#resetForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const p=$('#resetPass').value; $('#authErr').textContent='';
+  if(p.length<6){ $('#authErr').textContent='Password must be at least 6 characters.'; return; }
+  const btn=$('#resetBtn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  const r=await api('/api/admin',{action:'update_me',password:p});
+  if(r.ok){ $('#authReset').classList.add('hide'); boot(); }
+  else { $('#authErr').textContent='Something went wrong.'; btn.disabled=false; btn.textContent='Save & continue →'; }
+});
+
 /* ---------- profile self-edit ---------- */
 $('#editName').onclick=async()=>{ const name=prompt('Your name', ME.name||''); if(name===null) return; const r=await api('/api/admin',{action:'update_me',name}); if(r.ok){ ME=r.me; renderProfile(); renderAdminMe(); } };
 
@@ -792,7 +829,9 @@ const STATE={todo:['todo','To start','#dc2626'],progress:['progress','In progres
 function spill(st){ const [c,l]=STATE[st]||STATE.todo; return `<span class="spill ${c}">${l}</span>`; }
 const fmtMoney=c=>'$'+Math.round((c||0)/100).toLocaleString('en-US');
 const fmtDate=s=>{ if(!s) return '-'; try{ return new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){ return '-'; } };
-function talentName(email){ if(!email) return 'Unassigned'; const t=(ADMIN.talents||[]).find(x=>(x.email||'').toLowerCase()===email.toLowerCase()); return t?(t.name||t.email):email; }
+function talentObj(email){ return email?(ADMIN.talents||[]).find(x=>(x.email||'').toLowerCase()===email.toLowerCase()):null; }
+function talentName(email){ if(!email) return 'Unassigned'; const t=talentObj(email); return t?(t.name||t.email):email; }
+function talentChip(email){ if(!email) return '<span class="tchip tchip--none">Unassigned</span>'; const t=talentObj(email), nm=t?(t.name||t.email):email; return `<span class="tchip">${avatar(t||{name:nm},'xs')}<span class="tchip__n">${esc(nm)}</span></span>`; }
 const SECS=['dashboard','projects','talents','orders','crm'];
 function showAdmin(sec){ document.body.classList.remove('appmode'); $('#detail').classList.add('hide'); $('#adminApp').classList.remove('hide'); renderAdminMe(); navTo(sec||'dashboard'); }
 function navTo(sec){
@@ -878,7 +917,7 @@ function renderDashboard(){
 
 /* ----- projects: kanban with search + talent filter ----- */
 let PF={q:'',talent:''};
-function projCard(o){ return `<button class="kc" data-open="${esc(o.ref)}"><div class="kc__n">${esc(o.name||'Untitled')}</div><div class="kc__sub"><span class="swi__ref">#${esc(o.ref)}</span> · ${esc(talentName(o.talent_email))}</div><div class="kc__foot"><span class="kc__pack">${esc(planName(o.plan)||'')}</span>${dlBadge(o,o.items)}</div></button>`; }
+function projCard(o){ return `<button class="kc" data-open="${esc(o.ref)}"><div class="kc__n">${esc(o.name||'Untitled')} <span class="swi__ref">#${esc(o.ref)}</span></div><div class="kc__sub">${talentChip(o.talent_email)}</div><div class="kc__foot"><span class="kc__pack">${esc(planName(o.plan)||'')}</span>${dlBadge(o,o.items)}</div></button>`; }
 function renderKboard(){
   const list=ADMIN.orders.filter(o=> (!PF.q||(o.ref+' '+(o.name||'')+' '+(o.plan||'')).toLowerCase().includes(PF.q)) && (!PF.talent||(o.talent_email||'')===PF.talent));
   $('#kboard').innerHTML=['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st);
@@ -1197,6 +1236,7 @@ function renderSwitcher(){
   $('#switcherMenu').innerHTML=(items||'<div class="swi__empty">No projects yet.</div>')+ownerExtras;
 }
 $('#switcherBtn').onclick=e=>{ e.stopPropagation(); renderSwitcher(); $('#switcherMenu').classList.toggle('hide'); };
+$('#toDash').onclick=()=>showAdmin('dashboard');
 $('#switcherMenu').addEventListener('click',e=>{
   const it=e.target.closest('[data-ref]');
   if(it){ $('#switcherMenu').classList.add('hide'); if(it.dataset.ref!==REF) openOrder(it.dataset.ref); return; }
@@ -1213,6 +1253,7 @@ async function openOrder(ref){
   try{ localStorage.setItem('brasero_last_ref',REF); }catch(e){}
   $('#adminApp').classList.add('hide'); $('#detail').classList.remove('hide');
   document.body.classList.add('appmode');
+  $('#toDash').classList.toggle('hide',!(ME&&ME.is_owner));
   renderSwitcher();
   $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
   const o=d.order, ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
@@ -1432,13 +1473,14 @@ function renderTeam(){
     const assignSel=t.is_owner?'':`<select data-assign-for="${esc(t.email)}" style="margin-top:8px"><option value="">+ Assign a project…</option>${unassigned.map(o=>`<option value="${esc(o.ref)}">#${esc(o.ref)}, ${esc(o.name||o.email||'')}</option>`).join('')}</select>`;
     const mid=t.is_owner?'':`<div class="tcard__mid">${donut(c)}<div class="legend"><span><i style="background:#dc2626"></i>${c.todo} to start</span><span><i style="background:#2563eb"></i>${c.progress} in progress</span><span><i style="background:#16a34a"></i>${c.done} completed</span></div></div>`;
     return `<div class="tcard" data-talent="${esc(t.email)}">
-      <div class="tcard__top">
-        <label class="avwrap" title="Change photo">${avatar(t,'sm')}<input type="file" accept="image/*" hidden data-photo></label>
-        <div style="min-width:0"><div class="nm">${esc(t.name||'Unnamed')}</div><div class="em">${esc(t.email)}</div></div>
-        <span class="rolebadge ${t.is_owner?'owner':'talent'}" style="margin-left:auto">${t.is_owner?'Owner':'Talent'}</span></div>
-      ${mid}
-      <div><div class="sec">Projects</div>${chips}${assignSel}</div>
-      <div class="actions"><button class="b-ghost b-sm" data-edit>Edit</button><button class="b-del b-sm" data-del>Delete</button></div>
+      <div class="tcard__banner" style="${t.photo?`background-image:url(${esc(t.photo)})`:''}"></div>
+      <label class="tcard__av" title="Change photo">${avatar(t,'lg')}<input type="file" accept="image/*" hidden data-photo></label>
+      <div class="tcard__body">
+        <div class="tcard__id"><div style="min-width:0;margin-right:auto"><div class="nm">${esc(t.name||'Unnamed')}</div><div class="em">${esc(t.email)}</div></div><span class="rolebadge ${t.is_owner?'owner':'talent'}">${t.is_owner?'Owner':'Talent'}</span></div>
+        ${mid}
+        <div><div class="sec">Projects</div>${chips}${assignSel}</div>
+        <div class="actions"><button class="b-ghost b-sm" data-edit>Edit</button><button class="b-del b-sm" data-del>Delete</button></div>
+      </div>
     </div>`;
   }).join('')||'<div class="none">No talents yet.</div>';
   bindTeam();
@@ -1465,11 +1507,17 @@ function bindTeam(){
 }
 $('#talentForm').addEventListener('submit',async e=>{
   e.preventDefault(); const errEl=$('#tErr'); errEl.style.color=''; errEl.textContent='';
-  const body={action:'create_talent',name:$('#tName').value.trim(),email:$('#tEmail').value.trim(),is_owner:$('#tOwner').checked};
+  const email=$('#tEmail').value.trim();
+  const body={action:'create_talent',name:$('#tName').value.trim(),email,is_owner:$('#tOwner').checked};
   const r=await api('/api/admin',body);
   if(!r.ok){ errEl.textContent=r.error==='exists'?'Email already exists.':'Error: '+(r.error||''); return; }
   TALENTS=r.talents||TALENTS; $('#talentForm').reset();
-  errEl.style.color='#15803d'; errEl.textContent='Invite sent ✅';
+  const box=$('#tCreated');
+  box.innerHTML=`<div class="tcreated__h">✅ Account created</div><p>Share these with <b>${esc(email)}</b>. They'll be asked to change the password on first login.</p>
+    <div class="cred"><span>Email</span><code>${esc(email)}</code></div>
+    <div class="cred"><span>Temporary password</span><code>${esc(r.password||'')}</code><button type="button" class="b-ghost b-sm" data-copy="${esc(r.password||'')}">Copy</button></div>`;
+  box.classList.remove('hide');
+  box.querySelector('[data-copy]').onclick=ev=>{ navigator.clipboard?.writeText(ev.target.dataset.copy); ev.target.textContent='Copied'; };
   renderTeam();
 });
 

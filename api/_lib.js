@@ -365,7 +365,7 @@ export async function createManualOrder({ name, email, instagram, handle, plan, 
 }
 
 /* ---- Talent accounts + project assignment ---- */
-const pubTalent = t => t && ({ email: t.email, name: t.name || '', is_owner: !!t.is_owner, photo: t.photo || '' });
+const pubTalent = t => t && ({ email: t.email, name: t.name || '', is_owner: !!t.is_owner, photo: t.photo || '', must_reset: !!t.must_reset });
 
 export async function getTalentByEmail(email) {
   if (!STORE || !email) return null;
@@ -381,12 +381,12 @@ export async function loginTalent(email, password) {
   return { token: signToken({ email: t.email, owner: !!t.is_owner }), talent: pubTalent(t) };
 }
 
-export async function createTalent({ email, password, name, is_owner, photo }) {
+export async function createTalent({ email, password, name, is_owner, photo, must_reset }) {
   if (!STORE) return { error: 'no_store' };
   const EM = String(email || '').trim().toLowerCase();
   if (!EM || !password) return { error: 'missing' };
   if (await getTalentByEmail(EM)) return { error: 'exists' };
-  const row = { email: EM, name: name || '', is_owner: !!is_owner, photo: photo || '', password_hash: hashPassword(password) };
+  const row = { email: EM, name: name || '', is_owner: !!is_owner, photo: photo || '', must_reset: !!must_reset, password_hash: hashPassword(password) };
   if (MEM) { const t = { id: uid(), ...row }; MEM.talents.push(t); return { talent: pubTalent(t) }; }
   const { data, error } = await db.from('talents').insert(row).select('*').maybeSingle();
   if (error) return { error: error.message };
@@ -400,7 +400,7 @@ export async function updateTalent({ email, name, password, is_owner, photo }) {
   if (name != null) patch.name = name;
   if (is_owner != null) patch.is_owner = !!is_owner;
   if (photo != null) patch.photo = photo;
-  if (password) patch.password_hash = hashPassword(password);
+  if (password) { patch.password_hash = hashPassword(password); patch.must_reset = false; }
   if (MEM) { Object.assign(t, patch); return { talent: pubTalent(t) }; }
   const { data, error } = await db.from('talents').update(patch).eq('id', t.id).select('*').maybeSingle();
   if (error) return { error: error.message };
@@ -424,7 +424,7 @@ export async function deleteTalent(email) {
 export async function listTalents() {
   if (MEM) return MEM.talents.map(pubTalent);
   if (!db) return [];
-  const { data } = await db.from('talents').select('email,name,is_owner').order('created_at', { ascending: true });
+  const { data } = await db.from('talents').select('email,name,is_owner,photo,must_reset').order('created_at', { ascending: true });
   return (data || []).map(pubTalent);
 }
 
@@ -710,6 +710,8 @@ export function addonClientEmail({ name, planName, count, ref, trackUrl }) {
 
 /* ===================== Talent emails ===================== */
 export const randomPassword = () => crypto.randomBytes(18).toString('hex');
+// Short, shareable temporary password for a freshly-created talent account.
+export const tempPassword = () => crypto.randomBytes(5).toString('hex');
 const greet = name => `<p style="margin:0 0 8px">Hi${name ? ' ' + name.split(' ')[0] : ''},</p>`;
 
 // Invite a new talent to set up their account (password + name + photo).

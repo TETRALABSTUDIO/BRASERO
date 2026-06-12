@@ -79,6 +79,8 @@ create table if not exists talents (
 );
 
 alter table talents add column if not exists photo text;
+-- Force a password change on the talent's first login (account created by the owner).
+alter table talents add column if not exists must_reset boolean default false;
 
 create index if not exists talents_email_idx on talents (lower(email));
 

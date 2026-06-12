@@ -1,7 +1,7 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
   assignOrder, createManualOrder, populateOrderElements, orderState, orderRef, sendTo, reviewEmail, siteUrl,
-  signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail,
+  signToken, randomPassword, tempPassword, PLANS, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, messageNotifyEmail } from './_lib.js';
 
 // Talents never receive the client's price or contact details (email/phone/amount/billing).
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     if (action === 'list') {
       const rows = isOwner ? await adminListOrders() : await ordersForTalent(me.email);
       const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
-      return res.json({ ok: true, me: { email: me.email, name: me.name || '', is_owner: isOwner, photo: me.photo || '' }, orders });
+      return res.json({ ok: true, me: { email: me.email, name: me.name || '', is_owner: isOwner, photo: me.photo || '', must_reset: !!me.must_reset }, orders });
     }
 
     /* ----- owner dashboard: all projects + leads + talents ----- */
@@ -67,15 +67,11 @@ export default async function handler(req, res) {
     }
     if (action === 'create_talent') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
-      // Invite flow: the talent sets their own password/name/photo via the setup link.
-      const r = await createTalent({ email: b.email, password: b.password || randomPassword(), name: b.name, is_owner: !!b.is_owner });
+      // Quick create: generate a temporary password, the talent changes it on first login.
+      const pw = tempPassword();
+      const r = await createTalent({ email: b.email, password: pw, name: b.name, is_owner: !!b.is_owner, must_reset: true });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
-      try {
-        const token = signToken({ email: String(b.email).trim().toLowerCase(), setup: true }, 7);
-        const setupUrl = `${siteUrl(req)}/panel.html?setup=${encodeURIComponent(token)}`;
-        await sendTo(b.email, "You're invited to Brasero Studio 🎨", talentInviteEmail({ name: b.name, setupUrl }));
-      } catch (e) { console.error('invite email', e); }
-      return res.json({ ok: true, talent: r.talent, talents: await listTalents() });
+      return res.json({ ok: true, talent: r.talent, password: pw, talents: await listTalents() });
     }
     if (action === 'update_talent') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
