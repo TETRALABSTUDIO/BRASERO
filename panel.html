@@ -172,6 +172,23 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .side__me-info{display:flex;flex-direction:column;gap:3px;min-width:0;margin-right:auto}
 .side__me-name{font-size:13.5px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .side__me .rolebadge{align-self:flex-start;font-size:9px;padding:2px 8px}
+/* project switcher (sidebar top) */
+.switcher{position:relative;width:100%}
+.switcher__btn{display:flex;align-items:center;gap:8px;width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;font-family:inherit;text-align:left}
+.switcher__btn:hover{border-color:var(--orange)}
+.switcher__cur{flex:1;min-width:0;font-size:14px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.switcher__chev{width:16px;height:16px;color:var(--grey);flex-shrink:0}
+.switcher__menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.18);padding:6px;max-height:64vh;overflow-y:auto}
+.switcher__menu.hide{display:none}
+.swi{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:none;border:none;border-radius:10px;padding:10px 11px;cursor:pointer;font-family:inherit}
+.swi:hover,.swi.on{background:var(--soft)}
+.swi__l{display:flex;flex-direction:column;gap:3px;min-width:0;margin-right:auto}
+.swi__name{font-size:13.5px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swi__pack{font-size:11.5px;color:var(--grey);font-weight:700}
+.swi__r{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.swi__sep{height:1px;background:var(--line);margin:6px 4px}
+.swi--act{font-size:13px;font-weight:800;color:var(--orange)}
+.swi__empty{padding:14px;text-align:center;color:var(--grey);font-size:13px}
 .deckitem{width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:background .15s}
 .deckitem:hover{background:#fafafb;transform:none;box-shadow:none}
 .deckitem.sel{background:var(--soft);box-shadow:inset 3px 0 0 var(--orange)}
@@ -189,7 +206,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 @media(max-width:980px){.board,.board.chat-collapsed{position:static;display:flex;flex-direction:column}.board__list{border-right:none;border-bottom:1px solid var(--line)}#deckList{max-height:46vh}.board__chat{border-left:none;border-top:1px solid var(--line)}.board.chat-collapsed .chat__panel{display:flex}.chat__rail{display:none!important}.chat__thread{max-height:340px}}
 /* deadline badge */
 .dl{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:100px;background:rgba(0,0,0,.05);color:#555;white-space:nowrap}
-.dl.soon{background:var(--waitbg);color:var(--wait)}
+.dl.soon{background:rgba(220,38,38,.12);color:#c0291f}
 .dl.late{background:rgba(220,38,38,.12);color:#c0291f}
 .dlrow{margin-top:9px}
 
@@ -426,7 +443,13 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         <div class="board" id="board">
           <aside class="board__list">
             <div class="side__brand">
-              <button class="b-ghost b-sm" id="back">← All projects</button>
+              <div class="switcher" id="switcher">
+                <button type="button" class="switcher__btn" id="switcherBtn">
+                  <span class="switcher__cur" id="switcherCur">Project</span>
+                  <svg class="switcher__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="switcher__menu hide" id="switcherMenu"></div>
+              </div>
             </div>
             <div class="side__order">
               <h2 id="oName"></h2>
@@ -651,6 +674,12 @@ async function boot(){
   $('#tabs').classList.toggle('hide',!ME.is_owner);
   $('#newProject').classList.toggle('hide',!ME.is_owner);
   setView(VIEW); renderProjects();
+  if(!ME.is_owner){
+    // talents skip the "all projects" page: jump straight to the last (or first) project
+    const last=localStorage.getItem('brasero_last_ref');
+    const target=(last&&ORDERS.some(o=>o.ref===last))?last:(ORDERS[0]&&ORDERS[0].ref);
+    if(target) openOrder(target);
+  }
 }
 function renderProfile(){
   $('#meAvatar').innerHTML=avatar(ME,'lg');
@@ -934,15 +963,41 @@ $('#npForm').addEventListener('submit',async e=>{
 });
 
 /* ---------- detail ---------- */
-$('#back').onclick=()=>{ $('#detail').classList.add('hide'); $('#overview').classList.remove('hide'); document.body.classList.remove('appmode'); REF=''; };
+function backToOverview(){ $('#detail').classList.add('hide'); $('#overview').classList.remove('hide'); document.body.classList.remove('appmode'); REF=''; }
+/* ---------- project switcher (sidebar dropdown) ---------- */
+function renderSwitcher(){
+  const cur=ORDERS.find(o=>o.ref===REF);
+  $('#switcherCur').textContent=cur?(cur.name||('#'+cur.ref)):'Project';
+  const items=ORDERS.map(o=>{
+    const pack=planName(o.plan)?planName(o.plan)+' pack':'';
+    return `<button type="button" class="swi ${o.ref===REF?'on':''}" data-ref="${esc(o.ref)}">
+      <div class="swi__l"><span class="swi__name">${esc(o.name||('#'+o.ref))}</span><span class="swi__pack">${esc(pack)}</span></div>
+      <div class="swi__r">${spill(o.state)}${dlBadge(o,o.items)}</div>
+    </button>`;
+  }).join('');
+  const ownerExtras=(ME&&ME.is_owner)?`<div class="swi__sep"></div>
+    <button type="button" class="swi swi--act" data-act="new">+ New project</button>
+    <button type="button" class="swi swi--act" data-act="overview">View all projects</button>`:'';
+  $('#switcherMenu').innerHTML=(items||'<div class="swi__empty">No projects yet.</div>')+ownerExtras;
+}
+$('#switcherBtn').onclick=e=>{ e.stopPropagation(); renderSwitcher(); $('#switcherMenu').classList.toggle('hide'); };
+$('#switcherMenu').addEventListener('click',e=>{
+  const it=e.target.closest('[data-ref]');
+  if(it){ $('#switcherMenu').classList.add('hide'); if(it.dataset.ref!==REF) openOrder(it.dataset.ref); return; }
+  const act=e.target.closest('[data-act]');
+  if(act){ $('#switcherMenu').classList.add('hide'); if(act.dataset.act==='new') openNewModal(); else if(act.dataset.act==='overview') backToOverview(); }
+});
+document.addEventListener('click',e=>{ if(!e.target.closest('#switcher')) $('#switcherMenu')?.classList.add('hide'); });
 $('#deckList').addEventListener('click',e=>{ const it=e.target.closest('[data-pick]'); if(!it) return; SELDECK=it.dataset.pick; renderDeckList(); renderDeckDetail(); });
 $('#deckDetail').addEventListener('click',e=>{ const x=e.target.closest('[data-x]'); if(!x) return; x.closest('figure')?.remove(); const det=$('#deckDetail'), c=det.querySelector('[data-count]'); if(c) c.textContent=det.querySelectorAll('[data-imgs] img').length; });
 async function openOrder(ref){
   REF=ref.replace(/^#/,'');
   const d=await api('/api/admin',{action:'get',ref:REF});
   if(!d.ok){ alert(d.error==='forbidden'?'Not your project.':'Order not found'); return; }
+  try{ localStorage.setItem('brasero_last_ref',REF); }catch(e){}
   $('#overview').classList.add('hide'); $('#detail').classList.remove('hide');
   document.body.classList.add('appmode');
+  renderSwitcher();
   $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
   const o=d.order, ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
   const meta=[
