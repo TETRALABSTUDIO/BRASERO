@@ -303,7 +303,7 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .chat__atts .att img{width:100%;height:100%;object-fit:cover;display:block}
 .chat__atts .att button{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:10px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
 .msg__imgs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.msg__img{display:block;width:74px;height:74px;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#fff}
+.msg__img{display:block;width:74px;height:74px;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#fff;padding:0;cursor:zoom-in}
 .msg__img img{width:100%;height:100%;object-fit:cover;display:block}
 .msg--studio .msg__imgs{justify-content:flex-end}
 /* custom element picker (with deck/story/branding icons) */
@@ -670,7 +670,7 @@ function renderMessages(){
     const about=m.deck_id?`<span class="msg__about">${TYPE_ICON[deckTypeById(m.deck_id)]||''} ${esc(deckTitleById(m.deck_id)||'Element')}</span>`:'';
     const who=esc(m.sender_name||(m.sender==='client'?'You':'Brasero'));
     const bubble=m.body?`<div class="msg__bubble">${esc(m.body)}</div>`:'';
-    const imgs=(m.images&&m.images.length)?`<div class="msg__imgs">${m.images.map(u=>`<a class="msg__img" href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="attachment"></a>`).join('')}</div>`:'';
+    const imgs=(m.images&&m.images.length)?`<div class="msg__imgs">${m.images.map(u=>`<button type="button" class="msg__img" data-full="${esc(u)}"><img src="${esc(u)}" alt="attachment"></button>`).join('')}</div>`:'';
     return `<div class="msg ${cls}">${about}${bubble}${imgs}<span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}</span></div>`;
   }).join('');
   t.scrollTop=t.scrollHeight;
@@ -1063,8 +1063,10 @@ document.addEventListener('click',e=>{
   const t=e.target;
   if(t.matches&&t.matches('.gal img')){
     lbUrl=t.dataset.full; lbName=t.dataset.name||'deck-slide';
-    $('#lbImg').src=lbUrl; $('#lb').classList.add('open');
+    $('#lbImg').src=lbUrl; $('#lb').classList.add('open'); return;
   }
+  const ci=t.closest&&t.closest('.msg__img');   // chat attachment → same lightbox + download
+  if(ci&&ci.dataset.full){ lbUrl=ci.dataset.full; lbName='chat-image'; $('#lbImg').src=lbUrl; $('#lb').classList.add('open'); }
 });
 $('#lb').addEventListener('click',()=>$('#lb').classList.remove('open'));
 $('#lbDl').addEventListener('click',e=>{ e.stopPropagation(); if(lbUrl) downloadOne(lbUrl,lbName||'deck-slide'); });

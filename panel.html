@@ -639,8 +639,12 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .msg__about .ti{width:13px;height:13px}
 .msg__imgs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .msg--studio .msg__imgs{justify-content:flex-end}
-.msg__img{display:block;width:74px;height:74px;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#fff}
+.msg__img{display:block;width:74px;height:74px;border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#fff;padding:0;cursor:zoom-in}
 .msg__img img{width:100%;height:100%;object-fit:cover;display:block}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(10,10,10,.86);display:none;align-items:center;justify-content:center;padding:30px;cursor:zoom-out}
+.lb.open{display:flex}
+.lb img{max-width:92vw;max-height:84vh;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.5);display:block}
+.lb__dl{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:81;background:var(--grad);color:#fff;border:none;border-radius:100px;font-weight:700;font-size:13px;padding:10px 18px;cursor:pointer}
 .chat__clip{flex-shrink:0;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--grey);cursor:pointer;transition:.15s}
 .chat__clip:hover{color:var(--orange);border-color:var(--orange)}
 .chat__clip svg{width:17px;height:17px}
@@ -1020,6 +1024,9 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
       <div id="tCreated" class="tcreated hide"></div>
     </div>
   </div>
+
+  <!-- chat image lightbox (view large + download) -->
+  <div class="lb" id="lb"><img id="lbImg" alt=""><button type="button" class="lb__dl" id="lbDl">⬇ Download</button></div>
 
   <!-- Add elements modal (owner) -->
   <div class="modal hide" id="addElemModal">
@@ -1874,7 +1881,7 @@ function renderMessages(){
     const about=m.deck_id?`<span class="msg__about">${TYPE_ICON[deckTypeById(m.deck_id)]||''} ${esc(deckTitleById(m.deck_id)||'Element')}</span>`:'';
     const who=esc(m.sender_name||(m.sender==='studio'?'You':'Client'));
     const bubble=m.body?`<div class="msg__bubble">${esc(m.body)}</div>`:'';
-    const imgs=(m.images&&m.images.length)?`<div class="msg__imgs">${m.images.map(u=>`<a class="msg__img" href="${esc(u)}" target="_blank" rel="noopener" title="Open full size"><img src="${esc(u)}" alt="attachment"></a>`).join('')}</div>`:'';
+    const imgs=(m.images&&m.images.length)?`<div class="msg__imgs">${m.images.map(u=>`<button type="button" class="msg__img" data-full="${esc(u)}" title="View"><img src="${esc(u)}" alt="attachment"></button>`).join('')}</div>`:'';
     return `<div class="msg ${cls}">${about}${bubble}${imgs}<span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}</span></div>`;
   }).join('');
   t.scrollTop=t.scrollHeight;
@@ -1919,6 +1926,12 @@ $('#chatForm').addEventListener('submit',async e=>{
 });
 /* Enter sends, Shift+Enter makes a new line */
 $('#chatInput')?.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); $('#chatForm').requestSubmit(); } });
+/* chat image lightbox: click a thumbnail to view large + download */
+let lbUrl='';
+document.addEventListener('click',e=>{ const ci=e.target.closest&&e.target.closest('.msg__img'); if(ci&&ci.dataset.full){ lbUrl=ci.dataset.full; $('#lbImg').src=lbUrl; $('#lb').classList.add('open'); } });
+$('#lb').addEventListener('click',()=>$('#lb').classList.remove('open'));
+$('#lbDl').addEventListener('click',e=>{ e.stopPropagation(); if(!lbUrl) return; const a=document.createElement('a'); a.href=lbUrl; a.download='chat-image.jpg'; document.body.appendChild(a); a.click(); a.remove(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList.remove('open'); });
 /* ---------- live chat: poll for new client messages, refresh instantly ---------- */
 let MSGPOLL=null;
 function setUnread(on){ $('#chatDot')?.classList.toggle('hide',!on); $('#chatDotHead')?.classList.toggle('hide',!on); }

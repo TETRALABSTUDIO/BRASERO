@@ -27,10 +27,10 @@ a{color:inherit;text-decoration:none}
 .prog__bar{height:100%;width:0;background:var(--grad);transition:width .5s cubic-bezier(.4,0,.2,1)}
 
 /* ===== split layout ===== */
-.layout{display:grid;grid-template-columns:minmax(360px,38%) 1fr;min-height:100vh}
+.layout{display:grid;grid-template-columns:minmax(290px,30%) 1fr;min-height:100vh}
 
 /* left rail */
-.rail{position:sticky;top:0;height:100vh;background:var(--black);color:#fff;display:flex;flex-direction:column;padding:48px 52px;overflow:hidden}
+.rail{position:sticky;top:0;height:100vh;background:var(--black);color:#fff;display:flex;flex-direction:column;padding:44px 40px;overflow:hidden}
 .rail::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.26),transparent 70%);filter:blur(46px);top:-180px;left:-150px;pointer-events:none}
 .rail__top{display:flex;align-items:center;justify-content:space-between;gap:16px;position:relative;z-index:1;flex-shrink:0}
 .logo-svg{height:28px;width:auto;color:#fff}
@@ -73,23 +73,32 @@ h1.title{font-size:clamp(28px,3.6vw,40px);font-weight:900;letter-spacing:-.04em;
 /* card + fields */
 .card{background:transparent;border:none;border-radius:0;padding:0;box-shadow:none;animation:fin .4s cubic-bezier(.2,.7,.2,1)}
 @keyframes fin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.who{display:flex;align-items:center;gap:13px;padding:11px 13px;border:1px solid var(--line);border-radius:14px;background:var(--soft);margin-bottom:20px}
+.who{display:flex;align-items:center;gap:13px;padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-bottom:6px}
 .who img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 .who .ph{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
 .who b{font-size:15px;font-weight:800;display:block;line-height:1.2}
 .who span{display:block;font-size:12px;color:var(--grey);font-weight:600;margin-top:1px}
-.field{margin-bottom:18px}
-.field:last-child{margin-bottom:0}
-.field label{display:flex;align-items:baseline;gap:8px;font-size:14px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+/* minimalist : fields separated by hairlines, no boxes */
+.field{padding:20px 0;border-bottom:1px solid var(--line)}
+.field:first-child{padding-top:6px}
+.field:last-child{padding-bottom:4px;border-bottom:none}
+.field label{display:flex;align-items:baseline;gap:8px;font-size:14px;font-weight:800;letter-spacing:-.01em;margin-bottom:9px;transition:color .2s}
+.field:focus-within label{color:var(--orange)}
 .field label .opt-tag{font-size:12px;font-weight:600;color:#bbb;letter-spacing:0}
-.field input,.field textarea{width:100%;font-family:inherit;font-size:15px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;background:var(--soft);outline:none;transition:border .2s,box-shadow .2s,background .2s;color:var(--ink)}
-.field textarea{resize:none;min-height:64px;line-height:1.45}
-.field input::placeholder,.field textarea::placeholder{color:#bdbab2}
-.field input:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.12);background:#fff}
-.field.err input,.field.err textarea{border-color:#ff1a00;box-shadow:0 0 0 2px rgba(255,26,0,.35)}
-.field.err .opts{box-shadow:0 0 0 2px rgba(255,26,0,.35);border-radius:13px}
+/* main text fields : underline-free, transparent */
+.field>input[data-k],.field>textarea[data-k]{width:100%;font-family:inherit;font-size:17px;padding:2px 0;border:none;border-radius:0;background:transparent;outline:none;color:var(--ink)}
+.field>textarea[data-k]{resize:none;min-height:52px;line-height:1.5}
+.field>input[data-k]::placeholder,.field>textarea[data-k]::placeholder{color:#c4c1ba}
+.field>input[data-k]:focus,.field>textarea[data-k]:focus{box-shadow:none}
+.field.err{border-color:#ff1a00}
+.field.err>input[data-k],.field.err>textarea[data-k]::placeholder{color:#ff1a00}
+.field.err label{color:#ff1a00}
+/* nested widget inputs (hex, handle, font name…) keep a clean white box */
+.field input,.field textarea{font-family:inherit;font-size:15px;color:var(--ink);outline:none}
+.field .typo-name,.field .ig-input,.field .pal-hex{padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;transition:border .2s,box-shadow .2s}
+.field .typo-name:focus,.field .ig-input:focus,.field .pal-hex:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.1)}
 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px}
-.opt{border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font-size:14px;font-weight:700;cursor:pointer;background:var(--soft);transition:.18s;font-family:inherit;text-align:left;color:var(--ink);display:flex;align-items:center;gap:10px}
+.opt{border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font-size:14px;font-weight:700;cursor:pointer;background:#fff;transition:.18s;font-family:inherit;text-align:left;color:var(--ink);display:flex;align-items:center;gap:10px}
 .opt:hover{border-color:var(--orange)}
 .opt.sel{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(248,80,0,.28)}
 .opt .dot{width:17px;height:17px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;transition:.18s}
@@ -106,7 +115,7 @@ h1.title{font-size:clamp(28px,3.6vw,40px);font-weight:900;letter-spacing:-.04em;
 .pal-del{margin-left:auto;border:none;background:none;color:#cfccc6;font-size:14px;padding:6px 8px;cursor:pointer;border-radius:8px}
 .pal-del:hover{color:#c33;background:var(--soft)}
 .pal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.pal-add{border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.18s}
+.pal-add{border:1.5px dashed var(--line);background:#fff;color:var(--ink);font-weight:700;font-size:13px;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.18s}
 .pal-add:hover{border-color:var(--orange);color:var(--orange)}
 .pal-presets{display:flex;gap:8px;flex-wrap:wrap}
 .pal-preset{display:inline-flex;padding:4px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;transition:.18s}
@@ -117,14 +126,14 @@ h1.title{font-size:clamp(28px,3.6vw,40px);font-weight:900;letter-spacing:-.04em;
 /* typography */
 .typo{display:flex;flex-direction:column;gap:11px}
 .typo-import{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.typo-btn{display:inline-flex;align-items:center;gap:7px;border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:9px 15px;border-radius:10px;cursor:pointer;transition:.18s}
+.typo-btn{display:inline-flex;align-items:center;gap:7px;border:1.5px dashed var(--line);background:#fff;color:var(--ink);font-weight:700;font-size:13px;padding:9px 15px;border-radius:10px;cursor:pointer;transition:.18s}
 .typo-btn:hover{border-color:var(--orange);color:var(--orange)}
 .typo-file{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
 .typo-file button{border:none;background:none;color:#cfccc6;font-size:13px;cursor:pointer;padding:2px 4px}
 .typo-file button:hover{color:#c33}
 /* logo upload */
 .logo-up{display:flex;flex-direction:column;gap:11px}
-.logo-btn{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;border:1.5px dashed var(--line);background:var(--soft);color:var(--ink);font-weight:700;font-size:13px;padding:11px 16px;border-radius:12px;cursor:pointer}
+.logo-btn{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;border:1.5px dashed var(--line);background:#fff;color:var(--ink);font-weight:700;font-size:13px;padding:11px 16px;border-radius:12px;cursor:pointer}
 .logo-btn:hover{border-color:var(--orange);color:var(--orange)}
 .logo-prev{display:inline-flex;align-items:center;gap:12px;align-self:flex-start;padding:12px 14px;background:repeating-conic-gradient(#f1ece3 0 25%,#fff 0 50%) 0/16px 16px;border:1px solid var(--line);border-radius:12px}
 .logo-prev img{max-width:150px;max-height:64px;display:block;object-fit:contain}
@@ -137,7 +146,7 @@ h1.title{font-size:clamp(28px,3.6vw,40px);font-weight:900;letter-spacing:-.04em;
 .ig-btn{flex-shrink:0;background:var(--grad);color:#fff;border:none;font-weight:700;font-size:14px;padding:0 20px;border-radius:12px;cursor:pointer}
 .ig-btn:disabled{opacity:.4;cursor:not-allowed}
 .ig-chips{display:flex;flex-wrap:wrap;gap:8px}
-.ig-chip{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:7px 13px;font-size:13.5px;font-weight:700}
+.ig-chip{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:7px 13px;font-size:13.5px;font-weight:700}
 .ig-chip button{border:none;background:none;color:#b9b5ae;font-size:13px;cursor:pointer;padding:0;line-height:1}
 .ig-chip button:hover{color:#c33}
 .ig-hint{font-size:12.5px;color:var(--grey);font-weight:600}
