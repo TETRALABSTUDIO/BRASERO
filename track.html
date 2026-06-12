@@ -204,6 +204,18 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .addrow__label{font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:8px;margin-right:auto}
 .addrow__tag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#fff;background:var(--grad);padding:3px 7px;border-radius:100px}
 .addrow__price{font-weight:900;font-size:15px;white-space:nowrap}
+/* branding sold as a single pack */
+.brandpack{display:flex;flex-direction:column;gap:12px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
+.brandpack:hover{border-color:var(--orange);box-shadow:0 12px 26px rgba(248,80,0,.12);transform:translateY(-1px)}
+.brandpack__top{display:flex;align-items:center;gap:13px}
+.brandpack__h{margin-right:auto;display:flex;flex-direction:column;gap:2px;min-width:0}
+.brandpack__h b{font-size:15.5px;font-weight:900;letter-spacing:-.02em}
+.brandpack__h span{font-size:12px;color:var(--grey);font-weight:600}
+.brandpack__price{font-weight:900;font-size:18px;white-space:nowrap}
+.brandpack__list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;margin:0;padding:12px 0 0;border-top:1px solid var(--line)}
+.brandpack__list li{position:relative;padding-left:20px;font-size:12.5px;font-weight:600;color:#333}
+.brandpack__list li::before{content:"";position:absolute;left:0;top:3px;width:13px;height:13px;border-radius:50%;background:var(--grad);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E") center/10px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E") center/10px no-repeat}
+.brandpack__cta{align-self:flex-start;font-size:13px;font-weight:800;color:#fff;background:var(--grad);padding:8px 16px;border-radius:100px}
 /* step 1 : category cards */
 .addcats{display:flex;flex-direction:column;gap:12px}
 .addcat{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
@@ -476,12 +488,8 @@ const ADD_GROUPS=[
     {key:'story9',cards:9,label:'9 Stories',price:'$330',free:true,story:true},
   ]},
   {key:'branding', title:'Branding', sub:'Profile photo, banners & CTAs', items:[
-    {key:'brand_full',label:'Full branding pack',price:'$210',brand:true,pack:true},
-    {key:'brand_pfp', label:'Profile photo',     price:'$60', brand:true},
-    {key:'brand_x',   label:'X / Twitter banner',price:'$70', brand:true},
-    {key:'brand_li',  label:'LinkedIn banner',   price:'$70', brand:true},
-    {key:'brand_fb',  label:'Facebook banner',   price:'$70', brand:true},
-    {key:'brand_cta', label:'LinkedIn CTA',      price:'$50', brand:true},
+    {key:'brand_full',label:'Full branding pack',price:'$210',brand:true,pack:true,
+     includes:['Profile photo','X / Twitter banner','LinkedIn banner','Facebook banner','LinkedIn CTA buttons']},
   ]},
 ];
 // type icons (orange gradient) shown beside each production item + in the catalogue
@@ -717,10 +725,15 @@ $('#deckList').addEventListener('click',e=>{
 /* ---------- add decks: one-time packs added to this same order via Stripe ---------- */
 function optionHTML(it){
   if(it.brand){
-    return `<button type="button" class="addrow" data-item="${it.key}">
-      <span class="addrow__ic">${TYPE_ICON.branding}</span>
-      <span class="addrow__label">${it.label}${it.pack?'<span class="addrow__tag">best value</span>':''}</span>
-      <span class="addrow__price">${it.price}</span>
+    const inc=(it.includes||[]).map(x=>`<li>${esc(x)}</li>`).join('');
+    return `<button type="button" class="brandpack" data-item="${it.key}">
+      <div class="brandpack__top">
+        <span class="addrow__ic">${TYPE_ICON.branding}</span>
+        <div class="brandpack__h"><b>${it.label}</b><span>One pack with everything to brand your page</span></div>
+        <span class="brandpack__price">${it.price}</span>
+      </div>
+      ${inc?`<ul class="brandpack__list">${inc}</ul>`:''}
+      <span class="brandpack__cta">+ Add to my order</span>
     </button>`;
   }
   return `<button type="button" class="addpack ${it.free?'addpack--gold':''} ${it.story?'addpack--story':''}" data-item="${it.key}">
@@ -761,7 +774,7 @@ function closeAddModal(){ $('#addModal').classList.remove('open'); }
 
 async function startAddon(item,btn){
   $('#addErr').textContent='';
-  const priceEl=btn.querySelector('.addpack__price,.addrow__price'), old=priceEl?priceEl.innerHTML:'';
+  const priceEl=btn.querySelector('.addpack__price,.addrow__price,.brandpack__price'), old=priceEl?priceEl.innerHTML:'';
   btn.style.pointerEvents='none'; if(priceEl) priceEl.innerHTML='<span class="spin" style="border-color:rgba(0,0,0,.25);border-top-color:#111"></span>';
   try{
     const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},

@@ -281,6 +281,8 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .aelist{display:flex;flex-direction:column;gap:9px}
 .aeitem{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 16px;cursor:pointer;font-size:14.5px;font-weight:800;letter-spacing:-.01em;transition:border .15s,box-shadow .15s}
 .aeitem:hover{border-color:var(--orange);box-shadow:0 8px 20px rgba(248,80,0,.1)}
+.aeitem__l{display:flex;flex-direction:column;gap:2px;min-width:0}
+.aeitem__l small{font-size:11px;font-weight:600;color:var(--grey);white-space:normal}
 .aeitem__add{font-size:12.5px;font-weight:800;color:var(--orange);flex-shrink:0}
 .aeitem.on{opacity:.6;pointer-events:none}
 .side__order h2{font-size:17px;font-weight:900;letter-spacing:-.025em;line-height:1.15}
@@ -1669,16 +1671,15 @@ const AE_GROUPS=[
     {key:'deck3',label:'3 Decks'},{key:'deck6',label:'6 Decks'},{key:'deck9',label:'9 Decks +1 free'}]},
   {key:'stories', title:'Stories', sub:'Vertical 9:16 story sets', icon:'story', cat:'story', items:[
     {key:'story3',label:'3 Stories'},{key:'story6',label:'6 Stories'},{key:'story9',label:'9 Stories +1 free'}]},
-  {key:'branding', title:'Branding', sub:'Profile photo, banners & CTAs', icon:'branding', cat:'branding', items:[
-    {key:'brand_full',label:'Full branding pack'},{key:'brand_pfp',label:'Profile photo'},{key:'brand_x',label:'X / Twitter banner'},
-    {key:'brand_li',label:'LinkedIn banner'},{key:'brand_fb',label:'Facebook banner'},{key:'brand_cta',label:'LinkedIn CTA'}]},
+  {key:'branding', title:'Branding', sub:'Profile photo · banners · CTAs', icon:'branding', cat:'branding', items:[
+    {key:'brand_full',label:'Full branding pack',note:'Profile photo, X / LinkedIn / Facebook banners, LinkedIn CTAs'}]},
 ];
 let aeCat=null;
 function renderAE(){
   const b=$('#aeBody');
   if(!aeCat){ b.innerHTML=`<div class="aecats">${AE_GROUPS.map(g=>`<button type="button" class="aecat" data-aecat="${g.key}"><span class="aecat__vis">${TYPE_ICON[g.icon]}</span><span class="aecat__body"><b>${g.title}</b><span>${g.sub}</span></span><svg class="aecat__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>`).join('')}</div>`; return; }
   const g=AE_GROUPS.find(x=>x.key===aeCat);
-  b.innerHTML=`<button type="button" class="aeback" data-aeback>← All elements</button><div class="aelist">${g.items.map(it=>`<button type="button" class="aeitem" data-aeitem="${it.key}"><span>${it.label}</span><span class="aeitem__add">+ Add</span></button>`).join('')}</div>`;
+  b.innerHTML=`<button type="button" class="aeback" data-aeback>← All elements</button><div class="aelist">${g.items.map(it=>`<button type="button" class="aeitem" data-aeitem="${it.key}"><span class="aeitem__l">${it.label}${it.note?`<small>${it.note}</small>`:''}</span><span class="aeitem__add">+ Add</span></button>`).join('')}</div>`;
 }
 function openAddElems(group){ aeCat=AE_GROUPS.some(g=>g.key===group)?group:null; renderAE(); $('#addElemModal').classList.remove('hide'); }
 $('#aeClose').onclick=()=>$('#addElemModal').classList.add('hide');
