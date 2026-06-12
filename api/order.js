@@ -39,7 +39,12 @@ export default async function handler(req, res) {
 
     const decks = await decksForOrder(order.id);
     const messages = await listMessages(order.id);
-    res.json({ ok: true, order: publicOrder(order, decks), messages });
+    let talent = null;
+    if (order.talent_email) {
+      const t = await getTalentByEmail(order.talent_email);
+      if (t) talent = { name: t.name || '', photo: t.photo || '' };   // name + photo only, no contact details
+    }
+    res.json({ ok: true, order: publicOrder(order, decks), talent, messages });
   } catch (err) {
     console.error('order', err);
     res.status(500).json({ ok: false });
