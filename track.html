@@ -112,6 +112,13 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .board__detail{flex:1 1 auto;padding:28px 36px}
 .detail__head{margin-bottom:2px}
 .detail__title{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+/* element tabs in the middle column (status / approved script) */
+.dtabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.dtab{display:inline-flex;align-items:center;gap:7px;max-width:230px;padding:9px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:13.5px;font-weight:800;letter-spacing:-.01em;color:var(--grey);cursor:pointer;background:var(--soft);transition:.15s}
+.dtab:hover{color:var(--ink);border-color:var(--orange)}
+.dtab.on{background:#fff;color:var(--ink);border-color:var(--orange);box-shadow:0 6px 16px rgba(248,80,0,.14)}
+.dtab .ti{width:15px;height:15px;flex-shrink:0}
+.dtab__l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .board__detail .gal figure{width:100%;height:auto;aspect-ratio:1080/1350}
 @media(max-width:980px){.board,.board.chat-collapsed{position:static;display:flex;flex-direction:column}.board__list{border-right:none;border-bottom:1px solid var(--line)}#deckList{max-height:46vh}.board__detail{padding:20px}.board__chat{border-left:none;border-top:1px solid var(--line)}.board.chat-collapsed .chat__panel{display:flex}.chat__rail{display:none!important}.chat__thread{max-height:360px}}
@@ -524,7 +531,7 @@ function gatherEditedScript(){
 let CREDS={ref:'',email:''};
 let DECKS=[];
 let MESSAGES=[];
-let SELECTED=null;
+let SELECTED=null, scriptView=null;   // scriptView = deck id whose read-only approved script is shown
 let ORDER=null;
 let TALENT=null;
 let chatAsset='';   // selected element id for the next message ('' = general)
@@ -796,16 +803,16 @@ function renderDetail(){
   const det=$('#deckDetail'), cmd=$('#deckCmd');
   if(!d){ det.innerHTML=`<div class="empty">${CAT?'Select an element on the left.':'Pick a category on the left to see its elements.'}</div>`; cmd.innerHTML=''; return; }
   det.innerHTML=detailBody(d);
-  cmd.innerHTML=cmdBar(d);
+  cmd.innerHTML=(hasApprovedScript(d)&&scriptView===d.id)?'':cmdBar(d);   // read-only script tab has no action bar
   bindDeck(d);
 }
 
 /* sidebar navigation: categories → element list → back (event delegation, bound once) */
 $('#deckList').addEventListener('click',e=>{
   const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); openAddModal({carousel:'decks',story:'stories',branding:'branding'}[add.dataset.addcat]); return; }
-  const back=e.target.closest('[data-catback]'); if(back){ CAT=null; SELECTED=null; renderSidebar(); renderDetail(); return; }
-  const cat=e.target.closest('[data-cat]'); if(cat){ CAT=cat.dataset.cat; const inCat=decksOfCat(CAT); SELECTED=inCat[0]?inCat[0].id:null; renderSidebar(); renderDetail(); return; }
-  const it=e.target.closest('.deckitem'); if(it){ SELECTED=it.dataset.deck; renderSidebar(); renderDetail(); }
+  const back=e.target.closest('[data-catback]'); if(back){ CAT=null; SELECTED=null; scriptView=null; renderSidebar(); renderDetail(); return; }
+  const cat=e.target.closest('[data-cat]'); if(cat){ CAT=cat.dataset.cat; const inCat=decksOfCat(CAT); SELECTED=inCat[0]?inCat[0].id:null; scriptView=null; renderSidebar(); renderDetail(); return; }
+  const it=e.target.closest('.deckitem'); if(it){ SELECTED=it.dataset.deck; scriptView=null; renderSidebar(); renderDetail(); }
 });
 
 /* ---------- add decks: one-time packs added to this same order via Stripe ---------- */
@@ -894,33 +901,23 @@ const WAIT={
   revision:['✏️','Applying your retouch','We\'re updating the design and will resend it for approval shortly.']
 };
 
-/* once the script is approved (in design / done), let the client re-read it, read-only, in a new tab */
-function viewScriptBtn(d){
-  if(!(d.script && ['designing','design_review','revision','done'].includes(d.status))) return '';
-  return `<div class="actions" style="justify-content:center;margin-top:18px"><button type="button" class="btn btn--ghost btn--sm" data-act="view_script" data-id="${d.id}">📄 View the approved script</button></div>`;
-}
-function openScriptTab(id){
-  const d=DECKS.find(x=>String(x.id)===String(id)); if(!d||!d.script) return;
-  const w=window.open('','_blank'); if(!w) return;
-  const css=`body{margin:0;background:#f7f4ef;font-family:'Satoshi',system-ui,sans-serif;color:#111;-webkit-font-smoothing:antialiased}
-    .wrap{max-width:680px;margin:0 auto;padding:40px 22px 64px}
-    .h{display:flex;align-items:center;gap:11px;margin-bottom:7px}
-    .h h1{font-size:22px;font-weight:900;letter-spacing:-.03em;margin:0}
-    .ro{font-size:12px;font-weight:800;color:#c64600;background:rgba(248,80,0,.12);border-radius:100px;padding:4px 11px;white-space:nowrap}
-    .sub{color:#6b6b6b;font-size:14px;margin:0 0 26px;line-height:1.5}
-    .slides{display:flex;flex-direction:column;gap:16px}
-    .slide{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:16px;padding:18px 20px}
-    .slide__bar{padding:0 0 8px}
-    .slide__n{font-size:11px;font-weight:700;letter-spacing:.02em;color:#bcbcbc}
-    .slide__view{font-size:15.5px;line-height:1.6;color:#111}
-    .slide__view h4{font-size:18px;font-weight:900;letter-spacing:-.02em;margin:2px 0 6px}
-    .slide__view mark{background:#ffe39a;padding:0 2px;border-radius:3px}
-    .slide__empty{color:#c4c4c4}`;
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(d.title)} · Script</title><style>${css}</style></head><body><div class="wrap"><div class="h"><h1>${esc(d.title)}</h1><span class="ro">Read-only</span></div><p class="sub">This script is approved and now in design, so it can no longer be edited.</p>${slidesViewHTML(d.script)}</div></body></html>`);
-  w.document.close();
+/* once the script is approved (in design / done), the element gets a second tab
+   in the middle column to re-read the approved script, read-only */
+function hasApprovedScript(d){ return !!(d.script && ['designing','design_review','revision','done'].includes(d.status)); }
+function detailTabs(d){
+  if(!hasApprovedScript(d)) return '';
+  const onScript=scriptView===d.id;
+  return `<div class="dtabs">
+    <button type="button" class="dtab ${onScript?'':'on'}" data-act="show_main" data-id="${d.id}">${TYPE_ICON[d.type||'carousel']||TYPE_ICON.carousel}<span class="dtab__l">${esc(d.title)}</span></button>
+    <button type="button" class="dtab ${onScript?'on':''}" data-act="show_script" data-id="${d.id}"><span class="dtab__doc">📄</span><span class="dtab__l">Script</span></button>
+  </div>`;
 }
 function detailBody(d){
-  const head=`<div class="detail__head"><div class="detail__title">${esc(d.title)}</div></div>`;
+  const tabs=detailTabs(d);
+  if(tabs && scriptView===d.id){   // read-only approved script, shown as a tab in the middle column
+    return tabs+`<p class="detail__instr">📄 <b>Approved script</b>, read-only now that it's in design.</p>`+slidesViewHTML(d.script);
+  }
+  const head=tabs?'':`<div class="detail__head"><div class="detail__title">${esc(d.title)}</div></div>`;
   const n=NEXT[d.status];
   if(n){
     const instr=`<p class="detail__instr">${n[0]} <b>${n[1]}</b>, ${n[2]}</p>`;
@@ -935,15 +932,14 @@ function detailBody(d){
         </div>`;
     else if(d.status==='done')
       content=(d.images&&d.images.length)?galleryGrid(d):'';
-    return head+instr+content+viewScriptBtn(d);
+    return tabs+head+instr+content;
   }
   const w=WAIT[d.status]||['','In progress','We\'re working on it, you\'ll get news very soon.'];
-  return `<div class="waiting">
+  return tabs+head+`<div class="waiting">
     ${PAN_SVG}
     <div class="waiting__h">${w[1]}</div>
     <p class="waiting__p">${w[2]}</p>
     ${d.status==='revision'&&d.revision_note?`<p class="note-line"><b>Your retouch:</b> ${esc(d.revision_note)}</p>`:''}
-    ${viewScriptBtn(d)}
   </div>`;
 }
 /* cooking animation built ONLY from the real pan.svg + flame.svg assets */
@@ -1033,7 +1029,8 @@ function bindDeck(d){
 async function onAction(el){
   const act=el.dataset.act, id=el.dataset.id;
   if(act==='toggle_rev'){ $('#rev-'+id).classList.toggle('open'); return; }
-  if(act==='view_script'){ openScriptTab(id); return; }
+  if(act==='show_script'){ scriptView=id; renderDetail(); return; }
+  if(act==='show_main'){ scriptView=null; renderDetail(); return; }
   if(act==='download_deck'){ downloadDeck(id,el); return; }
   const payload={...CREDS,deckId:id,action:act};
   if(act==='validate_script'){
