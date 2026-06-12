@@ -232,11 +232,14 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 @media(max-width:560px){.board__detail{padding:18px}}
 
 /* ===== floating "How it works" guide (bottom-right) ===== */
-.helpfab{position:fixed;right:18px;bottom:18px;z-index:60;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#fff;border:none;box-shadow:0 10px 26px rgba(248,80,0,.34);cursor:grab;touch-action:none;padding:0;user-select:none}
+.board__guide{position:absolute;right:384px;bottom:82px;z-index:55;display:flex;flex-direction:column;align-items:flex-end}
+.board.chat-collapsed .board__guide{right:56px}
+.board__guide.hide{display:none}
+.helpfab{position:static;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#fff;border:none;box-shadow:0 10px 26px rgba(248,80,0,.34);cursor:pointer;padding:0}
 .helpfab:hover{transform:translateY(-1px)}
-.helpfab.dragging{cursor:grabbing;transform:scale(1.06)}
 .helpfab svg{width:22px;height:22px;pointer-events:none}
-.helpcard{position:fixed;right:18px;bottom:74px;z-index:61;width:340px;max-width:calc(100vw - 36px);background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.30);overflow:hidden;animation:tutpop .18s ease}
+.helpcard{position:absolute;right:0;bottom:56px;z-index:61;width:340px;max-width:min(340px,72vw);background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.30);overflow:hidden;animation:tutpop .18s ease}
+@media(max-width:980px){.board__guide{position:fixed;right:16px;bottom:16px}}
 .helpcard.hide{display:none!important}
 @keyframes tutpop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
 .helpcard__h{display:flex;align-items:center;gap:9px;padding:15px 16px 13px}
@@ -428,6 +431,22 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
           </form>
         </div>
       </aside>
+      <!-- How-it-works guide, pinned to the bottom-right of the middle column -->
+      <div class="board__guide hide" id="boardGuide">
+        <div class="helpcard hide" id="helpCard">
+          <div class="helpcard__h"><span class="tag" id="tutTag">Step 1</span><b>How it works</b><button class="helpcard__x" id="helpClose" type="button">✕</button></div>
+          <div class="tut-vis" id="tutVis"></div>
+          <div class="tut-body"><h4 id="tutTitle"></h4><p id="tutBody"></p></div>
+          <div class="tut-foot">
+            <div class="tut-dots" id="tutDots"></div>
+            <button class="btn btn--ghost btn--sm" id="tutBack" type="button">← Back</button>
+            <button class="btn btn--grad btn--sm" id="tutNext" type="button">Next →</button>
+          </div>
+        </div>
+        <button class="helpfab" id="helpFab" type="button" title="How it works" aria-label="How it works">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.4c.8.7 1 1.3 1 2.6h6c0-1.3.2-1.9 1-2.6A6 6 0 0 0 12 3z"/></svg>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -556,7 +575,7 @@ function logout(){
   CREDS={ref:'',email:''};
   $('#dash').classList.add('hide'); $('#gate').classList.remove('hide');
   document.body.classList.remove('appmode');
-  $('#helpFab').classList.add('hide'); $('#helpCard').classList.add('hide');
+  $('#boardGuide')?.classList.add('hide'); $('#helpCard')?.classList.add('hide');
   history.replaceState(null,'','track.html');
 }
 $('#logout').addEventListener('click',logout);
@@ -565,7 +584,7 @@ $('#logout').addEventListener('click',logout);
 function render(o){
   $('#gate').classList.add('hide'); $('#dash').classList.remove('hide');
   document.body.classList.add('appmode');
-  $('#helpFab').classList.remove('hide');
+  $('#boardGuide')?.classList.remove('hide');
   $('#hello').innerHTML = o.name ? `Hi <span class="grad-text">${esc(o.name.split(' ')[0])}</span>` : 'Your <span class="grad-text">decks</span>';
   $('#oref').textContent = '#'+o.ref;
   if(o.plan && PLAN_LOGO[o.plan]){ $('#oplan').innerHTML=`<img class="plan-logo" src="assets/plans/${PLAN_LOGO[o.plan]}.svg" alt="${esc(PLAN_NAMES[o.plan]||o.plan)} pack">`; $('#oplan').classList.remove('hide'); }
@@ -969,20 +988,6 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
 })();
 </script>
 
-<!-- floating "How it works" guide (client) -->
-<button class="helpfab hide" id="helpFab" type="button" title="How it works · drag to move" aria-label="How it works">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.4c.8.7 1 1.3 1 2.6h6c0-1.3.2-1.9 1-2.6A6 6 0 0 0 12 3z"/></svg>
-</button>
-<div class="helpcard hide" id="helpCard">
-  <div class="helpcard__h"><span class="tag" id="tutTag">Step 1</span><b>How it works</b><button class="helpcard__x" id="helpClose" type="button">✕</button></div>
-  <div class="tut-vis" id="tutVis"></div>
-  <div class="tut-body"><h4 id="tutTitle"></h4><p id="tutBody"></p></div>
-  <div class="tut-foot">
-    <div class="tut-dots" id="tutDots"></div>
-    <button class="btn btn--ghost" id="tutBack" type="button">← Back</button>
-    <button class="btn btn--grad" id="tutNext" type="button">Next →</button>
-  </div>
-</div>
 <script>
 /* ---------- client "How it works" guide (5 steps, zoomed tracker mockups) ---------- */
 (function(){
@@ -1051,20 +1056,9 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
     $('#tutBack').style.visibility=i===0?'hidden':'visible';
     $('#tutNext').textContent=i===TUT.length-1?'Got it ✓':'Next →';
   }
-  /* draggable bubble: drag to snap to a side, click to open the guide */
+  /* pinned bubble, click to open the guide */
   const fab=$('#helpFab'), card=$('#helpCard');
-  const KEY='brasero_help_pos';
-  const applyPos=p=>{ fab.style.right=p.side==='right'?'18px':'auto'; fab.style.left=p.side==='left'?'18px':'auto'; fab.style.top=p.top+'px'; fab.style.bottom='auto'; };
-  try{ const s=localStorage.getItem(KEY); if(s) applyPos(JSON.parse(s)); }catch(e){}
-  function placeCard(){ const r=fab.getBoundingClientRect(); card.style.right='auto'; card.style.left='auto'; card.style.top='auto'; card.style.bottom='auto';
-    if(r.left<window.innerWidth/2) card.style.left=Math.max(12,r.left)+'px'; else card.style.right=Math.max(12,window.innerWidth-r.right)+'px';
-    const ch=Math.min(window.innerHeight*0.8,520);
-    if(r.top>ch+16) card.style.bottom=(window.innerHeight-r.top+10)+'px'; else card.style.top=Math.max(12,Math.min(r.bottom+10,window.innerHeight-ch-12))+'px'; }
-  let drag=null,moved=false;
-  fab.addEventListener('pointerdown',e=>{ drag={x:e.clientX,y:e.clientY,t:fab.offsetTop,l:fab.offsetLeft}; moved=false; fab.setPointerCapture(e.pointerId); fab.classList.add('dragging'); });
-  fab.addEventListener('pointermove',e=>{ if(!drag) return; const dx=e.clientX-drag.x,dy=e.clientY-drag.y; if(Math.abs(dx)+Math.abs(dy)>4) moved=true; fab.style.left=(drag.l+dx)+'px'; fab.style.top=(drag.t+dy)+'px'; fab.style.right='auto'; fab.style.bottom='auto'; });
-  fab.addEventListener('pointerup',()=>{ if(!drag) return; fab.classList.remove('dragging'); const side=(fab.offsetLeft+fab.offsetWidth/2)<window.innerWidth/2?'left':'right'; const top=Math.max(12,Math.min(window.innerHeight-fab.offsetHeight-12,fab.offsetTop)); applyPos({side,top}); try{ localStorage.setItem(KEY,JSON.stringify({side,top})); }catch(e){} drag=null; if(!card.classList.contains('hide')) placeCard(); });
-  fab.addEventListener('click',()=>{ if(moved){ moved=false; return; } if(card.classList.contains('hide')){ i=0; renderTut(); placeCard(); card.classList.remove('hide'); } else card.classList.add('hide'); });
+  fab.addEventListener('click',()=>{ if(card.classList.contains('hide')){ i=0; renderTut(); card.classList.remove('hide'); } else card.classList.add('hide'); });
   $('#helpClose').addEventListener('click',()=>$('#helpCard').classList.add('hide'));
   $('#tutBack').addEventListener('click',()=>{ if(i>0){ i--; renderTut(); } });
   $('#tutNext').addEventListener('click',()=>{ if(i<TUT.length-1){ i++; renderTut(); } else $('#helpCard').classList.add('hide'); });

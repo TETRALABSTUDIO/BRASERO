@@ -291,6 +291,14 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .aeitem__l small{font-size:11px;font-weight:600;color:var(--grey);white-space:normal}
 .aeitem__add{font-size:12.5px;font-weight:800;color:var(--orange);flex-shrink:0}
 .aeitem.on{opacity:.6;pointer-events:none}
+.aeqty{display:flex;flex-direction:column;gap:14px}
+.aeqty__row{display:flex;align-items:center;gap:10px;justify-content:center}
+.aeqty__b{width:46px;height:46px;border-radius:12px;background:var(--soft);border:1px solid var(--line);font-size:22px;font-weight:800;color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.aeqty__b:hover{border-color:var(--orange);color:var(--orange)}
+.aeqty__in{width:96px;text-align:center;font-size:24px;font-weight:900;letter-spacing:-.03em;padding:9px 6px;border-radius:12px}
+.aeqty__chips{display:flex;gap:8px;justify-content:center}
+.aeqty__chip{background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:7px 16px;font-size:13px;font-weight:800;color:var(--grey);cursor:pointer}
+.aeqty__chip:hover{border-color:var(--orange);color:var(--orange)}
 .side__order h2{font-size:17px;font-weight:900;letter-spacing:-.025em;line-height:1.15}
 .side__order .meta{color:var(--grey);font-size:12.5px;margin-top:4px;line-height:1.45}
 .side__listhead{padding:8px 18px 9px;font-size:13px;font-weight:700;color:var(--grey)}
@@ -508,11 +516,13 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .np-actions{display:flex;align-items:center;gap:14px}
 
 /* ===== floating talent guide (bottom-right) ===== */
-.helpfab{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#fff;border:none;box-shadow:0 10px 26px rgba(248,80,0,.34);cursor:grab;touch-action:none;padding:0;user-select:none}
+.board__guide{position:absolute;right:378px;bottom:82px;z-index:45;display:flex;flex-direction:column;align-items:flex-end}
+.board.chat-collapsed .board__guide{right:56px}
+.helpfab{position:static;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#fff;border:none;box-shadow:0 10px 26px rgba(248,80,0,.34);cursor:pointer;padding:0}
 .helpfab:hover{transform:translateY(-1px)}
-.helpfab.dragging{cursor:grabbing;transform:scale(1.06)}
 .helpfab svg{width:22px;height:22px;pointer-events:none}
-.helpcard{position:fixed;right:18px;bottom:74px;z-index:52;width:340px;max-width:calc(100vw - 36px);background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.30);overflow:hidden;animation:tutpop .18s ease}
+.helpcard{position:absolute;right:0;bottom:56px;z-index:52;width:340px;max-width:min(340px,72vw);background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.30);overflow:hidden;animation:tutpop .18s ease}
+@media(max-width:980px){.board__guide{position:fixed;right:16px;bottom:16px}}
 .helpcard.hide{display:none}
 @keyframes tutpop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
 .helpcard__h{display:flex;align-items:center;gap:9px;padding:15px 16px 13px}
@@ -752,6 +762,22 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
               </form>
             </div>
           </aside>
+          <!-- How-it-works guide, pinned to the bottom-right of the middle column -->
+          <div class="board__guide" id="boardGuide">
+            <div class="helpcard hide" id="helpCard">
+              <div class="helpcard__h"><span class="tag" id="tutTag">Step 1</span><b>How it works</b><button class="mx" id="helpClose" type="button">✕</button></div>
+              <div class="tut-vis" id="tutVis"></div>
+              <div class="tut-body"><h4 id="tutTitle"></h4><p id="tutBody"></p></div>
+              <div class="tut-foot">
+                <div class="tut-dots" id="tutDots"></div>
+                <button class="b-ghost b-sm" id="tutBack" type="button">← Back</button>
+                <button class="b-grad b-sm" id="tutNext" type="button">Next →</button>
+              </div>
+            </div>
+            <button class="helpfab" id="helpFab" type="button" title="How it works" aria-label="How it works">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.4c.8.7 1 1.3 1 2.6h6c0-1.3.2-1.9 1-2.6A6 6 0 0 0 12 3z"/></svg>
+            </button>
+          </div>
         </div>
   </div>
 
@@ -770,20 +796,6 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
     <button class="b-ghost b-sm" id="logout">Sign out</button>
   </div>
 
-  <!-- floating talent guide (bottom-right) -->
-  <button class="helpfab" id="helpFab" type="button" title="How it works · drag to move" aria-label="How it works">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.4c.8.7 1 1.3 1 2.6h6c0-1.3.2-1.9 1-2.6A6 6 0 0 0 12 3z"/></svg>
-  </button>
-  <div class="helpcard hide" id="helpCard">
-    <div class="helpcard__h"><span class="tag" id="tutTag">Step 1</span><b>How it works</b><button class="mx" id="helpClose" type="button">✕</button></div>
-    <div class="tut-vis" id="tutVis"></div>
-    <div class="tut-body"><h4 id="tutTitle"></h4><p id="tutBody"></p></div>
-    <div class="tut-foot">
-      <div class="tut-dots" id="tutDots"></div>
-      <button class="b-ghost b-sm" id="tutBack" type="button">← Back</button>
-      <button class="b-grad b-sm" id="tutNext" type="button">Next →</button>
-    </div>
-  </div>
 
   <!-- New project modal (owner) -->
   <div class="modal hide" id="newModal">
@@ -1434,22 +1446,10 @@ function renderTut(){
   $('#tutBack').style.visibility=TUTI===0?'hidden':'visible';
   $('#tutNext').textContent=TUTI===TUT.length-1?'Got it ✓':'Next →';
 }
-/* draggable help bubble: drag to snap to either side, click to open the guide */
+/* help bubble pinned to the middle column, click to open the guide */
 (function(){
   const fab=$('#helpFab'), card=$('#helpCard'); if(!fab) return;
-  const KEY='brasero_help_pos';
-  const applyPos=p=>{ fab.style.right=p.side==='right'?'18px':'auto'; fab.style.left=p.side==='left'?'18px':'auto'; fab.style.top=p.top+'px'; fab.style.bottom='auto'; };
-  try{ const s=localStorage.getItem(KEY); if(s) applyPos(JSON.parse(s)); }catch(e){}
-  function placeCard(){ const r=fab.getBoundingClientRect(); card.style.right='auto'; card.style.left='auto'; card.style.top='auto'; card.style.bottom='auto';
-    if(r.left<window.innerWidth/2) card.style.left=Math.max(12,r.left)+'px'; else card.style.right=Math.max(12,window.innerWidth-r.right)+'px';
-    const ch=Math.min(window.innerHeight*0.8,520);
-    if(r.top>ch+16) card.style.bottom=(window.innerHeight-r.top+10)+'px'; else card.style.top=Math.max(12,Math.min(r.bottom+10,window.innerHeight-ch-12))+'px';
-  }
-  let drag=null,moved=false;
-  fab.addEventListener('pointerdown',e=>{ drag={x:e.clientX,y:e.clientY,t:fab.offsetTop,l:fab.offsetLeft}; moved=false; fab.setPointerCapture(e.pointerId); fab.classList.add('dragging'); });
-  fab.addEventListener('pointermove',e=>{ if(!drag) return; const dx=e.clientX-drag.x,dy=e.clientY-drag.y; if(Math.abs(dx)+Math.abs(dy)>4) moved=true; fab.style.left=(drag.l+dx)+'px'; fab.style.top=(drag.t+dy)+'px'; fab.style.right='auto'; fab.style.bottom='auto'; });
-  fab.addEventListener('pointerup',()=>{ if(!drag) return; fab.classList.remove('dragging'); const side=(fab.offsetLeft+fab.offsetWidth/2)<window.innerWidth/2?'left':'right'; const top=Math.max(12,Math.min(window.innerHeight-fab.offsetHeight-12,fab.offsetTop)); applyPos({side,top}); try{ localStorage.setItem(KEY,JSON.stringify({side,top})); }catch(e){} drag=null; if(!card.classList.contains('hide')) placeCard(); });
-  fab.addEventListener('click',()=>{ if(moved){ moved=false; return; } if(card.classList.contains('hide')){ TUTI=0; renderTut(); placeCard(); card.classList.remove('hide'); } else card.classList.add('hide'); });
+  fab.addEventListener('click',()=>{ if(card.classList.contains('hide')){ TUTI=0; renderTut(); card.classList.remove('hide'); } else card.classList.add('hide'); });
 })();
 $('#helpClose').onclick=()=>$('#helpCard').classList.add('hide');
 $('#tutBack').onclick=()=>{ if(TUTI>0){ TUTI--; renderTut(); } };
@@ -1711,33 +1711,53 @@ function renderDeckDetail(){
 }
 /* ---------- owner: add elements (same packs the client can buy, added free) ---------- */
 const AE_GROUPS=[
-  {key:'decks', title:'Carousels', sub:'Swipeable carousel decks', icon:'carousel', cat:'carousel', items:[
-    {key:'deck3',label:'3 Decks'},{key:'deck6',label:'6 Decks'},{key:'deck9',label:'9 Decks +1 free'}]},
-  {key:'stories', title:'Stories', sub:'Vertical 9:16 story sets', icon:'story', cat:'story', items:[
-    {key:'story3',label:'3 Stories'},{key:'story6',label:'6 Stories'},{key:'story9',label:'9 Stories +1 free'}]},
-  {key:'branding', title:'Branding', sub:'Profile photo · banners · CTAs', icon:'branding', cat:'branding', items:[
-    {key:'brand_full',label:'Full branding pack',note:'Profile photo, X / LinkedIn / Facebook banners, LinkedIn CTAs'}]},
+  {key:'decks',    title:'Carousels', sub:'Add any number of carousels', icon:'carousel', type:'carousel', mode:'qty', unit:'carousel'},
+  {key:'stories',  title:'Stories',   sub:'Add any number of stories',   icon:'story',    type:'story',    mode:'qty', unit:'story'},
+  {key:'branding', title:'Branding',  sub:'Full branding pack',          icon:'branding', type:'branding', mode:'pack', item:'brand_full', note:'Profile photo, X / LinkedIn / Facebook banners, LinkedIn CTAs'},
 ];
 let aeCat=null;
+function aeSyncN(){ const c=$('#aeCount'); if(!c) return 1; let n=Math.max(1,Math.min(50,Number(c.value)||1)); if($('#aeN')) $('#aeN').textContent=n; return n; }
 function renderAE(){
   const b=$('#aeBody');
   if(!aeCat){ b.innerHTML=`<div class="aecats">${AE_GROUPS.map(g=>`<button type="button" class="aecat" data-aecat="${g.key}"><span class="aecat__vis">${TYPE_ICON[g.icon]}</span><span class="aecat__body"><b>${g.title}</b><span>${g.sub}</span></span><svg class="aecat__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>`).join('')}</div>`; return; }
   const g=AE_GROUPS.find(x=>x.key===aeCat);
-  b.innerHTML=`<button type="button" class="aeback" data-aeback>← All elements</button><div class="aelist">${g.items.map(it=>`<button type="button" class="aeitem" data-aeitem="${it.key}"><span class="aeitem__l">${it.label}${it.note?`<small>${it.note}</small>`:''}</span><span class="aeitem__add">+ Add</span></button>`).join('')}</div>`;
+  let inner;
+  if(g.mode==='qty'){
+    inner=`<div class="aeqty">
+      <div class="aeqty__row">
+        <button type="button" class="aeqty__b" data-step="-1">−</button>
+        <input id="aeCount" class="aeqty__in" type="number" min="1" max="50" value="3">
+        <button type="button" class="aeqty__b" data-step="1">+</button>
+      </div>
+      <div class="aeqty__chips">${[3,6,10].map(n=>`<button type="button" class="aeqty__chip" data-set="${n}">+${n}</button>`).join('')}</div>
+      <button type="button" class="b-grad" id="aeAdd" style="width:100%">+ Add <span id="aeN">3</span> ${esc(g.unit)}s</button>
+    </div>`;
+  } else {
+    inner=`<button type="button" class="aeitem" data-aeitem="${g.item}"><span class="aeitem__l">${g.title}${g.note?`<small>${g.note}</small>`:''}</span><span class="aeitem__add">+ Add</span></button>`;
+  }
+  b.innerHTML=`<button type="button" class="aeback" data-aeback>← All elements</button>${inner}`;
 }
 function openAddElems(group){ aeCat=AE_GROUPS.some(g=>g.key===group)?group:null; renderAE(); $('#addElemModal').classList.remove('hide'); }
 $('#aeClose').onclick=()=>$('#addElemModal').classList.add('hide');
 $('#addElemModal').addEventListener('click',e=>{ if(e.target.id==='addElemModal') $('#addElemModal').classList.add('hide'); });
+$('#aeBody').addEventListener('input',e=>{ if(e.target.id==='aeCount') aeSyncN(); });
 $('#aeBody').addEventListener('click',async e=>{
   const back=e.target.closest('[data-aeback]'); if(back){ aeCat=null; renderAE(); return; }
   const cat=e.target.closest('[data-aecat]'); if(cat){ aeCat=cat.dataset.aecat; renderAE(); return; }
-  const it=e.target.closest('[data-aeitem]'); if(!it) return;
-  const key=it.dataset.aeitem; it.classList.add('on'); it.querySelector('.aeitem__add').textContent='Adding…';
-  const r=await api('/api/admin',{action:'add_item',ref:REF,key});
-  if(!r.ok){ alert('Error: '+(r.error||'')); it.classList.remove('on'); it.querySelector('.aeitem__add').textContent='+ Add'; return; }
-  $('#addElemModal').classList.add('hide');
-  CAT=key.startsWith('story')?'story':key.startsWith('brand')?'branding':'carousel'; SELDECK=null;
-  renderBoard(r.decks||[]);
+  const step=e.target.closest('[data-step]'); if(step){ const c=$('#aeCount'); c.value=Math.max(1,Math.min(50,(Number(c.value)||1)+Number(step.dataset.step))); aeSyncN(); return; }
+  const set=e.target.closest('[data-set]'); if(set){ $('#aeCount').value=set.dataset.set; aeSyncN(); return; }
+  const addq=e.target.closest('#aeAdd'); if(addq){
+    const g=AE_GROUPS.find(x=>x.key===aeCat), n=aeSyncN(); addq.disabled=true; addq.textContent='Adding…';
+    const r=await api('/api/admin',{action:'add_elements',ref:REF,type:g.type,count:n});
+    if(!r.ok){ alert('Error: '+(r.error||'')); addq.disabled=false; renderAE(); return; }
+    $('#addElemModal').classList.add('hide'); CAT=g.type; SELDECK=null; renderBoard(r.decks||[]); return;
+  }
+  const it=e.target.closest('[data-aeitem]'); if(it){
+    const key=it.dataset.aeitem; it.classList.add('on'); it.querySelector('.aeitem__add').textContent='Adding…';
+    const r=await api('/api/admin',{action:'add_item',ref:REF,key});
+    if(!r.ok){ alert('Error: '+(r.error||'')); it.classList.remove('on'); it.querySelector('.aeitem__add').textContent='+ Add'; return; }
+    $('#addElemModal').classList.add('hide'); CAT='branding'; SELDECK=null; renderBoard(r.decks||[]);
+  }
 });
 function imagesOf(d){ return Array.isArray(d.design_urls)&&d.design_urls.length?d.design_urls:(d.design_url?[d.design_url]:[]); }
 const T_INSTR={

@@ -213,6 +213,20 @@ export default async function handler(req, res) {
       return res.json({ ok: true, orders: await enrich(await adminListOrders()) });
     }
 
+    // Owner adds an arbitrary number of elements of a type (carousels / stories), no charge.
+    if (action === 'add_elements') {
+      if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+      if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
+      const type = ['carousel', 'story', 'branding'].includes(b.type) ? b.type : 'carousel';
+      const n = Math.max(1, Math.min(50, Number(b.count) || 1));
+      const existing = await decksForOrder(order.id);
+      const label = type === 'story' ? 'Story' : type === 'branding' ? 'Branding' : 'Deck';
+      let pos = existing.length, base = existing.filter(d => (d.type || 'carousel') === type).length;
+      for (let i = 0; i < n; i++) await createDeck(order.id, { title: `${label} ${base + i + 1}`, position: pos++, type });
+      return res.json({ ok: true, decks: await decksForOrder(order.id) });
+    }
+
     // Owner adds a catalogue item (the same packs the client can buy) directly, no charge.
     if (action === 'add_item') {
       if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
