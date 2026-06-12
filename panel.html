@@ -855,6 +855,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         <div class="np-recap" id="npRecap"></div>
         <div class="np-actions">
           <button class="b-grad" type="submit" id="npSubmit">Create project →</button>
+          <button class="b-del b-sm hide" type="button" id="npDelete">Delete project</button>
           <span class="err" id="npErr" style="margin-top:0"></span>
         </div>
       </form>
@@ -878,36 +879,6 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         </div>
       </form>
       <div id="tCreated" class="tcreated hide"></div>
-    </div>
-  </div>
-
-  <!-- Edit project modal (owner) -->
-  <div class="modal hide" id="editModal">
-    <div class="modalc">
-      <div class="modalc__h"><h3>Edit project</h3><button type="button" class="mx" id="eoClose">✕</button></div>
-      <form id="editForm">
-        <input type="hidden" id="eoRef">
-        <div class="np-sec__t" style="margin-bottom:12px">Client</div>
-        <div class="grid2">
-          <div class="field"><label>Client name</label><input id="eoName" placeholder="Nina Park"></div>
-          <div class="field"><label>Email</label><input id="eoEmail" type="email" placeholder="nina@brand.com"></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>Instagram handle</label><input id="eoIg" placeholder="@brand"></div>
-          <div class="field"><label>Phone</label><input id="eoPhone" placeholder="+1 555 …"></div>
-        </div>
-        <div class="np-sec__t" style="margin:6px 0 12px">Offer</div>
-        <div class="grid2">
-          <div class="field"><label>Pack</label><select id="eoPlan"><option value="starter">Ember</option><option value="flame">Flame</option><option value="burst">Meteor</option></select></div>
-          <div class="field"><label>Billing</label><select id="eoBilling"><option value="once">One-time</option><option value="sub">Subscription</option></select></div>
-        </div>
-        <div class="field"><label>Assigned talent</label><select id="eoTalent"><option value="">Unassigned</option></select></div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap">
-          <button class="b-grad" type="submit" id="eoSave">Save changes</button>
-          <button class="b-del b-sm" type="button" id="eoDelete">Delete project</button>
-          <span class="err" id="eoErr" style="margin-top:0"></span>
-        </div>
-      </form>
     </div>
   </div>
 
@@ -1133,7 +1104,7 @@ function projCard(o){
     <button class="kc__edit" data-stop data-edit="${esc(o.ref)}" title="Edit project">${EDIT_IC}</button>
     <div class="kc__n">${esc(o.name||'Untitled')}</div>
     <div class="kc__meta"><span class="swi__ref">#${esc(o.ref)}</span><span class="kc__pack">${esc(planName(o.plan)||'')}</span></div>
-    <div class="kc__foot">${dlBadge(o,o.items)}<span class="kc__items">${o.items||0} element${o.items===1?'':'s'}</span></div>
+    <div class="kc__foot">${dlBadge(o,o.kinds)}<span class="kc__items">${o.items||0} element${o.items===1?'':'s'}</span></div>
     <div class="kc__assign" data-stop>${assignSelect(o)}</div>
   </div>`;
 }
@@ -1145,7 +1116,7 @@ function projRow(o){
     <td>${o.billing==='sub'?'Subscription':'One-time'}</td>
     <td class="amoney">${fmtMoney(o.amount)}</td>
     <td data-stop>${assignSelect(o)}</td>
-    <td>${dlBadge(o,o.items)}</td>
+    <td>${dlBadge(o,o.kinds)}</td>
     <td>${spill(o.state)}</td>
     <td data-stop><button class="iconbtn" data-edit="${esc(o.ref)}" title="Edit project">${EDIT_IC}</button></td></tr>`;
 }
@@ -1160,40 +1131,8 @@ function renderProjectsBody(){
   }
   bindProjects();
 }
-/* ----- edit / delete a project (owner) ----- */
-function openEditOrder(ref){
-  const o=(ADMIN.orders||[]).find(x=>x.ref===ref); if(!o) return;
-  $('#eoRef').value=ref;
-  $('#eoName').value=o.name||''; $('#eoEmail').value=o.email||''; $('#eoIg').value=o.instagram||''; $('#eoPhone').value=o.phone||'';
-  $('#eoPlan').value=o.plan||'flame'; $('#eoBilling').value=o.billing||'once';
-  $('#eoTalent').innerHTML='<option value="">Unassigned</option>'+(ADMIN.talents||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}" ${(o.talent_email||'').toLowerCase()===(t.email||'').toLowerCase()?'selected':''}>${esc(t.name||t.email)}</option>`).join('');
-  $('#eoErr').textContent='';
-  $('#editModal').classList.remove('hide'); setTimeout(()=>$('#eoName').focus(),30);
-}
-$('#eoClose').onclick=()=>$('#editModal').classList.add('hide');
-$('#editModal').addEventListener('click',e=>{ if(e.target.id==='editModal') $('#editModal').classList.add('hide'); });
-$('#editForm').addEventListener('submit',async e=>{
-  e.preventDefault(); const ref=$('#eoRef').value; const btn=$('#eoSave'); $('#eoErr').textContent='';
-  btn.disabled=true; const old=btn.textContent; btn.innerHTML='<span class="spin"></span>';
-  try{
-    const r=await api('/api/admin',{action:'update_order',ref,
-      name:$('#eoName').value.trim(), email:$('#eoEmail').value.trim(), instagram:$('#eoIg').value.trim(),
-      phone:$('#eoPhone').value.trim(), plan:$('#eoPlan').value, billing:$('#eoBilling').value, talent_email:$('#eoTalent').value||null});
-    if(!r.ok){ $('#eoErr').textContent='Could not save ('+(r.error||'error')+').'; return; }
-    ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders;
-    $('#editModal').classList.add('hide'); renderProjectsSection();
-  }catch(err){ $('#eoErr').textContent='Network error.'; }
-  finally{ btn.disabled=false; btn.textContent=old; }
-});
-$('#eoDelete').onclick=async()=>{
-  const ref=$('#eoRef').value;
-  if(!confirm('Delete project #'+ref+'?\n\nThis permanently removes the order, all its elements and messages. This cannot be undone.')) return;
-  const r=await api('/api/admin',{action:'delete_order',ref});
-  if(!r.ok){ alert('Error: '+(r.error||'')); return; }
-  ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders;
-  try{ if(localStorage.getItem('brasero_last_ref')===ref) localStorage.removeItem('brasero_last_ref'); }catch(e){}
-  $('#editModal').classList.add('hide'); renderProjectsSection();
-};
+/* ----- edit a project: the full New-project overlay, prefilled (add/remove assets + upsells) ----- */
+function openEditOrder(ref){ const o=(ADMIN.orders||[]).find(x=>x.ref===ref); if(o) openNewModal(o); }
 function bindProjects(){
   $('#pbody').querySelectorAll('[data-card]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-stop]')) return; openOrder(el.dataset.card); });
   $('#pbody').querySelectorAll('tr[data-row]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-stop]')) return; openOrder(el.dataset.row); });
@@ -1242,16 +1181,17 @@ const TYPE_ICON={
   branding:`<svg class="ti" viewBox="0 0 120 120" fill="none"><use href="#ic-brand"/></svg>`,
 };
 const DPCT={writing:12,script_review:34,designing:58,design_review:80,revision:72,done:100};
-/* deadline scales with the number of production items, extra elements push it back */
-const PLAN_BASE_H={starter:72,flame:72,burst:48}, PLAN_PACK={starter:3,flame:6,burst:10}, EXTRA_H_PER_ITEM=12;
-function deadlineMs(o,items){
-  const base=PLAN_BASE_H[o.plan]??72, pack=PLAN_PACK[o.plan]??0;
-  const n=(items!=null?items:(o.items!=null?o.items:pack));
-  const start=o.created_at?new Date(o.created_at).getTime():Date.now();
-  return start + (base + Math.max(0,n-pack)*EXTRA_H_PER_ITEM)*3600000;
+/* deadline is additive per pack:
+   a pack of 10 (the 9+1) adds 3 days, a pack of 3 or 6 adds 2 days, branding adds 3 days. */
+function packDays(n){ return n>=10?3:(n>0?2:0); }
+function deadlineDays(kinds){ const k=kinds||{}; const d=packDays(k.carousel||0)+packDays(k.story||0)+((k.branding||0)>0?3:0); return d||2; }
+function kindsOfDecks(decks){ const k={carousel:0,story:0,branding:0}; (decks||[]).forEach(d=>{const t=d.type||'carousel';k[t]=(k[t]||0)+1;}); return k; }
+function deadlineMs(o,kinds){
+  const start=(o&&o.created_at)?new Date(o.created_at).getTime():Date.now();
+  return start + deadlineDays(kinds||(o&&o.kinds)||{})*86400000;
 }
-function dlBadge(o,items){
-  const ms=deadlineMs(o,items)-Date.now(), late=ms<0, abs=Math.abs(ms);
+function dlBadge(o,kinds){
+  const ms=deadlineMs(o,kinds)-Date.now(), late=ms<0, abs=Math.abs(ms);
   const h=Math.floor(abs/3600000), d=Math.floor(h/24), hr=h%24, t=d>0?`${d}d ${hr}h`:`${h}h`;
   return `<span class="dl ${late?'late':(h<24?'soon':'')}">⏱ ${late?'Overdue '+t:t+' left'}</span>`;
 }
@@ -1346,13 +1286,29 @@ $('#npAddons').addEventListener('click',e=>{
   renderNp();
 });
 
-async function openNewModal(){
+let NP_EDIT=null;   // ref being edited, or null for a brand-new project
+async function openNewModal(order){
+  if(!(order&&order.ref)) order=null;   // ignore click events passed as the arg
   if(ME&&ME.is_owner&&!TALENTS.length){ try{ const t=await api('/api/admin',{action:'list_talents'}); if(t.ok) TALENTS=t.talents||[]; }catch(e){} }
+  NP_EDIT=order?order.ref:null;
   $('#npForm').reset(); $('#npErr').textContent='';
-  NP.plan='burst'; NP.billing='once'; NP.branding=false; NP.story=null; NP.bundle=false;
-  $('#npBilling').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.bill==='once'));
-  $('#npDecks').value=NP_PLANS.burst.decks;
-  $('#npTalent').innerHTML='<option value="">Unassigned</option>'+(TALENTS||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}">${esc(t.name||t.email)}</option>`).join('');
+  if(order){
+    const a=order.addons||[], an=order.answers||{};
+    NP.plan=order.plan||'burst'; NP.billing=order.billing||'once';
+    NP.branding=a.includes('branding'); NP.story=STORY_KEYS.find(k=>a.includes(k))||null; NP.bundle=a.includes('bundle');
+    $('#npName').value=order.name||''; $('#npEmail').value=order.email||''; $('#npIg').value=order.instagram||''; $('#npPhone').value=order.phone||'';
+    $('#npDecks').value=(order.kinds&&order.kinds.carousel!=null)?order.kinds.carousel:NP_PLANS[NP.plan].decks;
+    $('#npBPage').value=an.page||''; $('#npBGoal').value=an.goal||''; $('#npBNiche').value=an.niche||'';
+    $('#npBAudience').value=an.audience||''; $('#npBStyle').value=an.style||''; $('#npBNotes').value=an.notes||'';
+  } else {
+    NP.plan='burst'; NP.billing='once'; NP.branding=false; NP.story=null; NP.bundle=false;
+    $('#npDecks').value=NP_PLANS.burst.decks;
+  }
+  $('#npBilling').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.bill===NP.billing));
+  $('#npTalent').innerHTML='<option value="">Unassigned</option>'+(TALENTS||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}" ${order&&(order.talent_email||'').toLowerCase()===(t.email||'').toLowerCase()?'selected':''}>${esc(t.name||t.email)}</option>`).join('');
+  $('#newModal').querySelector('.modalc__h h3').textContent=order?'Edit project':'New project';
+  $('#npSubmit').textContent=order?'Save changes →':'Create project →';
+  $('#npDelete').classList.toggle('hide',!order);
   renderNp();
   $('#newModal').classList.remove('hide'); setTimeout(()=>$('#npName').focus(),30);
 }
@@ -1502,18 +1458,32 @@ $('#tutNext').onclick=()=>{ if(TUTI<TUT.length-1){ TUTI++; renderTut(); } else $
 $('#npForm').addEventListener('submit',async e=>{
   e.preventDefault(); $('#npErr').textContent='';
   const btn=$('#npSubmit'); btn.disabled=true; const old=btn.textContent; btn.innerHTML='<span class="spin"></span>';
+  const f={ name:$('#npName').value.trim(), email:$('#npEmail').value.trim(), instagram:$('#npIg').value.trim(),
+    phone:$('#npPhone').value.trim(), plan:NP.plan, billing:NP.billing,
+    decks:Number($('#npDecks').value)||0, addons:npSelectedAddonKeys(), answers:npBrief() };
   try{
-    const r=await api('/api/admin',{action:'create_order',
-      name:$('#npName').value.trim(), email:$('#npEmail').value.trim(), instagram:$('#npIg').value.trim(),
-      phone:$('#npPhone').value.trim(), plan:NP.plan, billing:NP.billing,
-      decks:Number($('#npDecks').value)||0, addons:npSelectedAddonKeys(),
-      answers:npBrief(), talentEmail:$('#npTalent').value||null});
-    if(!r.ok){ $('#npErr').textContent='Could not create ('+(r.error||'error')+').'; return; }
-    ORDERS=r.orders||ORDERS; ADMIN.orders=ORDERS; $('#newModal').classList.add('hide');
-    if(r.ref) openOrder(r.ref);
+    if(NP_EDIT){
+      const r=await api('/api/admin',{action:'update_order',ref:NP_EDIT,talent_email:$('#npTalent').value||null,...f});
+      if(!r.ok){ $('#npErr').textContent='Could not save ('+(r.error||'error')+').'; return; }
+      ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders; $('#newModal').classList.add('hide'); renderProjectsSection();
+    } else {
+      const r=await api('/api/admin',{action:'create_order',talentEmail:$('#npTalent').value||null,...f});
+      if(!r.ok){ $('#npErr').textContent='Could not create ('+(r.error||'error')+').'; return; }
+      ORDERS=r.orders||ORDERS; ADMIN.orders=ORDERS; $('#newModal').classList.add('hide');
+      if(r.ref) openOrder(r.ref);
+    }
   }catch(e){ $('#npErr').textContent='Network error.'; }
   finally{ btn.disabled=false; btn.textContent=old; }
 });
+$('#npDelete').onclick=async()=>{
+  if(!NP_EDIT) return;
+  if(!confirm('Delete project #'+NP_EDIT+'?\n\nThis permanently removes the order, all its elements and messages. This cannot be undone.')) return;
+  const r=await api('/api/admin',{action:'delete_order',ref:NP_EDIT});
+  if(!r.ok){ alert('Error: '+(r.error||'')); return; }
+  ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders;
+  try{ if(localStorage.getItem('brasero_last_ref')===NP_EDIT) localStorage.removeItem('brasero_last_ref'); }catch(e){}
+  $('#newModal').classList.add('hide'); renderProjectsSection();
+};
 
 /* ---------- detail ---------- */
 function backToOverview(){ REF=''; showAdmin('projects'); }
@@ -1523,7 +1493,7 @@ function renderSwitcher(){
     const pack=planName(o.plan)?planName(o.plan)+' pack':'';
     return `<button type="button" class="swi ${o.ref===REF?'on':''}" data-ref="${esc(o.ref)}">
       <div class="swi__l"><span class="swi__name">${esc(o.name||'Untitled')} <span class="swi__ref">#${esc(o.ref)}</span></span><span class="swi__pack">${esc(pack)}</span></div>
-      <div class="swi__r">${spill(o.state)}${dlBadge(o,o.items)}</div>
+      <div class="swi__r">${spill(o.state)}${dlBadge(o,o.kinds)}</div>
     </button>`;
   }).join('');
   const ownerExtras=(ME&&ME.is_owner)?`<div class="swi__sep"></div>
@@ -1566,7 +1536,7 @@ async function openOrder(ref){
     (o.addons&&o.addons.length)?'+ '+o.addons.map(k=>ADDON_LBL[k]||k).join(', '):''
   ].filter(Boolean).join(' · ');
   $('#oMeta').textContent=meta;
-  $('#oDeadline').innerHTML=dlBadge(d.order,(d.decks||[]).length);
+  $('#oDeadline').innerHTML=dlBadge(d.order,kindsOfDecks(d.decks));
   const foot=document.querySelector('.side__foot'); if(foot) foot.style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   renderSideMe();
   SELDECK=null; CAT=null; renderBoard(d.decks||[]);

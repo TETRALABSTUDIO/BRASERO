@@ -1,7 +1,7 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
-  assignOrder, updateOrder, deleteOrder, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
-  signToken, randomPassword, tempPassword, PLANS, talentInviteEmail, talentAssignedEmail,
+  assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
+  signToken, randomPassword, tempPassword, PLANS, ADDONS, amountFor, addonKeys, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, messageNotifyEmail } from './_lib.js';
 
 // Talents never receive the client's price or contact details (email/phone/amount/billing).
@@ -9,8 +9,10 @@ const pub = (o, isOwner) => ({
   ref: o.ref || orderRef(o.stripe_session_id), name: o.name, plan: o.plan,
   instagram: o.instagram || '', addons: Array.isArray(o.addons) ? o.addons : [],
   talent_email: o.talent_email || '', created_at: o.created_at,
-  ...(isOwner ? { email: o.email, phone: o.phone || '', amount: o.amount || 0, billing: o.billing || '' } : {}),
+  ...(isOwner ? { email: o.email, phone: o.phone || '', amount: o.amount || 0, billing: o.billing || '', answers: o.answers || null } : {}),
 });
+// Count the board's elements per type, so the panel can compute deadlines + prefill the editor.
+const kindsOf = dk => { const k = { carousel: 0, story: 0, branding: 0 }; for (const d of dk) { const t = d.type || 'carousel'; k[t] = (k[t] || 0) + 1; } return k; };
 
 // Talent panel API. Authenticated by the Talent session token (Authorization: Bearer …).
 // Talents see only orders assigned to them; owners see all + manage the team.
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
   const isOwner = !!me.is_owner;
   const owns = order => isOwner || (order.talent_email || '').toLowerCase() === me.email.toLowerCase();
   // Enrich a list of order rows with per-project state + element count (used by the panel board/list).
-  const enrich = async rows => Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
+  const enrich = async rows => Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length, kinds: kindsOf(dk) }; }));
 
   try {
     const b = req.body || {};
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
       const paid = all.filter(o => o.status === 'paid');
       const orders = await Promise.all(paid.map(async o => {
         const dk = await decksForOrder(o.id);
-        return { ...pub(o, true), status: o.status, onboarding_at: o.onboarding_at || null, state: orderState(dk), items: dk.length };
+        return { ...pub(o, true), status: o.status, onboarding_at: o.onboarding_at || null, state: orderState(dk), items: dk.length, kinds: kindsOf(dk) };
       }));
       const leads = all.filter(o => o.status !== 'paid').map(o => ({
         ref: o.ref || '', name: o.name || '', email: o.email || '', plan: o.plan || '', billing: o.billing || '',
@@ -192,8 +194,16 @@ export default async function handler(req, res) {
 
     if (action === 'update_order') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
-      const r = await updateOrder(b.ref, b);
+      const target = await findOrderByRef(b.ref);
+      if (!target) return res.status(404).json({ ok: false, error: 'not_found' });
+      const plan = b.plan || target.plan;
+      const addons = addonKeys(b.addons);
+      const decks = (b.decks != null) ? Math.max(0, Math.min(50, Number(b.decks) || 0)) : undefined;
+      const planAmt = b.billing === 'sub' ? amountFor(plan, 'sub') : (PLANS[plan] ? PLANS[plan].amount : 0);
+      const amount = planAmt + addons.reduce((s, k) => s + (ADDONS[k] ? ADDONS[k].amount : 0), 0);
+      const r = await updateOrder(b.ref, { ...b, addons, amount });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      await syncOrderElements(target.id, { plan, addons, decks });   // add/remove assets to match the offer
       return res.json({ ok: true, orders: await enrich(await adminListOrders()) });
     }
     if (action === 'delete_order') {

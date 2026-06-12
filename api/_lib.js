@@ -459,7 +459,7 @@ export async function updateOrder(ref, patch = {}) {
   const order = await findOrderByRef(ref);
   if (!order) return { error: 'not_found' };
   const p = {};
-  for (const k of ['name', 'email', 'instagram', 'handle', 'phone', 'plan', 'billing']) {
+  for (const k of ['name', 'email', 'instagram', 'handle', 'phone', 'plan', 'billing', 'addons', 'answers', 'amount']) {
     if (patch[k] !== undefined) p[k] = patch[k] === '' ? null : patch[k];
   }
   if (patch.talent_email !== undefined) p.talent_email = patch.talent_email ? String(patch.talent_email).trim().toLowerCase() : null;
@@ -467,6 +467,32 @@ export async function updateOrder(ref, patch = {}) {
   if (MEM) { Object.assign(order, p); return { ok: true, order }; }
   const { error } = await db.from('orders').update(p).eq('id', order.id);
   if (error) return { error: 'db' };
+  return { ok: true };
+}
+
+// Owner: make the board match a target offer (plan decks + addons). Adds the
+// missing elements per type AND removes the surplus - but only surplus elements
+// that have NO work started, so in-progress assets are never destroyed.
+export async function syncOrderElements(orderId, { plan, addons, decks } = {}) {
+  const want = expectedElements({ plan, addons, decks });
+  const targets = { carousel: want.nCarousel, story: want.nStory, branding: want.branding.length };
+  const titleFor = { carousel: i => `Deck ${i + 1}`, story: i => `Story ${i + 1}`, branding: i => want.branding[i] || `Branding ${i + 1}` };
+  const started = d => !!(d.script || d.design_url || (Array.isArray(d.design_urls) && d.design_urls.length) || (d.status && d.status !== 'writing'));
+  let existing = await decksForOrder(orderId);
+  for (const type of ['carousel', 'story', 'branding']) {
+    const cur = existing.filter(d => (d.type || 'carousel') === type);
+    const target = targets[type] || 0;
+    if (cur.length < target) {
+      let pos = existing.length;
+      for (let i = cur.length; i < target; i++) await createDeck(orderId, { title: titleFor[type](i), position: pos++, type });
+      existing = await decksForOrder(orderId);
+    } else if (cur.length > target) {
+      const removable = cur.filter(d => !started(d)).sort((a, b) => (b.position || 0) - (a.position || 0));
+      let toRemove = cur.length - target;
+      for (const d of removable) { if (toRemove <= 0) break; await deleteDeck(d.id); toRemove--; }
+      existing = await decksForOrder(orderId);
+    }
+  }
   return { ok: true };
 }
 
