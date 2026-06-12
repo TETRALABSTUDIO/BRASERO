@@ -272,6 +272,18 @@ export function signClientSession(client) {
   return signToken({ email: client.email, cid: client.id, role: 'client' }, 14);
 }
 
+// Resolve a signed-in client from a request's Authorization header (role 'client').
+// Returns { id, email } or null. The server re-verifies the HMAC every call.
+export function clientFromAuth(req) {
+  const tok = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  const s = verifyToken(tok);
+  if (!s || s.role !== 'client' || !s.email) return null;
+  return { id: s.cid || null, email: String(s.email).toLowerCase() };
+}
+// True if a client owns an order (email is the stable join key; client_id as backup).
+export const ownsOrder = (o, c) => !!o && !!c &&
+  ((o.email || '').toLowerCase() === c.email || (!!c.id && o.client_id === c.id));
+
 // Every paid order belonging to a client (keyed by their email).
 export async function ordersForClient(client) {
   if (!STORE || !client) return [];

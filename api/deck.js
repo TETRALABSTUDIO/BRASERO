@@ -1,16 +1,25 @@
-import { findOrderByRefEmail, decksForOrder, getDeck, patchDeck, publicOrder, send,
-  sendTo, getTalentByEmail, talentClientActionEmail, talentProjectDoneEmail, siteUrl } from './_lib.js';
+import { findOrderByRefEmail, findOrderByRef, decksForOrder, getDeck, patchDeck, publicOrder, send,
+  sendTo, getTalentByEmail, talentClientActionEmail, talentProjectDoneEmail, siteUrl,
+  clientFromAuth, ownsOrder } from './_lib.js';
 
-// Customer-driven deck actions, authenticated by ref + email each call.
+// Customer-driven deck actions, authenticated EITHER by a client session (Bearer
+// token) or legacy ref + email each call.
 //   action = validate_script | validate_design | request_revision
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
     const { ref = '', email = '', deckId = '', action = '', script = '', note = '' } = req.body || {};
-    if (!ref || !email || !deckId || !action) return res.status(400).json({ ok: false, error: 'missing' });
+    if (!ref || !deckId || !action) return res.status(400).json({ ok: false, error: 'missing' });
 
-    const order = await findOrderByRefEmail(ref, email);
-    if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+    const client = clientFromAuth(req);
+    let order = null;
+    if (client) {
+      const o = await findOrderByRef(ref);
+      if (ownsOrder(o, client)) order = o;
+    } else if (email) {
+      order = await findOrderByRefEmail(ref, email);
+    }
+    if (!order) return res.status(client ? 403 : 404).json({ ok: false, error: 'not_found' });
 
     const deck = await getDeck(deckId);
     if (!deck || deck.order_id !== order.id) return res.status(403).json({ ok: false, error: 'forbidden' });

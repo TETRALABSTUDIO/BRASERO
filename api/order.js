@@ -1,15 +1,44 @@
-import { findOrderByRefEmail, decksForOrder, publicOrder, getDeck, listMessages, addMessage,
-  getTalentByEmail, sendTo, send, messageNotifyEmail, siteUrl } from './_lib.js';
+import { findOrderByRefEmail, findOrderByRef, ordersForClient, decksForOrder, orderProgress, orderRef,
+  publicOrder, getDeck, listMessages, addMessage, getTalentByEmail, sendTo, send,
+  messageNotifyEmail, siteUrl, clientFromAuth, ownsOrder } from './_lib.js';
 
-// POST { ref, email, action? } → the customer's order + decks + message thread.
-//   action = (none) load · send_message { body, deckId? }
+// POST { action, ... } authenticated EITHER by a client session (Bearer token →
+// aggregates all the client's orders) OR legacy { ref, email } (single order).
+//   my_orders                          → the signed-in client's orders (list)
+//   (none) | messages | send_message   → one order's board + thread
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
     const { ref = '', email = '', action = '', body = '', deckId = '', images = [] } = req.body || {};
-    if (!ref || !email) return res.status(400).json({ ok: false, error: 'missing' });
-    const order = await findOrderByRefEmail(ref, email);
-    if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+    const client = clientFromAuth(req);
+
+    // Client space: every paid order the signed-in client owns, with a progress summary.
+    if (action === 'my_orders') {
+      if (!client) return res.status(401).json({ ok: false, error: 'unauthorized' });
+      const orders = await ordersForClient(client);
+      const list = await Promise.all(orders.map(async (o) => {
+        const decks = await decksForOrder(o.id);
+        const prog = orderProgress(decks);
+        return {
+          ref: o.ref || orderRef(o.stripe_session_id),
+          name: o.name || '', plan: o.plan || '', billing: o.billing || '',
+          status: o.status, created_at: o.created_at,
+          percent: prog.percent, phase: prog.steps[prog.active] || '',
+          total: decks.length, done: decks.filter((d) => d.status === 'done').length,
+        };
+      }));
+      return res.json({ ok: true, orders: list });
+    }
+
+    // Resolve the single order being viewed/acted on.
+    let order = null;
+    if (client && ref) {
+      const o = await findOrderByRef(ref);
+      if (ownsOrder(o, client)) order = o;          // a client can only reach their own orders
+    } else if (ref && email) {
+      order = await findOrderByRefEmail(ref, email); // legacy ref+email (track.html during transition)
+    }
+    if (!order) return res.status(client ? 403 : 404).json({ ok: false, error: 'not_found' });
 
     if (action === 'messages') {
       return res.json({ ok: true, messages: await listMessages(order.id) });

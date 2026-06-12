@@ -1080,6 +1080,9 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList
 (function(){
   const q=new URLSearchParams(location.search);
   const ref=q.get('ref'), email=q.get('email');
+  // Unified app is the new front door: anything other than a legacy ref+email
+  // deep link (still sent by confirmation/review emails) goes to app.html.
+  if(!(ref&&email)){ location.replace('app.html'); return; }
   if(ref&&email){
     $('#ref').value=ref; $('#email').value=email;
     if(q.get('addon')){ const f=$('#flash'); if(f){ f.textContent='🎉 Payment received, your new decks are being added to this order.'; f.classList.remove('hide'); } }
