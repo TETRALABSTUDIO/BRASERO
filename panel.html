@@ -657,6 +657,8 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .msg--studio .msg__bubble{background:var(--grad);color:#fff;border-bottom-right-radius:5px}
 .msg--client .msg__bubble{background:#fff;border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:5px}
 .msg__meta{font-size:11px;color:var(--grey);font-weight:600;padding:0 4px}
+.msg__del{border:none;background:none;color:#cbc8c2;font-size:11px;font-weight:700;cursor:pointer;padding:0 2px;margin-left:6px;line-height:1;vertical-align:middle;transition:color .15s}
+.msg__del:hover{color:#e0341f}
 .msg__about{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:var(--orange);background:rgba(248,80,0,.1);border:1px solid rgba(248,80,0,.2);border-radius:100px;padding:2px 9px}
 .msg__about .ti{width:13px;height:13px}
 .msg__imgs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
@@ -1915,7 +1917,8 @@ function renderMessages(){
     const who=esc(m.sender_name||(m.sender==='studio'?'You':'Client'));
     const bubble=m.body?`<div class="msg__bubble">${esc(m.body)}</div>`:'';
     const imgs=(m.images&&m.images.length)?`<div class="msg__imgs">${m.images.map(u=>`<button type="button" class="msg__img" data-full="${esc(u)}" title="View"><img src="${esc(u)}" alt="attachment"></button>`).join('')}</div>`:'';
-    return `<div class="msg ${cls}">${about}${bubble}${imgs}<span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}</span></div>`;
+    const del=(ME&&ME.is_owner&&m.id)?`<button type="button" class="msg__del" data-del-msg="${esc(m.id)}" title="Delete this message">✕</button>`:'';
+    return `<div class="msg ${cls}">${about}${bubble}${imgs}<span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}${del}</span></div>`;
   }).join('');
   t.scrollTop=t.scrollHeight;
 }
@@ -1962,6 +1965,18 @@ $('#chatInput')?.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey
 /* chat image lightbox: click a thumbnail to view large + download */
 let lbUrl='';
 document.addEventListener('click',e=>{ const ci=e.target.closest&&e.target.closest('.msg__img'); if(ci&&ci.dataset.full){ lbUrl=ci.dataset.full; $('#lbImg').src=lbUrl; $('#lb').classList.add('open'); } });
+/* owner-only: delete any message in the thread */
+document.addEventListener('click',async e=>{
+  const db=e.target.closest&&e.target.closest('[data-del-msg]'); if(!db) return;
+  if(!REF||!(ME&&ME.is_owner)) return;
+  if(!confirm('Delete this message for everyone? This can’t be undone.')) return;
+  db.disabled=true;
+  try{
+    const r=await api('/api/admin',{action:'delete_message',ref:REF,messageId:db.dataset.delMsg});
+    if(r&&r.ok&&Array.isArray(r.messages)){ MESSAGES=r.messages; renderMessages(); }
+    else { db.disabled=false; alert('Could not delete this message.'); }
+  }catch(err){ db.disabled=false; }
+});
 $('#lb').addEventListener('click',()=>$('#lb').classList.remove('open'));
 $('#lbDl').addEventListener('click',e=>{ e.stopPropagation(); if(!lbUrl) return; const a=document.createElement('a'); a.href=lbUrl; a.download='chat-image.jpg'; document.body.appendChild(a); a.click(); a.remove(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#lb').classList.remove('open'); });

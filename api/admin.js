@@ -2,7 +2,7 @@ import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOr
   adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
   assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
   signToken, randomPassword, tempPassword, PLANS, ADDONS, amountFor, addonKeys, talentInviteEmail, talentAssignedEmail,
-  listMessages, addMessage, messageNotifyEmail } from './_lib.js';
+  listMessages, addMessage, deleteMessage, messageNotifyEmail } from './_lib.js';
 
 // Talents never receive the client's price or contact details (email/phone/amount/billing).
 const pub = (o, isOwner) => ({
@@ -171,6 +171,16 @@ export default async function handler(req, res) {
           }));
         }
       } catch (e) { console.error('msg notify client', e); }
+      return res.json({ ok: true, messages: await listMessages(order.id) });
+    }
+
+    // Owner-only moderation: delete any message (client or studio) in a thread.
+    if (action === 'delete_message') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+      if (!b.messageId) return res.status(400).json({ ok: false, error: 'missing' });
+      const removed = await deleteMessage(order.id, b.messageId);
+      if (!removed) return res.status(404).json({ ok: false, error: 'message_not_found' });
       return res.json({ ok: true, messages: await listMessages(order.id) });
     }
 

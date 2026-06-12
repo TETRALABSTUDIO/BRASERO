@@ -245,6 +245,22 @@ export async function addMessage(orderId, { deck_id, sender, sender_name, body, 
   return pubMessage(data);
 }
 
+// Hard-delete one message. Scoped to its order so a caller can only remove a
+// message that belongs to the order they're acting on (owner moderation).
+export async function deleteMessage(orderId, messageId) {
+  if (!STORE || !orderId || !messageId) return false;
+  if (MEM) {
+    const i = MEM.messages.findIndex(m => m.id === messageId && m.order_id === orderId);
+    if (i < 0) return false;
+    MEM.messages.splice(i, 1);
+    return true;
+  }
+  const { data, error } = await db.from('messages').delete()
+    .eq('id', messageId).eq('order_id', orderId).select('id');
+  if (error) { console.error('deleteMessage', error); return false; }
+  return !!(data && data.length);
+}
+
 export async function patchDeck(deckId, patch) {
   if (!STORE) return null;
   if (MEM) {
