@@ -8,10 +8,12 @@
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#111;--soft:#f7f4ef;--grey:#6b6b6b;--line:rgba(0,0,0,.10);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00,#f87000);--ok:#15803d;--okbg:rgba(22,163,74,.12);--wait:#b45309;--waitbg:rgba(245,158,11,.13);
+:root{--ink:#111;--soft:#f5f5f7;--grey:#6b6b6b;--line:rgba(0,0,0,.10);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00,#f87000);--ok:#15803d;--okbg:rgba(22,163,74,.12);--wait:#b45309;--waitbg:rgba(245,158,11,.13);
 --c-todo:#dc2626;--c-prog:#2563eb;--c-done:#16a34a;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Satoshi',system-ui,sans-serif;background:#f4f1ec;color:var(--ink);-webkit-font-smoothing:antialiased}
+body{font-family:'Satoshi',system-ui,sans-serif;background:#f3f3f5;color:var(--ink);-webkit-font-smoothing:antialiased}
+body.appmode{overflow:hidden}
+body.appmode #profilePill{display:none}
 input,textarea,button,select{font-family:inherit}
 input,textarea,select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;width:100%;font-size:14px}
 textarea{min-height:120px;resize:vertical;line-height:1.55}
@@ -154,15 +156,20 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 
 /* project board (master / detail), like the client tracker */
-.board{display:grid;grid-template-columns:292px minmax(0,1fr) 360px;align-items:stretch;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.05);overflow:hidden;min-height:calc(100vh - 210px)}
-.board.chat-collapsed{grid-template-columns:292px minmax(0,1fr) 56px}
-.board__list{background:var(--soft);border-right:1px solid var(--line);overflow-y:auto}
-.board__list-head{padding:16px 16px 12px}
-.board__list-head button{width:100%}
-#deckList{border-top:1px solid var(--line)}
+/* full-screen app shell: sidebar (elements) · work (deliverables) · chat */
+.board{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:300px minmax(0,1fr) 360px;background:#fff}
+.board.chat-collapsed{grid-template-columns:300px minmax(0,1fr) 56px}
+.board__list{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line);overflow:hidden}
+.side__brand{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.side__order{padding:15px 18px}
+.side__order h2{font-size:17px;font-weight:900;letter-spacing:-.025em;line-height:1.15}
+.side__order .meta{color:var(--grey);font-size:12.5px;margin-top:4px;line-height:1.45}
+.side__listhead{padding:6px 18px 9px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--grey)}
+.side__foot{padding:14px 16px;border-top:1px solid var(--line)}
+#deckList{flex:1;min-height:0;overflow-y:auto;border-top:1px solid var(--line)}
 .deckitem{width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:background .15s}
-.deckitem:hover{background:rgba(255,255,255,.6);transform:none;box-shadow:none}
-.deckitem.sel{background:#fff;box-shadow:inset 3px 0 0 var(--orange)}
+.deckitem:hover{background:#fafafb;transform:none;box-shadow:none}
+.deckitem.sel{background:var(--soft);box-shadow:inset 3px 0 0 var(--orange)}
 .deckitem__top{display:flex;align-items:center;min-width:0}
 .deckitem__title{font-size:14px;font-weight:900;letter-spacing:-.02em;line-height:1.2;display:flex;align-items:center;gap:8px;min-width:0}
 .deckitem__title>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -170,11 +177,11 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .miniprog{height:6px;border-radius:100px;background:rgba(0,0,0,.08);overflow:hidden}
 .miniprog i{display:block;height:100%;background:var(--grad);border-radius:100px;transition:width .5s cubic-bezier(.4,0,.2,1)}
 .deckitem__pill{align-self:flex-start}
-.board__right{display:flex;flex-direction:column;min-height:0;overflow-y:auto}
-.board__detail{flex:1 1 auto;padding:22px 24px;min-width:0}
+.board__right{display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:#fff}
+.board__detail{flex:1 1 auto;padding:26px 32px;min-width:0}
 .board__detail .deck{border:none;box-shadow:none;padding:0;border-radius:0}
 .empty{display:grid;place-items:center;min-height:50vh;color:var(--grey);text-align:center;font-size:14px;padding:20px}
-@media(max-width:980px){.board,.board.chat-collapsed{grid-template-columns:1fr;min-height:0}.board__list{border-right:none;border-bottom:1px solid var(--line)}.board__right{min-height:0}.board__chat{border-left:none;border-top:1px solid var(--line)}.board.chat-collapsed .chat__panel{display:flex}.chat__rail{display:none!important}.chat__thread{max-height:340px}}
+@media(max-width:980px){.board,.board.chat-collapsed{position:static;display:flex;flex-direction:column}.board__list{border-right:none;border-bottom:1px solid var(--line)}#deckList{max-height:46vh}.board__chat{border-left:none;border-top:1px solid var(--line)}.board.chat-collapsed .chat__panel{display:flex}.chat__rail{display:none!important}.chat__thread{max-height:340px}}
 /* deadline badge */
 .dl{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:100px;background:rgba(0,0,0,.05);color:#555;white-space:nowrap}
 .dl.soon{background:var(--waitbg);color:var(--wait)}
@@ -201,7 +208,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .board__detail .gal .adder{aspect-ratio:1080/1350;border-radius:10px;border:1.5px dashed var(--line);background:var(--soft);display:grid;place-items:center;cursor:pointer;color:var(--grey);font-size:12px;font-weight:700;text-align:center;line-height:1.2}
 .board__detail .gal .adder:hover{border-color:var(--orange);color:var(--orange)}
 /* command bar (talent actions + progress) at the bottom edge */
-.cmdbar{border-top:1px solid var(--line);background:var(--soft)}
+.cmdbar{border-top:1px solid var(--line);background:#fff;position:sticky;bottom:0}
 .cmdbar:empty{display:none}
 .cmdbar__row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 24px}
 .cmdbar__meta{display:flex;align-items:center;gap:12px;margin-right:auto}
@@ -411,17 +418,19 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         <div id="projects"></div>
       </div>
       <div id="detail" class="hide">
-        <div class="ohead">
-          <div><h2 id="oName"></h2><div class="meta" id="oMeta"></div></div>
-          <div class="right">
-            <button class="back b-sm" id="back">← All projects</button>
-            <span id="oDeadline"></span>
-          </div>
-        </div>
         <div class="board" id="board">
           <aside class="board__list">
-            <div class="board__list-head"><button class="b-grad b-sm" id="addDeck">+ Add element</button></div>
+            <div class="side__brand">
+              <button class="b-ghost b-sm" id="back">← All projects</button>
+            </div>
+            <div class="side__order">
+              <h2 id="oName"></h2>
+              <div class="meta" id="oMeta"></div>
+              <div id="oDeadline" style="margin-top:9px"></div>
+            </div>
+            <div class="side__listhead">Elements</div>
             <div id="deckList"></div>
+            <div class="side__foot"><button class="b-grad b-sm" id="addDeck" style="width:100%">+ Add element</button></div>
           </aside>
           <div class="board__right">
             <div class="board__detail" id="deckDetail"></div>
@@ -919,7 +928,7 @@ $('#npForm').addEventListener('submit',async e=>{
 });
 
 /* ---------- detail ---------- */
-$('#back').onclick=()=>{ $('#detail').classList.add('hide'); $('#overview').classList.remove('hide'); document.querySelector('.main')?.classList.remove('main--wide'); REF=''; };
+$('#back').onclick=()=>{ $('#detail').classList.add('hide'); $('#overview').classList.remove('hide'); document.body.classList.remove('appmode'); REF=''; };
 $('#deckList').addEventListener('click',e=>{ const it=e.target.closest('[data-pick]'); if(!it) return; SELDECK=it.dataset.pick; renderDeckList(); renderDeckDetail(); });
 $('#deckDetail').addEventListener('click',e=>{ const x=e.target.closest('[data-x]'); if(!x) return; x.closest('figure')?.remove(); const det=$('#deckDetail'), c=det.querySelector('[data-count]'); if(c) c.textContent=det.querySelectorAll('[data-imgs] img').length; });
 async function openOrder(ref){
@@ -927,7 +936,7 @@ async function openOrder(ref){
   const d=await api('/api/admin',{action:'get',ref:REF});
   if(!d.ok){ alert(d.error==='forbidden'?'Not your project.':'Order not found'); return; }
   $('#overview').classList.add('hide'); $('#detail').classList.remove('hide');
-  document.querySelector('.main')?.classList.add('main--wide');
+  document.body.classList.add('appmode');
   $('#oName').innerHTML='#'+esc(d.order.ref)+' · '+esc(d.order.name||d.order.email);
   const o=d.order, ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
   const meta=[
