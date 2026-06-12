@@ -12,6 +12,7 @@
 :root{--black:#0c0c0c;--ink:#111;--soft:#f5f5f7;--grey:#6b6b6b;--line:rgba(0,0,0,.09);--orange:#f87000;--grad:linear-gradient(100deg,#ff1a00 0%,#f87000 100%);}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{min-height:100%}
+html{scrollbar-gutter:stable}   /* keep scrollbar space reserved so steps don't shift the layout */
 body{font-family:'Satoshi',system-ui,sans-serif;background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -44,9 +45,9 @@ a{color:inherit;text-decoration:none}
 .snode:last-child{padding-bottom:0}
 .snode:not(:last-child)::before{content:"";position:absolute;left:20px;top:48px;bottom:2px;width:2px;background:rgba(255,255,255,.14);border-radius:2px;transition:.35s}
 .snode.done:not(:last-child)::before{background:var(--grad)}
-.snum{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-weight:900;font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.5);transition:.35s;flex-shrink:0}
+.snum{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.62);transition:background .35s,color .35s,border-color .35s,box-shadow .35s;flex-shrink:0}
+.snum svg{width:21px;height:21px;display:block}
 .snode.active .snum,.snode.done .snum{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 10px 24px rgba(248,80,0,.42)}
-.snode.done .snum{font-size:0}.snode.done .snum::after{content:"✓";font-size:18px}
 .stext{display:flex;flex-direction:column;gap:4px;padding-top:6px}
 .slabel{font-size:17px;font-weight:800;letter-spacing:-.01em;color:rgba(255,255,255,.6);transition:.35s}
 .snode.active .slabel,.snode.done .slabel{color:#fff}
@@ -284,11 +285,19 @@ const view=document.getElementById('view'),bar=document.getElementById('bar'),
       stepper=document.getElementById('stepper'),stepcount=document.getElementById('stepcount');
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 
+const STEP_ICONS=[
+  '<rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/>',
+  '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/>',
+  '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5.5-5.5L5 20"/>',
+];
+const SCHECK='<path d="M5 13l4 4L19 7"/>';
+function sIcon(p){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`; }
 function renderStepper(){
   let h='';
   STEPS.forEach((s,k)=>{
     const cls=k<step?'done':(k===step?'active':'');
-    h+=`<div class="snode ${cls}"><div class="snum">${k+1}</div><div class="stext"><span class="slabel">${s.short}</span><span class="sdesc">${s.desc}</span></div></div>`;
+    const ic=(k<step)?sIcon(SCHECK):sIcon(STEP_ICONS[k]||STEP_ICONS[0]);
+    h+=`<div class="snode ${cls}"><div class="snum">${ic}</div><div class="stext"><span class="slabel">${s.short}</span><span class="sdesc">${s.desc}</span></div></div>`;
   });
   stepper.innerHTML=h;
   bar.style.width=(step/STEPS.length*100)+'%';
