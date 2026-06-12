@@ -266,7 +266,9 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .board{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:300px minmax(0,1fr) 360px;background:#fff}
 .board.chat-collapsed{grid-template-columns:300px minmax(0,1fr) 38px}
 .board__list{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line);overflow:hidden}
-.side__brand{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.side__brand{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);position:relative}
+.side__actions{margin-left:auto;display:flex;align-items:center;gap:7px}
+.side__actions #oDeadline .dl{font-size:11px;padding:5px 9px}
 .side__order{padding:15px 18px}
 .side__order.switcher{flex:0 0 auto;position:relative}
 .side__order-top{display:flex;align-items:flex-start;gap:8px}
@@ -863,27 +865,29 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
   <div id="detail" class="hide">
         <div class="board" id="board">
           <aside class="board__list">
-            <div class="side__brand" style="gap:8px">
-              <button class="b-ghost b-sm hide" id="toDash" type="button" title="Back to dashboard" style="flex-shrink:0">← Dashboard</button>
-              <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:34px;color:var(--ink)"><use href="#brasero-studio"/></svg>
-            </div>
-            <div class="side__order switcher" id="switcher">
-              <div class="cprofile">
-                <div class="cprofile__av" id="oAvatar"></div>
-                <h2 class="cprofile__name" id="oName"></h2>
-                <div class="cprofile__ig" id="oIg"></div>
-                <div class="side__badges" id="oBadges"></div>
-              </div>
-              <div class="cprofile__row">
+            <div class="side__brand" id="sideTop">
+              <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:32px;color:var(--ink)"><use href="#brasero-studio"/></svg>
+              <div class="side__actions">
+                <span id="oDeadline"></span>
                 <button type="button" class="oswitch" id="briefBtn" title="View the brief" aria-label="View the brief">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
                 </button>
                 <button type="button" class="oswitch" id="switcherBtn" title="Switch project" aria-label="Switch project">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
                 </button>
+                <button type="button" class="oswitch hide" id="toDash" title="Back to dashboard" aria-label="Back to dashboard">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+                </button>
               </div>
-              <div id="oDeadline" style="margin-top:11px"></div>
               <div class="switcher__menu hide" id="switcherMenu"></div>
+            </div>
+            <div class="side__order" id="orderProfile">
+              <div class="cprofile">
+                <div class="cprofile__av" id="oAvatar"></div>
+                <h2 class="cprofile__name" id="oName"></h2>
+                <div class="cprofile__ig" id="oIg"></div>
+                <div class="side__badges" id="oBadges"></div>
+              </div>
             </div>
             <div id="deckList"></div>
             <div class="side__foot"><button class="b-grad b-sm" id="addDeck" style="width:100%">+ Add element</button></div>
@@ -1779,7 +1783,7 @@ $('#switcherMenu').addEventListener('click',e=>{
   const act=e.target.closest('[data-act]');
   if(act){ $('#switcherMenu').classList.add('hide'); if(act.dataset.act==='new') openNewModal(); else if(act.dataset.act==='overview') backToOverview(); }
 });
-document.addEventListener('click',e=>{ if(!e.target.closest('#switcher')) $('#switcherMenu')?.classList.add('hide'); });
+document.addEventListener('click',e=>{ if(!e.target.closest('#sideTop')) $('#switcherMenu')?.classList.add('hide'); });
 $('#deckList').addEventListener('click',e=>{
   const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); openAddElems({carousel:'decks',story:'stories',branding:'branding'}[add.dataset.addcat]); return; }
   const back=e.target.closest('[data-catback]'); if(back){ CAT=null; renderSidebar(); return; }
