@@ -117,11 +117,11 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .waiting{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:30px 20px;min-height:calc(100vh - 230px)}
 .waiting__h{font-size:19px;font-weight:800;color:var(--ink)}
 .waiting__p{font-size:14.5px;color:var(--grey);line-height:1.55;max-width:42ch}
-.pan{width:184px;height:178px}
+.pan{width:166px;height:124px}
 .pan svg{width:100%;height:100%;overflow:visible}
 .pan .flame{transform-origin:140px 236px;animation:flick 1s ease-in-out infinite alternate}
 @keyframes flick{0%{transform:scale(1,1)}100%{transform:scale(.9,1.12) translateY(-16px)}}
-.pan .scene{transform-origin:90px 168px;animation:sizzle 1.7s ease-in-out infinite}
+.pan .scene{transform-origin:90px 165px;animation:sizzle 1.7s ease-in-out infinite}
 @keyframes sizzle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(1.6px) rotate(-1.1deg)}}
 .note-line{font-size:14px;color:var(--ink);line-height:1.55;margin-top:12px}
 .note-line b{color:var(--orange)}
@@ -287,7 +287,36 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 <path d="M570.363 166.394C542.003 166.394 521.718 145.734 521.718 116.81C521.718 87.5102 541.439 67.0381 569.8 67.0381C599.287 67.0381 617.693 86.3833 617.693 116.998V124.323L549.515 124.698C551.206 137.094 558.155 142.916 570.926 142.916C581.82 142.916 589.52 138.972 591.586 132.211H618.069C614.688 153.059 596.094 166.394 570.363 166.394ZM569.987 90.5153C558.53 90.5153 552.145 95.5864 549.891 106.855H588.957C588.957 96.9011 581.632 90.5153 569.987 90.5153Z" fill="currentColor"/>
 <path d="M686.283 70.0431V97.2767H677.08C660.552 97.2767 650.598 104.602 650.598 123.196V163.952H621.674V70.231H648.907L650.41 84.1295C654.354 74.9264 662.618 68.7284 675.202 68.7284C678.583 68.7284 682.339 69.1041 686.283 70.0431Z" fill="currentColor"/>
 <path d="M679.94 116.81C679.94 87.1346 701.727 67.2259 731.778 67.2259C761.641 67.2259 783.428 87.1346 783.428 116.81C783.428 146.485 761.641 166.206 731.778 166.206C701.727 166.206 679.94 146.485 679.94 116.81ZM709.052 116.622C709.052 130.896 718.255 140.287 731.778 140.287C745.113 140.287 754.316 130.896 754.316 116.622C754.316 102.536 745.113 93.1447 731.778 93.1447C718.255 93.1447 709.052 102.536 709.052 116.622Z" fill="currentColor"/>
-</g></defs></svg>
+</g>
+<linearGradient id="dk0" x1="82.6852" y1="23.2616" x2="144.942" y2="56.7839" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="dk1" x1="42.4506" y1="25.4119" x2="104.707" y2="58.9343" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="dk2" x1="0.863029" y1="38.8498" x2="63.1196" y2="72.3722" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="st0" x1="79.1164" y1="32.1117" x2="146.563" y2="57.2837" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="st1" x1="40.5461" y1="33.959" x2="107.68" y2="58.8614" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="st2" x1="0.82578" y1="47.0273" x2="68.2719" y2="72.1992" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="br0" x1="1.71946" y1="34.7584" x2="107.3" y2="110.559" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="br1" x1="1.71946" y1="34.7584" x2="107.3" y2="110.559" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="br2" x1="11.0912" y1="100.697" x2="100.027" y2="164.547" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<linearGradient id="br3" x1="29.3415" y1="38.0439" x2="84.1506" y2="77.3935" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+<mask id="brmask" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120"><circle cx="60" cy="60" r="60" fill="url(#br0)"/></mask>
+<g id="ic-decks">
+<rect opacity="0.19" x="81.8221" y="0.000427246" width="60.2301" height="80.3069" rx="10.7554" transform="rotate(15 81.8221 0.000427246)" fill="url(#dk0)"/>
+<rect opacity="0.6" x="41.5875" y="2.15076" width="60.2301" height="80.3069" rx="10.7554" fill="url(#dk1)"/>
+<rect y="15.5887" width="60.2301" height="80.3069" rx="10.7554" transform="rotate(-15 0 15.5887)" fill="url(#dk2)"/>
+</g>
+<g id="ic-story">
+<rect opacity="0.19" x="78.2906" y="0.000366211" width="57.6306" height="110.861" rx="10.2911" transform="rotate(15 78.2906 0.000366211)" fill="url(#st0)"/>
+<rect opacity="0.6" x="39.7253" y="1.84766" width="57.2784" height="110.861" rx="10.2911" fill="url(#st1)"/>
+<rect y="14.9159" width="57.6306" height="110.861" rx="10.2911" transform="rotate(-15 0 14.9159)" fill="url(#st2)"/>
+</g>
+<g id="ic-brand">
+<g mask="url(#brmask)">
+<circle opacity="0.19" cx="60" cy="60" r="60" fill="url(#br1)"/>
+<path d="M110.725 121.959C110.725 149.872 88.0969 172.5 60.1839 172.5C32.2708 172.5 9.64282 149.872 9.64282 121.959C9.64282 94.046 32.2708 71.418 60.1839 71.418C88.0969 71.418 110.725 94.046 110.725 121.959Z" fill="url(#br2)"/>
+<path d="M90.7436 51.1474C90.7436 68.3496 76.7985 82.2948 59.5962 82.2948C42.394 82.2948 28.4489 68.3496 28.4489 51.1474C28.4489 33.9452 42.394 20 59.5962 20C76.7985 20 90.7436 33.9452 90.7436 51.1474Z" fill="url(#br3)"/>
+</g>
+</g>
+</defs></svg>
 
 <header class="top">
   <a href="index.html" aria-label="Brasero home"><svg class="logo-svg" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg></a>
@@ -424,9 +453,9 @@ const ADD_GROUPS=[
 ];
 // type icons (orange gradient) shown beside each production item + in the catalogue
 const TYPE_ICON={
-  carousel:`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="14" rx="2"/><path d="M18 8v10a2 2 0 0 1-2 2"/><path d="M21 10v6"/></svg>`,
-  story:`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="3" width="11" height="18" rx="3"/><path d="M10 7h4"/></svg>`,
-  branding:`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>`,
+  carousel:`<svg class="ti" viewBox="0 0 140 94" fill="none"><use href="#ic-decks"/></svg>`,
+  story:`<svg class="ti" viewBox="0 0 134 122" fill="none"><use href="#ic-story"/></svg>`,
+  branding:`<svg class="ti" viewBox="0 0 120 120" fill="none"><use href="#ic-brand"/></svg>`,
 };
 // white deck fan that spreads up from a shared bottom pivot (like the collection section)
 function fanHTML(n){
@@ -739,7 +768,7 @@ function detailBody(d){
   </div>`;
 }
 /* cooking animation built ONLY from the real pan.svg + flame.svg assets */
-const PAN_SVG=`<div class="pan"><svg viewBox="0 0 200 195" fill="none" aria-hidden="true">
+const PAN_SVG=`<div class="pan"><svg viewBox="0 40 200 150" fill="none" aria-hidden="true">
   <defs>
     <linearGradient id="pf0" x1="50.2201" y1="231.504" x2="133.932" y2="97.7671" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
     <linearGradient id="pf1" x1="241.043" y1="228.681" x2="174.91" y2="123.029" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
@@ -748,7 +777,7 @@ const PAN_SVG=`<div class="pan"><svg viewBox="0 0 200 195" fill="none" aria-hidd
   </defs>
   <g class="scene">
     <!-- flame.svg, tucked into the pan opening -->
-    <g transform="translate(15 44) scale(0.5)">
+    <g transform="translate(22 54) scale(0.45)">
       <g class="flame">
         <path d="M3.66209 161.884C3.33707 155.637 3.79759 149.531 4.95525 143.66C15.3507 158.045 32.6043 167.027 51.6467 166.036C81.4836 164.484 104.413 139.037 102.861 109.201C102.433 100.978 100.189 93.2804 96.5403 86.4749C126.793 94.4837 149.78 121.262 151.493 154.193C153.617 195.015 122.246 229.83 81.4235 231.954C40.601 234.078 5.78602 202.706 3.66209 161.884Z" fill="url(#pf0)"/>
         <path d="M277.823 173.682C278.08 168.746 277.716 163.922 276.802 159.285C268.589 170.648 254.96 177.744 239.916 176.962C216.345 175.735 198.231 155.632 199.457 132.061C199.795 125.565 201.571 119.485 204.454 114.108C180.553 120.434 162.392 141.589 161.038 167.605C159.36 199.855 184.143 227.358 216.393 229.036C248.642 230.714 276.146 205.931 277.823 173.682Z" fill="url(#pf1)"/>
