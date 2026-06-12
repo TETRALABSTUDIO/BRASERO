@@ -117,16 +117,12 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .waiting{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:30px 20px;min-height:calc(100vh - 230px)}
 .waiting__h{font-size:19px;font-weight:800;color:var(--ink)}
 .waiting__p{font-size:14.5px;color:var(--grey);line-height:1.55;max-width:42ch}
-.pan{width:172px;height:132px}
+.pan{width:184px;height:178px}
 .pan svg{width:100%;height:100%;overflow:visible}
-.pan .flame{transform-origin:159px 384px;animation:flick 1s ease-in-out infinite alternate}
-.pan .flame--glow{opacity:.4;filter:blur(2.5px);animation-duration:1.35s}
-@keyframes flick{0%{transform:scale(1,1)}100%{transform:scale(.9,1.13) translateY(-14px)}}
-.pan .scene{transform-origin:80px 90px;animation:sizzle 1.7s ease-in-out infinite}
+.pan .flame{transform-origin:140px 236px;animation:flick 1s ease-in-out infinite alternate}
+@keyframes flick{0%{transform:scale(1,1)}100%{transform:scale(.9,1.12) translateY(-16px)}}
+.pan .scene{transform-origin:90px 168px;animation:sizzle 1.7s ease-in-out infinite}
 @keyframes sizzle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(1.6px) rotate(-1.1deg)}}
-.pan .steam1,.pan .steam2{transform-origin:center;opacity:0;animation:steam 2.4s ease-out infinite}
-.pan .steam2{animation-delay:1.2s}
-@keyframes steam{0%{opacity:0;transform:translateY(8px) scaleY(.6)}30%{opacity:.55}100%{opacity:0;transform:translateY(-16px) scaleY(1.15)}}
 .note-line{font-size:14px;color:var(--ink);line-height:1.55;margin-top:12px}
 .note-line b{color:var(--orange)}
 textarea.script{width:100%;min-height:150px;font-family:inherit;font-size:14px;line-height:1.6;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none;resize:vertical;color:var(--ink);margin-top:12px}
@@ -742,28 +738,29 @@ function detailBody(d){
     ${d.status==='revision'&&d.revision_note?`<p class="note-line"><b>Your retouch:</b> ${esc(d.revision_note)}</p>`:''}
   </div>`;
 }
-/* the real brand flame (from assets/favicon.svg) cooking inside the pan */
-const FAV_FLAME="M163.509 96.921C173.804 90.9775 173.804 76.1187 163.509 70.1752L145.8 59.9509C141.023 57.1925 135.136 57.1925 130.359 59.9509L96.7733 79.3413C91.9956 82.0996 86.1093 82.0996 81.3317 79.3412L62.0884 68.2311C51.7939 62.2876 51.7939 47.4288 62.0883 41.4853L130.359 2.06882C135.137 -0.689597 141.023 -0.689606 145.801 2.06879L229.57 50.4328C234.348 53.1912 237.291 58.2889 237.291 63.8057L237.291 153.221C237.291 160.404 229.514 164.894 223.293 161.302C217.071 157.71 209.295 162.2 209.295 169.384L209.295 251.221C209.295 262.026 220.992 268.78 230.35 263.377C234.693 260.87 237.369 256.236 237.369 251.22L237.368 177.894C237.368 172.377 240.311 167.28 245.089 164.521L294.443 136.026C304.738 130.083 317.606 137.512 317.606 149.399L317.606 296.735C317.606 302.251 314.663 307.349 309.885 310.108L166.524 392.877C161.747 395.635 155.86 395.635 151.083 392.877L7.72107 310.107C2.94341 307.349 0.000229603 302.251 0.000224304 296.734L0 149.129C-1.7563e-05 137.242 12.8681 129.812 23.1625 135.756L72.5155 164.25C77.2932 167.008 80.2363 172.106 80.2364 177.623L80.2373 250.41C80.2374 255.926 83.1805 261.024 87.9582 263.782L151.378 300.398C155.973 303.051 161.634 303.051 166.229 300.398C176.129 294.682 176.129 280.391 166.229 274.675L117.861 246.75C113.083 243.991 110.14 238.894 110.14 233.377L110.14 136.649C110.14 131.132 113.083 126.034 117.861 123.276L163.509 96.921Z";
-const PAN_SVG=`<div class="pan"><svg viewBox="0 0 160 120" fill="none" aria-hidden="true">
+/* cooking animation built ONLY from the real pan.svg + flame.svg assets */
+const PAN_SVG=`<div class="pan"><svg viewBox="0 0 200 195" fill="none" aria-hidden="true">
   <defs>
-    <linearGradient id="flameG" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff1a00"/><stop offset=".55" stop-color="#ff5a00"/><stop offset="1" stop-color="#ffb300"/></linearGradient>
-    <linearGradient id="flameG2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a00"/><stop offset="1" stop-color="#ffd766"/></linearGradient>
+    <linearGradient id="pf0" x1="50.2201" y1="231.504" x2="133.932" y2="97.7671" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="pf1" x1="241.043" y1="228.681" x2="174.91" y2="123.029" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="pf2" x1="259.48" y1="87.4247" x2="102.244" y2="197.616" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
+    <linearGradient id="pf3" x1="30.7105" y1="68.2866" x2="236.484" y2="212.494" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0000"/><stop offset="1" stop-color="#F87000"/></linearGradient>
   </defs>
-  <!-- steam wisps -->
-  <g stroke="#cdcdcd" stroke-width="3" stroke-linecap="round" fill="none">
-    <path class="steam1" d="M62 40 C 55 32, 69 28, 62 20"/>
-    <path class="steam2" d="M84 40 C 77 32, 91 28, 84 18"/>
-  </g>
   <g class="scene">
-    <!-- glow behind -->
-    <g transform="translate(40.5 9) scale(0.186)"><g class="flame flame--glow"><path d="${FAV_FLAME}" fill="url(#flameG2)"/></g></g>
-    <!-- the brand flame -->
-    <g transform="translate(42.7 12) scale(0.172)"><g class="flame flame--a"><path d="${FAV_FLAME}" fill="url(#flameG)"/></g></g>
-    <!-- pan (side view) -->
-    <path class="pan__handle" d="M116 80 L150 73" stroke="#2a2a2a" stroke-width="8" stroke-linecap="round"/>
-    <path class="pan__bowl" d="M32 75 Q70 112 108 75 Z" fill="#1d1d1d"/>
-    <ellipse cx="70" cy="75" rx="38" ry="8.5" fill="#2a2a2a"/>
-    <ellipse cx="70" cy="74" rx="32" ry="6" fill="#0e0e0e"/>
+    <!-- flame.svg, tucked into the pan opening -->
+    <g transform="translate(15 44) scale(0.5)">
+      <g class="flame">
+        <path d="M3.66209 161.884C3.33707 155.637 3.79759 149.531 4.95525 143.66C15.3507 158.045 32.6043 167.027 51.6467 166.036C81.4836 164.484 104.413 139.037 102.861 109.201C102.433 100.978 100.189 93.2804 96.5403 86.4749C126.793 94.4837 149.78 121.262 151.493 154.193C153.617 195.015 122.246 229.83 81.4235 231.954C40.601 234.078 5.78602 202.706 3.66209 161.884Z" fill="url(#pf0)"/>
+        <path d="M277.823 173.682C278.08 168.746 277.716 163.922 276.802 159.285C268.589 170.648 254.96 177.744 239.916 176.962C216.345 175.735 198.231 155.632 199.457 132.061C199.795 125.565 201.571 119.485 204.454 114.108C180.553 120.434 162.392 141.589 161.038 167.605C159.36 199.855 184.143 227.358 216.393 229.036C248.642 230.714 276.146 205.931 277.823 173.682Z" fill="url(#pf1)"/>
+        <path d="M171.928 35.2455C164.315 35.2455 156.924 36.1912 149.863 37.9691C168.002 49.6932 180.008 70.0935 180.008 93.2982C180.008 129.657 150.533 159.131 114.174 159.131C104.154 159.131 94.6577 156.891 86.1562 152.887C97.8019 189.146 131.799 215.389 171.928 215.389C221.673 215.389 262 175.062 262 125.317C262 75.5716 221.673 35.2455 171.928 35.2455Z" fill="url(#pf2)"/>
+        <path d="M145.29 0C155.252 2.62032e-05 164.926 1.2376 174.166 3.56445C150.428 18.9076 134.716 45.6057 134.716 75.9736C134.716 123.556 173.29 162.129 220.872 162.129C233.985 162.129 246.413 159.198 257.539 153.958C242.298 201.41 197.806 235.753 145.29 235.753C80.1887 235.753 27.4133 182.978 27.4131 117.877C27.4131 52.7755 80.1886 0 145.29 0Z" fill="url(#pf3)"/>
+      </g>
+    </g>
+    <!-- pan.svg -->
+    <g transform="translate(36 150) scale(0.34)">
+      <path d="M0 18C0 8.05887 8.05888 0 18 0H289V51C289 79.1665 266.167 102 238 102H51C22.8335 102 0 79.1665 0 51V18Z" fill="#1A1A1A"/>
+      <rect x="172" width="234" height="39" rx="19.5" fill="#1A1A1A"/>
+    </g>
   </g>
 </svg></div>`;
 
