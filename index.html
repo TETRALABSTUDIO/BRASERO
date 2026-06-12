@@ -195,8 +195,8 @@ img,svg{display:block}
 @media(max-width:560px){.hslide{width:208px}.hslide.s2{--tx:-92%;--ty:-66%}.hslide.s3{--tx:-8%;--ty:-30%}.hchip,.hmini,.hgig{display:none}}
 
 /* ===== COLLECTION (dark) ===== */
-.collection{padding:118px 0 38px;overflow:visible;position:relative;background:transparent;isolation:isolate}
-.collection::before{content:"";position:absolute;inset:0 0 -88px 0;background:var(--black);clip-path:inset(-1500px -1500px 0 -1500px);transform:skewY(-6deg);z-index:-1}   /* only the dark band is tilted; content stays upright */
+.collection{padding:118px 0 38px;overflow:visible;position:relative;background:transparent;isolation:isolate;z-index:1}
+.collection::before{content:"";position:absolute;inset:0 0 -150px 0;background:var(--black);transform:skewY(-6deg);transform-origin:left;z-index:-1}   /* dark band is tilted; its slanted bottom edge carries into the next section */
 .collection>.wrap{position:relative}
 .cwrap{display:grid;grid-template-columns:1.22fr .78fr;gap:54px;align-items:center}
 .cright{order:-1;position:relative}
