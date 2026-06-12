@@ -58,7 +58,7 @@ a{color:inherit;text-decoration:none}
 .assure svg{width:16px;height:16px;flex-shrink:0;stroke:rgba(255,255,255,.55)}
 
 /* right main */
-.main{padding:72px clamp(24px,5.5vw,88px) 80px;display:flex;justify-content:center;background:#fff}
+.main{padding:72px clamp(24px,5.5vw,88px) 80px;display:flex;justify-content:center;align-items:center;background:#fff}
 .main__in{width:100%;max-width:580px}
 
 /* intro */
@@ -383,7 +383,6 @@ function render(){
   const s=STEPS[step],last=step===STEPS.length-1;
   view.innerHTML=`
     <div class="intro">
-      <span class="eyebrow"><span class="pxa"><i></i><i></i><i></i></span>${s.tag}</span>
       <h1 class="title">${s.title[0]}<span class="grad-text">${s.title[1]}</span>${s.title[2]}</h1>
       <p>${s.sub}</p>
     </div>
