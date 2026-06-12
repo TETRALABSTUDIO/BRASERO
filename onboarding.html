@@ -44,13 +44,13 @@ a{color:inherit;text-decoration:none}
 .snode{display:flex;align-items:flex-start;gap:18px;padding-bottom:34px;position:relative}
 .snode:last-child{padding-bottom:0}
 .snode:not(:last-child)::before{content:"";position:absolute;left:20px;top:48px;bottom:2px;width:2px;background:rgba(255,255,255,.14);border-radius:2px;transition:.35s}
-.snode.done:not(:last-child)::before{background:var(--grad)}
+.snode.sdone:not(:last-child)::before{background:var(--grad)}
 .snum{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.62);transition:background .35s,color .35s,border-color .35s,box-shadow .35s;flex-shrink:0}
 .snum svg{width:21px;height:21px;display:block}
-.snode.active .snum,.snode.done .snum{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 10px 24px rgba(248,80,0,.42)}
+.snode.active .snum,.snode.sdone .snum{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 10px 24px rgba(248,80,0,.42)}
 .stext{display:flex;flex-direction:column;gap:4px;padding-top:6px}
 .slabel{font-size:17px;font-weight:800;letter-spacing:-.01em;color:rgba(255,255,255,.6);transition:.35s}
-.snode.active .slabel,.snode.done .slabel{color:#fff}
+.snode.active .slabel,.snode.sdone .slabel{color:#fff}
 .sdesc{font-size:14px;font-weight:500;color:rgba(255,255,255,.42)}
 
 .rail__foot{position:relative;z-index:1;display:flex;flex-direction:column;gap:13px;flex-shrink:0}
@@ -295,7 +295,7 @@ function sIcon(p){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentC
 function renderStepper(){
   let h='';
   STEPS.forEach((s,k)=>{
-    const cls=k<step?'done':(k===step?'active':'');
+    const cls=k<step?'sdone':(k===step?'active':'');
     const ic=(k<step)?sIcon(SCHECK):sIcon(STEP_ICONS[k]||STEP_ICONS[0]);
     h+=`<div class="snode ${cls}"><div class="snum">${ic}</div><div class="stext"><span class="slabel">${s.short}</span><span class="sdesc">${s.desc}</span></div></div>`;
   });
