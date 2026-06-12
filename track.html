@@ -68,9 +68,14 @@ h1.title{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-.038em;l
 .side__brand{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
 .side__brand .logo-svg{height:30px;color:var(--ink)}
 .side__brand .btn{margin-left:auto}
-.side__order{padding:16px 20px}
-.side__hello{font-size:23px;font-weight:900;letter-spacing:-.03em}
-.side__badges{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.side__order{padding:20px}
+.profile{display:flex;flex-direction:column;align-items:center;text-align:center}
+.profile__av{width:76px;height:76px;border-radius:50%;overflow:hidden;border:2px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.13);background:var(--soft);display:grid;place-items:center;margin-bottom:13px}
+.profile__av img{width:100%;height:100%;object-fit:cover;display:block}
+.profile__ph{width:100%;height:100%;display:grid;place-items:center;background:var(--grad);color:#fff;font-weight:900;font-size:27px}
+.profile__name{font-size:18px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
+.profile__ig{font-size:13.5px;color:var(--grey);font-weight:600;margin-top:3px}
+.side__badges{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:15px}
 .obadge--plan{padding:6px 13px}
 .obadge--plan .plan-logo{height:16px;width:auto;display:block}
 .side__foot{padding:14px 18px;border-top:1px solid var(--line)}
@@ -409,10 +414,14 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
           <button type="button" class="btn btn--ghost btn--sm" id="logout">Sign out</button>
         </div>
         <div class="side__order">
-          <div class="side__hello" id="hello">Welcome back</div>
-          <div class="side__badges">
-            <span class="obadge">Order <b id="oref">#</b></span>
-            <span class="obadge obadge--plan hide" id="oplan"></span>
+          <div class="profile">
+            <div class="profile__av" id="oAvatar"></div>
+            <div class="profile__name" id="oName"></div>
+            <div class="profile__ig" id="oIg"></div>
+            <div class="side__badges">
+              <span class="obadge"><b id="oref">#</b></span>
+              <span class="obadge obadge--plan hide" id="oplan"></span>
+            </div>
           </div>
         </div>
         <div id="deckList"></div>
@@ -607,12 +616,22 @@ function logout(){
 }
 $('#logout').addEventListener('click',logout);
 
+/* ---------- profile card (avatar from the Instagram @, name, handle) ---------- */
+function igUser(s){ s=(s||'').toString().trim(); if(!s) return ''; const m=s.replace(/\/+$/,'').match(/instagram\.com\/([^\/?#]+)/i); return (m?m[1]:s).replace(/^@/,'').trim(); }
+function renderProfile(o){
+  const user=igUser(o.instagram||o.handle), nm=o.name||'Client', av=$('#oAvatar');
+  av.innerHTML='';
+  if(user){ const img=new Image(); img.alt=''; img.onerror=()=>{ av.innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`; }; img.src='https://unavatar.io/instagram/'+encodeURIComponent(user)+'?fallback=false'; av.appendChild(img); }
+  else av.innerHTML=`<span class="profile__ph">${esc(initials(nm))}</span>`;
+  $('#oName').textContent=nm;
+  const ig=$('#oIg'); if(user){ ig.textContent='@'+user; ig.style.display=''; } else { ig.textContent=''; ig.style.display='none'; }
+}
 /* ---------- render ---------- */
 function render(o){
   $('#gate').classList.add('hide'); $('#dash').classList.remove('hide');
   document.body.classList.add('appmode');
   $('#boardGuide')?.classList.remove('hide');
-  $('#hello').innerHTML = o.name ? `Hi <span class="grad-text">${esc(o.name.split(' ')[0])}</span>` : 'Your <span class="grad-text">decks</span>';
+  renderProfile(o);
   $('#oref').textContent = '#'+o.ref;
   if(o.plan && PLAN_LOGO[o.plan]){ $('#oplan').innerHTML=`<img class="plan-logo" src="assets/plans/${PLAN_LOGO[o.plan]}.svg" alt="${esc(PLAN_NAMES[o.plan]||o.plan)} pack">`; $('#oplan').classList.remove('hide'); }
   else if(o.plan){ $('#oplan').textContent=(PLAN_NAMES[o.plan]||o.plan)+' pack'; $('#oplan').classList.remove('hide'); }
@@ -877,6 +896,31 @@ const WAIT={
   revision:['✏️','Applying your retouch','We\'re updating the design and will resend it for approval shortly.']
 };
 
+/* once the script is approved (in design / done), let the client re-read it, read-only, in a new tab */
+function viewScriptBtn(d){
+  if(!(d.script && ['designing','design_review','revision','done'].includes(d.status))) return '';
+  return `<div class="actions" style="justify-content:center;margin-top:18px"><button type="button" class="btn btn--ghost btn--sm" data-act="view_script" data-id="${d.id}">📄 View the approved script</button></div>`;
+}
+function openScriptTab(id){
+  const d=DECKS.find(x=>String(x.id)===String(id)); if(!d||!d.script) return;
+  const w=window.open('','_blank'); if(!w) return;
+  const css=`body{margin:0;background:#f7f4ef;font-family:'Satoshi',system-ui,sans-serif;color:#111;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:680px;margin:0 auto;padding:40px 22px 64px}
+    .h{display:flex;align-items:center;gap:11px;margin-bottom:7px}
+    .h h1{font-size:22px;font-weight:900;letter-spacing:-.03em;margin:0}
+    .ro{font-size:12px;font-weight:800;color:#c64600;background:rgba(248,80,0,.12);border-radius:100px;padding:4px 11px;white-space:nowrap}
+    .sub{color:#6b6b6b;font-size:14px;margin:0 0 26px;line-height:1.5}
+    .slides{display:flex;flex-direction:column;gap:16px}
+    .slide{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:16px;padding:18px 20px}
+    .slide__bar{padding:0 0 8px}
+    .slide__n{font-size:11px;font-weight:700;letter-spacing:.02em;color:#bcbcbc}
+    .slide__view{font-size:15.5px;line-height:1.6;color:#111}
+    .slide__view h4{font-size:18px;font-weight:900;letter-spacing:-.02em;margin:2px 0 6px}
+    .slide__view mark{background:#ffe39a;padding:0 2px;border-radius:3px}
+    .slide__empty{color:#c4c4c4}`;
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(d.title)} · Script</title><style>${css}</style></head><body><div class="wrap"><div class="h"><h1>${esc(d.title)}</h1><span class="ro">Read-only</span></div><p class="sub">This script is approved and now in design, so it can no longer be edited.</p>${slidesViewHTML(d.script)}</div></body></html>`);
+  w.document.close();
+}
 function detailBody(d){
   const head=`<div class="detail__head"><div class="detail__title">${esc(d.title)}</div></div>`;
   const n=NEXT[d.status];
@@ -893,7 +937,7 @@ function detailBody(d){
         </div>`;
     else if(d.status==='done')
       content=(d.images&&d.images.length)?galleryGrid(d):'';
-    return head+instr+content;
+    return head+instr+content+viewScriptBtn(d);
   }
   const w=WAIT[d.status]||['','In progress','We\'re working on it, you\'ll get news very soon.'];
   return `<div class="waiting">
@@ -901,6 +945,7 @@ function detailBody(d){
     <div class="waiting__h">${w[1]}</div>
     <p class="waiting__p">${w[2]}</p>
     ${d.status==='revision'&&d.revision_note?`<p class="note-line"><b>Your retouch:</b> ${esc(d.revision_note)}</p>`:''}
+    ${viewScriptBtn(d)}
   </div>`;
 }
 /* cooking animation built ONLY from the real pan.svg + flame.svg assets */
@@ -990,6 +1035,7 @@ function bindDeck(d){
 async function onAction(el){
   const act=el.dataset.act, id=el.dataset.id;
   if(act==='toggle_rev'){ $('#rev-'+id).classList.toggle('open'); return; }
+  if(act==='view_script'){ openScriptTab(id); return; }
   if(act==='download_deck'){ downloadDeck(id,el); return; }
   const payload={...CREDS,deckId:id,action:act};
   if(act==='validate_script'){
