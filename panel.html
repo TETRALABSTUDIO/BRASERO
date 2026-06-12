@@ -293,7 +293,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .briefpage__topr{display:flex;align-items:center;gap:14px;flex-shrink:0}
 .briefpage__tag{font-size:13px;font-weight:600;color:#b3ab9f}
 .briefpage__body{flex:1;overflow-y:auto;padding:26px 28px 44px}
-.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:0 48px;grid-auto-flow:dense;max-width:960px;margin:0 auto}
+.bento{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:0 44px;grid-auto-flow:dense;max-width:1000px;margin:0 auto}
 .bt{padding:24px 0;border-top:1px solid #efeae1;display:flex;flex-direction:column;min-width:0}
 .bt--1{grid-column:span 1}.bt--2{grid-column:span 2}.bt--4{grid-column:1 / -1}
 .bt__k{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#b3ab9f;margin-bottom:11px}
@@ -309,8 +309,9 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .biglink{color:var(--orange);font-weight:600;text-decoration:none}
 .biglink:hover{text-decoration:underline}
 .bempty{color:var(--grey);font-size:15px;text-align:center;padding:72px 20px}
-@media(max-width:760px){.bento{grid-template-columns:repeat(2,1fr);gap:0 30px}.bt--2,.bt--4{grid-column:1 / -1}.briefpage__top{padding:14px 16px}.briefpage__body{padding:6px 16px 36px}.briefpage__nm{font-size:18px}}
-@media(max-width:440px){.bento{grid-template-columns:1fr}.bt--1{grid-column:1 / -1}}
+@media(max-width:760px){.briefpage__top{padding:14px 16px}.briefpage__body{padding:6px 16px 36px}.briefpage__nm{font-size:18px}}
+/* when the column is too narrow for a 2-wide tile, stack everything */
+@container (max-width:380px){.bento{grid-template-columns:1fr}.bt--1,.bt--2,.bt--4{grid-column:1 / -1}}
 /* add-elements modal (owner) */
 .aecats{display:flex;flex-direction:column;gap:12px}
 .aecat{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font-family:inherit;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition:border .2s,box-shadow .2s,transform .15s}
@@ -398,6 +399,21 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .miniprog i{display:block;height:100%;background:var(--grad);border-radius:100px;transition:width .5s cubic-bezier(.4,0,.2,1)}
 .deckitem__pill{align-self:flex-start}
 .board__right{display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:#fff}
+/* middle-column tabs (Brief + open elements), Chrome-style */
+.tabs{display:flex;gap:3px;padding:9px 12px 0;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;flex-shrink:0;position:sticky;top:0;z-index:6;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs.hide{display:none}
+.tab{display:inline-flex;align-items:center;gap:7px;padding:9px 9px 9px 12px;border:1px solid transparent;border-bottom:none;border-radius:11px 11px 0 0;font-size:13px;font-weight:700;color:var(--grey);cursor:pointer;white-space:nowrap;background:var(--soft);position:relative;top:1px;flex-shrink:0}
+.tab:hover{color:var(--ink)}
+.tab.on{background:#fff;color:var(--ink);border-color:var(--line)}
+.tab__ic{display:inline-flex;flex-shrink:0}
+.tab__ic .ti{width:15px;height:15px}
+.tab__l{overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.tab__x{border:none;background:none;color:#bbb;font-size:11px;cursor:pointer;padding:3px 4px;border-radius:6px;flex-shrink:0;line-height:1}
+.tab__x:hover{color:#c33;background:rgba(0,0,0,.06)}
+/* inline brief (rendered in the middle column instead of an overlay) */
+.briefin{container-type:inline-size}
+.briefin__head{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #efeae1}
 .board__detail{flex:1 1 auto;padding:26px 32px;min-width:0}
 .board__detail .deck{border:none;box-shadow:none;padding:0;border-radius:0}
 .empty{display:grid;place-items:center;min-height:50vh;color:var(--grey);text-align:center;font-size:14px;padding:20px}
@@ -837,6 +853,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
             <div class="side__me" id="sideMe"></div>
           </aside>
           <div class="board__right">
+            <div class="tabs hide" id="boardTabs"></div>
             <div class="board__detail" id="deckDetail"></div>
             <div class="cmdbar" id="deckCmd"></div>
           </div>
@@ -1715,9 +1732,9 @@ $('#switcherMenu').addEventListener('click',e=>{
 document.addEventListener('click',e=>{ if(!e.target.closest('#switcher')) $('#switcherMenu')?.classList.add('hide'); });
 $('#deckList').addEventListener('click',e=>{
   const add=e.target.closest('[data-addcat]'); if(add){ e.stopPropagation(); openAddElems({carousel:'decks',story:'stories',branding:'branding'}[add.dataset.addcat]); return; }
-  const back=e.target.closest('[data-catback]'); if(back){ CAT=null; SELDECK=null; renderSidebar(); renderDeckDetail(); return; }
-  const cat=e.target.closest('[data-cat]'); if(cat){ CAT=cat.dataset.cat; const inCat=decksOfCat(CAT); SELDECK=inCat[0]?inCat[0].id:null; renderSidebar(); renderDeckDetail(); return; }
-  const it=e.target.closest('[data-pick]'); if(it){ SELDECK=it.dataset.pick; renderSidebar(); renderDeckDetail(); }
+  const back=e.target.closest('[data-catback]'); if(back){ CAT=null; renderSidebar(); return; }
+  const cat=e.target.closest('[data-cat]'); if(cat){ CAT=cat.dataset.cat; renderSidebar(); return; }
+  const it=e.target.closest('[data-pick]'); if(it){ openTab({kind:'deck',id:it.dataset.pick}); }
 });
 $('#deckDetail').addEventListener('click',e=>{ const x=e.target.closest('[data-x]'); if(!x) return; x.closest('figure')?.remove(); const det=$('#deckDetail'), c=det.querySelector('[data-count]'); if(c) c.textContent=det.querySelectorAll('[data-imgs] img').length; });
 async function openOrder(ref){
@@ -1742,8 +1759,10 @@ async function openOrder(ref){
   $('#oDeadline').innerHTML=dlBadge(d.order,kindsOfDecks(d.decks));
   const foot=document.querySelector('.side__foot'); if(foot) foot.style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   renderSideMe();
-  SELDECK=null; CAT=null; renderBoard(d.decks||[]);
+  SELDECK=null; CAT=null;
   BRIEF=d.brief||null; CURORDER=d.order||null;
+  TABS=[{kind:'brief'}]; ATAB='brief';   // land on the brief tab when a project opens
+  renderBoard(d.decks||[]);
   chatAsset=''; renderExpert();
   MESSAGES=d.messages||[]; renderMessages(); renderAssetCur(); setUnread(false); startMsgPoll();
 }
@@ -1766,7 +1785,7 @@ const BRIEF_ICONS={
   notes:'<path d="M5 19h4L19 9l-4-4L5 15z"/><path d="M14 6l4 4"/>',
   _d:'<circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/>',
 };
-function renderBrief(){
+function briefHTML(){
   const b=(BRIEF&&typeof BRIEF==='object')?BRIEF:{}, o=CURORDER||{};
   const ADDON_LBL={branding:'Branding',story3:'3 stories',story6:'6 stories',story9:'9+1 stories',bundle:'Mega Bundle'};
   /* ---- header: who this project is for ---- */
@@ -1776,9 +1795,9 @@ function renderBrief(){
   if(o.plan) sub.push(`<span>${esc(planName(o.plan))} pack</span>`);
   if(o.addons&&o.addons.length) sub.push(`<span>+ ${esc(o.addons.map(k=>ADDON_LBL[k]||k).join(', '))}</span>`);
   if(ME&&ME.is_owner){ if(o.email) sub.push(`<a href="mailto:${esc(o.email)}">${esc(o.email)}</a>`); if(o.phone) sub.push(`<span>${esc(o.phone)}</span>`); }
-  $('#briefHead').innerHTML=`<div class="briefpage__av">${esc(initials(nm))}</div>
+  const head=`<div class="briefin__head"><div class="briefpage__av">${esc(initials(nm))}</div>
     <div style="min-width:0"><div class="briefpage__nm">${esc(nm)}</div>
-      <div class="briefpage__sub">${sub.join('<span class="sep">·</span>')}</div></div>`;
+      <div class="briefpage__sub">${sub.join('<span class="sep">·</span>')}</div></div></div>`;
   /* ---- body: a bento mosaic of tiles, varied sizes + visual accents ---- */
   const val=(k)=>{
     const v=(k==='typo')?b.typo:b[k];
@@ -1813,9 +1832,10 @@ function renderBrief(){
   Object.keys(b).filter(k=>!COVERED.has(k)&&!/_file(_name)?$/.test(k)&&b[k]).forEach(k=>TILES.push([k,BRIEF_LABELS[k]||k,2,'']));
   const tiles=TILES.filter(([k])=>has(k)).map(([k,label,span,cls])=>
     `<div class="bt bt--${span} ${cls}"><div class="bt__k">${icon(k)}<span>${esc(label)}</span></div><div class="bt__v">${val(k)}</div></div>`).join('');
-  $('#briefBody').innerHTML=tiles?`<div class="bento">${tiles}</div>`:'<div class="bempty">No brief was filled in for this project yet.</div>';
+  const body=tiles?`<div class="bento">${tiles}</div>`:'<div class="bempty">No brief was filled in for this project yet.</div>';
+  return `<div class="briefin">${head}${body}</div>`;
 }
-$('#briefBtn').onclick=()=>{ renderBrief(); $('#briefModal').classList.remove('hide'); };
+$('#briefBtn').onclick=()=>openTab({kind:'brief'});
 $('#bmClose').onclick=()=>$('#briefModal').classList.add('hide');
 /* backdrop click intentionally does NOT close the modal */
 /* talent profile pinned at the bottom of the project sidebar */
@@ -1927,12 +1947,38 @@ const DECK_CATS=[
   {key:'branding',label:'Branding'},
 ];
 function decksOfCat(k){ return DECKS.filter(d=>(d.type||'carousel')===k); }
+/* ---- middle-column tabs: Brief + each opened element, Chrome-style ---- */
+let TABS=[], ATAB=null;
+const BRIEF_TAB_ICON=`<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>`;
+function tabKey(t){ return t.kind==='brief'?'brief':'deck:'+t.id; }
+function renderTabs(){
+  const el=$('#boardTabs'); if(!el) return;
+  if(!TABS.length){ el.classList.add('hide'); el.innerHTML=''; return; }
+  el.classList.remove('hide');
+  el.innerHTML=TABS.map(t=>{ const k=tabKey(t), on=k===ATAB?'on':'';
+    if(t.kind==='brief') return `<div class="tab ${on}" data-tab="brief"><span class="tab__ic">${BRIEF_TAB_ICON}</span><span class="tab__l">Brief</span><button type="button" class="tab__x" data-tabx="brief" title="Close">✕</button></div>`;
+    const d=DECKS.find(x=>String(x.id)===String(t.id)), ic=TYPE_ICON[d?(d.type||'carousel'):'carousel']||TYPE_ICON.carousel;
+    return `<div class="tab ${on}" data-tab="${esc(k)}"><span class="tab__ic">${ic}</span><span class="tab__l">${esc(d?d.title:'Element')}</span><button type="button" class="tab__x" data-tabx="${esc(k)}" title="Close">✕</button></div>`;
+  }).join('');
+}
+function renderMiddle(){
+  const cmd=$('#deckCmd');
+  if(ATAB==='brief'){ $('#deckDetail').innerHTML=briefHTML(); cmd.innerHTML=''; cmd.style.display='none'; return; }
+  if(ATAB&&ATAB.indexOf('deck:')===0){ SELDECK=ATAB.slice(5); cmd.style.display=''; renderDeckDetail(); return; }
+  $('#deckDetail').innerHTML=`<div class="empty">${DECKS.length?'Pick an element on the left, or open the brief.':'No elements yet. Open the brief or add one.'}</div>`; cmd.innerHTML=''; cmd.style.display='none';
+}
+function openTab(t){ const k=tabKey(t); if(!TABS.some(x=>tabKey(x)===k)) TABS.push(t); ATAB=k; if(t.kind==='deck') SELDECK=t.id; renderTabs(); renderSidebar(); renderMiddle(); }
+function activateTab(k){ ATAB=k; const t=TABS.find(x=>tabKey(x)===k); if(t&&t.kind==='deck') SELDECK=t.id; renderTabs(); renderSidebar(); renderMiddle(); }
+function closeTab(k){ const i=TABS.findIndex(x=>tabKey(x)===k); if(i<0) return; TABS.splice(i,1);
+  if(ATAB===k){ const n=TABS[i]||TABS[i-1]||null; ATAB=n?tabKey(n):null; if(n&&n.kind==='deck') SELDECK=n.id; }
+  renderTabs(); renderSidebar(); renderMiddle(); }
+$('#boardTabs').addEventListener('click',e=>{ const x=e.target.closest('[data-tabx]'); if(x){ e.stopPropagation(); closeTab(x.dataset.tabx); return; } const t=e.target.closest('[data-tab]'); if(t) activateTab(t.dataset.tab); });
 function renderBoard(decks){
   DECKS=decks||[];
-  if(!DECKS.length){ $('#deckList').innerHTML=''; $('#deckDetail').innerHTML='<div class="empty">No elements yet. Add one to start.</div>'; $('#deckCmd').innerHTML=''; return; }
+  TABS=TABS.filter(t=>t.kind==='brief'||DECKS.some(d=>String(d.id)===String(t.id)));   // drop tabs of deleted elements
+  if(ATAB&&!TABS.some(t=>tabKey(t)===ATAB)) ATAB=TABS.length?tabKey(TABS[TABS.length-1]):null;
   if(CAT && !decksOfCat(CAT).length) CAT=null;                 // category emptied out
-  if(CAT){ const inCat=decksOfCat(CAT); if(!inCat.some(d=>d.id===SELDECK)) SELDECK=inCat[0]?inCat[0].id:null; }
-  renderSidebar(); renderDeckDetail();
+  renderSidebar(); renderTabs(); renderMiddle();
 }
 function renderSidebar(){ if(CAT) renderCatList(CAT); else renderCategories(); }
 function renderCategories(){
@@ -2183,7 +2229,7 @@ function bind(d){
     if(!t){ titleEl.value=d.title||''; return; }
     if(t===(d.title||'')) return;
     try{ const r=await api('/api/admin',{action:'save_deck',ref:REF,deckId:d.id,title:t});
-      if(r&&r.ok){ d.title=t; const dd=DECKS.find(x=>x.id===d.id); if(dd) dd.title=t; renderSidebar(); }
+      if(r&&r.ok){ d.title=t; const dd=DECKS.find(x=>x.id===d.id); if(dd) dd.title=t; renderSidebar(); renderTabs(); }
     }catch(e){}
   });
   const file=det.querySelector('[data-file]');
