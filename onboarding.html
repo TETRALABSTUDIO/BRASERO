@@ -246,7 +246,7 @@ body.is-done .main,body.is-locked .main{padding-top:72px}
 /* localhost → local Express backend ; otherwise same-origin Vercel /api functions. */
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
 const STEPS=[
-  {tag:'Step 1 · Your page',short:'Your page',desc:'Brand & audience',title:['Let’s set up your ','page','.'],
+  {tag:'Your page',short:'Your page',desc:'Brand & audience',title:['Let’s set up your ','page','.'],
     sub:'We pulled in your Instagram, just confirm and fill the rest.',
     fields:[
       {key:'page',label:'Page / brand name',type:'text',placeholder:'e.g. Wealth Notes',required:true},
@@ -254,14 +254,14 @@ const STEPS=[
       {key:'niche',label:'What is your page about?',type:'textarea',placeholder:'Your niche, topics and angle…',required:true},
       {key:'audience',label:'Who are you talking to?',type:'textarea',placeholder:'Your ideal follower: age, stage, what they want…',required:true},
     ]},
-  {tag:'Step 2 · Your goals',short:'Goals',desc:'Goals & cadence',title:['What does ','winning',' look like?'],
+  {tag:'Your goals',short:'Goals',desc:'Goals & cadence',title:['What does ','winning',' look like?'],
     sub:'So every deck pushes the metric that actually matters to you.',
     fields:[
       {key:'goal',label:'Your #1 goal right now',type:'choice',options:['Reach & virality','Saves & shares','Followers growth','Sales / leads'],required:true},
       {key:'freq',label:'How often do you want to post?',type:'choice',options:['1–2 / week','3–4 / week','Daily'],required:true},
       {key:'challenge',label:'Biggest content challenge today?',type:'textarea',placeholder:'Running out of ideas, low saves, inconsistent look…',required:false},
     ]},
-  {tag:'Step 3 · Visual identity',short:'Visual',desc:'Look & references',title:['Make it ','unmistakably',' yours.'],
+  {tag:'Visual identity',short:'Visual',desc:'Look & references',title:['Make it ','unmistakably',' yours.'],
     sub:'Colors, type and references, the more you share, the sharper your decks.',
     fields:[
       {key:'style',label:'Brand vibe',type:'textarea',placeholder:'Bold, high-contrast, warm orange accents, big type…',required:false},
@@ -292,14 +292,22 @@ const STEP_ICONS=[
 ];
 const SCHECK='<path d="M5 13l4 4L19 7"/>';
 function sIcon(p){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`; }
+/* Build the stepper nodes once; afterwards we only toggle classes / swap the
+   icon so the CSS transitions (.35s) actually animate when the step changes. */
+function buildStepper(){
+  stepper.innerHTML=STEPS.map((s,k)=>
+    `<div class="snode" data-snode="${k}"><div class="snum"></div><div class="stext"><span class="slabel">${s.short}</span><span class="sdesc">${s.desc}</span></div></div>`
+  ).join('');
+}
 function renderStepper(){
-  let h='';
+  if(!stepper.querySelector('.snode')) buildStepper();
   STEPS.forEach((s,k)=>{
-    const cls=k<step?'sdone':(k===step?'active':'');
-    const ic=(k<step)?sIcon(SCHECK):sIcon(STEP_ICONS[k]||STEP_ICONS[0]);
-    h+=`<div class="snode ${cls}"><div class="snum">${ic}</div><div class="stext"><span class="slabel">${s.short}</span><span class="sdesc">${s.desc}</span></div></div>`;
+    const node=stepper.querySelector(`[data-snode="${k}"]`);
+    if(!node) return;
+    node.classList.toggle('sdone',k<step);
+    node.classList.toggle('active',k===step);
+    node.querySelector('.snum').innerHTML=(k<step)?sIcon(SCHECK):sIcon(STEP_ICONS[k]||STEP_ICONS[0]);
   });
-  stepper.innerHTML=h;
   bar.style.width=(step/STEPS.length*100)+'%';
   stepcount.textContent=`Step ${step+1} of ${STEPS.length}`;
 }
