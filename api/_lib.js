@@ -91,6 +91,8 @@ export const MEM = db ? null : {
     { id: 'msg-2', order_id: 'ord-demo', deck_id: 'dk-1', sender: 'studio', sender_name: 'Demo Talent',
       body: 'On it! Sending a revised script shortly.', created_at: new Date(Date.now() - 30e5).toISOString() },
   ],
+  // Client accounts (magic-link auth). Created lazily; seeded empty in dev.
+  clients: [],
 };
 const STORE = !!(db || MEM);
 
@@ -201,6 +203,84 @@ export async function findOrderByRef(ref) {
   if (MEM) return MEM.orders.find(o => matchRef(o, REF)) || null;
   const { data } = await db.from('orders').select('*').or(`ref.eq.${REF},ref.is.null`).limit(500);
   return (data || []).find(o => matchRef(o, REF)) || null;
+}
+
+/* ---- Client accounts (magic-link auth) ----
+   A client is a persistent account keyed by email. They sign in with a magic
+   link (no password) and reach a space aggregating ALL their orders, instead of
+   logging into a single order by ref+email. Orders link back via orders.client_id;
+   email stays the stable join key for reads (one account per email). */
+const pubClient = c => c && ({ email: c.email, name: c.name || '' });
+
+export async function getClientByEmail(email) {
+  if (!STORE || !email) return null;
+  const EM = String(email).trim().toLowerCase();
+  if (MEM) return MEM.clients.find(c => c.email === EM) || null;
+  const { data } = await db.from('clients').select('*').ilike('email', EM).maybeSingle();
+  return data || null;
+}
+
+// True if this email already has at least one order — gates lazy account creation
+// (only people who actually ordered can get a sign-in link).
+export async function emailHasOrders(email) {
+  if (!STORE || !email) return false;
+  const EM = String(email).trim().toLowerCase();
+  if (MEM) return MEM.orders.some(o => (o.email || '').toLowerCase() === EM);
+  const { data } = await db.from('orders').select('id').ilike('email', EM).limit(1);
+  return !!(data && data.length);
+}
+
+// Create the client account if missing (idempotent by email), then back-link any
+// of their existing orders. Returns the client row.
+export async function upsertClient({ email, name } = {}) {
+  if (!STORE) return null;
+  const EM = String(email || '').trim().toLowerCase();
+  if (!EM) return null;
+  const existing = await getClientByEmail(EM);
+  if (existing) {
+    if (name && !existing.name) {
+      if (MEM) existing.name = name;
+      else await db.from('clients').update({ name }).eq('id', existing.id);
+    }
+    return existing;
+  }
+  if (MEM) {
+    const c = { id: uid(), email: EM, name: name || '', created_at: new Date().toISOString() };
+    MEM.clients.push(c);
+    MEM.orders.forEach(o => { if ((o.email || '').toLowerCase() === EM) o.client_id = c.id; });
+    return c;
+  }
+  const { data, error } = await db.from('clients').insert({ email: EM, name: name || '' }).select('*').maybeSingle();
+  if (error) {
+    if (/duplicate|unique/i.test(error.message)) return await getClientByEmail(EM); // lost a race; fetch the winner
+    console.error('upsertClient', error);
+    return null;
+  }
+  await db.from('orders').update({ client_id: data.id }).ilike('email', EM).is('client_id', null);
+  return data;
+}
+
+// Stamp last sign-in (best-effort).
+export async function touchClient(client) {
+  if (!client) return;
+  if (MEM) { client.last_login = new Date().toISOString(); return; }
+  await db.from('clients').update({ last_login: new Date().toISOString() }).eq('id', client.id);
+}
+
+// Long-lived session token for a signed-in client.
+export function signClientSession(client) {
+  return signToken({ email: client.email, cid: client.id, role: 'client' }, 14);
+}
+
+// Every paid order belonging to a client (keyed by their email).
+export async function ordersForClient(client) {
+  if (!STORE || !client) return [];
+  const EM = (client.email || '').toLowerCase();
+  if (MEM) return MEM.orders.filter(o => o.status === 'paid' && (o.email || '').toLowerCase() === EM)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const { data } = await db.from('orders').select('*').ilike('email', EM)
+    .eq('status', 'paid').order('created_at', { ascending: false }).limit(200);
+  return data || [];
 }
 
 export async function decksForOrder(orderId) {
@@ -456,7 +536,7 @@ export async function getTalentByEmail(email) {
 export async function loginTalent(email, password) {
   const t = await getTalentByEmail(email);
   if (!t || !verifyPassword(password, t.password_hash)) return null;
-  return { token: signToken({ email: t.email, owner: !!t.is_owner }), talent: pubTalent(t) };
+  return { token: signToken({ email: t.email, owner: !!t.is_owner, role: t.is_owner ? 'owner' : 'talent' }), talent: pubTalent(t) };
 }
 
 export async function createTalent({ email, password, name, is_owner, photo, must_reset }) {
@@ -842,6 +922,16 @@ export function addonClientEmail({ name, planName, count, ref, trackUrl }) {
       ${trackUrl ? ctaButton(trackUrl, 'Open your tracker →') : ''}
     </td></tr>
     <tr><td style="padding:14px 28px 26px;color:#9a9a9a;font-size:12px">Order #${ref || ''}</td></tr>`);
+}
+
+// Passwordless sign-in link to the client's space (expires in 15 min).
+export function magicLinkEmail({ name, url }) {
+  return emailShell(
+    emailHero('Sign in', 'Your sign-in link 🔥') +
+    emailText(`${greet(name)}<p style="margin:0">Tap the button below to open your space and follow all your orders in one place. This link expires in 15 minutes.</p>`) +
+    emailCta(url || '#', 'Open my space →') +
+    emailText(`<p style="margin:0;font-size:12px;color:#9a9a9a">If you didn't request this, you can safely ignore this email.</p>`)
+  );
 }
 
 /* ===================== Talent emails ===================== */

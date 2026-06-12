@@ -1,4 +1,4 @@
-import { stripe, send, sendTo, markPaid, populateOrderElements, PLANS, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, siteUrl } from './_lib.js';
+import { stripe, send, sendTo, markPaid, populateOrderElements, PLANS, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, siteUrl, upsertClient } from './_lib.js';
 
 // Stripe needs the raw request body to verify the signature.
 export const config = { api: { bodyParser: false } };
@@ -45,6 +45,8 @@ export default async function handler(req, res) {
 
     let order = null;
     try { order = await markPaid(s.id, s.amount_total); } catch (e) { console.error(e); }
+    // Create/link the client account (their space aggregates every order they place).
+    try { await upsertClient({ email: s.customer_email || m.email, name: m.name }); } catch (e) { console.error('client upsert failed', e); }
     // Seed the full board so the talent opens a ready-to-fill order: plan decks + every purchased upsell.
     try {
       if (order) await populateOrderElements(order.id, { plan: m.plan, addons: (m.addons || '').split(',').map(a => a.trim()).filter(Boolean) });
