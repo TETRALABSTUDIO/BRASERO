@@ -268,12 +268,11 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .board__list{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line);overflow:hidden}
 .side__brand{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);position:relative}
 .side__actions{margin-left:auto;display:flex;align-items:center;gap:7px}
-.side__actions #oDeadline .dl{font-size:11px;padding:5px 9px}
 .side__order{padding:15px 18px}
 .side__order.switcher{flex:0 0 auto;position:relative}
 .side__order-top{display:flex;align-items:flex-start;gap:8px}
 .side__order-top h2{flex:1;min-width:0}
-.oswitch{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
+.oswitch{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
 .oswitch:hover{color:var(--orange);border-color:var(--orange)}
 .oswitch svg{width:16px;height:16px}
 /* brief modal rows */
@@ -632,6 +631,9 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .iav--exp{width:42px;height:42px;font-size:15px;border:2px solid #fff;box-shadow:0 5px 14px rgba(248,80,0,.22)}
 .iav--xl{width:74px;height:74px;font-size:26px;border:2px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.13)}
 /* client profile card in the board sidebar (social-profile style) */
+#orderProfile{position:relative}
+.cprofile__dl{position:absolute;top:13px;right:13px;z-index:2}
+.cprofile__dl .dl{font-size:10.5px;padding:4px 8px}
 .cprofile{display:flex;flex-direction:column;align-items:center;text-align:center}
 .cprofile__av{margin-bottom:13px}
 .cprofile__name{font-size:18px;font-weight:900;letter-spacing:-.025em;line-height:1.2}
@@ -866,9 +868,8 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         <div class="board" id="board">
           <aside class="board__list">
             <div class="side__brand" id="sideTop">
-              <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:32px;color:var(--ink)"><use href="#brasero-studio"/></svg>
+              <svg class="logo" viewBox="0 0 798 220" fill="none" style="height:42px;color:var(--ink)"><use href="#brasero-studio"/></svg>
               <div class="side__actions">
-                <span id="oDeadline"></span>
                 <button type="button" class="oswitch" id="briefBtn" title="View the brief" aria-label="View the brief">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
                 </button>
@@ -882,6 +883,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
               <div class="switcher__menu hide" id="switcherMenu"></div>
             </div>
             <div class="side__order" id="orderProfile">
+              <span id="oDeadline" class="cprofile__dl"></span>
               <div class="cprofile">
                 <div class="cprofile__av" id="oAvatar"></div>
                 <h2 class="cprofile__name" id="oName"></h2>
