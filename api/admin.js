@@ -24,6 +24,8 @@ export default async function handler(req, res) {
   if (!me) return res.status(401).json({ ok: false, error: 'unauthorized' });
   const isOwner = !!me.is_owner;
   const owns = order => isOwner || (order.talent_email || '').toLowerCase() === me.email.toLowerCase();
+  // Enrich a list of order rows with per-project state + element count (used by the panel board/list).
+  const enrich = async rows => Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
 
   try {
     const b = req.body || {};
@@ -32,7 +34,7 @@ export default async function handler(req, res) {
     /* ----- order list (scoped) + per-project state ----- */
     if (action === 'list') {
       const rows = isOwner ? await adminListOrders() : await ordersForTalent(me.email);
-      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
+      const orders = await enrich(rows);
       return res.json({ ok: true, me: { email: me.email, name: me.name || '', is_owner: isOwner, photo: me.photo || '', must_reset: !!me.must_reset }, orders });
     }
 
@@ -84,7 +86,7 @@ export default async function handler(req, res) {
       if (String(b.email || '').toLowerCase() === me.email.toLowerCase()) return res.status(400).json({ ok: false, error: 'self' });
       const r = await deleteTalent(b.email);
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
-      return res.json({ ok: true, talents: await listTalents(), orders: (await adminListOrders()).map(o => pub(o, isOwner)) });
+      return res.json({ ok: true, talents: await listTalents(), orders: await enrich(await adminListOrders()) });
     }
     if (action === 'assign_order') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
@@ -102,7 +104,7 @@ export default async function handler(req, res) {
           }));
         } catch (e) { console.error('assign email', e); }
       }
-      return res.json({ ok: true, orders: (await adminListOrders()).map(o => pub(o, isOwner)) });
+      return res.json({ ok: true, orders: await enrich(await adminListOrders()) });
     }
     if (action === 'create_order') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
@@ -118,8 +120,7 @@ export default async function handler(req, res) {
           }));
         } catch (e) { console.error('assign email', e); }
       }
-      const rows = await adminListOrders();
-      const orders = await Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length }; }));
+      const orders = await enrich(await adminListOrders());
       return res.json({ ok: true, ref: r.ref, orders });
     }
 

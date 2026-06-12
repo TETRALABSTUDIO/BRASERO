@@ -11,6 +11,10 @@ export default async function handler(req, res) {
     const order = await findOrderByRefEmail(ref, email);
     if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
 
+    if (action === 'messages') {
+      return res.json({ ok: true, messages: await listMessages(order.id) });
+    }
+
     if (action === 'send_message') {
       const text = String(body || '').trim();
       if (!text) return res.status(400).json({ ok: false, error: 'empty' });

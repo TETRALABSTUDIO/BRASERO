@@ -90,9 +90,22 @@ body.appmode{overflow:hidden}
 .tchip .avatar{width:19px;height:19px;font-size:8px;border:none;box-shadow:none;flex-shrink:0}
 .tchip__n{color:#3d3d3d;font-weight:700}
 .tchip--none{color:var(--grey);font-weight:600}
-.kc__foot{display:flex;align-items:center;gap:8px;margin-top:13px;flex-wrap:wrap}
-.kc__pack{font-size:12px;font-weight:700;color:var(--grey)}
+.kc__meta{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
+.kc__pack{font-size:12px;font-weight:800;color:var(--orange)}
+.kc__foot{display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap}
+.kc__items{font-size:12px;font-weight:700;color:var(--grey)}
+.kc__assign{margin-top:11px;padding-top:11px;border-top:1px solid var(--line)}
+.kc:hover{cursor:pointer}
+.passign{width:100%;padding:7px 10px;font-size:12.5px;font-weight:700;border-radius:9px;background:var(--soft);cursor:pointer}
+.passign--none{color:var(--grey)}
+.rsub{font-size:12px;color:var(--grey);margin-top:2px}
+.tbl td .passign{min-width:150px;width:auto}
 .knone{color:var(--grey);font-size:13px;padding:8px 4px}
+/* talent card stats (red / blue / green) */
+.tstats{display:flex;gap:10px}
+.tstat{flex:1;text-align:center;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:11px 6px}
+.tstat b{display:block;font-size:24px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.tstat span{font-size:11px;color:var(--grey);font-weight:700;margin-top:4px;display:block}
 input,textarea,button,select{font-family:inherit}
 input,textarea,select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;width:100%;font-size:14px}
 textarea{min-height:120px;resize:vertical;line-height:1.55}
@@ -237,10 +250,16 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 /* project board (master / detail), like the client tracker */
 /* full-screen app shell: sidebar (elements) · work (deliverables) · chat */
 .board{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:300px minmax(0,1fr) 360px;background:#fff}
-.board.chat-collapsed{grid-template-columns:300px minmax(0,1fr) 56px}
+.board.chat-collapsed{grid-template-columns:300px minmax(0,1fr) 42px}
 .board__list{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line);overflow:hidden}
 .side__brand{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .side__order{padding:15px 18px}
+.side__order.switcher{flex:0 0 auto;position:relative}
+.side__order-top{display:flex;align-items:flex-start;gap:8px}
+.side__order-top h2{flex:1;min-width:0}
+.oswitch{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
+.oswitch:hover{color:var(--orange);border-color:var(--orange)}
+.oswitch svg{width:16px;height:16px}
 .side__order h2{font-size:17px;font-weight:900;letter-spacing:-.025em;line-height:1.15}
 .side__order .meta{color:var(--grey);font-size:12.5px;margin-top:4px;line-height:1.45}
 .side__listhead{padding:8px 18px 9px;font-size:13px;font-weight:700;color:var(--grey)}
@@ -465,8 +484,12 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .chat__panel{display:flex;flex-direction:column;flex:1;min-height:0}
 .board.chat-collapsed .chat__panel{display:none}
 .chat__rail{display:none}
-.board.chat-collapsed .chat__rail{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--soft);border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:13px;letter-spacing:.02em;color:var(--ink);writing-mode:vertical-rl;transform:rotate(180deg);padding:18px 0}
+.board.chat-collapsed .chat__rail{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--soft);border:none;border-left:1px solid var(--line);cursor:pointer;font-family:inherit;font-weight:800;font-size:12px;letter-spacing:.04em;color:var(--ink);writing-mode:vertical-rl;transform:rotate(180deg);padding:18px 0}
 .chat__rail:hover{color:var(--orange)}
+.chat__dot{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--grad);box-shadow:0 0 0 3px #fff;z-index:3;display:none}
+.board.chat-collapsed #chatDot:not(.hide){display:block}
+.chat__head .chat__dot{position:static;transform:none;display:inline-block;box-shadow:none;margin-left:7px;vertical-align:middle}
+.chat__head #chatDotHead.hide{display:none}
 .chat__head{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
 .chat__head b{font-size:15px;font-weight:900;letter-spacing:-.02em}
 .chat__sub{display:block;font-size:12px;color:var(--grey);margin-top:2px}
@@ -545,7 +568,6 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
         <button class="navi on" type="button" data-sec="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</button>
         <button class="navi" type="button" data-sec="projects"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Projects</button>
         <button class="navi" type="button" data-sec="talents"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg> Talents</button>
-        <button class="navi" type="button" data-sec="orders"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg> Orders</button>
         <button class="navi" type="button" data-sec="crm"><svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg> CRM</button>
       </nav>
       <div class="aside__foot">
@@ -557,24 +579,9 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
       <section class="asec" id="sec-dashboard"></section>
       <section class="asec hide" id="sec-projects"></section>
       <section class="asec hide" id="sec-talents">
-        <div class="sechead"><h2>Talents</h2></div>
-        <div class="addcard">
-          <h3>Create a talent account</h3>
-          <p style="font-size:13px;color:var(--grey);margin:-6px 0 14px">We generate a temporary password to share with them. They change it on first login.</p>
-          <form id="talentForm">
-            <div class="grid2">
-              <div class="field"><label>Name (optional)</label><input id="tName" placeholder="Jane Doe"></div>
-              <div class="field"><label>Email</label><input id="tEmail" type="email" placeholder="jane@brasero.studio" required></div>
-            </div>
-            <label style="display:flex;align-items:center;gap:7px;margin:0 0 14px"><input type="checkbox" id="tOwner" style="width:auto"> Make owner</label><br>
-            <button class="b-grad" type="submit">Create account →</button>
-            <span class="err" id="tErr" style="display:inline-block;margin-left:10px"></span>
-          </form>
-          <div id="tCreated" class="tcreated hide"></div>
-        </div>
+        <div class="sechead"><h2>Talents</h2><button class="b-grad b-sm" id="openTalentModal" type="button">+ Create talent</button></div>
         <div class="tgrid" id="teamGrid"></div>
       </section>
-      <section class="asec hide" id="sec-orders"></section>
       <section class="asec hide" id="sec-crm"></section>
     </main>
   </div>
@@ -585,18 +592,18 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           <aside class="board__list">
             <div class="side__brand" style="gap:8px">
               <button class="b-ghost b-sm hide" id="toDash" type="button" title="Back to dashboard" style="flex-shrink:0">← Dashboard</button>
-              <div class="switcher" id="switcher">
-                <button type="button" class="switcher__btn" id="switcherBtn">
-                  <span class="switcher__cur" id="switcherCur">Project</span>
-                  <svg class="switcher__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                </button>
-                <div class="switcher__menu hide" id="switcherMenu"></div>
-              </div>
+              <svg class="logo" viewBox="0 0 798 189" fill="none" style="height:26px;color:var(--ink)"><use href="#brasero-mark"/></svg>
             </div>
-            <div class="side__order">
-              <h2 id="oName"></h2>
+            <div class="side__order switcher" id="switcher">
+              <div class="side__order-top">
+                <h2 id="oName"></h2>
+                <button type="button" class="oswitch" id="switcherBtn" title="Switch project" aria-label="Switch project">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
+                </button>
+              </div>
               <div class="meta" id="oMeta"></div>
               <div id="oDeadline" style="margin-top:9px"></div>
+              <div class="switcher__menu hide" id="switcherMenu"></div>
             </div>
             <div class="side__listhead">Elements</div>
             <div id="deckList"></div>
@@ -609,10 +616,11 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
           </div>
           <!-- ===== conversation with the client (collapsible) ===== -->
           <aside class="board__chat" id="boardChat">
-            <button type="button" class="chat__rail" id="chatOpen" title="Open messages">💬 Messages</button>
+            <span class="chat__dot hide" id="chatDot"></span>
+            <button type="button" class="chat__rail" id="chatOpen" title="Open messages">Messages</button>
             <div class="chat__panel">
               <div class="chat__head">
-                <div><b>Messages</b><span class="chat__sub">Talk to the client. Pick an element to reply about a specific asset.</span></div>
+                <div><b>Messages<span class="chat__dot hide" id="chatDotHead"></span></b><span class="chat__sub">Talk to the client. Pick an element to reply about a specific asset.</span></div>
                 <button type="button" class="chat__collapse" id="chatToggle" title="Hide chat">⟩</button>
               </div>
               <div class="chat__thread" id="chatThread"></div>
@@ -731,6 +739,26 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
       </form>
     </div>
   </div>
+
+  <!-- Create talent modal (owner) -->
+  <div class="modal hide" id="talentModal">
+    <div class="modalc">
+      <div class="modalc__h"><h3>Create a talent account</h3><button type="button" class="mx" id="tmClose">✕</button></div>
+      <p style="font-size:13px;color:var(--grey);margin:-8px 0 16px">We generate a temporary password to share with them. They change it on first login.</p>
+      <form id="talentForm">
+        <div class="grid2">
+          <div class="field"><label>Name (optional)</label><input id="tName" placeholder="Jane Doe"></div>
+          <div class="field"><label>Email</label><input id="tEmail" type="email" placeholder="jane@brasero.studio" required></div>
+        </div>
+        <label style="display:flex;align-items:center;gap:7px;margin:0 0 16px"><input type="checkbox" id="tOwner" style="width:auto"> Make owner</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="b-grad" type="submit">Create account →</button>
+          <span class="err" id="tErr"></span>
+        </div>
+      </form>
+      <div id="tCreated" class="tcreated hide"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -832,15 +860,14 @@ const fmtDate=s=>{ if(!s) return '-'; try{ return new Date(s).toLocaleDateString
 function talentObj(email){ return email?(ADMIN.talents||[]).find(x=>(x.email||'').toLowerCase()===email.toLowerCase()):null; }
 function talentName(email){ if(!email) return 'Unassigned'; const t=talentObj(email); return t?(t.name||t.email):email; }
 function talentChip(email){ if(!email) return '<span class="tchip tchip--none">Unassigned</span>'; const t=talentObj(email), nm=t?(t.name||t.email):email; return `<span class="tchip">${avatar(t||{name:nm},'xs')}<span class="tchip__n">${esc(nm)}</span></span>`; }
-const SECS=['dashboard','projects','talents','orders','crm'];
-function showAdmin(sec){ document.body.classList.remove('appmode'); $('#detail').classList.add('hide'); $('#adminApp').classList.remove('hide'); renderAdminMe(); navTo(sec||'dashboard'); }
+const SECS=['dashboard','projects','talents','crm'];
+function showAdmin(sec){ stopMsgPoll(); document.body.classList.remove('appmode'); $('#detail').classList.add('hide'); $('#adminApp').classList.remove('hide'); renderAdminMe(); navTo(sec||'dashboard'); }
 function navTo(sec){
   $('#adminNav').querySelectorAll('.navi').forEach(b=>b.classList.toggle('on',b.dataset.sec===sec));
   SECS.forEach(s=>$('#sec-'+s).classList.toggle('hide',s!==sec));
   if(sec==='dashboard') renderDashboard();
   else if(sec==='projects') renderProjectsSection();
   else if(sec==='talents') loadTeam();
-  else if(sec==='orders') renderOrdersSection();
   else if(sec==='crm') renderCRMSection();
 }
 $('#adminNav').addEventListener('click',e=>{ const b=e.target.closest('.navi'); if(b) navTo(b.dataset.sec); });
@@ -915,36 +942,82 @@ function renderDashboard(){
   $('#dperiod').addEventListener('click',e=>{ const b=e.target.closest('[data-p]'); if(b){ DPERIOD=b.dataset.p; renderDashboard(); } });
 }
 
-/* ----- projects: kanban with search + talent filter ----- */
-let PF={q:'',talent:''};
-function projCard(o){ return `<button class="kc" data-open="${esc(o.ref)}"><div class="kc__n">${esc(o.name||'Untitled')} <span class="swi__ref">#${esc(o.ref)}</span></div><div class="kc__sub">${talentChip(o.talent_email)}</div><div class="kc__foot"><span class="kc__pack">${esc(planName(o.plan)||'')}</span>${dlBadge(o,o.items)}</div></button>`; }
-function renderKboard(){
-  const list=ADMIN.orders.filter(o=> (!PF.q||(o.ref+' '+(o.name||'')+' '+(o.plan||'')).toLowerCase().includes(PF.q)) && (!PF.talent||(o.talent_email||'')===PF.talent));
-  $('#kboard').innerHTML=['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st);
-    return `<div><div class="kcolh"><span class="dot" style="background:${col}"></span>${l}<span class="c">${items.length}</span></div><div class="kcards">${items.map(projCard).join('')||'<div class="knone">No projects</div>'}</div></div>`; }).join('');
-  $('#kboard').querySelectorAll('[data-open]').forEach(r=>r.onclick=()=>openOrder(r.dataset.open));
+/* ----- projects: board + list, search, talent filter, sort, inline assign ----- */
+let PF={q:'',talent:'',sort:'deadline',view:'board'};
+const PLAN_RANK={burst:0,flame:1,starter:2};
+function filteredProjects(){
+  return ADMIN.orders.filter(o=> (!PF.q||(o.ref+' '+(o.name||'')+' '+(o.plan||'')+' '+(o.email||'')).toLowerCase().includes(PF.q)) && (!PF.talent||(o.talent_email||'')===PF.talent));
+}
+function sortProjects(list){
+  const arr=[...list];
+  if(PF.sort==='offer') arr.sort((a,b)=>(PLAN_RANK[a.plan]??9)-(PLAN_RANK[b.plan]??9)||(b.amount||0)-(a.amount||0));
+  else if(PF.sort==='status'){ const r={todo:0,progress:1,done:2}; arr.sort((a,b)=>r[a.state||'todo']-r[b.state||'todo']); }
+  else arr.sort((a,b)=>deadlineMs(a,a.items)-deadlineMs(b,b.items));
+  return arr;
+}
+/* inline talent assignment, so the owner sees at a glance who owns each order */
+function assignSelect(o){
+  const opts=(ADMIN.talents||[]).filter(t=>!t.is_owner).map(t=>`<option value="${esc(t.email)}" ${(o.talent_email||'').toLowerCase()===(t.email||'').toLowerCase()?'selected':''}>${esc(t.name||t.email)}</option>`).join('');
+  return `<select class="passign ${o.talent_email?'':'passign--none'}" data-assign="${esc(o.ref)}"><option value="">Unassigned</option>${opts}</select>`;
+}
+function projCard(o){
+  return `<div class="kc" data-card="${esc(o.ref)}">
+    <div class="kc__n">${esc(o.name||'Untitled')}</div>
+    <div class="kc__meta"><span class="swi__ref">#${esc(o.ref)}</span><span class="kc__pack">${esc(planName(o.plan)||'')}</span></div>
+    <div class="kc__foot">${dlBadge(o,o.items)}<span class="kc__items">${o.items||0} element${o.items===1?'':'s'}</span></div>
+    <div class="kc__assign" data-stop>${assignSelect(o)}</div>
+  </div>`;
+}
+function projRow(o){
+  return `<tr data-row="${esc(o.ref)}" class="clk"><td><span class="swi__ref">#${esc(o.ref)}</span></td>
+    <td><b>${esc(o.name||'-')}</b><div class="rsub">${esc(o.email||'')}</div></td>
+    <td>${esc(planName(o.plan)||'-')}</td>
+    <td>${o.billing==='sub'?'Subscription':'One-time'}</td>
+    <td class="amoney">${fmtMoney(o.amount)}</td>
+    <td data-stop>${assignSelect(o)}</td>
+    <td>${dlBadge(o,o.items)}</td>
+    <td>${spill(o.state)}</td></tr>`;
+}
+function renderProjectsBody(){
+  const list=sortProjects(filteredProjects()), body=$('#pbody');
+  if(PF.view==='list'){
+    const rows=list.length?list.map(projRow).join(''):'<tr><td colspan="8" class="emptyrow">No projects.</td></tr>';
+    body.innerHTML=`<div class="tbl"><table><thead><tr><th>Ref</th><th>Client</th><th>Pack</th><th>Billing</th><th>Amount</th><th>Talent</th><th>Deadline</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  } else {
+    body.innerHTML=`<div class="kboard">`+['todo','progress','done'].map(st=>{ const [c,l,col]=STATE[st]; const items=list.filter(o=>(o.state||'todo')===st);
+      return `<div><div class="kcolh"><span class="dot" style="background:${col}"></span>${l}<span class="c">${items.length}</span></div><div class="kcards">${items.map(projCard).join('')||'<div class="knone">No projects</div>'}</div></div>`; }).join('')+`</div>`;
+  }
+  bindProjects();
+}
+function bindProjects(){
+  $('#pbody').querySelectorAll('[data-card]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-stop]')) return; openOrder(el.dataset.card); });
+  $('#pbody').querySelectorAll('tr[data-row]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-stop]')) return; openOrder(el.dataset.row); });
+  $('#pbody').querySelectorAll('[data-assign]').forEach(s=>s.onchange=async ev=>{ ev.stopPropagation();
+    const r=await api('/api/admin',{action:'assign_order',ref:s.dataset.assign,talentEmail:s.value||null});
+    if(r.ok){ ADMIN.orders=r.orders||ADMIN.orders; ORDERS=ADMIN.orders; renderProjectsBody(); }
+  });
 }
 function renderProjectsSection(){
   const talents=[...new Set(ADMIN.orders.map(o=>o.talent_email).filter(Boolean))];
   $('#sec-projects').innerHTML=`
-    <div class="sechead"><h2>Projects</h2><button class="b-grad b-sm" data-newproj type="button">+ New project</button></div>
-    <div class="filters">
-      <input id="pfq" placeholder="Search projects…" value="${esc(PF.q)}">
-      <select id="pftalent"><option value="">All talents</option>${talents.map(t=>`<option value="${esc(t)}" ${PF.talent===t?'selected':''}>${esc(talentName(t))}</option>`).join('')}</select>
+    <div class="sechead"><h2>Projects</h2>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div class="vswitch" id="pview"><button type="button" data-v="board" class="${PF.view==='board'?'on':''}">Board</button><button type="button" data-v="list" class="${PF.view==='list'?'on':''}">List</button></div>
+        <button class="b-grad b-sm" data-newproj type="button">+ New project</button>
+      </div>
     </div>
-    <div class="kboard" id="kboard"></div>`;
-  $('#pfq').oninput=e=>{ PF.q=e.target.value.trim().toLowerCase(); renderKboard(); };
-  $('#pftalent').onchange=e=>{ PF.talent=e.target.value; renderKboard(); };
+    <div class="filters">
+      <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4" stroke-linecap="round"/></svg><input id="pfq" placeholder="Search by name, #ref, email…" value="${esc(PF.q)}"></div>
+      <select id="pftalent"><option value="">All talents</option>${talents.map(t=>`<option value="${esc(t)}" ${PF.talent===t?'selected':''}>${esc(talentName(t))}</option>`).join('')}</select>
+      <select id="pfsort"><option value="deadline" ${PF.sort==='deadline'?'selected':''}>Sort: Deadline</option><option value="offer" ${PF.sort==='offer'?'selected':''}>Sort: Offer</option><option value="status" ${PF.sort==='status'?'selected':''}>Sort: Status</option></select>
+    </div>
+    <div id="pbody"></div>`;
+  $('#pfq').oninput=e=>{ PF.q=e.target.value.trim().toLowerCase(); renderProjectsBody(); };
+  $('#pftalent').onchange=e=>{ PF.talent=e.target.value; renderProjectsBody(); };
+  $('#pfsort').onchange=e=>{ PF.sort=e.target.value; renderProjectsBody(); };
+  $('#pview').addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(b&&b.dataset.v!==PF.view){ PF.view=b.dataset.v; renderProjectsSection(); } });
   $('#sec-projects').querySelector('[data-newproj]').onclick=openNewModal;
-  renderKboard();
-}
-function renderOrdersSection(){
-  const O=ADMIN.orders;
-  const rows=O.length?O.map(o=>`<tr class="clk" data-open="${esc(o.ref)}"><td><span class="swi__ref">#${esc(o.ref)}</span></td><td><b>${esc(o.name||'-')}</b></td><td>${esc(o.email||'-')}</td><td>${esc(planName(o.plan)||'-')}</td><td>${o.billing==='sub'?'Subscription':'One-time'}</td><td class="amoney">${fmtMoney(o.amount)}</td><td>${fmtDate(o.created_at)}</td><td>${spill(o.state)}</td></tr>`).join(''):'<tr><td colspan="8" class="emptyrow">No orders yet.</td></tr>';
-  $('#sec-orders').innerHTML=`
-    <div class="sechead"><h2>Orders</h2><span style="color:var(--grey);font-weight:700;font-size:14px">${O.length} paid · ${fmtMoney(O.reduce((s,o)=>s+(o.amount||0),0))} total</span></div>
-    <div class="tbl"><table><thead><tr><th>Ref</th><th>Client</th><th>Email</th><th>Pack</th><th>Billing</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  $('#sec-orders').querySelectorAll('[data-open]').forEach(r=>r.onclick=()=>openOrder(r.dataset.open));
+  renderProjectsBody();
 }
 function renderCRMSection(){
   const L=ADMIN.leads;
@@ -1221,8 +1294,6 @@ $('#npForm').addEventListener('submit',async e=>{
 function backToOverview(){ REF=''; showAdmin('projects'); }
 /* ---------- project switcher (sidebar dropdown) ---------- */
 function renderSwitcher(){
-  const cur=ORDERS.find(o=>o.ref===REF);
-  $('#switcherCur').textContent=cur?(cur.name||('#'+cur.ref)):'Project';
   const items=ORDERS.map(o=>{
     const pack=planName(o.plan)?planName(o.plan)+' pack':'';
     return `<button type="button" class="swi ${o.ref===REF?'on':''}" data-ref="${esc(o.ref)}">
@@ -1269,7 +1340,7 @@ async function openOrder(ref){
   const foot=document.querySelector('.side__foot'); if(foot) foot.style.display=(ME&&ME.is_owner)?'':'none';   // talents don't add elements
   renderSideMe();
   SELDECK=null; renderBoard(d.decks||[]);
-  MESSAGES=d.messages||[]; renderMessages();
+  MESSAGES=d.messages||[]; renderMessages(); setUnread(false); startMsgPoll();
 }
 /* talent profile pinned at the bottom of the project sidebar */
 function renderSideMe(){
@@ -1308,9 +1379,27 @@ $('#chatForm').addEventListener('submit',async e=>{
   }catch(err){}
   finally{ btn.disabled=false; }
 });
+/* ---------- live chat: poll for new client messages, refresh instantly ---------- */
+let MSGPOLL=null;
+function setUnread(on){ $('#chatDot')?.classList.toggle('hide',!on); $('#chatDotHead')?.classList.toggle('hide',!on); }
+async function pollMessages(){
+  if(!REF||document.hidden) return;
+  try{
+    const r=await api('/api/admin',{action:'messages',ref:REF});
+    if(r.ok&&Array.isArray(r.messages)&&r.messages.length!==MESSAGES.length){
+      const grew=r.messages.length>MESSAGES.length;
+      const newFromClient=grew&&r.messages.slice(MESSAGES.length).some(m=>m.sender!=='studio');
+      MESSAGES=r.messages; renderMessages();
+      if(newFromClient && $('#board')?.classList.contains('chat-collapsed')) setUnread(true);
+    }
+  }catch(e){}
+}
+function startMsgPoll(){ stopMsgPoll(); MSGPOLL=setInterval(pollMessages,7000); }
+function stopMsgPoll(){ if(MSGPOLL){ clearInterval(MSGPOLL); MSGPOLL=null; } }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) pollMessages(); });
 /* collapse / expand the chat column (remembered) */
 const CHAT_KEY='brasero_chat_collapsed';
-function setChatCollapsed(c){ $('#board')?.classList.toggle('chat-collapsed',c); try{ localStorage.setItem(CHAT_KEY,c?'1':''); }catch(e){} }
+function setChatCollapsed(c){ $('#board')?.classList.toggle('chat-collapsed',c); if(!c) setUnread(false); try{ localStorage.setItem(CHAT_KEY,c?'1':''); }catch(e){} }
 $('#chatToggle')?.addEventListener('click',()=>setChatCollapsed(true));
 $('#chatOpen')?.addEventListener('click',()=>setChatCollapsed(false));
 try{ if(localStorage.getItem(CHAT_KEY)) $('#board')?.classList.add('chat-collapsed'); }catch(e){}
@@ -1454,14 +1543,18 @@ function bind(d){
 /* ---------- team (owner) ---------- */
 async function loadTeam(){
   const [t,o]=await Promise.all([api('/api/admin',{action:'list_talents'}),api('/api/admin',{action:'list'})]);
-  TALENTS=t.talents||[]; ORDERS=o.orders||[]; renderTeam();
+  TALENTS=t.talents||[]; ORDERS=o.orders||[]; ADMIN.talents=TALENTS; ADMIN.orders=ORDERS; renderTeam();
 }
-function donut(c){
-  const total=c.todo+c.progress+c.done;
-  if(!total) return `<div class="donut empty"><div class="hole"><b>0</b><span>projects</span></div></div>`;
-  const seg=[['#dc2626',c.todo],['#2563eb',c.progress],['#16a34a',c.done]]; let acc=0, stops=[];
-  seg.forEach(([col,n])=>{ if(n>0){ const a=(acc/total*360).toFixed(1), b=((acc+n)/total*360).toFixed(1); stops.push(`${col} ${a}deg ${b}deg`); } acc+=n; });
-  return `<div class="donut" style="background:conic-gradient(${stops.join(',')})"><div class="hole"><b>${total}</b><span>projects</span></div></div>`;
+/* create-talent overlay */
+$('#openTalentModal').onclick=()=>{ $('#talentForm').reset(); $('#tErr').textContent=''; $('#tCreated').classList.add('hide'); $('#talentModal').classList.remove('hide'); setTimeout(()=>$('#tEmail').focus(),30); };
+$('#tmClose').onclick=()=>$('#talentModal').classList.add('hide');
+$('#talentModal').addEventListener('click',e=>{ if(e.target.id==='talentModal') $('#talentModal').classList.add('hide'); });
+function statNums(c){
+  return `<div class="tstats">
+    <div class="tstat"><b style="color:var(--c-todo)">${c.todo}</b><span>To start</span></div>
+    <div class="tstat"><b style="color:var(--c-prog)">${c.progress}</b><span>In progress</span></div>
+    <div class="tstat"><b style="color:var(--c-done)">${c.done}</b><span>Completed</span></div>
+  </div>`;
 }
 function renderTeam(){
   const unassigned=ORDERS.filter(o=>!o.talent_email);
@@ -1471,7 +1564,7 @@ function renderTeam(){
     const chips=t.is_owner?'<div class="none">Owners see every project.</div>'
       :(mine.length?`<div class="chips">${mine.map(o=>`<span class="chip">#${esc(o.ref)}<button data-unassign="${esc(o.ref)}" title="Remove">✕</button></span>`).join('')}</div>`:'<div class="none">No projects assigned.</div>');
     const assignSel=t.is_owner?'':`<select data-assign-for="${esc(t.email)}" style="margin-top:8px"><option value="">+ Assign a project…</option>${unassigned.map(o=>`<option value="${esc(o.ref)}">#${esc(o.ref)}, ${esc(o.name||o.email||'')}</option>`).join('')}</select>`;
-    const mid=t.is_owner?'':`<div class="tcard__mid">${donut(c)}<div class="legend"><span><i style="background:#dc2626"></i>${c.todo} to start</span><span><i style="background:#2563eb"></i>${c.progress} in progress</span><span><i style="background:#16a34a"></i>${c.done} completed</span></div></div>`;
+    const mid=t.is_owner?'':statNums(c);
     return `<div class="tcard" data-talent="${esc(t.email)}">
       <div class="tcard__banner" style="${t.photo?`background-image:url(${esc(t.photo)})`:''}"></div>
       <label class="tcard__av" title="Change photo">${avatar(t,'lg')}<input type="file" accept="image/*" hidden data-photo></label>
@@ -1486,15 +1579,15 @@ function renderTeam(){
   bindTeam();
 }
 function bindTeam(){
-  document.querySelectorAll('[data-unassign]').forEach(b=>b.onclick=async()=>{ const r=await api('/api/admin',{action:'assign_order',ref:b.dataset.unassign,talentEmail:null}); if(r.ok){ ORDERS=r.orders||ORDERS; renderTeam(); } });
-  document.querySelectorAll('[data-assign-for]').forEach(s=>s.onchange=async()=>{ if(!s.value) return; const r=await api('/api/admin',{action:'assign_order',ref:s.value,talentEmail:s.dataset.assignFor}); if(r.ok){ ORDERS=r.orders||ORDERS; renderTeam(); } });
+  document.querySelectorAll('[data-unassign]').forEach(b=>b.onclick=async()=>{ const r=await api('/api/admin',{action:'assign_order',ref:b.dataset.unassign,talentEmail:null}); if(r.ok){ ORDERS=r.orders||ORDERS; ADMIN.orders=ORDERS; renderTeam(); } });
+  document.querySelectorAll('[data-assign-for]').forEach(s=>s.onchange=async()=>{ if(!s.value) return; const r=await api('/api/admin',{action:'assign_order',ref:s.value,talentEmail:s.dataset.assignFor}); if(r.ok){ ORDERS=r.orders||ORDERS; ADMIN.orders=ORDERS; renderTeam(); } });
   document.querySelectorAll('.tcard [data-photo]').forEach(inp=>inp.onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const email=inp.closest('.tcard').dataset.talent; const photo=await compress(f,512,0.8); const r=await api('/api/admin',{action:'update_talent',email,photo}); if(r.ok){ TALENTS=r.talents||TALENTS; renderTeam(); } e.target.value=''; });
   document.querySelectorAll('.tcard [data-del]').forEach(b=>b.onclick=async()=>{
     const email=b.closest('.tcard').dataset.talent;
     if(!confirm('Delete '+email+'? Their projects will become unassigned.')) return;
     const r=await api('/api/admin',{action:'delete_talent',email});
     if(!r.ok){ alert(r.error==='self'?"You can't delete your own account.":'Error: '+(r.error||'')); return; }
-    TALENTS=r.talents||TALENTS; ORDERS=r.orders||ORDERS; renderTeam();
+    TALENTS=r.talents||TALENTS; ORDERS=r.orders||ORDERS; ADMIN.talents=TALENTS; ADMIN.orders=ORDERS; renderTeam();
   });
   document.querySelectorAll('.tcard [data-edit]').forEach(b=>b.onclick=async()=>{
     const email=b.closest('.tcard').dataset.talent; const t=TALENTS.find(x=>x.email===email);
@@ -1511,7 +1604,7 @@ $('#talentForm').addEventListener('submit',async e=>{
   const body={action:'create_talent',name:$('#tName').value.trim(),email,is_owner:$('#tOwner').checked};
   const r=await api('/api/admin',body);
   if(!r.ok){ errEl.textContent=r.error==='exists'?'Email already exists.':'Error: '+(r.error||''); return; }
-  TALENTS=r.talents||TALENTS; $('#talentForm').reset();
+  TALENTS=r.talents||TALENTS; ADMIN.talents=TALENTS; $('#talentForm').reset();
   const box=$('#tCreated');
   box.innerHTML=`<div class="tcreated__h">✅ Account created</div><p>Share these with <b>${esc(email)}</b>. They'll be asked to change the password on first login.</p>
     <div class="cred"><span>Email</span><code>${esc(email)}</code></div>
