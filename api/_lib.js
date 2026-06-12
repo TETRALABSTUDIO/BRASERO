@@ -491,9 +491,11 @@ export function publicOrder(order, decks) {
     ref: order.ref || orderRef(order.stripe_session_id),
     name: order.name || '',
     handle: order.handle || '',
+    instagram: order.instagram || '',
     plan: order.plan || '',
     billing: order.billing || '',
     status: order.status,
+    answers: (order.answers && typeof order.answers === 'object') ? order.answers : null,
     progress: orderProgress(decks),
     decks: decks.map(d => ({
       id: d.id,
