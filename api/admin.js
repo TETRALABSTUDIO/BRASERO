@@ -1,7 +1,8 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
   assignOrder, createManualOrder, populateOrderElements, orderState, orderRef, sendTo, reviewEmail, siteUrl,
-  signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail } from './_lib.js';
+  signToken, randomPassword, PLANS, talentInviteEmail, talentAssignedEmail,
+  listMessages, addMessage, messageNotifyEmail } from './_lib.js';
 
 const pub = o => ({ ref: o.ref || orderRef(o.stripe_session_id), name: o.name, email: o.email, plan: o.plan, billing: o.billing || '', amount: o.amount || 0, instagram: o.instagram || '', phone: o.phone || '', addons: Array.isArray(o.addons) ? o.addons : [], talent_email: o.talent_email || '', created_at: o.created_at });
 
@@ -117,7 +118,34 @@ export default async function handler(req, res) {
         const r = await populateOrderElements(order.id, { plan: order.plan, addons: order.addons });
         if (r.created) decks = await decksForOrder(order.id);
       }
-      return res.json({ ok: true, order: pub(order), decks });
+      return res.json({ ok: true, order: pub(order), decks, messages: await listMessages(order.id) });
+    }
+
+    if (action === 'messages') {
+      if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+      if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
+      return res.json({ ok: true, messages: await listMessages(order.id) });
+    }
+
+    if (action === 'send_message') {
+      if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+      if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
+      const text = String(b.body || '').trim();
+      if (!text) return res.status(400).json({ ok: false, error: 'empty' });
+      let dk = null;
+      if (b.deckId) { const dd = await getDeck(b.deckId); if (dd && dd.order_id === order.id) dk = dd; }
+      await addMessage(order.id, { deck_id: dk ? dk.id : null, sender: 'studio', sender_name: me.name || 'Brasero studio', body: text });
+      // Notify the client by email (they reply from their tracker).
+      try {
+        if (order.email) {
+          const trackUrl = `${siteUrl(req)}/track.html?ref=${encodeURIComponent(order.ref || '')}&email=${encodeURIComponent(order.email)}`;
+          await sendTo(order.email, `💬 A message about your Brasero order #${order.ref || ''}`, messageNotifyEmail({
+            name: order.name, ref: order.ref, fromName: me.name || 'Brasero studio', body: text, about: dk ? dk.title : '',
+            ctaUrl: trackUrl, ctaLabel: 'Open the conversation →',
+          }));
+        }
+      } catch (e) { console.error('msg notify client', e); }
+      return res.json({ ok: true, messages: await listMessages(order.id) });
     }
 
     if (action === 'add_deck') {

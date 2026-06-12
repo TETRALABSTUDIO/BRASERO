@@ -91,6 +91,23 @@ alter table talents enable row level security;
 -- hashes can never be read from the public anon key.
 
 -- Bootstrap your owner account: pick an email, then set the password from the
--- panel's first login is not possible — instead create it once via the API
+-- panel's first login is not possible, instead create it once via the API
 -- (POST /api/auth { action:'bootstrap', email, password, name } with the
 -- x-admin-token header = ADMIN_TOKEN). See README/notes.
+
+-- ---------- messages (client <-> talent thread per order) ----------
+
+create table if not exists messages (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz default now(),
+  order_id    uuid references orders(id) on delete cascade,
+  deck_id     uuid references decks(id) on delete set null,  -- optional: the asset this message is about
+  sender      text,                                          -- 'client' | 'studio'
+  sender_name text,
+  body        text
+);
+create index if not exists messages_order_idx on messages (order_id, created_at);
+
+alter table messages enable row level security;
+-- Backend uses the SERVICE ROLE key (bypasses RLS); keep RLS on so the thread
+-- can never be read from the public anon key.

@@ -81,6 +81,12 @@ export const MEM = db ? null : {
       title: 'Launch announcement', script: 'We are live!',
       design_urls: ['assets/carousels/3-1.jpg'], design_validated_at: new Date().toISOString() },
   ],
+  messages: [
+    { id: 'msg-1', order_id: 'ord-demo', deck_id: 'dk-1', sender: 'client', sender_name: 'Demo Client',
+      body: 'Could you make the hook punchier on this one?', created_at: new Date(Date.now() - 36e5).toISOString() },
+    { id: 'msg-2', order_id: 'ord-demo', deck_id: 'dk-1', sender: 'studio', sender_name: 'Demo Talent',
+      body: 'On it! Sending a revised script shortly.', created_at: new Date(Date.now() - 30e5).toISOString() },
+  ],
 };
 const STORE = !!(db || MEM);
 
@@ -148,6 +154,32 @@ export async function getDeck(deckId) {
   if (MEM) return MEM.decks.find(d => d.id === deckId) || null;
   const { data } = await db.from('decks').select('*').eq('id', deckId).maybeSingle();
   return data || null;
+}
+
+/* ---- Messages: one client <-> studio thread per order, optionally about an asset ---- */
+const pubMessage = m => ({
+  id: m.id, deck_id: m.deck_id || null, sender: m.sender, sender_name: m.sender_name || '',
+  body: m.body || '', created_at: m.created_at,
+});
+
+export async function listMessages(orderId) {
+  if (!STORE || !orderId) return [];
+  if (MEM) return MEM.messages.filter(m => m.order_id === orderId)
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).map(pubMessage);
+  const { data } = await db.from('messages').select('*').eq('order_id', orderId).order('created_at', { ascending: true });
+  return (data || []).map(pubMessage);
+}
+
+export async function addMessage(orderId, { deck_id, sender, sender_name, body }) {
+  if (!STORE || !orderId) return null;
+  const text = String(body || '').trim().slice(0, 4000);
+  if (!text) return null;
+  const row = { order_id: orderId, deck_id: deck_id || null, sender: sender === 'studio' ? 'studio' : 'client',
+    sender_name: String(sender_name || '').slice(0, 120), body: text };
+  if (MEM) { const m = { id: uid(), created_at: new Date().toISOString(), ...row }; MEM.messages.push(m); return pubMessage(m); }
+  const { data, error } = await db.from('messages').insert(row).select('*').maybeSingle();
+  if (error) { console.error('addMessage', error); return null; }
+  return pubMessage(data);
 }
 
 export async function patchDeck(deckId, patch) {
@@ -719,6 +751,17 @@ export function talentProjectDoneEmail({ name, ref, clientName, panelUrl }) {
     emailText(`${greet(name)}<p style="margin:0">Every element${clientName ? ` of <b>${clientName}</b>'s order` : ''} is approved &amp; delivered. Great work!</p>`) +
     nextSteps(['The full project is now live in the client\'s space', 'Check the panel for any new assignments']) +
     emailCta(panelUrl || '#', 'View the project →')
+  );
+}
+
+// New chat message between the client and the studio.
+export function messageNotifyEmail({ name, ref, fromName, body, about, ctaUrl, ctaLabel }) {
+  const esc = s => String(s || '').replace(/</g, '&lt;');
+  return emailShell(
+    emailHero('New message', `New message · #${ref || ''}`) +
+    emailText(`${greet(name)}<p style="margin:0"><b>${esc(fromName) || 'Someone'}</b> sent you a message${about ? ` about <b>${esc(about)}</b>` : ''}:</p>`) +
+    noteBox('Message', esc(body)) +
+    emailCta(ctaUrl || '#', ctaLabel || 'Open the conversation →')
   );
 }
 

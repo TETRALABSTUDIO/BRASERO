@@ -21,15 +21,15 @@ export default async function handler(req, res) {
     if (action === 'validate_script') {
       if (deck.status !== 'script_review') return res.status(409).json({ ok: false, error: 'wrong_state' });
       patch = { script: String(script || deck.script || ''), status: 'designing', script_validated_at: now };
-      notify = `✅ Script approved — "${deck.title || 'deck'}" (#${order.ref || ''})`;
+      notify = `✅ Script approved - "${deck.title || 'deck'}" (#${order.ref || ''})`;
     } else if (action === 'validate_design') {
       if (deck.status !== 'design_review') return res.status(409).json({ ok: false, error: 'wrong_state' });
       patch = { status: 'done', design_validated_at: now };
-      notify = `🎉 Design approved — "${deck.title || 'deck'}" (#${order.ref || ''})`;
+      notify = `🎉 Design approved - "${deck.title || 'deck'}" (#${order.ref || ''})`;
     } else if (action === 'request_revision') {
       if (deck.status !== 'design_review') return res.status(409).json({ ok: false, error: 'wrong_state' });
       patch = { status: 'revision', revision_note: String(note || '').slice(0, 2000) };
-      notify = `✏️ Retouch requested — "${deck.title || 'deck'}" (#${order.ref || ''})`;
+      notify = `✏️ Retouch requested - "${deck.title || 'deck'}" (#${order.ref || ''})`;
     } else {
       return res.status(400).json({ ok: false, error: 'bad_action' });
     }
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     // Notify the studio inbox (no-ops if MAIL_TO unset).
     try {
       await send(notify, `<h2>${notify}</h2>
-        <p><b>Client:</b> ${order.name || '—'} · ${order.email}</p>
+        <p><b>Client:</b> ${order.name || '-'} · ${order.email}</p>
         <p><b>Order:</b> #${order.ref || ''} · ${order.plan || ''}</p>
         ${note ? `<p><b>Retouch note:</b><br>${String(note).replace(/</g, '&lt;')}</p>` : ''}`);
     } catch (e) { console.error('notify', e); }
