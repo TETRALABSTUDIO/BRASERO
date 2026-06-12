@@ -393,6 +393,12 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .detail__head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
 .detail__titleinput{font-size:21px;font-weight:900;letter-spacing:-.03em;line-height:1.1;border:none;background:transparent;padding:5px 7px;flex:1;min-width:0}
 .detail__titleinput:hover{background:var(--soft)}
+.autofill{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--line);border-radius:100px;padding:3px 5px 3px 10px;background:#fff;flex:none}
+.autofill__ic{font-size:13px;margin-right:3px;line-height:1}
+.autofill__step{width:22px;height:22px;padding:0;border:none;background:var(--soft);color:var(--ink);border-radius:50%;font-size:15px;font-weight:800;line-height:1;display:grid;place-items:center}
+.autofill__step:hover{background:#ececec;transform:none}
+.autofill__n{min-width:16px;text-align:center;font-size:13px;font-weight:800}
+.autofill__go{background:var(--grad);color:#fff;border-radius:100px;font-size:12px;font-weight:800;padding:5px 12px;margin-left:3px}
 .detail__instr{font-size:14.5px;color:var(--ink);line-height:1.55;margin:8px 0 16px;max-width:64ch}
 .detail__instr b{color:var(--orange)}
 .note-line{font-size:14px;color:var(--ink);line-height:1.55;margin:0 0 12px}
@@ -1799,9 +1805,46 @@ function slidesViewHTML(script){
     return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i+1}</span></div><div class="slide__view">${c||'<span class="slide__empty">Empty</span>'}</div></div>`; }).join('')}</div>`;
 }
 function renumberSlides(det){ det.querySelectorAll('.slides [data-slide] .slide__n').forEach((el,i)=>el.textContent='Slide '+(i+1)); }
+/* owner autofill: build N starter slides from the project brief + client info (no AI, fully editable) */
+function buildScaffoldSlides(n,b,o){
+  b=b||{}; o=o||{};
+  const niche=b.niche||b.page||o.name||'your topic';
+  const goal=b.goal||'grow the page';
+  const audience=b.audience||'your audience';
+  let handle=b.handle||o.instagram||o.handle||'';
+  if(handle&&handle[0]!=='@') handle='@'+handle;
+  const mk=(t,body)=>`<h4>${esc(t)}</h4>${body}`;
+  const hl=s=>`<mark>${esc(s)}</mark>`;
+  const slides=[mk('Hook',`Stop scrolling if you care about ${hl(niche)}.`)];
+  const bodies=[
+    ['The problem',`Most ${esc(audience)} struggle with ${hl(niche)} because no one explains it simply.`],
+    ['Why it matters',`If the goal is to ${hl(goal)}, this is the part everyone skips.`],
+    ['Quick tip',`One thing ${esc(audience)} can do today to move toward ${hl(goal)}.`],
+    ['Myth vs truth',`The myth: ___. The truth about ${hl(niche)}: ___.`],
+    ['Proof',`A quick example that shows this works for ${esc(audience)}.`],
+    ['Step by step',`Break ${hl(goal)} into 3 simple steps the audience can follow.`],
+  ];
+  const mid=Math.max(0,n-(n>=2?2:1));
+  for(let i=0;i<mid;i++){ const [t,bd]=bodies[i%bodies.length]; slides.push(mk(t,bd)); }
+  if(n>=2) slides.push(mk('Call to action',`Follow ${handle?hl(handle):'the page'} for more on ${hl(niche)}. Save this for later.`));
+  return slides.slice(0,n);
+}
+function fillScaffold(det,slidesEl,n){
+  const arr=buildScaffoldSlides(n,BRIEF,CURORDER);
+  slidesEl.innerHTML=arr.map(h=>`<div class="slide" data-slide><div class="slide__bar"><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
+  renumberSlides(det);
+}
 function detailHTML(d){
   const scriptEdit=d.status==='writing'||d.status==='script_review';
-  const head=`<div class="detail__head"><input class="detail__titleinput" data-f="title" value="${esc(d.title)}">${(ME&&ME.is_owner)?'<button class="b-del b-sm" data-a="delete_deck">Delete</button>':''}</div>`;
+  const owner=ME&&ME.is_owner;
+  const autofill=(owner&&scriptEdit)?`<div class="autofill" data-autofill title="Auto-fill slides from the client brief">
+      <span class="autofill__ic">✨</span>
+      <button type="button" class="autofill__step" data-af-dec aria-label="Fewer slides">−</button>
+      <span class="autofill__n" data-af-n>6</span>
+      <button type="button" class="autofill__step" data-af-inc aria-label="More slides">+</button>
+      <button type="button" class="autofill__go" data-af-go>Fill</button>
+    </div>`:'';
+  const head=`<div class="detail__head"><input class="detail__titleinput" data-f="title" value="${esc(d.title)}">${autofill}${owner?'<button class="b-del b-sm" data-a="delete_deck">Delete</button>':''}</div>`;
   const instr=`<p class="detail__instr">${T_INSTR[d.status]||''}</p>`;
   let body;
   if(scriptEdit){
@@ -1851,6 +1894,21 @@ function bind(d){
   if(addBtn&&slidesEl) addBtn.onclick=()=>{ const div=document.createElement('div'); div.className='slide'; div.setAttribute('data-slide','');
     div.innerHTML='<div class="slide__bar"><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body></div>';
     slidesEl.appendChild(div); renumberSlides(det); div.querySelector('[data-slide-body]').focus(); };
+  /* owner autofill pill: stepper + generate slides from the brief */
+  const afEl=det.querySelector('[data-autofill]');
+  if(afEl&&slidesEl){
+    const nEl=afEl.querySelector('[data-af-n]');
+    const clamp=v=>Math.max(1,Math.min(12,v));
+    const setN=v=>{ nEl.textContent=clamp(v); };
+    afEl.querySelector('[data-af-dec]').onclick=()=>setN(Number(nEl.textContent)-1);
+    afEl.querySelector('[data-af-inc]').onclick=()=>setN(Number(nEl.textContent)+1);
+    afEl.querySelector('[data-af-go]').onclick=()=>{
+      const n=clamp(Number(nEl.textContent)||6);
+      const hasContent=[...slidesEl.querySelectorAll('[data-slide-body]')].some(x=>x.textContent.trim());
+      if(hasContent&&!confirm('Replace the current slides with '+n+' auto-filled slides from the brief?')) return;
+      fillScaffold(det,slidesEl,n);
+    };
+  }
   if(slidesEl) slidesEl.addEventListener('click',e=>{ const del=e.target.closest('[data-slide-del]'); if(!del) return;
     if(slidesEl.querySelectorAll('[data-slide]').length<=1){ del.closest('.slide').querySelector('[data-slide-body]').innerHTML=''; return; }
     del.closest('.slide').remove(); renumberSlides(det); });
