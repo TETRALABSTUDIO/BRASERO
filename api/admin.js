@@ -142,7 +142,7 @@ export default async function handler(req, res) {
       if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
       let decks = await decksForOrder(order.id);
       // Top up the board to the full offer (plan decks + upsells) as long as no work
-      // has started — so old/partial orders show every element ready to fill, while
+      // has started - so old/partial orders show every element ready to fill, while
       // any order already in progress is left untouched.
       const started = decks.some(d => d.script || d.design_url || (Array.isArray(d.design_urls) && d.design_urls.length) || (d.status && d.status !== 'writing'));
       if (!started) {

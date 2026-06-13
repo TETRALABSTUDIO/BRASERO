@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       if (EM && (await getClientByEmail(EM) || await emailHasOrders(EM))) {
         const c = await upsertClient({ email: EM });
         if (c) {
-          const token = signToken({ email: c.email, cid: c.id, magic: true }, 15 / 1440); // 15 min
+          const token = signToken({ email: c.email, cid: c.id, magic: true }, 30 / 1440); // 30 min
           const url = `${siteUrl(req)}/app.html?magic=${encodeURIComponent(token)}`;
           await sendTo(c.email, 'Your Brasero sign-in link 🔥', magicLinkEmail({ name: c.name, url }));
         }

@@ -71,7 +71,7 @@ export const MEM = db ? null : {
     { id: 'ord-done', ref: 'DONE9001', stripe_session_id: 'sess_done', status: 'paid',
       plan: 'burst', billing: 'sub', name: 'Leo Marchand', email: 'leo@example.com',
       talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
-    // unpaid lead (abandoned checkout) — shows up in the CRM
+    // unpaid lead (abandoned checkout) - shows up in the CRM
     { id: 'ord-lead', ref: 'LEAD0001', stripe_session_id: 'sess_lead', status: 'pending',
       plan: 'flame', billing: 'once', name: 'Marc Abandon', email: 'marc@lead.com', instagram: '@marc',
       amount: 24000, created_at: new Date(Date.now() - 2 * 864e5).toISOString() },
@@ -170,7 +170,7 @@ export async function onboardingDone(sessionId) {
   return !!(data && data.onboarding_at);
 }
 
-// SECURITY GATE — returns the trusted order only if the Stripe Checkout session
+// SECURITY GATE - returns the trusted order only if the Stripe Checkout session
 // is genuinely paid, else null. Used to gate the onboarding page + submission so
 // nobody can send a brief without paying. Accepts a locally-stored paid order
 // (webhook already ran / demo / manual) or confirms live with Stripe otherwise.
@@ -178,7 +178,7 @@ export async function verifyPaidSession(sessionId) {
   if (!sessionId) return null;
   const ord = await findOrderBySession(sessionId);
   if (ord && ord.status === 'paid') return onboardingOrder(ord, null);
-  // Ask Stripe directly — covers the race before the webhook marks the order paid.
+  // Ask Stripe directly - covers the race before the webhook marks the order paid.
   if (process.env.STRIPE_SECRET_KEY && /^cs_/.test(sessionId)) {
     try {
       const s = await stripe.checkout.sessions.retrieve(sessionId);
@@ -220,7 +220,7 @@ export async function getClientByEmail(email) {
   return data || null;
 }
 
-// True if this email already has at least one order — gates lazy account creation
+// True if this email already has at least one order - gates lazy account creation
 // (only people who actually ordered can get a sign-in link).
 export async function emailHasOrders(email) {
   if (!STORE || !email) return false;
@@ -372,7 +372,7 @@ export async function adminListOrders() {
   if (MEM) return MEM.orders.filter(o => o.status === 'paid');
   if (!db) return [];
   // select '*' so the enriched list carries the full brief (answers, instagram, addons,
-  // phone, amount, billing) — the owner edit modal prefills from these, and a stripped
+  // phone, amount, billing) - the owner edit modal prefills from these, and a stripped
   // list would wipe them on every save/reopen.
   const { data } = await db.from('orders')
     .select('*')
@@ -380,7 +380,7 @@ export async function adminListOrders() {
   return data || [];
 }
 
-// Every order, any status (paid + pending/abandoned) — for the owner dashboard + CRM.
+// Every order, any status (paid + pending/abandoned) - for the owner dashboard + CRM.
 export async function listAllOrders() {
   if (MEM) return MEM.orders.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   if (!db) return [];

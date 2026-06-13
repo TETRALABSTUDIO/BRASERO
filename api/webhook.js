@@ -66,14 +66,14 @@ export default async function handler(req, res) {
     } catch (e) { console.error('client email failed', e); }
     // Internal notification (only if MAIL_TO is set)
     try {
-      await send(`💸 New ${m.plan || ''} order — ${m.name || s.customer_email}`,
+      await send(`💸 New ${m.plan || ''} order - ${m.name || s.customer_email}`,
         `<h2>Payment received</h2>
          <p><b>Plan:</b> ${m.plan} (${m.billing === 'sub' ? 'subscription' : 'one-time'})</p>
          <p><b>Amount:</b> $${(s.amount_total / 100).toFixed(2)}</p>
-         <p><b>Name:</b> ${m.name || '—'}</p>
-         <p><b>Email:</b> ${s.customer_email || m.email || '—'}</p>
+         <p><b>Name:</b> ${m.name || '-'}</p>
+         <p><b>Email:</b> ${s.customer_email || m.email || '-'}</p>
          <p><b>Instagram:</b> ${m.handle || ''} ${m.instagram ? `(${m.instagram})` : ''}</p>
-         <p><b>Add-ons:</b> ${m.addons || '—'}</p>
+         <p><b>Add-ons:</b> ${m.addons || '-'}</p>
          <p><b>Stripe session:</b> ${s.id}</p>`);
     } catch (e) { console.error(e); }
   }

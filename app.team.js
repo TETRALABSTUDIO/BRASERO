@@ -1,5 +1,5 @@
 /* ============================================================================
-   app.team.js — owner + talent workspace (team bundle), lazy-loaded for roles
+   app.team.js - owner + talent workspace (team bundle), lazy-loaded for roles
    'owner' and 'talent'. Ported from panel.html into the unified app shell:
    owner admin (dashboard / projects / talents / CRM + impersonation) and the
    shared project board (brief · elements · script/design · client chat), with
@@ -44,7 +44,7 @@ function doLogout() { ['brasero_session', 'brasero_owner_session', 'brasero_owne
 const STUDIO_LOGO = '<svg class="logo" viewBox="0 0 798 220" fill="none" style="height:46px"><use href="#brasero-studio"/></svg>';
 
 /* ============================================================================
-   MARKUP — the authenticated app shell (admin + board + modals), injected once.
+   MARKUP - the authenticated app shell (admin + board + modals), injected once.
    ========================================================================== */
 function shellHTML() {
   return `
@@ -1385,7 +1385,7 @@ async function submitTalent(e) {
 }
 
 /* ============================================================================
-   WIRING — element-level bindings after the shell is injected (per mount)
+   WIRING - element-level bindings after the shell is injected (per mount)
    ========================================================================== */
 function wireStatic() {
   // admin nav
@@ -1485,7 +1485,7 @@ function wireStatic() {
   $('#tutNext').onclick = () => { if (TUTI < TUT.length - 1) { TUTI++; renderTut(); } else $('#helpCard').classList.add('hide'); };
 }
 
-/* document-level listeners — attached once, survive re-mounts */
+/* document-level listeners - attached once, survive re-mounts */
 function wireDocOnce() {
   if (docWired) return;
   docWired = true;

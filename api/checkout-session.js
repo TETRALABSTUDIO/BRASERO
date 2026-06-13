@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         mode: 'payment',
         customer_email: email || undefined,
         allow_promotion_codes: true,          // show the "Add promotion code" field
-        line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero — ${it.name}` } } }],
+        line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero - ${it.name}` } } }],
         success_url: `${SITE}/app.html?order=${ar}`,
         cancel_url: `${SITE}/app.html?order=${ar}`,
         metadata: { addon_ref, addon_item, email: email || '' },
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         price_data: {
           currency: 'usd',
           unit_amount: amount,
-          product_data: { name: `Brasero — ${PLANS[plan].name} pack` },
+          product_data: { name: `Brasero - ${PLANS[plan].name} pack` },
           ...(mode === 'subscription' ? { recurring: { interval: 'month' } } : {}),
         },
       }];

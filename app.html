@@ -110,7 +110,7 @@ async function route() {
   }
 }
 
-/* 3. Login screen — client magic link by default, team password on toggle. */
+/* 3. Login screen - client magic link by default, team password on toggle. */
 function renderLogin(error, prefillEmail) {
   const pre = (prefillEmail || '').replace(/"/g, '&quot;');
   app.innerHTML = `
@@ -126,7 +126,7 @@ function renderLogin(error, prefillEmail) {
         <button class="btn btn--grad" style="width:100%" type="submit" id="mBtn">Email me a sign-in link</button>
         <div class="err" id="mErr">${error ? error : ''}</div>
       </form>
-      <div class="authnote hide" id="mSent">Check your inbox — if that email has an account, a sign-in link is on its way. 🔥</div>
+      <div class="authnote hide" id="mSent">Check your inbox - if that email has an account, a sign-in link is on its way. 🔥</div>
       <div class="authswap">
         Team member? <button type="button" id="teamToggle">Sign in with password</button>
       </div>
@@ -179,7 +179,7 @@ function renderLogin(error, prefillEmail) {
   await consumeMagic();
   if (getToken()) return route();
   if (app.querySelector('.authwrap')) return;   // consumeMagic already showed login (bad token)
-  // Legacy track.html?ref&email links land here as ?order&email — prefill the
+  // Legacy track.html?ref&email links land here as ?order&email - prefill the
   // email and point them at a fresh sign-in link for that order.
   const sp = new URLSearchParams(location.search);
   const ref = sp.get('order') || '', email = sp.get('email') || '';

@@ -274,7 +274,7 @@ const STEPS=[
 ];
 
 const order=JSON.parse(sessionStorage.getItem('brasero_order')||'{}');
-/* the Stripe Checkout session id — proof of payment, set on the success redirect */
+/* the Stripe Checkout session id - proof of payment, set on the success redirect */
 let SID=new URLSearchParams(location.search).get('session_id')||order.sessionId||'';
 const ans={};
 /* prefill the handle + niche from the info entered at checkout */

@@ -1,5 +1,5 @@
 /* ============================================================================
-   app.core.js — shared core for the unified role-based app (Phase 2)
+   app.core.js - shared core for the unified role-based app (Phase 2)
    Imported once by every role bundle (client / owner / talent). Holds the
    primitives that were duplicated across panel.html + track.html: API base,
    signed-token decode, authenticated fetch, HTML escaping, initials, avatar

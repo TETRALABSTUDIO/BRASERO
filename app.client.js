@@ -1,5 +1,5 @@
 /* ============================================================================
-   app.client.js — client space (light bundle), lazy-loaded for role 'client'.
+   app.client.js - client space (light bundle), lazy-loaded for role 'client'.
    Phase 3: magic-link "my orders" list (aggregated by client account) + the
    per-order board (read scripts/designs, approve, request retouch, download,
    chat with the studio, add to the order). Reuses the brasero.css board/chat
@@ -131,7 +131,7 @@ function bindGlobalOnce() {
 }
 
 /* ============================================================================
-   HOME — the client's aggregated list of orders
+   HOME - the client's aggregated list of orders
    ========================================================================== */
 async function renderHome() {
   stopMsgPoll();
@@ -180,7 +180,7 @@ function ocardHTML(o) {
 }
 
 /* ============================================================================
-   BOARD — a single order (sidebar · deliverables · studio chat)
+   BOARD - a single order (sidebar · deliverables · studio chat)
    ========================================================================== */
 async function openOrder(ref) {
   REF = ref;
