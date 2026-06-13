@@ -363,6 +363,14 @@ function ownerTok() { return localStorage.getItem('brasero_owner_session') || ((
 function showSwitcher() { return !!ownerTok(); }
 function clearNav() { ['brasero_last_ref', 'brasero_nav', 'brasero_last_tab', 'brasero_open_tabs'].forEach(k => { try { localStorage.removeItem(k); } catch (_) {} }); }
 const ACCT_GEAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+// Role glyphs for the avatar corner bubble: crown = owner, spark = talent.
+const IC_CROWN = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7.5l4 3.2L12 4l5 6.7 4-3.2L19 19H5L3 7.5z"/></svg>';
+const IC_SPARK = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6L19.5 9.5 13.9 11.4 12 17l-1.9-5.6L4.5 9.5l5.6-1.9L12 2z"/></svg>';
+// Avatar with a small role bubble bottom-right (owner crown / talent spark).
+function avatarRole(t, size) {
+  const owner = !!(t && t.is_owner);
+  return `<span class="avrole"><span class="avrole__ph">${avatar(t, size)}</span><span class="avrole__b ${owner ? 'avrole__b--owner' : 'avrole__b--talent'}" title="${owner ? 'Owner' : 'Talent'}">${owner ? IC_CROWN : IC_SPARK}</span></span>`;
+}
 function meActions(logoutId) {
   const sw = showSwitcher() ? `<button type="button" class="acctsw__ic" data-acct-menu title="Switch account">${ACCT_UP}</button>` : '';
   return `<div class="acctsw"><button type="button" class="acctsw__ic" data-profile title="Edit my profile">${ACCT_GEAR}</button>${sw}<button type="button" class="acctsw__ic" id="${logoutId}" title="Sign out">${ACCT_OUT}</button><div class="acctsw__menu hide" data-acct-list></div></div>`;
@@ -418,7 +426,7 @@ function renderImpBar() {
 }
 function renderAdminMe() {
   const el = $('#adminMe'); if (!el || !ME) return;
-  el.innerHTML = `${avatar(ME, 'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name || ME.email.split('@')[0])}</span><span class="rolebadge owner">Owner</span></div>${meActions('adminLogout')}`;
+  el.innerHTML = `${avatarRole(ME, 'sm')}<div class="side__me-info"><span class="side__me-name" title="${esc(ME.name || ME.email)}">${esc(ME.name || ME.email.split('@')[0])}</span></div>${meActions('adminLogout')}`;
   wireAcct(el, 'adminLogout');
 }
 
@@ -520,32 +528,57 @@ function planPie(orders) {
   const legend = segs.map(s => `<div class="row"><i style="background:${s.color}"></i>${esc(s.name)}<b>${s.n} · ${Math.round(s.n / total * 100)}%</b></div>`).join('');
   return `<div class="pierow"><div class="pie" style="background:conic-gradient(${stops.join(',')})"></div><div class="pielegend">${legend}</div></div>`;
 }
-const KPI_IC = {
-  rev: '<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-  proj: '<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
-  tal: '<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg>',
-  lead: '<svg viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>',
-};
-function kpiCard(t, l, v, s) { return `<div class="kpi"><div class="kpi__ic">${KPI_IC[t] || ''}</div><div><div class="kpi__l">${l}</div><div class="kpi__v">${v}</div><div class="kpi__s">${s}</div></div></div>`; }
+function kCell(l, v, s) { return `<div class="kcell"><div class="kcell__l">${l}</div><div class="kcell__v">${v}</div><div class="kcell__s">${s}</div></div>`; }
+const CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+// Remaining/overdue time, short form (e.g. "2d 4h left" / "overdue 3h").
+function relLeft(ms) { const late = ms < 0, abs = Math.abs(ms), h = Math.floor(abs / 36e5), d = Math.floor(h / 24), hr = h % 24, t = d > 0 ? `${d}d ${hr}h` : `${h}h`; return late ? `overdue ${t}` : `${t} left`; }
+// Actionable items for the owner, surfaced on the dashboard (global, not period-bound):
+// overdue / due-soon projects, unassigned projects, leads to recover. Sorted by urgency.
+function needsAttention() {
+  const now = Date.now(), out = [];
+  (ADMIN.orders || []).forEach(o => {
+    if ((o.state || 'todo') === 'done') return;
+    const dms = deadlineMs(o, o.kinds) - now;
+    if (dms < 0) out.push({ sev: 0, ref: o.ref, who: o.name || 'Untitled', tag: 'Overdue', meta: relLeft(dms) });
+    else if (dms < 2 * 864e5) out.push({ sev: 1, ref: o.ref, who: o.name || 'Untitled', tag: 'Due soon', meta: relLeft(dms) });
+    if (!o.talent_email) out.push({ sev: 2, ref: o.ref, who: o.name || 'Untitled', tag: 'Unassigned', meta: 'No talent yet' });
+  });
+  (ADMIN.leads || []).forEach(l => out.push({ sev: 3, lead: 1, who: l.name || l.email || 'Lead', tag: 'Lead', meta: planName(l.plan) || 'Abandoned checkout' }));
+  return out.sort((a, b) => a.sev - b.sev);
+}
+function attnRow(a) {
+  return `<button type="button" class="attn__row" ${a.lead ? 'data-attn-crm' : `data-attn-ref="${esc(a.ref)}"`}>
+    <span class="attn__dot s${a.sev}"></span>
+    <span class="attn__main"><span class="attn__who">${esc(a.who)}</span><span class="attn__tag s${a.sev}">${a.tag}</span></span>
+    <span class="attn__meta">${esc(a.meta)}</span><span class="attn__go">${CHEV}</span>
+  </button>`;
+}
 function renderDashboard() {
   const O = ordersInPeriod(), L = ADMIN.leads, T = (ADMIN.talents || []).filter(t => !t.is_owner);
   const active = O.filter(o => o.state !== 'done').length, done = O.filter(o => o.state === 'done').length;
   const revenue = O.reduce((s, o) => s + (o.amount || 0), 0);
+  const attn = needsAttention(), shown = attn.slice(0, 6);
   $('#sec-dashboard').innerHTML = `
     <div class="sechead"><h2>Dashboard</h2>
       <div class="period" id="dperiod">${PERIODS.map(([k, l]) => `<button type="button" data-p="${k}" class="${DPERIOD === k ? 'on' : ''}">${l}</button>`).join('')}</div>
     </div>
-    <div class="kpis">
-      ${kpiCard('rev', 'Revenue', fmtMoney(revenue), O.length + ' paid order' + (O.length === 1 ? '' : 's'))}
-      ${kpiCard('proj', 'Active projects', active, done + ' completed')}
-      ${kpiCard('tal', 'Talents', T.length, 'in the studio')}
-      ${kpiCard('lead', 'Leads', L.length, 'unpaid / abandoned')}
+    <div class="kstrip">
+      ${kCell('Revenue', fmtMoney(revenue), O.length + ' paid order' + (O.length === 1 ? '' : 's'))}
+      ${kCell('Active projects', active, done + ' completed')}
+      ${kCell('Talents', T.length, 'in the studio')}
+      ${kCell('Leads', L.length, 'unpaid / abandoned')}
     </div>
     <div class="panels">
-      <div class="panel"><h3>Revenue</h3><div class="ph-sub">Paid orders over the selected period</div>${lineChart(revSeries(O))}</div>
-      <div class="panel"><h3>Offers split</h3><div class="ph-sub">Packages bought in this period</div>${planPie(O)}</div>
+      <div class="panel"><div class="panel__h"><h3>Revenue</h3><span class="panel__big">${fmtMoney(revenue)}</span></div><div class="ph-sub">Paid orders over the selected period</div>${lineChart(revSeries(O))}</div>
+      <div class="panel"><div class="panel__h"><h3>Offers split</h3></div><div class="ph-sub">Packages bought in this period</div>${planPie(O)}</div>
+    </div>
+    <div class="panel attn">
+      <div class="panel__h"><h3>Needs attention</h3>${attn.length ? `<span class="attn__count">${attn.length}</span>` : ''}</div>
+      <div class="attn__list">${shown.length ? shown.map(attnRow).join('') : '<div class="attn__clear">✓ You\'re all caught up. Nothing needs your attention right now.</div>'}</div>
     </div>`;
   $('#dperiod').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (b) { DPERIOD = b.dataset.p; renderDashboard(); } });
+  $('#sec-dashboard').querySelectorAll('[data-attn-ref]').forEach(el => el.onclick = () => openOrder(el.dataset.attnRef));
+  $('#sec-dashboard').querySelectorAll('[data-attn-crm]').forEach(el => el.onclick = () => navTo('crm'));
 }
 
 /* ----- projects ----- */
@@ -1074,7 +1107,7 @@ function briefHTML() {
 }
 function renderSideMe() {
   const el = $('#sideMe'); if (!el || !ME) return;
-  el.innerHTML = `${avatar(ME, 'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name || ME.email.split('@')[0])}</span><span class="rolebadge ${ME.is_owner ? 'owner' : 'talent'}">${ME.is_owner ? 'Owner' : 'Talent'}</span></div>${meActions('sideLogout')}`;
+  el.innerHTML = `${avatarRole(ME, 'sm')}<div class="side__me-info"><span class="side__me-name" title="${esc(ME.name || ME.email)}">${esc(ME.name || ME.email.split('@')[0])}</span></div>${meActions('sideLogout')}`;
   wireAcct(el, 'sideLogout');
 }
 

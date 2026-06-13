@@ -107,7 +107,7 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 /* ============================================================================
    OWNER ADMIN SHELL (sidebar nav + main; lazy-loaded owner bundle)
    ========================================================================== */
-.adminapp{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:236px minmax(0,1fr);background:#fff}
+.adminapp{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:264px minmax(0,1fr);background:#fff}
 .adminapp.hide{display:none}
 .aside{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line)}
 .aside__brand{height:64px;display:flex;align-items:center;justify-content:flex-start;padding:0 20px;border-bottom:1px solid var(--line);flex-shrink:0}
@@ -126,7 +126,14 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .sechead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}
 .sechead h2{font-size:22px;font-weight:800;letter-spacing:-.025em}
 .sechead .muted{color:var(--grey);font-weight:600;font-size:14px}
-@media(max-width:920px){.adminapp{grid-template-columns:200px minmax(0,1fr)}}
+@media(max-width:920px){.adminapp{grid-template-columns:220px minmax(0,1fr)}}
+/* avatar with a role bubble (owner crown / talent spark), bottom-right corner */
+.avrole{position:relative;display:inline-block;flex-shrink:0;line-height:0}
+.avrole__ph{display:block}
+.avrole__b{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;border:2px solid #fff;color:#fff;box-shadow:0 2px 5px rgba(0,0,0,.18)}
+.avrole__b svg{width:9px;height:9px}
+.avrole__b--owner{background:var(--grad)}
+.avrole__b--talent{background:var(--c-prog)}
 
 /* period selector */
 .period{display:inline-flex;background:var(--soft);border-radius:100px;padding:3px}
@@ -134,19 +141,39 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .period button:hover{transform:none;color:var(--ink)}
 .period button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.10)}
 
-/* KPI cards */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;gap:14px;align-items:flex-start}
-.kpi__ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(248,80,0,.1);flex-shrink:0}
-.kpi__ic svg{width:22px;height:22px}
-.kpi__l{font-size:13.5px;font-weight:600;color:var(--grey)}
-.kpi__v{font-size:27px;font-weight:900;letter-spacing:-.03em;margin-top:5px;line-height:1}
-.kpi__s{font-size:12.5px;color:var(--grey);font-weight:600;margin-top:5px}
-.panels{display:grid;grid-template-columns:1.45fr 1fr;gap:16px}
+/* KPI strip (flat, hairline-separated) */
+.kstrip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.kcell{padding:16px 20px;border-left:1px solid var(--line)}
+.kcell:first-child{border-left:none}
+.kcell__l{font-size:12px;font-weight:700;color:var(--grey)}
+.kcell__v{font-size:28px;font-weight:800;letter-spacing:-.035em;margin-top:6px;line-height:1}
+.kcell__s{font-size:12px;color:var(--faint);font-weight:600;margin-top:6px}
+@media(max-width:780px){.kstrip{grid-template-columns:repeat(2,1fr)}.kcell:nth-child(3){border-left:none}}
+.panels{display:grid;grid-template-columns:1.45fr 1fr;gap:16px;margin-bottom:16px}
 @media(max-width:980px){.panels{grid-template-columns:1fr}}
-.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
-.panel h3{font-size:16px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.panel__h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.panel__big{font-size:20px;font-weight:800;letter-spacing:-.03em}
+.panel h3{font-size:15px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
 .panel .ph-sub{font-size:12.5px;color:var(--grey);font-weight:600;margin-bottom:14px}
+
+/* needs-attention feed */
+.attn .attn__list{display:flex;flex-direction:column;margin:2px -8px -6px}
+.attn__row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;border-radius:10px;padding:11px 8px;cursor:pointer;font-family:inherit}
+.attn__row:hover{transform:none;background:var(--wash)}
+.attn__row+.attn__row{border-top:1px solid var(--line-2)}
+.attn__dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--faint)}
+.attn__dot.s0{background:var(--c-todo)}.attn__dot.s1{background:var(--wait)}.attn__dot.s2{background:var(--orange)}.attn__dot.s3{background:var(--c-prog)}
+.attn__main{display:flex;align-items:center;gap:9px;min-width:0;margin-right:auto}
+.attn__who{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attn__tag{font-size:10.5px;font-weight:800;letter-spacing:.02em;padding:3px 8px;border-radius:100px;flex-shrink:0;background:var(--soft);color:var(--grey)}
+.attn__tag.s0{background:rgba(220,38,38,.10);color:var(--c-todo)}.attn__tag.s1{background:var(--waitbg);color:var(--wait)}.attn__tag.s2{background:rgba(248,80,0,.12);color:#c64600}.attn__tag.s3{background:rgba(37,99,235,.10);color:var(--c-prog)}
+.attn__meta{font-size:12.5px;color:var(--grey);font-weight:600;white-space:nowrap;flex-shrink:0}
+.attn__go{color:var(--faint);display:grid;place-items:center;flex-shrink:0}
+.attn__go svg{width:16px;height:16px}
+.attn__row:hover .attn__go{color:var(--ink-2)}
+.attn__count{font-size:12px;font-weight:800;color:var(--grey);background:var(--soft);border-radius:100px;padding:2px 10px}
+.attn__clear{padding:18px 8px;color:var(--grey);font-size:13.5px;font-weight:600}
 
 /* charts */
 .linec{width:100%;height:auto;display:block;overflow:visible}
@@ -665,17 +692,17 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .swi__ref{color:var(--grey);font-weight:700;font-size:12px}
 /* talent / owner profile pinned at the bottom of a sidebar */
 .side__listhead{padding:8px 18px 9px;font-size:13px;font-weight:700;color:var(--grey)}
-.side__me{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+.side__me{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
 .side__me .avatar.sm{width:36px;height:36px;font-size:13px;flex-shrink:0}
 .side__me-info{display:flex;flex-direction:column;gap:3px;min-width:0;margin-right:auto}
-.side__me-name{font-size:13.5px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.side__me-name{font-size:13px;font-weight:800;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
 .side__me .rolebadge{align-self:flex-start;font-size:9px;padding:2px 8px}
 .aside__foot .side__me{padding:12px 4px 0;border:none}
 /* account switcher (owner) + impersonation bar */
-.acctsw{position:relative;display:flex;align-items:center;gap:6px;flex-shrink:0}
-.acctsw__ic{width:30px;height:30px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
+.acctsw{position:relative;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.acctsw__ic{width:28px;height:28px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
 .acctsw__ic:hover{color:var(--orange);border-color:var(--orange)}
-.acctsw__ic svg{width:15px;height:15px}
+.acctsw__ic svg{width:14px;height:14px}
 .acctsw__menu{position:absolute;bottom:calc(100% + 8px);right:0;z-index:40;background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:0 18px 44px rgba(0,0,0,.18);padding:6px;min-width:212px;max-height:50vh;overflow-y:auto}
 .acctsw__menu.hide{display:none}
 .acctsw__row{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;border-radius:9px;padding:8px 9px;cursor:pointer;font-family:inherit}
