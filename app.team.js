@@ -321,7 +321,7 @@ function renderReset() {
     <h1 style="font-size:22px;font-weight:900;letter-spacing:-.03em;margin-bottom:6px">Choose a password</h1>
     <p>Set a new password to finish setting up your account.</p>
     <form id="resetForm">
-      <div class="field"><label>New password</label><input id="resetPass" type="password" placeholder="At least 6 characters" autocomplete="new-password" required></div>
+      <div class="field"><label>New password</label><input id="resetPass" type="password" placeholder="Min 8 characters, 1 uppercase" autocomplete="new-password" required></div>
       <button class="b-grad" id="resetBtn" style="width:100%" type="submit">Save &amp; continue →</button>
       <div class="err" id="resetErr"></div>
     </form>
@@ -329,7 +329,7 @@ function renderReset() {
   setTimeout(() => $('#resetPass').focus(), 30);
   $('#resetForm').addEventListener('submit', async e => {
     e.preventDefault(); const p = $('#resetPass').value; $('#resetErr').textContent = '';
-    if (p.length < 6) { $('#resetErr').textContent = 'Password must be at least 6 characters.'; return; }
+    const pe = pwError(p); if (pe) { $('#resetErr').textContent = pe; return; }
     const btn = $('#resetBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
     const r = await api('/api/admin', { action: 'update_me', password: p });
     if (r.ok) { mount(R, CTX); }
@@ -426,6 +426,12 @@ function renderAdminMe() {
 const PF_DAYS = [['mon', 'Monday'], ['tue', 'Tuesday'], ['wed', 'Wednesday'], ['thu', 'Thursday'], ['fri', 'Friday'], ['sat', 'Saturday'], ['sun', 'Sunday']];
 function tzList() { try { const z = Intl.supportedValuesOf('timeZone'); if (z && z.length) return z; } catch (_) {} return ['UTC', 'Europe/Paris', 'Europe/London', 'Europe/Madrid', 'America/New_York', 'America/Chicago', 'America/Los_Angeles', 'America/Sao_Paulo', 'Asia/Dubai', 'Asia/Tokyo', 'Australia/Sydney']; }
 function guessTz() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (_) { return ''; } }
+// Password policy: at least 8 chars and one uppercase letter. Returns '' if ok.
+function pwError(p) {
+  if (!p || p.length < 8) return 'Password must be at least 8 characters.';
+  if (!/[A-Z]/.test(p)) return 'Password must include at least one uppercase letter.';
+  return '';
+}
 let PF_PHOTO; // undefined = keep current photo
 function openProfile() { PF_PHOTO = undefined; renderProfileForm(); $('#profileModal').classList.remove('hide'); }
 function renderProfileForm() {
@@ -444,7 +450,7 @@ function renderProfileForm() {
       <label class="pfphoto" title="Change photo">${photo ? `<img src="${esc(photo)}" alt="">` : avatar(ME, 'lg')}<span class="pfphoto__edit">Change</span><input type="file" accept="image/*" hidden data-pf-photo></label>
       <div class="pffields">
         <div class="field"><label>Name</label><input id="pfName" value="${esc(ME.name || '')}" placeholder="Your name"></div>
-        <div class="field"><label>New password <span class="field__opt">leave blank to keep</span></label><input id="pfPass" type="password" autocomplete="new-password" placeholder="••••••"></div>
+        <div class="field"><label>New password <span class="field__opt">leave blank to keep · min 8 chars, 1 uppercase</span></label><input id="pfPass" type="password" autocomplete="new-password" placeholder="••••••"></div>
       </div>
     </div>
     <div class="field"><label>Time zone</label><select id="pfTz">${tzOpts}</select></div>
@@ -463,7 +469,7 @@ async function saveProfile() {
   body.querySelectorAll('.pfday').forEach(row => { const on = row.querySelector('[data-on]').checked;
     availability[row.dataset.day] = { on, start: row.querySelector('[data-start]').value || '09:00', end: row.querySelector('[data-end]').value || '17:00' }; });
   const name = $('#pfName').value.trim(), pass = $('#pfPass').value, timezone = $('#pfTz').value;
-  if (pass && pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if (pass) { const pe = pwError(pass); if (pe) { errEl.textContent = pe; return; } }
   const payload = { action: 'update_me', name, timezone, availability };
   if (pass) payload.password = pass;
   if (PF_PHOTO !== undefined) payload.photo = PF_PHOTO;
@@ -1566,6 +1572,7 @@ function bindTeam() {
     const email = b.closest('.tcard').dataset.talent; const t = TALENTS.find(x => x.email === email);
     const name = prompt('Name', t.name || ''); if (name === null) return;
     const pass = prompt('New password (leave blank to keep current):', ''); if (pass === null) return;
+    if (pass) { const pe = pwError(pass); if (pe) { alert(pe); return; } }
     const r = await api('/api/admin', { action: 'update_talent', email, name, ...(pass ? { password: pass } : {}) });
     if (!r.ok) { alert('Error: ' + (r.error || '')); return; }
     TALENTS = r.talents || TALENTS; renderTeam();

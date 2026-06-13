@@ -59,8 +59,12 @@ export default async function handler(req, res) {
       return res.json({ ok: true, orders, leads, talents: await listTalents() });
     }
 
+    // Password policy for user-chosen passwords: 8+ chars and at least one uppercase.
+    const weakPw = p => p && (p.length < 8 || !/[A-Z]/.test(p));
+
     /* ----- self profile (any talent) ----- */
     if (action === 'update_me') {
+      if (weakPw(b.password)) return res.status(400).json({ ok: false, error: 'weak_password' });
       const r = await updateTalent({ email: me.email, name: b.name, photo: b.photo, password: b.password, availability: b.availability, timezone: b.timezone });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
       return res.json({ ok: true, me: { ...r.talent, is_owner: isOwner } });
@@ -88,6 +92,7 @@ export default async function handler(req, res) {
     }
     if (action === 'update_talent') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (weakPw(b.password)) return res.status(400).json({ ok: false, error: 'weak_password' });
       const r = await updateTalent({ email: b.email, name: b.name, password: b.password, is_owner: b.is_owner, photo: b.photo });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
       return res.json({ ok: true, talents: await listTalents() });
