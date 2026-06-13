@@ -594,9 +594,46 @@ function sortProjects(list) {
   else arr.sort((a, b) => deadlineMs(a, a.items) - deadlineMs(b, b.items));
   return arr;
 }
-function assignSelect(o) {
-  const opts = (ADMIN.talents || []).filter(t => !t.is_owner).map(t => `<option value="${esc(t.email)}" ${(o.talent_email || '').toLowerCase() === (t.email || '').toLowerCase() ? 'selected' : ''}>${esc(t.name || t.email)}</option>`).join('');
-  return `<select class="passign ${o.talent_email ? '' : 'passign--none'}" data-assign="${esc(o.ref)}"><option value="">Unassigned</option>${opts}</select>`;
+const PLUS_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+const CHECK_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg>';
+// Compact reassign control: assigned talent's avatar + name, or a quiet "Assign"
+// pill when unassigned. Clicking opens a popover (openAssignMenu) to reassign.
+function assignChip(o) {
+  const t = talentObj(o.talent_email);
+  if (t) return `<button class="who" type="button" data-stop data-assign-btn="${esc(o.ref)}" title="Reassign talent"><span class="who__av">${avatar(t, 'avatar--xs')}</span><span class="who__n">${esc(t.name || t.email)}</span></button>`;
+  return `<button class="who who--none" type="button" data-stop data-assign-btn="${esc(o.ref)}" title="Assign talent">${PLUS_IC}<span class="who__n">Assign</span></button>`;
+}
+function closeAssignMenu() {
+  const m = document.getElementById('assignMenu'); if (m) m.remove();
+  document.removeEventListener('click', onAssignOutside, true);
+  document.removeEventListener('keydown', onAssignKey);
+}
+function onAssignOutside(e) { if (!e.target.closest('#assignMenu') && !e.target.closest('[data-assign-btn]')) closeAssignMenu(); }
+function onAssignKey(e) { if (e.key === 'Escape') closeAssignMenu(); }
+function openAssignMenu(ref, anchor) {
+  const existing = document.getElementById('assignMenu');
+  const wasSame = existing && existing.dataset.ref === ref;
+  closeAssignMenu();
+  if (wasSame) return; // second click on the same chip closes it
+  const o = (ADMIN.orders || []).find(x => x.ref === ref); if (!o) return;
+  const cur = (o.talent_email || '').toLowerCase();
+  const item = (av, name, val, on) => `<button class="amenu__i ${on ? 'on' : ''}" type="button" data-pick="${esc(val)}">${av}<span class="amenu__n">${esc(name)}</span>${on ? CHECK_IC : ''}</button>`;
+  const rows = (ADMIN.talents || []).filter(t => !t.is_owner)
+    .map(t => item(avatar(t, 'avatar--xs'), t.name || t.email, t.email, cur === (t.email || '').toLowerCase())).join('');
+  const m = document.createElement('div');
+  m.className = 'amenu'; m.id = 'assignMenu'; m.dataset.ref = ref;
+  m.innerHTML = `<div class="amenu__h">Assign to</div>${rows}${item(`<span class="amenu__none">${PLUS_IC}</span>`, 'Unassigned', '', !cur)}`;
+  document.body.appendChild(m);
+  const r = anchor.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  let left = r.left; if (left + w > window.innerWidth - 8) left = window.innerWidth - 8 - w;
+  let top = r.bottom + 6; if (top + h > window.innerHeight - 8) top = r.top - 6 - h;
+  m.style.left = Math.max(8, left) + 'px'; m.style.top = Math.max(8, top) + 'px';
+  m.querySelectorAll('[data-pick]').forEach(b => b.onclick = async () => {
+    const val = b.dataset.pick; closeAssignMenu();
+    const res = await api('/api/admin', { action: 'assign_order', ref, talentEmail: val || null });
+    if (res.ok) { ADMIN.orders = res.orders || ADMIN.orders; ORDERS = ADMIN.orders; renderProjectsBody(); }
+  });
+  setTimeout(() => { document.addEventListener('click', onAssignOutside, true); document.addEventListener('keydown', onAssignKey); }, 0);
 }
 function kindChips(kinds) {
   const map = [['carousel', kinds && kinds.carousel, 'deck'], ['story', kinds && kinds.story, 'story'], ['branding', kinds && kinds.branding, 'branding']];
@@ -613,7 +650,7 @@ function projCard(o) {
     ${chips ? `<div class="kc__kinds">${chips}</div>` : ''}
     ${total ? `<div class="kc__prog"><div class="kc__bar"><i style="width:${pct}%"></i></div><span class="kc__progt">${line}</span></div>` : ''}
     <div class="kc__foot">${dlBadge(o, o.kinds)}<span class="kc__items">${total} element${total === 1 ? '' : 's'}</span></div>
-    <div class="kc__assign" data-stop>${assignSelect(o)}</div>
+    <div class="kc__assign" data-stop>${assignChip(o)}</div>
   </div>`;
 }
 const EDIT_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1L20 7.5a2 2 0 0 0-2.8-2.8L4.8 17.5 4 20z"/></svg>';
@@ -623,12 +660,13 @@ function projRow(o) {
     <td>${esc(planName(o.plan) || '-')}</td>
     <td>${o.billing === 'sub' ? 'Subscription' : 'One-time'}</td>
     <td class="amoney">${fmtMoney(o.amount)}</td>
-    <td data-stop>${assignSelect(o)}</td>
+    <td data-stop>${assignChip(o)}</td>
     <td>${dlBadge(o, o.kinds)}</td>
     <td>${spill(o.state)}</td>
     <td data-stop><button class="iconbtn" data-edit="${esc(o.ref)}" title="Edit project">${EDIT_IC}</button></td></tr>`;
 }
 function renderProjectsBody() {
+  closeAssignMenu();
   const list = sortProjects(filteredProjects()), body = $('#pbody');
   if (PF.view === 'list') {
     const rows = list.length ? list.map(projRow).join('') : '<tr><td colspan="9" class="emptyrow">No projects.</td></tr>';
@@ -643,10 +681,7 @@ function openEditOrder(ref) { const o = (ADMIN.orders || []).find(x => x.ref ===
 function bindProjects() {
   $('#pbody').querySelectorAll('[data-card]').forEach(el => el.onclick = e => { if (e.target.closest('[data-stop]')) return; openOrder(el.dataset.card); });
   $('#pbody').querySelectorAll('tr[data-row]').forEach(el => el.onclick = e => { if (e.target.closest('[data-stop]')) return; openOrder(el.dataset.row); });
-  $('#pbody').querySelectorAll('[data-assign]').forEach(s => s.onchange = async ev => { ev.stopPropagation();
-    const r = await api('/api/admin', { action: 'assign_order', ref: s.dataset.assign, talentEmail: s.value || null });
-    if (r.ok) { ADMIN.orders = r.orders || ADMIN.orders; ORDERS = ADMIN.orders; renderProjectsBody(); }
-  });
+  $('#pbody').querySelectorAll('[data-assign-btn]').forEach(b => b.onclick = e => { e.stopPropagation(); openAssignMenu(b.dataset.assignBtn, b); });
   $('#pbody').querySelectorAll('[data-edit]').forEach(b => b.onclick = e => { e.stopPropagation(); openEditOrder(b.dataset.edit); });
 }
 function renderProjectsSection() {
