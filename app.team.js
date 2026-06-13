@@ -341,7 +341,7 @@ const ACCT_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 function impersonating() { return !!localStorage.getItem('brasero_owner_session'); }
 function ownerTok() { return localStorage.getItem('brasero_owner_session') || ((ME && ME.is_owner) ? TOKEN : ''); }
 function showSwitcher() { return !!ownerTok(); }
-function clearNav() { ['brasero_last_ref', 'brasero_nav', 'brasero_last_tab'].forEach(k => { try { localStorage.removeItem(k); } catch (_) {} }); }
+function clearNav() { ['brasero_last_ref', 'brasero_nav', 'brasero_last_tab', 'brasero_open_tabs'].forEach(k => { try { localStorage.removeItem(k); } catch (_) {} }); }
 function meActions(logoutId) {
   const sw = showSwitcher() ? `<button type="button" class="acctsw__ic" data-acct-menu title="Switch account">${ACCT_UP}</button>` : '';
   return `<div class="acctsw">${sw}<button type="button" class="acctsw__ic" id="${logoutId}" title="Sign out">${ACCT_OUT}</button><div class="acctsw__menu hide" data-acct-list></div></div>`;
@@ -906,9 +906,19 @@ async function openOrder(ref, restore) {
   renderSideMe();
   SELDECK = null; CAT = null;
   BRIEF = d.brief || null; CURORDER = d.order || null;
-  TABS = [{ kind: 'brief' }]; ATAB = 'brief';
-  renderBoard(d.decks || []);
-  if (restore) { const tab = localStorage.getItem('brasero_last_tab') || ''; if (tab.indexOf('deck:') === 0) { const id = tab.slice(5); if ((d.decks || []).some(x => String(x.id) === id)) openTab({ kind: 'deck', id }); } }
+  const decks = d.decks || [];
+  // On a refresh, reopen every tab that was open before, not just the active one.
+  let savedKeys = null, savedActive = '';
+  if (restore) {
+    try { savedKeys = JSON.parse(localStorage.getItem('brasero_open_tabs') || 'null'); } catch (_) {}
+    savedActive = localStorage.getItem('brasero_last_tab') || '';
+  }
+  TABS = [{ kind: 'brief' }];
+  if (Array.isArray(savedKeys)) savedKeys.forEach(k => {
+    if (k && k.indexOf('deck:') === 0) { const id = k.slice(5); if (decks.some(x => String(x.id) === id) && !TABS.some(t => tabKey(t) === k)) TABS.push({ kind: 'deck', id }); }
+  });
+  ATAB = (savedActive && TABS.some(t => tabKey(t) === savedActive)) ? savedActive : 'brief';
+  renderBoard(decks);
   chatAsset = ''; renderExpert();
   MESSAGES = d.messages || []; renderMessages(); renderAssetCur(); setUnread(false); startMsgPoll();
 }
@@ -1055,7 +1065,7 @@ let TABS = [], ATAB = null;
 const BRIEF_TAB_ICON = `<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>`;
 function tabKey(t) { return t.kind === 'brief' ? 'brief' : 'deck:' + t.id; }
 function renderTabs() {
-  try { localStorage.setItem('brasero_last_tab', ATAB || 'brief'); } catch (e) {}
+  try { localStorage.setItem('brasero_last_tab', ATAB || 'brief'); localStorage.setItem('brasero_open_tabs', JSON.stringify(TABS.map(tabKey))); } catch (e) {}
   const el = $('#boardTabs'); if (!el) return;
   if (!TABS.length) { el.classList.add('hide'); el.innerHTML = ''; return; }
   el.classList.remove('hide');
