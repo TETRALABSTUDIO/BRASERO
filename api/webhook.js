@@ -1,4 +1,4 @@
-import { stripe, send, sendTo, markPaid, populateOrderElements, PLANS, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, siteUrl, upsertClient } from './_lib.js';
+import { stripe, send, sendTo, markPaid, populateOrderElements, PLANS, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, siteUrl, clientMagicLink, upsertClient } from './_lib.js';
 
 // Stripe needs the raw request body to verify the signature.
 export const config = { api: { bodyParser: false } };
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         const r = m.addon_item ? await addItemsToOrder(m.addon_ref, m.addon_item) : await addDecksToOrder(m.addon_ref, m.plan);
         const label = m.addon_item ? (r.name || m.addon_item) : `${PLANS[m.plan]?.name || m.plan} pack`;
         const to = s.customer_email || m.email;
-        const trackUrl = to ? `${siteUrl(req)}/track.html?ref=${encodeURIComponent(m.addon_ref)}&email=${encodeURIComponent(to)}` : '';
+        const trackUrl = to ? clientMagicLink(siteUrl(req), to, m.addon_ref) : '';
         await sendTo(to, 'Your new Brasero items are on the way 🔥', addonClientEmail({
           name: m.name, planName: label, count: r.created || 0, ref: m.addon_ref, trackUrl,
         }));
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     // Confirmation email to the customer
     try {
       const to = s.customer_email || m.email;
-      const trackUrl = to ? `${siteUrl(req)}/track.html?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(to)}` : '';
+      const trackUrl = to ? clientMagicLink(siteUrl(req), to, ref) : '';
       await sendTo(to, 'Your Brasero order is confirmed 🎉', clientOrderEmail({
         name: m.name, planName: PLANS[m.plan]?.name || m.plan, billing: m.billing,
         amountCents: s.amount_total, handle: m.handle, ref, trackUrl,

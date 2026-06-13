@@ -1,6 +1,6 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
   adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
-  assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl,
+  assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl, clientMagicLink,
   signToken, randomPassword, tempPassword, PLANS, ADDONS, amountFor, addonKeys, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, deleteMessage, messageNotifyEmail } from './_lib.js';
 
@@ -111,7 +111,7 @@ export default async function handler(req, res) {
             ref: order ? (order.ref || orderRef(order.stripe_session_id)) : b.ref,
             clientName: order?.name,
             planName: order?.plan ? (PLANS[order.plan]?.name || order.plan) : '',
-            panelUrl: `${siteUrl(req)}/panel.html`,
+            panelUrl: `${siteUrl(req)}/app.html`,
           }));
         } catch (e) { console.error('assign email', e); }
       }
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
           const talent = await getTalentByEmail(b.talentEmail);
           await sendTo(b.talentEmail, '🚀 New project assigned to you', talentAssignedEmail({
             name: talent?.name, ref: r.ref, clientName: b.name,
-            planName: b.plan ? (PLANS[b.plan]?.name || b.plan) : '', panelUrl: `${siteUrl(req)}/panel.html`,
+            planName: b.plan ? (PLANS[b.plan]?.name || b.plan) : '', panelUrl: `${siteUrl(req)}/app.html`,
           }));
         } catch (e) { console.error('assign email', e); }
       }
@@ -171,7 +171,7 @@ export default async function handler(req, res) {
       // Notify the client by email (they reply from their tracker).
       try {
         if (order.email) {
-          const trackUrl = `${siteUrl(req)}/track.html?ref=${encodeURIComponent(order.ref || '')}&email=${encodeURIComponent(order.email)}`;
+          const trackUrl = clientMagicLink(siteUrl(req), order.email, order.ref || '');
           await sendTo(order.email, `💬 A message about your Brasero order #${order.ref || ''}`, messageNotifyEmail({
             name: order.name, ref: order.ref, fromName: me.name || 'Brasero studio', body: notifyBody, about: dk ? dk.title : '',
             ctaUrl: trackUrl, ctaLabel: 'Open the conversation →',
@@ -295,7 +295,7 @@ export default async function handler(req, res) {
       // Email the customer that they have something to validate.
       if (deckOrder.email) {
         const ref = deckOrder.ref || orderRef(deckOrder.stripe_session_id);
-        const url = `${siteUrl(req)}/track.html?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(deckOrder.email)}`;
+        const url = clientMagicLink(siteUrl(req), deckOrder.email, ref);
         try {
           await sendTo(deckOrder.email,
             isScript ? 'Your Brasero script is ready to review 👀' : 'Your Brasero design is ready to review 👀',

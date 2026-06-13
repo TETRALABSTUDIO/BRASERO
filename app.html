@@ -83,11 +83,13 @@ async function consumeMagic() {
   const params = new URLSearchParams(location.search);
   const magic = params.get('magic');
   if (!magic) return;
+  const order = params.get('order');   // optional deep-link to a specific order
   app.innerHTML = `<div class="authwrap" style="text-align:center">${LOGO}<p>Signing you in…</p></div>`;
   const d = await post('/api/auth', { action: 'verify_magic', token: magic });
   if (d && d.ok && d.token) setToken(d.token);
-  // Drop the token from the URL either way (avoid replay / leaks in history).
-  history.replaceState(null, '', 'app.html');
+  // Drop the token from the URL (avoid replay / leaks in history), but keep the
+  // order deep-link so the role bundle can open it.
+  history.replaceState(null, '', 'app.html' + (order ? '?order=' + encodeURIComponent(order) : ''));
   if (!d || !d.ok) renderLogin('That sign-in link is invalid or expired. Request a new one below.');
 }
 
@@ -109,7 +111,8 @@ async function route() {
 }
 
 /* 3. Login screen — client magic link by default, team password on toggle. */
-function renderLogin(error) {
+function renderLogin(error, prefillEmail) {
+  const pre = (prefillEmail || '').replace(/"/g, '&quot;');
   app.innerHTML = `
     <div class="authwrap">
       ${LOGO}
@@ -118,7 +121,7 @@ function renderLogin(error) {
       <form id="magicForm">
         <div class="field">
           <label for="mEmail">Email</label>
-          <input id="mEmail" type="email" autocomplete="email" placeholder="you@email.com" required>
+          <input id="mEmail" type="email" autocomplete="email" placeholder="you@email.com" value="${pre}" required>
         </div>
         <button class="btn btn--grad" style="width:100%" type="submit" id="mBtn">Email me a sign-in link</button>
         <div class="err" id="mErr">${error ? error : ''}</div>
@@ -174,8 +177,13 @@ function renderLogin(error) {
 /* boot */
 (async () => {
   await consumeMagic();
-  if (getToken()) route();
-  else if (!app.querySelector('.authwrap')) renderLogin();
+  if (getToken()) return route();
+  if (app.querySelector('.authwrap')) return;   // consumeMagic already showed login (bad token)
+  // Legacy track.html?ref&email links land here as ?order&email — prefill the
+  // email and point them at a fresh sign-in link for that order.
+  const sp = new URLSearchParams(location.search);
+  const ref = sp.get('order') || '', email = sp.get('email') || '';
+  renderLogin(ref ? `Sign in to open your order #${ref}. We'll email you a secure link.` : '', email);
 })();
 </script>
 </body>

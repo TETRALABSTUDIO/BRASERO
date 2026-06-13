@@ -1020,3 +1020,12 @@ export function messageNotifyEmail({ name, ref, fromName, body, about, ctaUrl, c
 export function siteUrl(req) {
   return (process.env.SITE_URL || `https://${req.headers.host}`).replace(/\/+$/, '');
 }
+
+// Passwordless deep link into a client's space for transactional emails
+// (order confirmed, add-on, new message, deck-to-review). Signs a magic token
+// so the client lands authenticated; an optional ref deep-links to that order.
+// Replaces the legacy track.html?ref&email links (retired in Phase 5).
+export function clientMagicLink(base, email, ref, days = 30) {
+  const token = signToken({ email: String(email || '').toLowerCase(), magic: true }, days);
+  return `${base}/app.html?magic=${encodeURIComponent(token)}${ref ? `&order=${encodeURIComponent(ref)}` : ''}`;
+}

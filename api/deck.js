@@ -1,25 +1,20 @@
-import { findOrderByRefEmail, findOrderByRef, decksForOrder, getDeck, patchDeck, publicOrder, send,
+import { findOrderByRef, decksForOrder, getDeck, patchDeck, publicOrder, send,
   sendTo, getTalentByEmail, talentClientActionEmail, talentProjectDoneEmail, siteUrl,
   clientFromAuth, ownsOrder } from './_lib.js';
 
-// Customer-driven deck actions, authenticated EITHER by a client session (Bearer
-// token) or legacy ref + email each call.
+// Customer-driven deck actions, authenticated by a client session (Bearer token).
 //   action = validate_script | validate_design | request_revision
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
-    const { ref = '', email = '', deckId = '', action = '', script = '', note = '' } = req.body || {};
+    const { ref = '', deckId = '', action = '', script = '', note = '' } = req.body || {};
     if (!ref || !deckId || !action) return res.status(400).json({ ok: false, error: 'missing' });
 
     const client = clientFromAuth(req);
-    let order = null;
-    if (client) {
-      const o = await findOrderByRef(ref);
-      if (ownsOrder(o, client)) order = o;
-    } else if (email) {
-      order = await findOrderByRefEmail(ref, email);
-    }
-    if (!order) return res.status(client ? 403 : 404).json({ ok: false, error: 'not_found' });
+    if (!client) return res.status(401).json({ ok: false, error: 'unauthorized' });
+    const o = await findOrderByRef(ref);
+    const order = ownsOrder(o, client) ? o : null;
+    if (!order) return res.status(403).json({ ok: false, error: 'not_found' });
 
     const deck = await getDeck(deckId);
     if (!deck || deck.order_id !== order.id) return res.status(403).json({ ok: false, error: 'forbidden' });
@@ -59,7 +54,7 @@ export default async function handler(req, res) {
     try {
       if (order.talent_email) {
         const talent = await getTalentByEmail(order.talent_email);
-        const panelUrl = `${siteUrl(req)}/panel.html`;
+        const panelUrl = `${siteUrl(req)}/app.html`;
         const kind = action === 'validate_script' ? 'approved_script' : action === 'validate_design' ? 'approved_design' : 'revision';
         const subj = kind === 'approved_script' ? '✅ Your client approved a script'
           : kind === 'approved_design' ? '🎉 Your client approved a design'

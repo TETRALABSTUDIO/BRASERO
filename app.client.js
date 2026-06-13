@@ -119,7 +119,15 @@ export async function mount(root, ctx) {
   ME = ctx.session || {};
   document.body.classList.remove('appmode');
   bindGlobalOnce();
-  await renderHome();
+  // Deep link from a transactional email / add-on checkout return (?order=REF):
+  // open that order directly (openOrder falls back to the list if it's invalid).
+  const deepRef = new URLSearchParams(location.search).get('order');
+  if (deepRef) {
+    history.replaceState(null, '', 'app.html');
+    await openOrder(deepRef);
+  } else {
+    await renderHome();
+  }
 }
 
 /* ---- document/root delegated listeners (lightbox, asset menu) attached once ---- */

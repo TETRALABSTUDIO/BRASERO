@@ -1,20 +1,20 @@
-import { findOrderByRefEmail, findOrderByRef, ordersForClient, decksForOrder, orderProgress, orderRef,
+import { findOrderByRef, ordersForClient, decksForOrder, orderProgress, orderRef,
   publicOrder, getDeck, listMessages, addMessage, getTalentByEmail, sendTo, send,
   messageNotifyEmail, siteUrl, clientFromAuth, ownsOrder } from './_lib.js';
 
-// POST { action, ... } authenticated EITHER by a client session (Bearer token →
-// aggregates all the client's orders) OR legacy { ref, email } (single order).
+// POST { action, ... } authenticated by a client session (Bearer token). The
+// magic-link session aggregates every order the client owns.
 //   my_orders                          → the signed-in client's orders (list)
 //   (none) | messages | send_message   → one order's board + thread
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
-    const { ref = '', email = '', action = '', body = '', deckId = '', images = [] } = req.body || {};
+    const { ref = '', action = '', body = '', deckId = '', images = [] } = req.body || {};
     const client = clientFromAuth(req);
+    if (!client) return res.status(401).json({ ok: false, error: 'unauthorized' });
 
     // Client space: every paid order the signed-in client owns, with a progress summary.
     if (action === 'my_orders') {
-      if (!client) return res.status(401).json({ ok: false, error: 'unauthorized' });
       const orders = await ordersForClient(client);
       const list = await Promise.all(orders.map(async (o) => {
         const decks = await decksForOrder(o.id);
@@ -30,15 +30,13 @@ export default async function handler(req, res) {
       return res.json({ ok: true, orders: list });
     }
 
-    // Resolve the single order being viewed/acted on.
+    // Resolve the single order being viewed/acted on (client can only reach their own).
     let order = null;
-    if (client && ref) {
+    if (ref) {
       const o = await findOrderByRef(ref);
-      if (ownsOrder(o, client)) order = o;          // a client can only reach their own orders
-    } else if (ref && email) {
-      order = await findOrderByRefEmail(ref, email); // legacy ref+email (track.html during transition)
+      if (ownsOrder(o, client)) order = o;
     }
-    if (!order) return res.status(client ? 403 : 404).json({ ok: false, error: 'not_found' });
+    if (!order) return res.status(403).json({ ok: false, error: 'not_found' });
 
     if (action === 'messages') {
       return res.json({ ok: true, messages: await listMessages(order.id) });
@@ -61,7 +59,7 @@ export default async function handler(req, res) {
           const talent = await getTalentByEmail(order.talent_email);
           await sendTo(order.talent_email, `💬 New message from ${order.name || 'your client'}`, messageNotifyEmail({
             name: talent?.name, ref: order.ref, fromName: order.name || 'Client', body: notifyBody, about,
-            ctaUrl: `${siteUrl(req)}/panel.html`, ctaLabel: 'Open the panel →',
+            ctaUrl: `${siteUrl(req)}/app.html`, ctaLabel: 'Open the panel →',
           }));
         }
       } catch (e) { console.error('msg notify', e); }

@@ -9,14 +9,14 @@ export default async function handler(req, res) {
     // Tracker upsell: add one catalogue item (carousels / stories / branding) to an existing order.
     if (addon_ref && addon_item && ITEMS[addon_item]) {
       const it = ITEMS[addon_item];
-      const ar = encodeURIComponent(addon_ref), em = encodeURIComponent(email || '');
+      const ar = encodeURIComponent(addon_ref);
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         customer_email: email || undefined,
         allow_promotion_codes: true,          // show the "Add promotion code" field
         line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero — ${it.name}` } } }],
-        success_url: `${SITE}/track.html?ref=${ar}&email=${em}&addon=1`,
-        cancel_url: `${SITE}/track.html?ref=${ar}&email=${em}`,
+        success_url: `${SITE}/app.html?order=${ar}`,
+        cancel_url: `${SITE}/app.html?order=${ar}`,
         metadata: { addon_ref, addon_item, email: email || '' },
       });
       return res.json({ url: session.url });
@@ -50,17 +50,17 @@ export default async function handler(req, res) {
 
     line_items = [...line_items, ...addonLineItems(addOns)];
 
-    const ar = encodeURIComponent(addon_ref || ''), em = encodeURIComponent(email || '');
+    const ar = encodeURIComponent(addon_ref || '');
     const session = await stripe.checkout.sessions.create({
       mode,
       customer_email: email || undefined,
       allow_promotion_codes: true,          // show the "Add promotion code" field
       line_items,
       success_url: isAddon
-        ? `${SITE}/track.html?ref=${ar}&email=${em}&addon=1`
+        ? `${SITE}/app.html?order=${ar}`
         : `${SITE}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: isAddon
-        ? `${SITE}/track.html?ref=${ar}&email=${em}`
+        ? `${SITE}/app.html?order=${ar}`
         : `${SITE}/checkout.html?plan=${plan}&billing=${billing}`,
       metadata: { plan, billing, name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '', addon_ref: addon_ref || '', addons: addOns.join(',') },
     });

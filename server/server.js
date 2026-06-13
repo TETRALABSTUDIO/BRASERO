@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { saveOrder, markPaid, saveOnboarding, verifyPaidSession, onboardingDone, sendTo, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, stripePriceId, addonLineItems, addonKeys, ITEMS } from '../api/_lib.js';
+import { saveOrder, markPaid, saveOnboarding, verifyPaidSession, onboardingDone, sendTo, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, stripePriceId, addonLineItems, addonKeys, clientMagicLink, ITEMS } from '../api/_lib.js';
 import orderHandler from '../api/order.js';
 import deckHandler from '../api/deck.js';
 import adminHandler from '../api/admin.js';
@@ -64,7 +64,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
           const r = m.addon_item ? await addItemsToOrder(m.addon_ref, m.addon_item) : await addDecksToOrder(m.addon_ref, m.plan);
           const label = m.addon_item ? (r.name || m.addon_item) : `${PLANS[m.plan]?.name || m.plan} pack`;
           const to = s.customer_email || m.email;
-          const trackUrl = to ? `${SITE_URL}/track.html?ref=${encodeURIComponent(m.addon_ref)}&email=${encodeURIComponent(to)}` : '';
+          const trackUrl = to ? clientMagicLink(SITE_URL, to, m.addon_ref) : '';
           await sendTo(to, 'Your new Brasero items are on the way 🔥', addonClientEmail({
             name: m.name, planName: label, count: r.created || 0, ref: m.addon_ref, trackUrl,
           }));
@@ -78,7 +78,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
     markPaid(s.id, s.amount_total).catch(console.error);
     const to = s.customer_email || m.email;
     const ref = s.id.slice(-8).toUpperCase();
-    const trackUrl = to ? `${SITE_URL}/track.html?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(to)}` : '';
+    const trackUrl = to ? clientMagicLink(SITE_URL, to, ref) : '';
     sendTo(to, 'Your Brasero order is confirmed 🎉', clientOrderEmail({
       name: m.name, planName: PLANS[m.plan]?.name || m.plan, billing: m.billing,
       amountCents: s.amount_total, handle: m.handle, ref, trackUrl,
@@ -111,13 +111,13 @@ app.post('/api/checkout-session', async (req, res) => {
     // Tracker upsell: add one catalogue item (carousels / stories / branding) to an existing order.
     if (addon_ref && addon_item && ITEMS[addon_item]) {
       const it = ITEMS[addon_item];
-      const ar = encodeURIComponent(addon_ref), em = encodeURIComponent(email || '');
+      const ar = encodeURIComponent(addon_ref);
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         customer_email: email || undefined,
         line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: it.amount, product_data: { name: `Brasero - ${it.name}` } } }],
-        success_url: `${SITE_URL}/track.html?ref=${ar}&email=${em}&addon=1`,
-        cancel_url: `${SITE_URL}/track.html?ref=${ar}&email=${em}`,
+        success_url: `${SITE_URL}/app.html?order=${ar}`,
+        cancel_url: `${SITE_URL}/app.html?order=${ar}`,
         metadata: { addon_ref, addon_item, email: email || '' },
       });
       return res.json({ url: session.url });
@@ -152,16 +152,16 @@ app.post('/api/checkout-session', async (req, res) => {
 
     line_items = [...line_items, ...addonLineItems(addOns)];
 
-    const ar = encodeURIComponent(addon_ref || ''), em = encodeURIComponent(email || '');
+    const ar = encodeURIComponent(addon_ref || '');
     const session = await stripe.checkout.sessions.create({
       mode,
       customer_email: email || undefined,
       line_items,
       success_url: isAddon
-        ? `${SITE_URL}/track.html?ref=${ar}&email=${em}&addon=1`
+        ? `${SITE_URL}/app.html?order=${ar}`
         : `${SITE_URL}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: isAddon
-        ? `${SITE_URL}/track.html?ref=${ar}&email=${em}`
+        ? `${SITE_URL}/app.html?order=${ar}`
         : `${SITE_URL}/checkout.html?plan=${plan}&billing=${billing}`,
       metadata: { plan, billing, name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', addon_ref: addon_ref || '', addons: addOns.join(',') },
     });
