@@ -12,7 +12,15 @@ export const db = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE
   : null;
 
 /* ---- Auth primitives (Talent accounts) ---- */
-const SESSION_SECRET = process.env.SESSION_SECRET || process.env.ADMIN_TOKEN || 'brasero-dev-secret';
+// Tokens are HMAC-signed with this. A known fallback would make every session
+// forgeable, so in a deployed env we refuse to start without a real secret;
+// the dev fallback only applies to local runs (no VERCEL / not production).
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.ADMIN_TOKEN || (() => {
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    throw new Error('SESSION_SECRET (or ADMIN_TOKEN) must be set in production');
+  }
+  return 'brasero-dev-secret';
+})();
 const b64url = b => Buffer.from(b).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 const unb64url = s => Buffer.from(s.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
 
@@ -117,7 +125,9 @@ export async function markPaid(sessionId, amount) {
     .update({ status: 'paid', amount, ref: orderRef(sessionId) })
     .eq('stripe_session_id', sessionId)
     .select('*').maybeSingle();
-  if (error) { console.error('markPaid', error); return null; }
+  // Throw on a real DB error so the webhook can 500 and let Stripe retry
+  // (this update is idempotent). A missing row returns null without throwing.
+  if (error) { console.error('markPaid', error); throw new Error('markPaid: ' + error.message); }
   return data;
 }
 

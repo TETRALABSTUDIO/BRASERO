@@ -43,14 +43,18 @@ export default async function handler(req, res) {
       return res.json({ received: true });
     }
 
-    let order = null;
-    try { order = await markPaid(s.id, s.amount_total); } catch (e) { console.error(e); }
+    let order = null, persistFailed = false;
+    try { order = await markPaid(s.id, s.amount_total); } catch (e) { console.error(e); persistFailed = true; }
     // Create/link the client account (their space aggregates every order they place).
     try { await upsertClient({ email: s.customer_email || m.email, name: m.name }); } catch (e) { console.error('client upsert failed', e); }
     // Seed the full board so the talent opens a ready-to-fill order: plan decks + every purchased upsell.
     try {
       if (order) await populateOrderElements(order.id, { plan: m.plan, addons: (m.addons || '').split(',').map(a => a.trim()).filter(Boolean) });
-    } catch (e) { console.error('populate elements failed', e); }
+    } catch (e) { console.error('populate elements failed', e); persistFailed = true; }
+    // A paid order that didn't persist is a silent loss: 500 so Stripe retries.
+    // markPaid + populateOrderElements are both idempotent, and emails are sent
+    // only below (after this guard), so a retry never duplicates them.
+    if (persistFailed) return res.status(500).json({ error: 'persist_failed' });
     // Confirmation email to the customer
     try {
       const to = s.customer_email || m.email;
