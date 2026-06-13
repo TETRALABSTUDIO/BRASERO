@@ -6,7 +6,7 @@
    design system; talks to /api/order + /api/deck with the client session token
    (api() attaches the Authorization header), so no ref+email is needed.
    ========================================================================== */
-import { api, post, clearToken, esc, initials, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML, slideMeta } from './app.core.js';
+import { api, post, clearToken, esc, initials, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML, slideMeta, brandKind, normBrand, brandBriefView } from './app.core.js';
 
 /* ---- module state ---- */
 let R = null;            // mount root (<main id="app">), stable across view swaps
@@ -328,8 +328,13 @@ function renderCategories() {
       <span class="catrow__add" data-addcat="${c.key}" title="Add to your order">+</span></div>`;
   }).join('');
 }
+// Branding 'writing' = the client owes us the brief (an action), not a wait.
+function tagFor(d) {
+  if ((d.type || '') === 'branding' && d.status === 'writing') return ['pill--act', 'Your details'];
+  return TAG[d.status] || TAG.writing;
+}
 function deckItemHTML(d) {
-  const [pc, pl] = TAG[d.status] || TAG.writing;
+  const [pc, pl] = tagFor(d);
   const sel = String(d.id) === String(SELECTED) ? 'sel' : '';
   const ic = TYPE_ICON[d.type] || TYPE_ICON.carousel;
   return `<button type="button" class="deckitem ${sel}" data-deck="${esc(d.id)}">
@@ -345,7 +350,7 @@ function renderCatList(cat) {
 }
 
 /* ---- detail (middle column) ---- */
-function hasApprovedScript(d) { return !!(d.script && ['designing', 'design_review', 'revision', 'done'].includes(d.status)); }
+function hasApprovedScript(d) { return (d.type || '') !== 'branding' && !!(d.script && ['designing', 'design_review', 'revision', 'done'].includes(d.status)); }
 function detailTabs(d) {
   const onScript = scriptView === d.id;
   return `<div class="dtabs">
@@ -353,7 +358,75 @@ function detailTabs(d) {
     <button type="button" class="dtab ${onScript ? 'on' : ''}" data-act="show_script" data-id="${d.id}"><span class="dtab__doc">📄</span><span class="dtab__l">Script</span></button>
   </div>`;
 }
+/* ---- branding (client provides the step-1 brief) ---- */
+function brandFormHTML(d) {
+  const b = normBrand(d);
+  if (b.kind === 'profile') {
+    return `<div class="brandform" data-brand="profile">
+      <div class="btoggle bm-mode">
+        <button type="button" data-bm="upload" class="${b.mode === 'avatar' ? '' : 'on'}">Upload a photo</button>
+        <button type="button" data-bm="avatar" class="${b.mode === 'avatar' ? 'on' : ''}">Describe an avatar</button>
+      </div>
+      <div class="bm-pane bm-upload ${b.mode === 'avatar' ? 'hide' : ''}">
+        <label class="field"><span>Your photo <small>we'll clean it up &amp; make it on-brand</small></span>
+          <label class="bm-photo" data-bm-drop>${b.photo ? `<img src="${esc(b.photo)}" alt="">` : '<span class="bm-photo__ph">+ Add a photo</span>'}<input type="file" accept="image/*" hidden data-bm-file></label>
+        </label>
+      </div>
+      <div class="bm-pane bm-avatar ${b.mode === 'avatar' ? '' : 'hide'}">
+        <label class="field"><span>Describe the avatar you want</span>
+          <textarea class="script" data-bm-desc placeholder="e.g. friendly cartoon avatar, orange hoodie, warm smile, flat style…" style="min-height:90px">${esc(b.desc)}</textarea>
+        </label>
+      </div>
+    </div>`;
+  }
+  if (b.kind === 'cta') {
+    return `<div class="brandform" data-brand="cta">
+      ${[0, 1, 2].map(i => `<label class="field"><span>CTA button ${i + 1}${i ? ' <small>optional</small>' : ''}</span><input type="text" data-bm-cta="${i}" value="${esc(b.ctas[i] || '')}" placeholder="${['Book a call', 'See pricing', 'Follow us'][i]}" maxlength="120"></label>`).join('')}
+    </div>`;
+  }
+  return `<div class="brandform" data-brand="banner">
+    <label class="field"><span>Banner headline</span><input type="text" data-bm-headline value="${esc(b.headline)}" placeholder="e.g. We help founders grow on LinkedIn" maxlength="300"></label>
+    <div class="field"><span>Links <small>add the ones you want on the banner</small></span>
+      <div class="bm-links" data-bm-links>
+        <div class="ig-add"><input type="text" class="ig-input bm-link-input" placeholder="https://… or your-site.com" autocomplete="off"><button type="button" class="ig-btn" data-bm-link-add>Add</button></div>
+        <div class="ig-chips bm-link-chips">${b.links.map(brandLinkChip).join('')}</div>
+      </div>
+    </div>
+    <div class="field"><span>Metrics <small>numbers to show off, optional</small></span>
+      <div class="bm-metrics" data-bm-metrics>${(b.metrics.length ? b.metrics : [{ name: '', value: '' }]).map(brandMetricRow).join('')}</div>
+      <button type="button" class="btn btn--ghost btn--sm bm-metric-add" data-bm-metric-add>+ Add metric</button>
+    </div>
+  </div>`;
+}
+function brandLinkChip(u) { return `<span class="ig-chip" data-bm-link="${esc(u)}">${esc(String(u).replace(/^https?:\/\//, ''))}<button type="button" data-bm-link-del aria-label="Remove">✕</button></span>`; }
+function brandMetricRow(m) { return `<div class="bm-metric" data-bm-metric><input type="text" class="bm-mn" placeholder="Metric (e.g. Clients)" value="${esc((m && m.name) || '')}" maxlength="80"><input type="text" class="bm-mv" placeholder="Value (e.g. 200+)" value="${esc((m && m.value) || '')}" maxlength="80"><button type="button" class="bm-metric-del" data-bm-metric-del aria-label="Remove">✕</button></div>`; }
+const BRAND_INSTR = {
+  profile: ['🖼️', 'Set up your profile photo', "upload a photo for us to enhance, or describe the avatar you'd like."],
+  cta: ['🔘', 'Your CTA buttons', 'tell us the labels for the call-to-action buttons.'],
+  banner: ['🎯', 'Your banner details', 'give us the headline, links and metrics to feature, then send it over.'],
+};
+function brandDetailBody(d) {
+  const k = brandKind(d.title);
+  if (d.status === 'writing') {
+    const n = BRAND_INSTR[k];
+    return `<div class="detail__head"><div class="detail__title">${esc(d.title)}</div></div>
+      <p class="detail__instr">${n[0]} <b>${n[1]}</b>, ${n[2]}</p>${brandFormHTML(d)}`;
+  }
+  // submitted → recap + the usual design phase
+  const recap = `<div class="bb-wrap"><div class="bb-wrap__h">Your details</div>${brandBriefView(d)}</div>`;
+  if (d.status === 'design_review') {
+    return `<p class="detail__instr">👀 <b>Validate design</b>, review it below, then approve or request a retouch.</p>${galleryGrid(d)}
+      <div class="revbox" id="rev-${d.id}"><textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:90px"></textarea>
+      <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div></div>${recap}`;
+  }
+  if (d.status === 'done') return (imgCount(d) ? galleryGrid(d) : '') + recap;
+  // designing / revision → in production
+  const w = d.status === 'revision' ? ['✏️', 'Applying your retouch', "We're updating the design and will resend it for approval shortly."] : ['🎨', 'In design', "Your branding is in production. We'll notify you the moment it's ready to review."];
+  return `<div class="waiting">${PAN_SVG}<div class="waiting__h">${w[1]}</div><p class="waiting__p">${w[2]}</p>
+    ${d.status === 'revision' && d.revision_note ? `<p class="note-line"><b>Your retouch:</b> ${esc(d.revision_note)}</p>` : ''}</div>${recap}`;
+}
 function detailBody(d) {
+  if ((d.type || '') === 'branding') return brandDetailBody(d);
   if (hasApprovedScript(d) && scriptView === d.id) {
     return `<div class="ro-banner">📄 <b>Approved script</b>, read-only now that it's in design.</div>` + slidesViewHTML(d.script);
   }
@@ -387,10 +460,19 @@ function galleryGrid(d) {
   return `<div class="${gc}">${imagesOf(d).map((u, i) => `<figure><img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}" data-name="${esc(name)}-${String(i + 1).padStart(2, '0')}"></figure>`).join('')}</div>`;
 }
 function cmdBar(d) {
-  const [pc, pl] = TAG[d.status] || TAG.writing;
+  const [pc, pl] = tagFor(d);
   const n = imgCount(d);
+  const isBrand = (d.type || '') === 'branding';
   let actions = '';
-  if (d.status === 'script_review')
+  if (isBrand && d.status === 'writing')
+    actions = `<button class="btn btn--grad btn--sm" data-act="submit_brief" data-id="${d.id}">Send details →</button>`;
+  else if (isBrand && d.status === 'design_review')
+    actions = `<button class="btn btn--grad btn--sm" data-act="validate_design" data-id="${d.id}">Approve ✓</button>
+      <button class="btn btn--ghost btn--sm" data-act="toggle_rev" data-id="${d.id}">Request a retouch</button>`;
+  else if (isBrand && d.status === 'done' && n)
+    actions = `<button class="btn btn--grad btn--sm" data-act="download_deck" data-id="${d.id}">${DL_ICON} Download (${n})</button>`;
+  else if (isBrand) { /* designing / revision: nothing to do */ }
+  else if (d.status === 'script_review')
     actions = `<button class="btn btn--grad btn--sm" data-act="validate_script" data-id="${d.id}">Approve script ✓</button>`;
   else if (d.status === 'design_review')
     actions = `<button class="btn btn--grad btn--sm" data-act="validate_design" data-id="${d.id}">Approve ✓</button>
@@ -563,6 +645,64 @@ function openLb() { q('#lbImg').src = lbUrl; q('#lb').classList.add('open'); }
 /* ---- deck actions ---- */
 function bindDeck(d) {
   qa(`[data-id="${d.id}"]`).forEach((el) => { if (el.dataset.act) el.addEventListener('click', () => onAction(el)); });
+  if ((d.type || '') === 'branding' && d.status === 'writing') bindBrandForm();
+}
+function bindBrandForm() {
+  const form = q('.brandform'); if (!form) return;
+  // profile: mode toggle + photo upload
+  form.querySelectorAll('[data-bm]').forEach((b) => b.addEventListener('click', () => {
+    const m = b.dataset.bm;
+    form.querySelectorAll('[data-bm]').forEach((x) => x.classList.toggle('on', x === b));
+    form.querySelector('.bm-upload')?.classList.toggle('hide', m !== 'upload');
+    form.querySelector('.bm-avatar')?.classList.toggle('hide', m !== 'avatar');
+  }));
+  const file = form.querySelector('[data-bm-file]');
+  if (file) file.addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    try {
+      const url = await compress(f, 1200), drop = form.querySelector('[data-bm-drop]');
+      drop.querySelector('.bm-photo__ph')?.remove();
+      let img = drop.querySelector('img');
+      if (!img) { img = document.createElement('img'); drop.insertBefore(img, file); }
+      img.src = url;
+    } catch (err) { alert('Could not read that image.'); }
+  });
+  // banner: links chip list
+  const linkWrap = form.querySelector('[data-bm-links]');
+  if (linkWrap) {
+    const input = linkWrap.querySelector('.bm-link-input'), chips = linkWrap.querySelector('.bm-link-chips');
+    const add = () => { let u = (input.value || '').trim(); if (!u) return;
+      if (!/^https?:\/\//i.test(u) && /\./.test(u)) u = 'https://' + u;
+      const have = [...chips.querySelectorAll('[data-bm-link]')].map((c) => c.dataset.bmLink);
+      if (!have.includes(u) && have.length < 6) chips.insertAdjacentHTML('beforeend', brandLinkChip(u));
+      input.value = ''; input.focus(); };
+    linkWrap.querySelector('[data-bm-link-add]').addEventListener('click', add);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+    chips.addEventListener('click', (e) => { const d = e.target.closest('[data-bm-link-del]'); if (d) d.closest('[data-bm-link]').remove(); });
+  }
+  // banner: metrics repeater
+  const metrics = form.querySelector('[data-bm-metrics]');
+  if (metrics) {
+    form.querySelector('[data-bm-metric-add]')?.addEventListener('click', () => {
+      if (metrics.querySelectorAll('[data-bm-metric]').length >= 6) return;
+      metrics.insertAdjacentHTML('beforeend', brandMetricRow({})); });
+    metrics.addEventListener('click', (e) => { const d = e.target.closest('[data-bm-metric-del]'); if (d) d.closest('[data-bm-metric]').remove(); });
+  }
+}
+function gatherBrand() {
+  const form = q('.brandform'); if (!form) return {};
+  const kind = form.dataset.brand;
+  if (kind === 'profile') {
+    const mode = form.querySelector('[data-bm].on')?.dataset.bm === 'avatar' ? 'avatar' : 'upload';
+    const img = form.querySelector('.bm-photo img');
+    return { mode, photo: img ? img.getAttribute('src') : '', desc: (form.querySelector('[data-bm-desc]')?.value || '').trim() };
+  }
+  if (kind === 'cta') return { ctas: [...form.querySelectorAll('[data-bm-cta]')].map((i) => i.value.trim()) };
+  return {
+    headline: (form.querySelector('[data-bm-headline]')?.value || '').trim(),
+    links: [...form.querySelectorAll('[data-bm-link]')].map((c) => c.dataset.bmLink),
+    metrics: [...form.querySelectorAll('[data-bm-metric]')].map((r) => ({ name: r.querySelector('.bm-mn').value.trim(), value: r.querySelector('.bm-mv').value.trim() })).filter((m) => m.name || m.value),
+  };
 }
 async function onAction(el) {
   const act = el.dataset.act, id = el.dataset.id;
@@ -574,6 +714,14 @@ async function onAction(el) {
   if (act === 'validate_script') {
     const sc = gatherEditedScript(); if (sc != null) payload.script = sc;   // send the client's edits
     if (!confirm('Approve this script and move it into design?')) return;
+  }
+  if (act === 'submit_brief') {
+    const brand = gatherBrand();
+    const filled = brand.headline || (brand.links && brand.links.length) || (brand.metrics && brand.metrics.length)
+      || (brand.ctas && brand.ctas.some((s) => s)) || brand.photo || (brand.desc && brand.desc.trim());
+    if (!filled) { alert('Add at least one detail before sending.'); return; }
+    if (!confirm('Send these details to start the design?')) return;
+    payload.brand = brand;
   }
   if (act === 'validate_design') { if (!confirm('Approve this design as final?')) return; }
   if (act === 'request_revision') {

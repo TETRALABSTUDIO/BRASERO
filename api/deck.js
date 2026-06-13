@@ -1,9 +1,9 @@
 import { findOrderByRef, decksForOrder, getDeck, patchDeck, publicOrder, send,
   sendTo, getTalentByEmail, talentClientActionEmail, talentProjectDoneEmail, siteUrl,
-  clientFromAuth, ownsOrder } from './_lib.js';
+  clientFromAuth, ownsOrder, sanitizeBrand } from './_lib.js';
 
 // Customer-driven deck actions, authenticated by a client session (Bearer token).
-//   action = validate_script | validate_design | request_revision
+//   action = validate_script | validate_design | request_revision | submit_brief
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
   try {
@@ -34,6 +34,12 @@ export default async function handler(req, res) {
       if (deck.status !== 'design_review') return res.status(409).json({ ok: false, error: 'wrong_state' });
       patch = { status: 'revision', revision_note: String(note || '').slice(0, 2000) };
       notify = `✏️ Retouch requested - "${deck.title || 'deck'}" (#${order.ref || ''})`;
+    } else if (action === 'submit_brief') {
+      // Branding step 1: the client provides the brief, then it moves into design.
+      if ((deck.type || '') !== 'branding') return res.status(409).json({ ok: false, error: 'wrong_type' });
+      if (deck.status !== 'writing') return res.status(409).json({ ok: false, error: 'wrong_state' });
+      patch = { brand: sanitizeBrand(deck.title, req.body.brand), status: 'designing' };
+      notify = `🎨 Branding details submitted - "${deck.title || 'element'}" (#${order.ref || ''})`;
     } else {
       return res.status(400).json({ ok: false, error: 'bad_action' });
     }
@@ -55,11 +61,16 @@ export default async function handler(req, res) {
       if (order.talent_email) {
         const talent = await getTalentByEmail(order.talent_email);
         const panelUrl = `${siteUrl(req)}/app.html`;
+        if (action === 'submit_brief') {
+          await sendTo(order.talent_email, '🎨 Branding details are in - time to design',
+            talentClientActionEmail({ name: talent?.name, ref, deckTitle: deck.title, kind: 'approved_script', note: '', panelUrl }));
+        } else {
         const kind = action === 'validate_script' ? 'approved_script' : action === 'validate_design' ? 'approved_design' : 'revision';
         const subj = kind === 'approved_script' ? '✅ Your client approved a script'
           : kind === 'approved_design' ? '🎉 Your client approved a design'
           : '✏️ Your client requested a retouch';
         await sendTo(order.talent_email, subj, talentClientActionEmail({ name: talent?.name, ref, deckTitle: deck.title, kind, note, panelUrl }));
+        }
         if (action === 'validate_design' && decks.length && decks.every(d => d.status === 'done')) {
           await sendTo(order.talent_email, '🎉 Project completed', talentProjectDoneEmail({ name: talent?.name, ref, clientName: order.name, panelUrl }));
         }

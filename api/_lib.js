@@ -96,8 +96,13 @@ export const MEM = db ? null : {
     { id: 'dk-3', order_id: 'ord-demo', position: 2, status: 'writing', type: 'story', title: 'Founder story' },
     { id: 'dk-4', order_id: 'ord-demo', position: 3, status: 'done', type: 'branding',
       title: 'Profile photo', script: 'What our clients say...',
+      brand: { mode: 'avatar', desc: 'Friendly cartoon avatar, orange hoodie, warm smile, flat style.' },
       design_urls: ['assets/carousels/2-1.jpg', 'assets/carousels/2-2.jpg'],
       design_validated_at: new Date().toISOString() },
+    { id: 'dk-6', order_id: 'ord-demo', position: 4, status: 'writing', type: 'branding', title: 'X / Twitter banner' },
+    { id: 'dk-7', order_id: 'ord-demo', position: 5, status: 'designing', type: 'branding', title: 'LinkedIn banner',
+      brand: { headline: 'We help founders grow on LinkedIn', links: ['https://brasero.studio', 'https://linkedin.com/in/demo'], metrics: [{ name: 'Clients', value: '200+' }, { name: 'Posts shipped', value: '1.2k' }] } },
+    { id: 'dk-8', order_id: 'ord-demo', position: 6, status: 'writing', type: 'branding', title: 'LinkedIn CTA buttons' },
     { id: 'dk-5', order_id: 'ord-done', position: 0, status: 'done',
       title: 'Launch announcement', script: 'We are live!',
       design_urls: ['assets/carousels/3-1.jpg'], design_validated_at: new Date().toISOString() },
@@ -740,6 +745,31 @@ export function deckImages(d) {
   return imgs.filter(Boolean).slice(0, 10);
 }
 
+// Branding elements collect their step-1 info from the client; the field set
+// depends on the element kind, inferred from the title (mirrors app.core.js).
+export function brandKind(title) {
+  const t = String(title || '').toLowerCase();
+  if (/profile|photo|pfp|avatar/.test(t)) return 'profile';
+  if (/cta|button/.test(t)) return 'cta';
+  return 'banner';
+}
+// Server-side whitelist/clamp of a client-submitted branding brief.
+export function sanitizeBrand(title, raw) {
+  const k = brandKind(title), b = (raw && typeof raw === 'object') ? raw : {};
+  const s = v => String(v == null ? '' : v);
+  if (k === 'profile') return {
+    mode: b.mode === 'avatar' ? 'avatar' : 'upload',
+    photo: (typeof b.photo === 'string' && b.photo.startsWith('data:image')) ? b.photo.slice(0, 2000000) : '',
+    desc: s(b.desc).slice(0, 1000),
+  };
+  if (k === 'cta') return { ctas: (Array.isArray(b.ctas) ? b.ctas : []).slice(0, 3).map(x => s(x).slice(0, 120)) };
+  return {
+    headline: s(b.headline).slice(0, 300),
+    links: (Array.isArray(b.links) ? b.links : []).map(x => s(x).trim()).filter(Boolean).slice(0, 6).map(x => x.slice(0, 300)),
+    metrics: (Array.isArray(b.metrics) ? b.metrics : []).filter(m => m && (m.name || m.value)).slice(0, 6).map(m => ({ name: s(m.name).slice(0, 80), value: s(m.value).slice(0, 80) })),
+  };
+}
+
 // Owner/talent board deck without the (potentially multi-MB base64) image bytes.
 // The workspace lists every element from this, then fetches a single deck's images
 // on demand via the `deck_images` action when its tab is opened - so opening a
@@ -749,6 +779,7 @@ export function publicDeckLite(d) {
     id: d.id, order_id: d.order_id, position: d.position,
     title: d.title || '', type: d.type || 'carousel', status: d.status,
     script: d.script || '', revision_note: d.revision_note || '',
+    brand: (d.brand && typeof d.brand === 'object') ? d.brand : null,
     script_validated_at: d.script_validated_at || null,
     design_validated_at: d.design_validated_at || null,
     created_at: d.created_at || null,
@@ -782,6 +813,7 @@ export function publicOrder(order, decks) {
       type: d.type || 'carousel',
       status: d.status,
       script: d.script || '',
+      brand: (d.brand && typeof d.brand === 'object') ? d.brand : null,
       image_count: deckImages(d).length,   // bytes fetched on demand via deck_images
       revision_note: d.revision_note || '',
       script_validated_at: d.script_validated_at,

@@ -150,6 +150,51 @@ export function slidesViewHTML(script) {
     return `<div class="slide ${m.cls}"><div class="slide__bar"><span class="slide__n">${m.label}</span></div><div class="slide__view">${c || '<span class="slide__empty">Empty</span>'}</div></div>`; }).join('')}</div>`;
 }
 
+/* ---- branding elements ----
+   Unlike decks/stories (the studio writes a script), branding elements collect
+   their step-1 info FROM the client. The fields depend on the element kind,
+   inferred from its title:
+     - profile : upload a photo to enhance, or describe an avatar
+     - cta     : just the (up to 3) CTA button labels
+     - banner  : headline + links + metrics  (X / LinkedIn / Facebook banners) */
+export function brandKind(title) {
+  const t = String(title || '').toLowerCase();
+  if (/profile|photo|pfp|avatar/.test(t)) return 'profile';
+  if (/cta|button/.test(t)) return 'cta';
+  return 'banner';
+}
+export function normBrand(d) {
+  const k = brandKind(d && d.title), b = (d && d.brand && typeof d.brand === 'object') ? d.brand : {};
+  if (k === 'profile') return { kind: k, mode: b.mode === 'avatar' ? 'avatar' : 'upload', photo: b.photo || '', desc: b.desc || '' };
+  if (k === 'cta') return { kind: k, ctas: (Array.isArray(b.ctas) ? b.ctas : []).slice(0, 3).map(s => String(s || '')) };
+  return { kind: k, headline: b.headline || '',
+    links: (Array.isArray(b.links) ? b.links : []).map(s => String(s || '')).filter(Boolean).slice(0, 6),
+    metrics: (Array.isArray(b.metrics) ? b.metrics : []).filter(m => m && (m.name || m.value)).map(m => ({ name: String(m.name || ''), value: String(m.value || '') })).slice(0, 6) };
+}
+export function brandFilled(d) {
+  const b = normBrand(d);
+  if (b.kind === 'profile') return b.mode === 'upload' ? !!b.photo : !!b.desc.trim();
+  if (b.kind === 'cta') return b.ctas.some(s => s.trim());
+  return !!(b.headline.trim() || b.links.length || b.metrics.length);
+}
+/* Read-only render of the client-submitted branding brief (studio + client recap). */
+export function brandBriefView(d) {
+  const b = normBrand(d);
+  if (!brandFilled(d)) return `<div class="bb bb--empty">No branding details yet.</div>`;
+  const row = (k, v) => `<div class="bb__row"><span class="bb__k">${k}</span><span class="bb__v">${v}</span></div>`;
+  if (b.kind === 'profile') {
+    return `<div class="bb">${b.mode === 'upload'
+      ? row('Photo to enhance', b.photo ? `<img class="bb__photo" src="${esc(b.photo)}" alt="">` : '<i>none</i>')
+      : row('Avatar brief', esc(b.desc) || '<i>none</i>')}</div>`;
+  }
+  if (b.kind === 'cta') {
+    return `<div class="bb">${b.ctas.filter(s => s.trim()).map((s, i) => row('CTA ' + (i + 1), esc(s))).join('') || '<div class="bb bb--empty">No CTAs.</div>'}</div>`;
+  }
+  const links = b.links.length ? `<span class="bb__chips">${b.links.map(l => `<a class="bb__chip" href="${esc(l)}" target="_blank" rel="noopener">${esc(l.replace(/^https?:\/\//, ''))}</a>`).join('')}</span>` : '<i>none</i>';
+  const metrics = b.metrics.length ? `<span class="bb__metrics">${b.metrics.map(m => `<span class="bb__metric"><b>${esc(m.value)}</b>${esc(m.name)}</span>`).join('')}</span>` : '<i>none</i>';
+  return `<div class="bb">${row('Headline', esc(b.headline) || '<i>none</i>')}${row('Links', links)}${row('Metrics', metrics)}</div>`;
+}
+
 /* Tiny query helpers. */
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];

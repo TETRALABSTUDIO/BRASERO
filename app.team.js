@@ -7,7 +7,7 @@
    module assumes an authenticated session (it only adds the must_reset screen).
    Client code never loads this file (clients load app.client.js).
    ========================================================================== */
-import { API, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML, slideMeta } from './app.core.js';
+import { API, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML, slideMeta, brandBriefView } from './app.core.js';
 
 /* ---- module state ---- */
 let R = null, CTX = null;                 // mount root + ctx, stable across re-mounts
@@ -1350,6 +1350,8 @@ function setChatOpen(open) { $('#board')?.classList.toggle('chat-open', open); i
 
 /* ---------- decks ---------- */
 const PILL = { writing: ['pill--wait', 'Writing'], script_review: ['pill--act', 'Script · awaiting client'], designing: ['pill--act', 'Designing'], design_review: ['pill--act', 'Design · awaiting client'], revision: ['pill--act', 'Retouch requested'], done: ['pill--done', 'Done ✓'] };
+// Branding 'writing' = waiting on the client's brief, not us writing a script.
+function pillFor(d) { if ((d.type || '') === 'branding' && d.status === 'writing') return ['pill--wait', 'Awaiting client']; return PILL[d.status] || PILL.writing; }
 let DECKS = [], SELDECK = null, CAT = null;
 const DECK_CATS = [{ key: 'carousel', label: 'Decks' }, { key: 'story', label: 'Stories' }, { key: 'branding', label: 'Branding' }];
 function decksOfCat(k) { return DECKS.filter(d => (d.type || 'carousel') === k); }
@@ -1405,7 +1407,7 @@ function renderCategories() {
   }).join('');
 }
 function deckItemHTML(d) {
-  const [pc, pl] = PILL[d.status] || PILL.writing, ic = TYPE_ICON[d.type] || TYPE_ICON.carousel, sel = d.id === SELDECK ? 'sel' : '';
+  const [pc, pl] = pillFor(d), ic = TYPE_ICON[d.type] || TYPE_ICON.carousel, sel = d.id === SELDECK ? 'sel' : '';
   return `<button type="button" class="deckitem ${sel}" data-pick="${d.id}">
     <div class="deckitem__top"><span class="deckitem__title">${ic}<span>${esc(d.title)}</span></span></div>
     <div class="miniprog"><i style="width:${DPCT[d.status] || 10}%"></i></div>
@@ -1607,7 +1609,28 @@ function fillScaffold(det, slidesEl, n) {
   slidesEl.innerHTML = arr.map(h => `<div class="slide" data-slide><div class="slide__bar"><button type="button" class="slide__drag" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
   renumberSlides(det);
 }
+// Branding elements have no studio-written script: step 1 is the client's brief
+// (read-only here), then the studio designs once it's been submitted.
+function brandDetailHTML(d) {
+  const owner = ME && ME.is_owner;
+  const head = `<div class="detail__head"><input class="detail__titleinput" data-f="title" value="${esc(d.title)}">${owner ? '<button class="b-del b-sm" data-a="delete_deck">Delete</button>' : ''}</div>`;
+  const brief = `<div class="bb-wrap"><div class="bb-wrap__h">Client brief</div>${brandBriefView(d)}</div>`;
+  let body;
+  if (d.status === 'writing') {
+    body = brief + `<p class="note-line">⏳ Waiting for the client to send the branding details. You'll be able to design once they're in.</p>`;
+  } else {
+    const editable = d.status !== 'done';
+    const note = (d.status === 'revision' && d.revision_note) ? `<p class="note-line"><b>Client retouch:</b> ${esc(d.revision_note)}</p>` : '';
+    const gc = 'gal gal--' + (d.type || 'branding');
+    const grid = imagesLoaded(d)
+      ? `<div class="${gc}" data-imgs>${imagesOf(d).map(u => tThumb(u, editable)).join('')}${editable ? '<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>' : ''}</div>`
+      : `<div class="${gc}" data-imgs data-loading>${Array.from({ length: Math.min(imgCount(d), 10) }, () => '<figure class="gal__skel"></figure>').join('')}</div>`;
+    body = note + grid + brief;
+  }
+  return head + `<div class="detail__body">${body}</div>`;
+}
 function detailHTML(d) {
+  if ((d.type || '') === 'branding') return brandDetailHTML(d);
   const scriptEdit = d.status === 'writing' || d.status === 'script_review';
   const owner = ME && ME.is_owner;
   const autofill = (owner && scriptEdit) ? `<div class="autofill" data-autofill title="Auto-fill slides from the client brief">
@@ -1635,8 +1658,16 @@ function detailHTML(d) {
   return head + `<div class="detail__body">${body}</div>`;
 }
 function cmdHTML(d) {
-  const [pc, pl] = PILL[d.status] || PILL.writing, imgs = { length: imgCount(d) };
+  const [pc, pl] = pillFor(d), imgs = { length: imgCount(d) };
+  const isBrand = (d.type || '') === 'branding';
   let actions = '';
+  if (isBrand) {
+    if (d.status === 'designing' || d.status === 'revision') actions = `<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_design">Send design →</button>`;
+    else if (d.status === 'design_review') actions = `<button class="b-grad b-sm" data-a="send_design">Update &amp; resend</button>`;
+    const meta = `<div class="cmdbar__meta">${imgs.length ? `<span class="foot-count">${imgs.length} image${imgs.length > 1 ? 's' : ''}</span>` : ''}<span class="pill ${pc}">${pl}</span></div>`;
+    const right = actions ? `<div class="actions">${actions}</div>` : `<span class="cmdbar__hint">${d.status === 'writing' ? 'Waiting for the client to send their details.' : 'Approved, nothing to do here.'}</span>`;
+    return `<div class="cmdbar__row">${meta}${right}</div><div class="cmdprog"><i style="width:${DPCT[d.status] || 10}%"></i></div>`;
+  }
   if (d.status === 'writing') actions = `<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_script">Send script →</button>`;
   else if (d.status === 'script_review') actions = `<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_script">Update &amp; resend</button>`;
   else if (d.status === 'designing') actions = `<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_design">Send design →</button>`;
