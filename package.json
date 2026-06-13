@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
     "nodemailer": "^6.9.14",
+    "sharp": "^0.35.1",
     "stripe": "^16.8.0"
   }
 }

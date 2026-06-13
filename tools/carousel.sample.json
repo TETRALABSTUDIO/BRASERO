@@ -1,0 +1,29 @@
+{
+  "slides": [
+    {
+      "kicker": "Brasero",
+      "text": "5 erreurs qui tuent ton deck d'investisseur",
+      "visual": "Moody warm gradient studio backdrop, soft amber light, premium minimal, subtle film grain"
+    },
+    {
+      "kicker": "01",
+      "text": "Trop de texte sur chaque slide",
+      "visual": "Abstract dark surface with a single warm spotlight, lots of empty space, editorial"
+    },
+    {
+      "kicker": "02",
+      "text": "Pas d'histoire, juste des chiffres",
+      "visual": "Soft out-of-focus orange bokeh on a near-black background, cinematic, calm"
+    },
+    {
+      "kicker": "03",
+      "text": "Un design qui crie l'amateurisme",
+      "visual": "Clean concrete texture lit by warm directional light, architectural, refined"
+    },
+    {
+      "kicker": "Brasero",
+      "text": "On transforme ton idée en deck qui lève",
+      "visual": "Warm ember glow rising over a deep dark gradient, premium, aspirational, no text"
+    }
+  ]
+}
