@@ -703,6 +703,22 @@ export function deckImages(d) {
   return imgs.filter(Boolean).slice(0, 10);
 }
 
+// Owner/talent board deck without the (potentially multi-MB base64) image bytes.
+// The workspace lists every element from this, then fetches a single deck's images
+// on demand via the `deck_images` action when its tab is opened - so opening a
+// project no longer downloads every deck's images up front.
+export function publicDeckLite(d) {
+  return {
+    id: d.id, order_id: d.order_id, position: d.position,
+    title: d.title || '', type: d.type || 'carousel', status: d.status,
+    script: d.script || '', revision_note: d.revision_note || '',
+    script_validated_at: d.script_validated_at || null,
+    design_validated_at: d.design_validated_at || null,
+    created_at: d.created_at || null,
+    image_count: deckImages(d).length,
+  };
+}
+
 // Coarse project state for the Talent dashboard: todo | progress | done.
 export function orderState(decks) {
   if (!decks.length) return 'todo';
@@ -729,7 +745,7 @@ export function publicOrder(order, decks) {
       type: d.type || 'carousel',
       status: d.status,
       script: d.script || '',
-      images: deckImages(d),
+      image_count: deckImages(d).length,   // bytes fetched on demand via deck_images
       revision_note: d.revision_note || '',
       script_validated_at: d.script_validated_at,
       design_validated_at: d.design_validated_at,

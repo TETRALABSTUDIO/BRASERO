@@ -1,4 +1,4 @@
-import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck,
+import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck, deckImages, publicDeckLite,
   adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
   assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl, clientMagicLink,
   signToken, randomPassword, tempPassword, PLANS, ADDONS, amountFor, addonKeys, talentInviteEmail, talentAssignedEmail,
@@ -149,7 +149,7 @@ export default async function handler(req, res) {
         const r = await populateOrderElements(order.id, { plan: order.plan, addons: order.addons });
         if (r.created) decks = await decksForOrder(order.id);
       }
-      return res.json({ ok: true, order: pub(order, isOwner), brief: order.answers || null, decks, messages: await listMessages(order.id) });
+      return res.json({ ok: true, order: pub(order, isOwner), brief: order.answers || null, decks: decks.map(publicDeckLite), messages: await listMessages(order.id) });
     }
 
     if (action === 'messages') {
@@ -198,7 +198,7 @@ export default async function handler(req, res) {
       const existing = await decksForOrder(order.id);
       const t = ['carousel', 'story', 'branding'].includes(b.type) ? b.type : 'carousel';
       await createDeck(order.id, { position: existing.length, title: b.title || `Deck ${existing.length + 1}`, type: t });
-      return res.json({ ok: true, decks: await decksForOrder(order.id) });
+      return res.json({ ok: true, decks: (await decksForOrder(order.id)).map(publicDeckLite) });
     }
 
     if (action === 'add_upsell') {
@@ -210,7 +210,7 @@ export default async function handler(req, res) {
       if (!key) return res.status(400).json({ ok: false, error: 'bad_category' });
       const r = await addItemsToOrder(order.ref || b.ref, key);
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
-      return res.json({ ok: true, decks: await decksForOrder(order.id) });
+      return res.json({ ok: true, decks: (await decksForOrder(order.id)).map(publicDeckLite) });
     }
 
     if (action === 'update_order') {
@@ -245,7 +245,7 @@ export default async function handler(req, res) {
       const label = type === 'story' ? 'Story' : type === 'branding' ? 'Branding' : 'Deck';
       let pos = existing.length, base = existing.filter(d => (d.type || 'carousel') === type).length;
       for (let i = 0; i < n; i++) await createDeck(order.id, { title: `${label} ${base + i + 1}`, position: pos++, type });
-      return res.json({ ok: true, decks: await decksForOrder(order.id) });
+      return res.json({ ok: true, decks: (await decksForOrder(order.id)).map(publicDeckLite) });
     }
 
     // Owner adds a catalogue item (the same packs the client can buy) directly, no charge.
@@ -255,7 +255,7 @@ export default async function handler(req, res) {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
       const r = await addItemsToOrder(order.ref || b.ref, b.key);
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
-      return res.json({ ok: true, decks: await decksForOrder(order.id) });
+      return res.json({ ok: true, decks: (await decksForOrder(order.id)).map(publicDeckLite) });
     }
 
     /* ----- deck-scoped (ownership checked via the deck's order) ----- */
@@ -264,19 +264,24 @@ export default async function handler(req, res) {
     const deckOrder = await getOrderById(deck.order_id);
     if (!deckOrder || !owns(deckOrder)) return res.status(403).json({ ok: false, error: 'forbidden' });
 
+    // On-demand image bytes for a single deck (the board list ships only counts).
+    if (action === 'deck_images') {
+      return res.json({ ok: true, images: deckImages(deck) });
+    }
+
     if (action === 'save_deck') {
       const patch = {};
       if (b.title != null) patch.title = b.title;
       if (b.script != null) patch.script = b.script;
       if (Array.isArray(b.images)) patch.design_urls = b.images.filter(Boolean).slice(0, 10);
       await patchDeck(deck.id, patch);
-      return res.json({ ok: true, decks: await decksForOrder(deck.order_id) });
+      return res.json({ ok: true, decks: (await decksForOrder(deck.order_id)).map(publicDeckLite) });
     }
 
     if (action === 'delete_deck') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'owner_only' });
       await deleteDeck(deck.id);
-      return res.json({ ok: true, decks: await decksForOrder(deck.order_id) });
+      return res.json({ ok: true, decks: (await decksForOrder(deck.order_id)).map(publicDeckLite) });
     }
 
     if (action === 'send_script' || action === 'send_design') {
@@ -302,7 +307,7 @@ export default async function handler(req, res) {
             reviewEmail({ name: deckOrder.name, kind: isScript ? 'script' : 'design', deckTitle, ref, url }));
         } catch (e) { console.error('review email', e); }
       }
-      return res.json({ ok: true, decks: await decksForOrder(deck.order_id) });
+      return res.json({ ok: true, decks: (await decksForOrder(deck.order_id)).map(publicDeckLite) });
     }
 
     return res.status(400).json({ ok: false, error: 'bad_action' });

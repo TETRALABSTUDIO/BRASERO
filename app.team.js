@@ -1131,6 +1131,9 @@ function renderDeckDetail() {
   $('#deckDetail').innerHTML = detailHTML(d);
   $('#deckCmd').innerHTML = cmdHTML(d);
   bind(d);
+  // Fetch this deck's images on first view (the list omits them), then repaint the
+  // gallery with the real thumbnails + their drag/delete wiring.
+  if (!imagesLoaded(d)) loadDeckImages(d).then(() => { if (SELDECK === d.id) renderDeckDetail(); });
 }
 
 /* ---------- owner: add elements ---------- */
@@ -1163,7 +1166,20 @@ function renderAE() {
 }
 function openAddElems(group) { aeCat = AE_GROUPS.some(g => g.key === group) ? group : null; renderAE(); $('#addElemModal').classList.remove('hide'); }
 
-function imagesOf(d) { return Array.isArray(d.design_urls) && d.design_urls.length ? d.design_urls : (d.design_url ? [d.design_url] : []); }
+/* The board list ships each deck without its image bytes (just image_count); a
+   deck's images are fetched once, on demand, the first time its tab is shown and
+   then cached here by id. IMG_CACHE survives renderBoard (which swaps DECKS for
+   fresh light rows), so we never re-download an open deck's images on save. */
+const IMG_CACHE = {};
+function imagesOf(d) { const c = IMG_CACHE[d.id]; return (c && c.loaded) ? c.images : []; }
+function imgCount(d) { const c = IMG_CACHE[d.id]; return (c && c.loaded) ? c.images.length : (d.image_count || 0); }
+function imagesLoaded(d) { return (d.image_count || 0) === 0 || !!(IMG_CACHE[d.id] && IMG_CACHE[d.id].loaded); }
+async function loadDeckImages(d) {
+  if (IMG_CACHE[d.id] && IMG_CACHE[d.id].loaded) return;
+  try { const r = await api('/api/admin', { action: 'deck_images', ref: REF, deckId: d.id });
+    if (r && r.ok) IMG_CACHE[d.id] = { images: Array.isArray(r.images) ? r.images : [], loaded: true }; }
+  catch (e) {}
+}
 function tThumb(u, editable) { return `<figure><img src="${esc(u)}" alt="" loading="lazy" decoding="async">${editable ? '<button class="x" data-x title="Remove">✕</button>' : ''}</figure>`; }
 function slidesEditorHTML(d) {
   const slides = parseSlides(d.script);
@@ -1211,6 +1227,39 @@ function wireSlideDnD(slidesEl, det) {
   slidesEl.addEventListener('pointerup', end);
   slidesEl.addEventListener('pointercancel', end);
 }
+/* drag-and-drop image reordering (editable gallery). Mirrors the slide reorder:
+   pointer-based so it never starts a native image drag, and we ignore grabs that
+   land on the ✕ delete button. New order is read from the DOM by gatherImgs on
+   Save/Send, so no separate persist step is needed. */
+function galDropTarget(galEl, x, y) {
+  const figs = [...galEl.querySelectorAll('figure:not(.gal--drag)')];
+  let best = null, bestDist = Infinity, after = false;
+  for (const f of figs) { const b = f.getBoundingClientRect(); const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+    const d = Math.hypot(x - cx, y - cy);
+    if (d < bestDist) { bestDist = d; best = f; after = (y > cy + b.height / 4) || (Math.abs(y - cy) <= b.height / 2 && x > cx); } }
+  return { best, after };
+}
+function wireGalleryDnD(galEl) {
+  if (!galEl) return;
+  let el = null, startX = 0, startY = 0, moving = false;
+  galEl.addEventListener('pointerdown', e => {
+    if (e.target.closest('[data-x]')) return; // let the delete button click through
+    el = e.target.closest('figure'); if (!el) return;
+    startX = e.clientX; startY = e.clientY; moving = false;
+    try { galEl.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  });
+  galEl.addEventListener('pointermove', e => {
+    if (!el) return;
+    if (!moving) { if (Math.hypot(e.clientX - startX, e.clientY - startY) < 5) return; moving = true; el.classList.add('gal--drag'); }
+    e.preventDefault();
+    const { best, after } = galDropTarget(galEl, e.clientX, e.clientY);
+    if (best && best !== el) { const ref = after ? best.nextElementSibling : best; if (ref !== el) galEl.insertBefore(el, ref); }
+  });
+  const end = e => { if (!el) return; try { galEl.releasePointerCapture(e.pointerId); } catch (_) {} el.classList.remove('gal--drag'); el = null; moving = false; };
+  galEl.addEventListener('pointerup', end);
+  galEl.addEventListener('pointercancel', end);
+}
 function buildScaffoldSlides(n, b, o) {
   b = b || {};
   const niche = (b.niche || '').trim();
@@ -1251,22 +1300,24 @@ function detailHTML(d) {
       <button type="button" class="autofill__step" data-af-inc aria-label="More slides">+</button>
       <button type="button" class="autofill__go" data-af-go>Fill</button>
     </div>` : '';
-  const counter = !scriptEdit ? `<span class="imgcount"><span data-count>${imagesOf(d).length}</span>/10</span>` : '';
+  const counter = !scriptEdit ? `<span class="imgcount"><span data-count>${imgCount(d)}</span>/10</span>` : '';
   const head = `<div class="detail__head"><input class="detail__titleinput" data-f="title" value="${esc(d.title)}">${counter}${autofill}${owner ? '<button class="b-del b-sm" data-a="delete_deck">Delete</button>' : ''}</div>`;
   let body;
   if (scriptEdit) {
     body = slidesEditorHTML(d);
   } else {
-    const imgs = imagesOf(d), editable = d.status !== 'done';
+    const editable = d.status !== 'done';
     const note = (d.status === 'revision' && d.revision_note) ? `<p class="note-line"><b>Client retouch:</b> ${esc(d.revision_note)}</p>` : '';
-    const grid = `<div class="gal" data-imgs>${imgs.map(u => tThumb(u, editable)).join('')}${editable ? '<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>' : ''}</div>`;
+    const grid = imagesLoaded(d)
+      ? `<div class="gal" data-imgs>${imagesOf(d).map(u => tThumb(u, editable)).join('')}${editable ? '<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>' : ''}</div>`
+      : `<div class="gal" data-imgs data-loading>${Array.from({ length: Math.min(imgCount(d), 10) }, () => '<figure class="gal__skel"></figure>').join('')}</div>`;
     const sc = d.script ? `<div class="tscript"><div class="tscript__h">Approved script</div>${slidesViewHTML(d.script)}</div>` : '';
     body = note + grid + sc;
   }
   return head + `<div class="detail__body">${body}</div>`;
 }
 function cmdHTML(d) {
-  const [pc, pl] = PILL[d.status] || PILL.writing, imgs = imagesOf(d);
+  const [pc, pl] = PILL[d.status] || PILL.writing, imgs = { length: imgCount(d) };
   let actions = '';
   if (d.status === 'writing') actions = `<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_script">Send script →</button>`;
   else if (d.status === 'script_review') actions = `<button class="b-ghost b-sm" data-a="save_deck">Save draft</button><button class="b-grad b-sm" data-a="send_script">Update &amp; resend</button>`;
@@ -1296,6 +1347,7 @@ function bind(d) {
   }));
   const slidesEl = det.querySelector('.slides[data-f="script"]');
   wireSlideDnD(slidesEl, det);
+  if (d.status !== 'done' && imagesLoaded(d)) wireGalleryDnD(det.querySelector('.gal[data-imgs]'));
   const addBtn = det.querySelector('[data-slide-add]');
   if (addBtn && slidesEl) addBtn.onclick = () => { const div = document.createElement('div'); div.className = 'slide'; div.setAttribute('data-slide', '');
     div.innerHTML = '<div class="slide__bar"><button type="button" class="slide__drag" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body></div>';
@@ -1339,10 +1391,21 @@ function bind(d) {
     const a = btn.dataset.a;
     if (a === 'delete_deck' && !confirm('Delete this element?')) return;
     if (a === 'send_script' && !confirm('Send this script to the client for approval?')) return;
-    if (a === 'send_design') { if (!gatherImgs().length) { alert('Add at least one image first.'); return; } if (!confirm('Send this design to the client for approval?')) return; }
-    const body = { action: a, ref: REF, deckId: d.id, title: val('title'), script: gatherScript(), images: gatherImgs() };
+    // Images load lazily; if they aren't in the DOM yet we must NOT send an empty
+    // list (save_deck/send_design only touch design_urls when images is an array),
+    // otherwise we'd wipe the deck's existing design. Send images only when loaded.
+    const loaded = imagesLoaded(d);
+    if (a === 'send_design') {
+      if (!loaded) { alert('Images are still loading, please wait a moment.'); return; }
+      if (!gatherImgs().length) { alert('Add at least one image first.'); return; }
+      if (!confirm('Send this design to the client for approval?')) return;
+    }
+    const body = { action: a, ref: REF, deckId: d.id, title: val('title'), script: gatherScript() };
+    if (loaded) body.images = gatherImgs();
     const old = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
-    try { const r = await api('/api/admin', body); if (r.ok) renderBoard(r.decks || []); else { alert('Error: ' + (r.error || '')); btn.disabled = false; btn.innerHTML = old; } }
+    try { const r = await api('/api/admin', body);
+      if (r.ok) { if (body.images) IMG_CACHE[d.id] = { images: body.images, loaded: true }; renderBoard(r.decks || []); }
+      else { alert('Error: ' + (r.error || '')); btn.disabled = false; btn.innerHTML = old; } }
     catch (e) { btn.disabled = false; btn.innerHTML = old; }
   });
 }

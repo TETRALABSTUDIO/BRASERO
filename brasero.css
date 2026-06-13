@@ -346,10 +346,16 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .board__detail .gal figure{width:100%;height:auto;aspect-ratio:1080/1350}
 .imgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.thumb{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.thumb .x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;border:none;font-size:12px;display:grid;place-items:center;padding:0;line-height:1}
-.thumb .x:hover{background:#c33}
+/* delete button on uploaded thumbnails (gallery figures, editable detail) */
+.gal figure .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;border:none;font-size:13px;display:grid;place-items:center;padding:0;line-height:1;cursor:pointer;z-index:2}
+.gal figure .x:hover{background:#c33}
+/* drag-to-reorder affordance on the editable image gallery */
+.gal[data-imgs] figure,.gal[data-imgs] figure img{cursor:grab}
+.gal[data-imgs] figure:active{cursor:grabbing}
+.gal figure.gal--drag{opacity:.4}
+/* placeholder tiles while a deck's images are fetched on demand */
+.gal figure.gal__skel{background:linear-gradient(100deg,#ededed 30%,#f7f7f7 50%,#ededed 70%);background-size:200% 100%;animation:galskel 1.15s linear infinite}
+@keyframes galskel{from{background-position:200% 0}to{background-position:-200% 0}}
 .adder{width:74px;height:74px;border-radius:10px;border:1.5px dashed var(--line);background:var(--soft);display:grid;place-items:center;cursor:pointer;color:var(--grey);font-size:11px;font-weight:700;text-align:center;line-height:1.2}
 .adder:hover{border-color:var(--orange);color:var(--orange)}
 .board__detail .adder{width:100%;height:auto;aspect-ratio:1080/1350;border-radius:12px;font-size:15px;line-height:1.3}

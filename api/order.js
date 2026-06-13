@@ -1,5 +1,5 @@
 import { findOrderByRef, ordersForClient, decksForOrder, orderProgress, orderRef,
-  publicOrder, getDeck, listMessages, addMessage, getTalentByEmail, sendTo, send,
+  publicOrder, getDeck, deckImages, listMessages, addMessage, getTalentByEmail, sendTo, send,
   messageNotifyEmail, siteUrl, clientFromAuth, ownsOrder } from './_lib.js';
 
 // POST { action, ... } authenticated by a client session (Bearer token). The
@@ -40,6 +40,13 @@ export default async function handler(req, res) {
 
     if (action === 'messages') {
       return res.json({ ok: true, messages: await listMessages(order.id) });
+    }
+
+    // On-demand image bytes for one deck (the board ships only image_count).
+    if (action === 'deck_images') {
+      const d = deckId ? await getDeck(deckId) : null;
+      if (!d || d.order_id !== order.id) return res.status(404).json({ ok: false, error: 'not_found' });
+      return res.json({ ok: true, images: deckImages(d) });
     }
 
     if (action === 'send_message') {

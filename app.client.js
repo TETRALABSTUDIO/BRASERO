@@ -89,6 +89,18 @@ function slidesEditHTML(script) {
   return `<div class="slides" data-edit-slides>${parseSlides(script).map((h, i) => { const c = sanitizeSlide(h);
     return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i + 1}</span></div><div class="slide__edit" contenteditable="true" data-slide-body>${c}</div></div>`; }).join('')}</div>`;
 }
+/* Deck images are fetched on demand (the board list ships only image_count) and
+   cached by id, so opening a project no longer downloads every deck's design. */
+const IMG_CACHE = {};
+function imagesOf(d) { const c = IMG_CACHE[d.id]; return (c && c.loaded) ? c.images : []; }
+function imgCount(d) { const c = IMG_CACHE[d.id]; return (c && c.loaded) ? c.images.length : (d.image_count || 0); }
+function imagesLoaded(d) { return (d.image_count || 0) === 0 || !!(IMG_CACHE[d.id] && IMG_CACHE[d.id].loaded); }
+async function loadDeckImages(d) {
+  if (IMG_CACHE[d.id] && IMG_CACHE[d.id].loaded) return;
+  try { const r = await api('/api/order', { ref: REF, action: 'deck_images', deckId: d.id });
+    if (r && r.ok) IMG_CACHE[d.id] = { images: Array.isArray(r.images) ? r.images : [], loaded: true }; }
+  catch (e) {}
+}
 function gatherEditedScript() {
   const bodies = qa('[data-edit-slides] [data-slide-body]');
   if (!bodies.length) return undefined;
@@ -354,7 +366,7 @@ function detailBody(d) {
           <textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:90px"></textarea>
           <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div>
         </div>`;
-    else if (d.status === 'done') content = (d.images && d.images.length) ? galleryGrid(d) : '';
+    else if (d.status === 'done') content = imgCount(d) ? galleryGrid(d) : '';
     return head + instr + content;
   }
   const w = WAIT[d.status] || ['', 'In progress', "We're working on it, you'll get news very soon."];
@@ -366,13 +378,14 @@ function detailBody(d) {
   </div>`;
 }
 function galleryGrid(d) {
-  const imgs = d.images || []; if (!imgs.length) return '';
+  if (!imgCount(d)) return '';
+  if (!imagesLoaded(d)) return `<div class="gal">${Array.from({ length: Math.min(imgCount(d), 10) }, () => '<figure class="gal__skel"></figure>').join('')}</div>`;
   const name = slug(d.title);
-  return `<div class="gal">${imgs.map((u, i) => `<figure><img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}" data-name="${esc(name)}-${String(i + 1).padStart(2, '0')}"></figure>`).join('')}</div>`;
+  return `<div class="gal">${imagesOf(d).map((u, i) => `<figure><img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}" data-name="${esc(name)}-${String(i + 1).padStart(2, '0')}"></figure>`).join('')}</div>`;
 }
 function cmdBar(d) {
   const [pc, pl] = TAG[d.status] || TAG.writing;
-  const n = (d.images || []).length;
+  const n = imgCount(d);
   let actions = '';
   if (d.status === 'script_review')
     actions = `<button class="btn btn--grad btn--sm" data-act="validate_script" data-id="${d.id}">Approve script ✓</button>`;
@@ -396,6 +409,8 @@ function renderDetail() {
   det.innerHTML = detailBody(d);
   cmd.innerHTML = (hasApprovedScript(d) && scriptView === d.id) ? '' : cmdBar(d);
   bindDeck(d);
+  // Fetch this deck's images on first view, then repaint with the real thumbnails.
+  if (!imagesLoaded(d)) loadDeckImages(d).then(() => { if (String(SELECTED) === String(d.id)) renderDetail(); });
 }
 
 /* ---- chat / studio conversation ---- */
@@ -534,7 +549,8 @@ async function downloadOne(url, name) {
 }
 async function downloadDeck(id, btn) {
   const d = DECKS.find((x) => String(x.id) === String(id)); if (!d) return;
-  const imgs = d.images || []; if (!imgs.length) return;
+  await loadDeckImages(d);                 // ensure the full-res bytes are fetched
+  const imgs = imagesOf(d); if (!imgs.length) return;
   const name = slug(d.title), old = btn ? btn.innerHTML : '';
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Preparing…'; }
   for (let i = 0; i < imgs.length; i++) { await downloadOne(imgs[i], `${name}-${String(i + 1).padStart(2, '0')}`); await sleep(350); }
