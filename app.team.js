@@ -1587,22 +1587,70 @@ async function loadTeam() {
   const [t, o] = await Promise.all([api('/api/admin', { action: 'list_talents' }), api('/api/admin', { action: 'list' })]);
   TALENTS = t.talents || []; ORDERS = o.orders || []; ADMIN.talents = TALENTS; ADMIN.orders = ORDERS; renderTeam();
 }
-function statNums(c) {
-  return `<div class="tstats">
-    <div class="tstat"><b style="color:var(--c-todo)">${c.todo}</b><span>To start</span></div>
-    <div class="tstat"><b style="color:var(--c-prog)">${c.progress}</b><span>In progress</span></div>
-    <div class="tstat"><b style="color:var(--c-done)">${c.done}</b><span>Completed</span></div>
+// Approx weekly load summed from the availability grid (null = none set).
+function weeklyHours(t) {
+  const av = (t.availability && typeof t.availability === 'object') ? t.availability : null;
+  if (!av) return null;
+  let mins = 0;
+  PF_DAYS.forEach(([k]) => { const d = av[k]; if (d && d.on && d.start && d.end) { const a = d.start.split(':'), b = d.end.split(':'); const diff = (+b[0] * 60 + +b[1]) - (+a[0] * 60 + +a[1]); if (diff > 0) mins += diff; } });
+  return Math.round(mins / 60);
+}
+const tzShort = z => (z || '').split('/').pop().replace(/_/g, ' ');
+// Compact workload strip: active projects, ~h/week, timezone.
+function workStrip(t, c) {
+  const active = c.todo + c.progress, wh = weeklyHours(t);
+  const cell = (b, l) => `<div class="twork"><b>${b}</b><span>${l}</span></div>`;
+  return `<div class="tcard__work">
+    ${cell(active, active === 1 ? 'active project' : 'active projects')}
+    ${cell(wh == null ? '—' : '~' + wh + 'h', 'per week')}
+    ${cell(t.timezone ? esc(tzShort(t.timezone)) : '—', 'timezone')}
   </div>`;
 }
-function hoursSummary(t) {
-  const av = (t.availability && typeof t.availability === 'object') ? t.availability : null;
-  const tz = t.timezone ? `<div class="thours__tz">🌍 ${esc(t.timezone)}</div>` : '';
-  if (!av) return tz + '<div class="none">No hours set yet.</div>';
-  const rows = PF_DAYS.map(([k, label]) => { const d = av[k] || {};
-    return `<div class="thours__row"><span class="thours__d">${label.slice(0, 3)}</span><span class="thours__v ${d.on ? '' : 'off'}">${d.on ? `${esc(d.start || '')}–${esc(d.end || '')}` : 'Off'}</span></div>`; }).join('');
-  return tz + `<div class="thours">${rows}</div>`;
+const KEBAB_IC = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>';
+const TRASH_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7"/></svg>';
+function placeMenu(m, anchor, alignRight) {
+  const r = anchor.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  let left = alignRight ? r.right - w : r.left;
+  if (left + w > window.innerWidth - 8) left = window.innerWidth - 8 - w;
+  let top = r.bottom + 6; if (top + h > window.innerHeight - 8) top = r.top - 6 - h;
+  m.style.left = Math.max(8, left) + 'px'; m.style.top = Math.max(8, top) + 'px';
+}
+function closeCardMenu() {
+  const m = document.getElementById('cardMenu'); if (m) m.remove();
+  document.removeEventListener('click', onCardOutside, true);
+  document.removeEventListener('keydown', onCardKey);
+}
+function onCardOutside(e) { if (!e.target.closest('#cardMenu') && !e.target.closest('[data-cardmenu]')) closeCardMenu(); }
+function onCardKey(e) { if (e.key === 'Escape') closeCardMenu(); }
+function openCardMenu(email, anchor) {
+  const ex = document.getElementById('cardMenu'), same = ex && ex.dataset.email === email;
+  closeCardMenu(); if (same) return;
+  const m = document.createElement('div');
+  m.className = 'amenu'; m.id = 'cardMenu'; m.dataset.email = email;
+  m.innerHTML = `<button class="amenu__i" type="button" data-act="edit">${EDIT_IC}<span class="amenu__n">Edit talent</span></button><button class="amenu__i amenu__i--del" type="button" data-act="del">${TRASH_IC}<span class="amenu__n">Delete</span></button>`;
+  document.body.appendChild(m);
+  placeMenu(m, anchor, true);
+  m.querySelector('[data-act="edit"]').onclick = () => { closeCardMenu(); editTalent(email); };
+  m.querySelector('[data-act="del"]').onclick = () => { closeCardMenu(); deleteTalent(email); };
+  setTimeout(() => { document.addEventListener('click', onCardOutside, true); document.addEventListener('keydown', onCardKey); }, 0);
+}
+async function editTalent(email) {
+  const t = TALENTS.find(x => x.email === email); if (!t) return;
+  const name = prompt('Name', t.name || ''); if (name === null) return;
+  const pass = prompt('New password (leave blank to keep current):', ''); if (pass === null) return;
+  if (pass) { const pe = pwError(pass); if (pe) { alert(pe); return; } }
+  const r = await api('/api/admin', { action: 'update_talent', email, name, ...(pass ? { password: pass } : {}) });
+  if (!r.ok) { alert('Error: ' + (r.error || '')); return; }
+  TALENTS = r.talents || TALENTS; renderTeam();
+}
+async function deleteTalent(email) {
+  if (!confirm('Delete ' + email + '? Their projects will become unassigned.')) return;
+  const r = await api('/api/admin', { action: 'delete_talent', email });
+  if (!r.ok) { alert(r.error === 'self' ? "You can't delete your own account." : 'Error: ' + (r.error || '')); return; }
+  TALENTS = r.talents || TALENTS; ORDERS = r.orders || ORDERS; ADMIN.talents = TALENTS; ADMIN.orders = ORDERS; renderTeam();
 }
 function renderTeam() {
+  closeCardMenu();
   const unassigned = ORDERS.filter(o => !o.talent_email);
   $('#teamGrid').innerHTML = TALENTS.map(t => {
     const mine = ORDERS.filter(o => (o.talent_email || '').toLowerCase() === t.email.toLowerCase());
@@ -1610,17 +1658,14 @@ function renderTeam() {
     const chips = t.is_owner ? '<div class="none">Owners see every project.</div>'
       : (mine.length ? `<div class="chips">${mine.map(o => `<span class="chip">#${esc(o.ref)}<button data-unassign="${esc(o.ref)}" title="Remove">✕</button></span>`).join('')}</div>` : '<div class="none">No projects assigned.</div>');
     const assignSel = t.is_owner ? '' : `<select data-assign-for="${esc(t.email)}" style="margin-top:8px"><option value="">+ Assign a project…</option>${unassigned.map(o => `<option value="${esc(o.ref)}">#${esc(o.ref)}, ${esc(o.name || o.email || '')}</option>`).join('')}</select>`;
-    const mid = t.is_owner ? '' : statNums(c);
     return `<div class="tcard" data-talent="${esc(t.email)}">
-      <div class="tcard__banner" style="${t.photo ? `background-image:url(${esc(t.photo)})` : ''}"></div>
-      <label class="tcard__av" title="Change photo">${avatar(t, 'lg')}<input type="file" accept="image/*" hidden data-photo></label>
-      <div class="tcard__body">
-        <div class="tcard__id"><div style="min-width:0;margin-right:auto"><div class="nm">${esc(t.name || 'Unnamed')}</div><div class="em">${esc(t.email)}</div></div><span class="rolebadge ${t.is_owner ? 'owner' : 'talent'}">${t.is_owner ? 'Owner' : 'Talent'}</span></div>
-        ${mid}
-        <div><div class="sec">Projects</div>${chips}${assignSel}</div>
-        <div><div class="sec">Availability</div>${hoursSummary(t)}</div>
-        <div class="actions"><button class="b-ghost b-sm" data-edit>Edit</button><button class="b-del b-sm" data-del>Delete</button></div>
+      <button class="tcard__menu" type="button" data-stop data-cardmenu="${esc(t.email)}" title="Actions">${KEBAB_IC}</button>
+      <div class="tcard__head">
+        <label class="tcard__av" title="Change photo">${avatarRole(t, 'sm')}<input type="file" accept="image/*" hidden data-photo></label>
+        <div class="tcard__idn"><div class="nm">${esc(t.name || 'Unnamed')}</div><div class="em" title="${esc(t.email)}">${esc(t.email)}</div></div>
       </div>
+      ${t.is_owner ? '<div class="tcard__owner">Owners see and manage every project.</div>'
+        : workStrip(t, c) + `<div class="tcard__sec"><div class="sec">Projects</div>${chips}${assignSel}</div>`}
     </div>`;
   }).join('') || '<div class="none">No talents yet.</div>';
   bindTeam();
@@ -1629,22 +1674,7 @@ function bindTeam() {
   $$('[data-unassign]').forEach(b => b.onclick = async () => { const r = await api('/api/admin', { action: 'assign_order', ref: b.dataset.unassign, talentEmail: null }); if (r.ok) { ORDERS = r.orders || ORDERS; ADMIN.orders = ORDERS; renderTeam(); } });
   $$('[data-assign-for]').forEach(s => s.onchange = async () => { if (!s.value) return; const r = await api('/api/admin', { action: 'assign_order', ref: s.value, talentEmail: s.dataset.assignFor }); if (r.ok) { ORDERS = r.orders || ORDERS; ADMIN.orders = ORDERS; renderTeam(); } });
   $$('.tcard [data-photo]').forEach(inp => inp.onchange = async e => { const f = e.target.files[0]; if (!f) return; const email = inp.closest('.tcard').dataset.talent; const photo = await compress(f, 512, 0.8); const r = await api('/api/admin', { action: 'update_talent', email, photo }); if (r.ok) { TALENTS = r.talents || TALENTS; renderTeam(); } e.target.value = ''; });
-  $$('.tcard [data-del]').forEach(b => b.onclick = async () => {
-    const email = b.closest('.tcard').dataset.talent;
-    if (!confirm('Delete ' + email + '? Their projects will become unassigned.')) return;
-    const r = await api('/api/admin', { action: 'delete_talent', email });
-    if (!r.ok) { alert(r.error === 'self' ? "You can't delete your own account." : 'Error: ' + (r.error || '')); return; }
-    TALENTS = r.talents || TALENTS; ORDERS = r.orders || ORDERS; ADMIN.talents = TALENTS; ADMIN.orders = ORDERS; renderTeam();
-  });
-  $$('.tcard [data-edit]').forEach(b => b.onclick = async () => {
-    const email = b.closest('.tcard').dataset.talent; const t = TALENTS.find(x => x.email === email);
-    const name = prompt('Name', t.name || ''); if (name === null) return;
-    const pass = prompt('New password (leave blank to keep current):', ''); if (pass === null) return;
-    if (pass) { const pe = pwError(pass); if (pe) { alert(pe); return; } }
-    const r = await api('/api/admin', { action: 'update_talent', email, name, ...(pass ? { password: pass } : {}) });
-    if (!r.ok) { alert('Error: ' + (r.error || '')); return; }
-    TALENTS = r.talents || TALENTS; renderTeam();
-  });
+  $$('.tcard [data-cardmenu]').forEach(b => b.onclick = e => { e.stopPropagation(); openCardMenu(b.dataset.cardmenu, b); });
 }
 async function submitTalent(e) {
   e.preventDefault(); const errEl = $('#tErr'); errEl.style.color = ''; errEl.textContent = '';
