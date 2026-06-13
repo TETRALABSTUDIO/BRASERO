@@ -788,14 +788,33 @@ function renderProjectsSection() {
   $('#sec-projects').querySelector('[data-newproj]').onclick = openNewModal;
   renderProjectsBody();
 }
+const MAIL_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6"/></svg>';
 function renderCRMSection() {
-  const L = ADMIN.leads;
-  const stage = l => l.onboarded ? 'Onboarded · unpaid' : 'Abandoned checkout';
-  const rows = L.length ? L.map(l => `<tr><td><b>${esc(l.name || '-')}</b></td><td>${esc(l.email || '-')}</td><td>${esc(l.handle || '-')}</td><td>${esc(planName(l.plan) || '-')}</td><td class="amoney">${l.amount ? fmtMoney(l.amount) : '-'}</td><td><span class="lead-stage">${stage(l)}</span></td><td>${fmtDate(l.created_at)}</td></tr>`).join('') : '<tr><td colspan="7" class="emptyrow">No leads yet. Unpaid or abandoned checkouts will show here.</td></tr>';
+  const L = ADMIN.leads || [];
+  const onboarded = L.filter(l => l.onboarded).length, abandoned = L.length - onboarded;
+  const pipeline = L.reduce((s, l) => s + (l.amount || 0), 0);
+  const funCell = (lab, v, s, tone) => `<div class="funcell"><div class="funcell__l">${tone ? `<i class="lstage__d lstage__d--${tone}"></i>` : ''}${lab}</div><div class="funcell__v">${v}</div><div class="funcell__s">${s}</div></div>`;
+  const dotLabel = l => l.onboarded
+    ? '<span class="lstage"><i class="lstage__d lstage__d--warm"></i>Onboarded · unpaid</span>'
+    : '<span class="lstage"><i class="lstage__d lstage__d--cold"></i>Abandoned checkout</span>';
+  const sub = l => [l.email, l.handle].filter(Boolean).map(esc).join(' · ') || '—';
+  const rows = L.length ? L.map(l => `<tr>
+      <td><div class="lname">${esc(l.name || 'Unknown')}</div><div class="lsub">${sub(l)}</div></td>
+      <td>${esc(planName(l.plan) || '—')}</td>
+      <td class="ta-r">${l.amount ? fmtMoney(l.amount) : '—'}</td>
+      <td>${dotLabel(l)}</td>
+      <td class="lmuted">${fmtDate(l.created_at)}</td>
+      <td class="crow__act">${l.email ? `<a class="qa" href="mailto:${esc(l.email)}?subject=${encodeURIComponent('Your BRASERO order')}" title="Email this lead">${MAIL_IC} Email</a>` : ''}</td>
+    </tr>`).join('') : '<tr><td colspan="6" class="emptyrow">No leads yet. Unpaid or abandoned checkouts show up here.</td></tr>';
   $('#sec-crm').innerHTML = `
-    <div class="sechead"><h2>CRM · Leads</h2><span style="color:var(--grey);font-weight:700;font-size:14px">${L.length} lead${L.length === 1 ? '' : 's'}</span></div>
-    <p style="color:var(--grey);font-size:13.5px;margin:-10px 0 18px">People who filled the checkout but didn't complete payment (abandoned cart or failed payment).</p>
-    <div class="tbl"><table><thead><tr><th>Name</th><th>Email</th><th>Handle</th><th>Pack</th><th>Est. value</th><th>Stage</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    <div class="sechead"><h2>CRM</h2><span class="sechead__sub">${L.length} lead${L.length === 1 ? '' : 's'} to recover</span></div>
+    <div class="funnel">
+      ${funCell('In pipeline', L.length, 'unpaid leads')}
+      ${funCell('Onboarded', onboarded, 'filled the brief', 'warm')}
+      ${funCell('Abandoned', abandoned, 'left at checkout', 'cold')}
+      ${funCell('Pipeline value', fmtMoney(pipeline), 'est. if recovered')}
+    </div>
+    <div class="tbl tbl--crm"><table><thead><tr><th>Lead</th><th>Pack</th><th class="ta-r">Est. value</th><th>Stage</th><th>Date</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 /* type icons + per-deck progress */

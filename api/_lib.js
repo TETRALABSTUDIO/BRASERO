@@ -75,10 +75,13 @@ export const MEM = db ? null : {
     { id: 'ord-done', ref: 'DONE9001', stripe_session_id: 'sess_done', status: 'paid',
       plan: 'burst', billing: 'sub', amount: 31500, addons: ['story6'], name: 'Leo Marchand', email: 'leo@example.com',
       talent_email: 'gaby@brasero.studio', created_at: new Date(Date.now() - 72 * 864e5).toISOString() },
-    // unpaid lead (abandoned checkout) - shows up in the CRM
+    // unpaid leads - show up in the CRM (one abandoned, one onboarded-but-unpaid)
     { id: 'ord-lead', ref: 'LEAD0001', stripe_session_id: 'sess_lead', status: 'pending',
       plan: 'flame', billing: 'once', name: 'Marc Abandon', email: 'marc@lead.com', instagram: '@marc',
       amount: 24000, created_at: new Date(Date.now() - 2 * 864e5).toISOString() },
+    { id: 'ord-lead2', ref: 'LEAD0002', stripe_session_id: 'sess_lead2', status: 'pending',
+      plan: 'burst', billing: 'once', name: 'Sara Klein', email: 'sara@lead.com', instagram: '@sara',
+      amount: 35000, onboarding_at: new Date(Date.now() - 1 * 864e5).toISOString(), created_at: new Date(Date.now() - 3 * 864e5).toISOString() },
   ],
   decks: [
     { id: 'dk-1', order_id: 'ord-demo', position: 0, status: 'script_review',

@@ -193,8 +193,34 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .tbl tr.clk:hover td{background:var(--soft)}
 .filters{position:sticky;top:0;z-index:8;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 32px;margin:0 -32px 18px;background:#fff;border-bottom:1px solid var(--line)}
 .filters input,.filters select{width:auto;min-width:170px}
-.lead-stage{font-size:12px;font-weight:700;padding:4px 11px;border-radius:100px;background:var(--waitbg);color:var(--wait);white-space:nowrap}
 .emptyrow{text-align:center;color:var(--grey);padding:28px}
+/* CRM: funnel summary + lighter leads table */
+.sechead__sub{color:var(--grey);font-weight:700;font-size:14px}
+.funnel{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.funcell{padding:15px 18px;border-left:1px solid var(--line)}
+.funcell:first-child{border-left:none}
+.funcell__l{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--grey)}
+.funcell__v{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-top:6px;line-height:1}
+.funcell__s{font-size:12px;color:var(--faint);font-weight:600;margin-top:5px}
+@media(max-width:780px){.funnel{grid-template-columns:repeat(2,1fr)}.funcell:nth-child(odd){border-left:none}}
+.tbl--crm th{background:transparent;text-transform:uppercase;letter-spacing:.04em;font-size:11px;color:var(--faint);font-weight:800;border-bottom-color:var(--line)}
+.tbl--crm td{border-bottom:1px solid var(--line-2)}
+.tbl--crm tr:hover td{background:var(--wash)}
+.ta-r{text-align:right;font-variant-numeric:tabular-nums}
+td.ta-r{font-weight:700}
+.lname{font-weight:700;font-size:13.5px}
+.lsub{font-size:12px;color:var(--grey);margin-top:2px}
+.lmuted{color:var(--grey)}
+.lstage{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.lstage__d{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.lstage__d--warm{background:var(--orange)}
+.lstage__d--cold{background:var(--faint)}
+.crow__act{text-align:right;width:1%}
+.qa{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:100px;padding:5px 11px;opacity:0;transition:opacity .12s,border-color .12s,color .12s}
+.tbl--crm tr:hover .qa{opacity:1}
+.qa:hover{border-color:var(--orange);color:var(--orange)}
+.qa svg{width:13px;height:13px}
+@media(hover:none){.qa{opacity:1}}
 
 /* owner kanban */
 .kboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
