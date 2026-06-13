@@ -555,11 +555,21 @@ export async function getTalentByEmail(email) {
   return data || null;
 }
 
-export async function loginTalent(email, password) {
+// Verify a talent/owner email+password pair. Returns the raw talent row on
+// success (so the caller can issue a 2FA challenge), or null on bad creds.
+export async function verifyTalentPassword(email, password) {
   const t = await getTalentByEmail(email);
   if (!t || !verifyPassword(password, t.password_hash)) return null;
-  return { token: signToken({ email: t.email, owner: !!t.is_owner, role: t.is_owner ? 'owner' : 'talent' }), talent: pubTalent(t) };
+  return t;
 }
+
+// The session token a talent/owner gets once their email login is confirmed.
+export function talentSession(t) {
+  return signToken({ email: t.email, owner: !!t.is_owner, role: t.is_owner ? 'owner' : 'talent' });
+}
+
+// Six-digit email verification code (2FA) for team password logins.
+export const loginCode = () => String(crypto.randomInt(0, 1000000)).padStart(6, '0');
 
 export async function createTalent({ email, password, name, is_owner, photo, must_reset }) {
   if (!STORE) return { error: 'no_store' };
@@ -971,6 +981,17 @@ export function magicLinkEmail({ name, url }) {
     emailText(`${greet(name)}<p style="margin:0">Tap the button below to open your space and follow all your orders in one place. This link expires in 15 minutes.</p>`) +
     emailCta(url || '#', 'Open my space →') +
     emailText(`<p style="margin:0;font-size:12px;color:#9a9a9a">If you didn't request this, you can safely ignore this email.</p>`)
+  );
+}
+
+// Team (owner/talent) password login: one-time verification code.
+export function loginCodeEmail({ name, code }) {
+  const spaced = String(code || '').split('').join('&nbsp;');
+  return emailShell(
+    emailHero('Verify it\'s you', 'Your verification code 🔒') +
+    emailText(`${greet(name)}<p style="margin:0">Use this code to finish signing in to your Brasero studio space. It expires in 10 minutes.</p>`) +
+    `<tr><td style="padding:22px 30px 4px"><div style="font-size:34px;font-weight:800;letter-spacing:8px;color:#111111;background:#f7f4ef;border-radius:12px;padding:18px 0;text-align:center">${spaced}</div></td></tr>` +
+    emailText(`<p style="margin:0;font-size:12px;color:#9a9a9a">If you didn't try to sign in, someone may have your password, change it as soon as you can.</p>`)
   );
 }
 

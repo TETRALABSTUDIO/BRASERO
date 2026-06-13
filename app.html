@@ -160,14 +160,70 @@ function renderLogin(error, prefillEmail) {
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
     try {
       const d = await post('/api/auth', { action: 'login', email, password });
-      if (!d || !d.ok || !d.token) { document.getElementById('tErr').textContent = 'Invalid email or password.'; btn.disabled = false; btn.textContent = 'Sign in'; return; }
-      setToken(d.token);
-      route();
+      if (!d || !d.ok || !d.twofa || !d.pending) { document.getElementById('tErr').textContent = 'Invalid email or password.'; btn.disabled = false; btn.textContent = 'Sign in'; return; }
+      renderTwoFactor(email, password, d.pending);
     } catch {
       document.getElementById('tErr').textContent = 'Something went wrong. Try again.';
       btn.disabled = false; btn.textContent = 'Sign in';
     }
   });
+}
+
+/* 3b. 2FA code screen - shown after a correct team password. The code was
+   emailed; we hold email+password in closure so the user can request a new one. */
+function renderTwoFactor(email, password, pending) {
+  const masked = email.replace(/^(.).*(@.*)$/, '$1•••$2');
+  app.innerHTML = `
+    <div class="authwrap">
+      ${LOGO}
+      <p>We emailed a 6-digit code to <b>${masked}</b>.<br>Enter it below to finish signing in.</p>
+      <form id="codeForm" class="authform">
+        <input id="cCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required
+          style="text-align:center;letter-spacing:.4em;font-size:20px;font-weight:700">
+        <button class="btn btn--grad" type="submit" id="cBtn">Verify &amp; sign in</button>
+        <div class="err" id="cErr"></div>
+      </form>
+      <div class="authswap">
+        <button type="button" id="cResend">Resend code</button>
+        <span style="opacity:.4"> · </span>
+        <button type="button" id="cBack">Use a different account</button>
+      </div>
+    </div>`;
+
+  const codeForm = document.getElementById('codeForm');
+  codeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('cBtn');
+    const code = document.getElementById('cCode').value.trim();
+    document.getElementById('cErr').textContent = '';
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+    try {
+      const d = await post('/api/auth', { action: 'verify_2fa', pending, code });
+      if (!d || !d.ok || !d.token) {
+        document.getElementById('cErr').textContent = d && d.error === 'expired'
+          ? 'That code expired. Request a new one.' : 'Incorrect code. Try again.';
+        btn.disabled = false; btn.textContent = 'Verify & sign in'; return;
+      }
+      setToken(d.token);
+      route();
+    } catch {
+      document.getElementById('cErr').textContent = 'Something went wrong. Try again.';
+      btn.disabled = false; btn.textContent = 'Verify & sign in';
+    }
+  });
+
+  document.getElementById('cResend').addEventListener('click', async (e) => {
+    const link = e.target;
+    link.disabled = true; link.textContent = 'Sending...';
+    try {
+      const d = await post('/api/auth', { action: 'login', email, password });
+      if (d && d.ok && d.pending) pending = d.pending;
+      document.getElementById('cErr').textContent = '';
+      link.textContent = 'Code sent ✓';
+    } catch { link.textContent = 'Resend code'; link.disabled = false; }
+  });
+
+  document.getElementById('cBack').addEventListener('click', () => renderLogin());
 }
 
 /* boot */

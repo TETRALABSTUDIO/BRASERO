@@ -1,10 +1,13 @@
-import { loginTalent, getTalentByEmail, createTalent, updateTalent, verifyToken, signToken,
+import { verifyTalentPassword, talentSession, loginCode, loginCodeEmail,
+  hashPassword, verifyPassword, getTalentByEmail, createTalent, updateTalent, verifyToken, signToken,
   getClientByEmail, emailHasOrders, upsertClient, touchClient, signClientSession,
   magicLinkEmail, sendTo, siteUrl } from './_lib.js';
 
 // Authentication for all roles.
-//   Talent/owner:
-//   login         { email, password }              → { token, talent }
+//   Talent/owner (password + email 2FA):
+//   login         { email, password }              → { twofa, email, pending }
+//                 (emails a 6-digit code; no session yet)
+//   verify_2fa    { pending, code }                → { token, talent }
 //   me            (Authorization: Bearer <token>)  → { talent }
 //   bootstrap     { email, password, name }        → create the first OWNER
 //                 (requires header x-admin-token === ADMIN_TOKEN; DB mode only)
@@ -17,10 +20,28 @@ export default async function handler(req, res) {
   try {
     const b = req.body || {};
 
+    // Team password login, step 1: verify the password, then email a one-time
+    // code. We return a signed, short-lived "pending" challenge (carrying a
+    // scrypt hash of the code, never the code itself) instead of a session.
     if (b.action === 'login') {
-      const r = await loginTalent(b.email, b.password);
-      if (!r) return res.status(401).json({ ok: false, error: 'invalid' });
-      return res.json({ ok: true, ...r });
+      const t = await verifyTalentPassword(b.email, b.password);
+      if (!t) return res.status(401).json({ ok: false, error: 'invalid' });
+      const code = loginCode();
+      const pending = signToken({ twofa: true, email: t.email, ch: hashPassword(code) }, 10 / 1440); // 10 min
+      await sendTo(t.email, 'Your Brasero verification code 🔒', loginCodeEmail({ name: t.name, code }));
+      return res.json({ ok: true, twofa: true, email: t.email, pending });
+    }
+
+    // Team password login, step 2: exchange the pending challenge + the emailed
+    // code for a real session.
+    if (b.action === 'verify_2fa') {
+      const s = verifyToken(b.pending);
+      if (!s || !s.twofa || !s.email || !s.ch) return res.status(401).json({ ok: false, error: 'expired' });
+      if (!verifyPassword(String(b.code || '').trim(), s.ch)) return res.status(401).json({ ok: false, error: 'bad_code' });
+      const t = await getTalentByEmail(s.email);
+      if (!t) return res.status(404).json({ ok: false, error: 'not_found' });
+      return res.json({ ok: true, token: talentSession(t),
+        talent: { email: t.email, name: t.name || '', is_owner: !!t.is_owner, must_reset: !!t.must_reset } });
     }
 
     if (b.action === 'setup') {
