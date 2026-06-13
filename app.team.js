@@ -1232,7 +1232,7 @@ function wireSlideDnD(slidesEl, det) {
    land on the ✕ delete button. New order is read from the DOM by gatherImgs on
    Save/Send, so no separate persist step is needed. */
 function galDropTarget(galEl, x, y) {
-  const figs = [...galEl.querySelectorAll('figure:not(.gal--drag)')];
+  const figs = [...galEl.querySelectorAll('figure:not(.gal--placeholder)')];
   let best = null, bestDist = Infinity, after = false;
   for (const f of figs) { const b = f.getBoundingClientRect(); const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
     const d = Math.hypot(x - cx, y - cy);
@@ -1241,22 +1241,42 @@ function galDropTarget(galEl, x, y) {
 }
 function wireGalleryDnD(galEl) {
   if (!galEl) return;
-  let el = null, startX = 0, startY = 0, moving = false;
+  // The grabbed tile is cloned into a floating "ghost" that tracks the cursor, while
+  // the real <figure> stays in the grid as a faded placeholder and reflows to show
+  // where it will land - so the image genuinely moves with the mouse.
+  let el = null, ghost = null, startX = 0, startY = 0, grabX = 0, grabY = 0, moving = false;
   galEl.addEventListener('pointerdown', e => {
     if (e.target.closest('[data-x]')) return; // let the delete button click through
-    el = e.target.closest('figure'); if (!el) return;
-    startX = e.clientX; startY = e.clientY; moving = false;
+    const fig = e.target.closest('figure');
+    if (!fig || fig.classList.contains('gal__skel')) return;
+    el = fig;
+    const r = el.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY; grabX = e.clientX - r.left; grabY = e.clientY - r.top;
+    moving = false;
     try { galEl.setPointerCapture(e.pointerId); } catch (_) {}
     e.preventDefault();
   });
   galEl.addEventListener('pointermove', e => {
     if (!el) return;
-    if (!moving) { if (Math.hypot(e.clientX - startX, e.clientY - startY) < 5) return; moving = true; el.classList.add('gal--drag'); }
+    if (!moving) {
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) < 5) return;
+      moving = true;
+      const r = el.getBoundingClientRect();
+      ghost = el.cloneNode(true);
+      ghost.classList.add('gal__ghost');
+      ghost.querySelectorAll('[data-x]').forEach(n => n.remove());
+      ghost.style.width = r.width + 'px'; ghost.style.height = r.height + 'px';
+      ghost.style.left = r.left + 'px'; ghost.style.top = r.top + 'px';
+      document.body.appendChild(ghost);
+      el.classList.add('gal--placeholder');
+    }
     e.preventDefault();
+    ghost.style.left = (e.clientX - grabX) + 'px';
+    ghost.style.top = (e.clientY - grabY) + 'px';
     const { best, after } = galDropTarget(galEl, e.clientX, e.clientY);
     if (best && best !== el) { const ref = after ? best.nextElementSibling : best; if (ref !== el) galEl.insertBefore(el, ref); }
   });
-  const end = e => { if (!el) return; try { galEl.releasePointerCapture(e.pointerId); } catch (_) {} el.classList.remove('gal--drag'); el = null; moving = false; };
+  const end = e => { if (!el) return; try { galEl.releasePointerCapture(e.pointerId); } catch (_) {} if (ghost) { ghost.remove(); ghost = null; } el.classList.remove('gal--placeholder'); el = null; moving = false; };
   galEl.addEventListener('pointerup', end);
   galEl.addEventListener('pointercancel', end);
 }

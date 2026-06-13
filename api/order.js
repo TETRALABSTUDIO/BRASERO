@@ -1,4 +1,4 @@
-import { findOrderByRef, ordersForClient, decksForOrder, orderProgress, orderRef,
+import { findOrderByRef, ordersForClient, decksForOrder, decksMetaForOrder, orderProgress, orderRef,
   publicOrder, getDeck, deckImages, listMessages, addMessage, getTalentByEmail, sendTo, send,
   messageNotifyEmail, siteUrl, clientFromAuth, ownsOrder } from './_lib.js';
 
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     if (action === 'my_orders') {
       const orders = await ordersForClient(client);
       const list = await Promise.all(orders.map(async (o) => {
-        const decks = await decksForOrder(o.id);
+        const decks = await decksMetaForOrder(o.id);
         const prog = orderProgress(decks);
         return {
           ref: o.ref || orderRef(o.stripe_session_id),

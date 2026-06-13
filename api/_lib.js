@@ -302,6 +302,16 @@ export async function decksForOrder(orderId) {
   return data || [];
 }
 
+// Metadata-only deck rows (no script, no image base64) for the order list /
+// dashboard / progress, which only need status + type to count elements. Avoids
+// pulling every deck's multi-MB design out of the DB just to compute a count.
+export async function decksMetaForOrder(orderId) {
+  if (!STORE || !orderId) return [];
+  if (MEM) return MEM.decks.filter(d => d.order_id === orderId).sort((a, b) => a.position - b.position);
+  const { data } = await db.from('decks').select('id, order_id, position, type, status').eq('order_id', orderId).order('position', { ascending: true });
+  return data || [];
+}
+
 export async function getDeck(deckId) {
   if (!STORE || !deckId) return null;
   if (MEM) return MEM.decks.find(d => d.id === deckId) || null;

@@ -1,5 +1,5 @@
 import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOrder, getDeck, patchDeck, deckImages, publicDeckLite,
-  adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
+  decksMetaForOrder, adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
   assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl, clientMagicLink,
   signToken, randomPassword, tempPassword, PLANS, ADDONS, amountFor, addonKeys, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, deleteMessage, messageNotifyEmail } from './_lib.js';
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   const isOwner = !!me.is_owner;
   const owns = order => isOwner || (order.talent_email || '').toLowerCase() === me.email.toLowerCase();
   // Enrich a list of order rows with per-project state + element count (used by the panel board/list).
-  const enrich = async rows => Promise.all(rows.map(async o => { const dk = await decksForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length, kinds: kindsOf(dk), counts: countsOf(dk) }; }));
+  const enrich = async rows => Promise.all(rows.map(async o => { const dk = await decksMetaForOrder(o.id); return { ...pub(o, isOwner), state: orderState(dk), items: dk.length, kinds: kindsOf(dk), counts: countsOf(dk) }; }));
 
   try {
     const b = req.body || {};
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       const all = await listAllOrders();
       const paid = all.filter(o => o.status === 'paid');
       const orders = await Promise.all(paid.map(async o => {
-        const dk = await decksForOrder(o.id);
+        const dk = await decksMetaForOrder(o.id);
         return { ...pub(o, true), status: o.status, onboarding_at: o.onboarding_at || null, state: orderState(dk), items: dk.length, kinds: kindsOf(dk), counts: countsOf(dk) };
       }));
       const leads = all.filter(o => o.status !== 'paid').map(o => ({

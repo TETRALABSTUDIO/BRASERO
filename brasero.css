@@ -352,7 +352,10 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 /* drag-to-reorder affordance on the editable image gallery */
 .gal[data-imgs] figure,.gal[data-imgs] figure img{cursor:grab}
 .gal[data-imgs] figure:active{cursor:grabbing}
-.gal figure.gal--drag{opacity:.4}
+.gal figure.gal--placeholder{opacity:.28;filter:grayscale(.3)}
+/* floating clone that tracks the cursor while reordering */
+.gal__ghost{position:fixed;margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 16px 36px rgba(0,0,0,.30);opacity:.96;pointer-events:none;z-index:9999;transform:scale(1.05);will-change:left,top}
+.gal__ghost img{width:100%;height:100%;object-fit:cover;display:block}
 /* placeholder tiles while a deck's images are fetched on demand */
 .gal figure.gal__skel{background:linear-gradient(100deg,#ededed 30%,#f7f7f7 50%,#ededed 70%);background-size:200% 100%;animation:galskel 1.15s linear infinite}
 @keyframes galskel{from{background-position:200% 0}to{background-position:-200% 0}}
