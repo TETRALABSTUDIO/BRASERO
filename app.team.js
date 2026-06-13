@@ -962,7 +962,9 @@ function briefHTML() {
       return s; }
     if (k === 'inspo') { return String(v || '').split(',').map(s => s.trim()).filter(Boolean).map(u => { const user = u.replace(/^@/, '');
       return `<a class="biglink" href="https://instagram.com/${esc(user)}" target="_blank" rel="noopener">${esc(u)}</a>`; }).join('&nbsp;&nbsp;·&nbsp;&nbsp;'); }
-    if (k === 'logo') { return `<div class="bt__logo"><img src="${esc(b.logo)}" alt="Brand logo"></div>`; }
+    if (k === 'logo') { const ln = b.logo_name || 'brand-logo';
+      return `<div class="bt__logo"><img src="${esc(b.logo)}" alt="Brand logo"></div>
+        <a class="biglink" href="${esc(b.logo)}" download="${esc(ln)}">⬇ ${esc(ln)}</a>`; }
     return esc(String(v || ''));
   };
   const has = (k) => k === 'typo' ? (b.typo || b.typo_file) : b[k];
