@@ -1158,7 +1158,7 @@ function tThumb(u, editable) { return `<figure><img src="${esc(u)}" alt="">${edi
 function slidesEditorHTML(d) {
   const slides = parseSlides(d.script);
   const rows = slides.map((h, i) => `<div class="slide" data-slide>
-    <div class="slide__bar"><button type="button" class="slide__drag" draggable="true" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n">Slide ${i + 1}</span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div>
+    <div class="slide__bar"><button type="button" class="slide__drag" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n">Slide ${i + 1}</span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div>
     <div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
   return `<div class="rt-toolbar">
       <button type="button" data-rt="title" title="Title">Title</button>
@@ -1179,11 +1179,16 @@ function slideDropTarget(slidesEl, y) {
 }
 function wireSlideDnD(slidesEl, det) {
   if (!slidesEl) return;
-  let drag = null;
-  slidesEl.addEventListener('dragstart', e => { if (!e.target.closest('[data-slide-drag]')) return; const s = e.target.closest('[data-slide]'); if (!s) return; drag = s; s.classList.add('slide--drag'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', ''); } catch (_) {} } });
+  let drag = null, armed = null;
+  const disarm = () => { if (armed) { armed.removeAttribute('draggable'); armed = null; } };
+  // The slide carries draggable; we only arm it when the grab starts on the
+  // handle, so editing/selecting text in the slide never starts a drag.
+  slidesEl.addEventListener('mousedown', e => { const h = e.target.closest('[data-slide-drag]'); if (!h) return; armed = h.closest('[data-slide]'); if (armed) armed.setAttribute('draggable', 'true'); });
+  slidesEl.addEventListener('mouseup', disarm);
+  slidesEl.addEventListener('dragstart', e => { const s = e.target.closest('[data-slide]'); if (!s || s !== armed) return; drag = s; s.classList.add('slide--drag'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', ''); } catch (_) {} } });
   slidesEl.addEventListener('dragover', e => { if (!drag) return; e.preventDefault(); const after = slideDropTarget(slidesEl, e.clientY); if (after == null) slidesEl.appendChild(drag); else if (after !== drag) slidesEl.insertBefore(drag, after); });
   slidesEl.addEventListener('drop', e => { if (drag) e.preventDefault(); });
-  slidesEl.addEventListener('dragend', () => { if (!drag) return; drag.classList.remove('slide--drag'); drag = null; renumberSlides(det); });
+  slidesEl.addEventListener('dragend', () => { if (drag) { drag.classList.remove('slide--drag'); drag.removeAttribute('draggable'); drag = null; } armed = null; renumberSlides(det); });
 }
 function buildScaffoldSlides(n, b, o) {
   b = b || {};
@@ -1212,7 +1217,7 @@ function buildScaffoldSlides(n, b, o) {
 }
 function fillScaffold(det, slidesEl, n) {
   const arr = buildScaffoldSlides(n, BRIEF, CURORDER);
-  slidesEl.innerHTML = arr.map(h => `<div class="slide" data-slide><div class="slide__bar"><button type="button" class="slide__drag" draggable="true" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
+  slidesEl.innerHTML = arr.map(h => `<div class="slide" data-slide><div class="slide__bar"><button type="button" class="slide__drag" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
   renumberSlides(det);
 }
 function detailHTML(d) {
@@ -1272,7 +1277,7 @@ function bind(d) {
   wireSlideDnD(slidesEl, det);
   const addBtn = det.querySelector('[data-slide-add]');
   if (addBtn && slidesEl) addBtn.onclick = () => { const div = document.createElement('div'); div.className = 'slide'; div.setAttribute('data-slide', '');
-    div.innerHTML = '<div class="slide__bar"><button type="button" class="slide__drag" draggable="true" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body></div>';
+    div.innerHTML = '<div class="slide__bar"><button type="button" class="slide__drag" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body></div>';
     slidesEl.appendChild(div); renumberSlides(det); div.querySelector('[data-slide-body]').focus(); };
   const afEl = det.querySelector('[data-autofill]');
   if (afEl && slidesEl) {
