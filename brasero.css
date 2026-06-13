@@ -217,13 +217,19 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .side__brand .logo-svg{height:30px;color:var(--ink)}
 .side__brand .btn,.side__actions{margin-left:auto}
 .side__actions{display:flex;align-items:center;gap:7px}
-.side__order{padding:20px}
+.side__order{padding:20px 20px 16px}
 .side__order.switcher{flex:0 0 auto;position:relative}
 .side__order-top{display:flex;align-items:flex-start;gap:8px}
 .side__order-top h2{flex:1;min-width:0}
 .oswitch{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
 .oswitch:hover{color:var(--orange);border-color:var(--orange)}
 .oswitch svg{width:16px;height:16px}
+
+/* boxed action toolbar (between profile and elements) */
+.side__tools{position:relative;display:flex;gap:4px;margin:0 18px 16px;padding:5px;background:var(--soft);border:1px solid var(--line);border-radius:13px}
+.stool{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;border:none;border-radius:9px;padding:9px 6px;font-family:inherit;font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:var(--grey);cursor:pointer;transition:background .15s,color .15s}
+.stool:hover{background:#fff;color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.stool svg{width:15px;height:15px;flex-shrink:0}
 
 /* profile block (board sidebar) */
 .profile{display:flex;flex-direction:column;align-items:center;text-align:center}
@@ -670,9 +676,6 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .iav--exp{width:42px;height:42px;font-size:15px;border:2px solid #fff;box-shadow:0 5px 14px rgba(248,80,0,.22)}
 .iav--xl{width:74px;height:74px;font-size:26px;border:2px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.13)}
 /* client profile card in the board sidebar */
-#orderProfile{position:relative}
-.cprofile__dl{position:absolute;top:13px;right:13px;z-index:2}
-.cprofile__dl .dl{font-size:10.5px;padding:4px 8px}
 .cprofile{display:flex;flex-direction:column;align-items:center;text-align:center}
 .cprofile__av{margin-bottom:13px}
 .cprofile__name{font-size:18px;font-weight:900;letter-spacing:-.025em;line-height:1.2}
