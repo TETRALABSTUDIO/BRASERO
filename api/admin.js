@@ -93,7 +93,7 @@ export default async function handler(req, res) {
     if (action === 'update_talent') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
       if (weakPw(b.password)) return res.status(400).json({ ok: false, error: 'weak_password' });
-      const r = await updateTalent({ email: b.email, name: b.name, password: b.password, is_owner: b.is_owner, photo: b.photo });
+      const r = await updateTalent({ email: b.email, name: b.name, password: b.password, is_owner: b.is_owner, photo: b.photo, availability: b.availability, timezone: b.timezone, rates: b.rates });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
       return res.json({ ok: true, talents: await listTalents() });
     }

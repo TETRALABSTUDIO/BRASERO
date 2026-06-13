@@ -240,7 +240,7 @@ function shellHTML() {
 
     <div class="modal modal--panel hide" id="profileModal">
       <div class="modalc">
-        <div class="modalc__h"><h3>My profile</h3><button type="button" class="mx" id="pfClose">✕</button></div>
+        <div class="modalc__h"><h3 id="pfTitle">My profile</h3><button type="button" class="mx" id="pfClose">✕</button></div>
         <div id="pfBody"></div>
       </div>
     </div>
@@ -440,36 +440,68 @@ function pwError(p) {
   if (!/[A-Z]/.test(p)) return 'Password must include at least one uppercase letter.';
   return '';
 }
-let PF_PHOTO; // undefined = keep current photo
-function openProfile() { PF_PHOTO = undefined; renderProfileForm(); $('#profileModal').classList.remove('hide'); }
+let PF_PHOTO;      // undefined = keep current photo
+let PF_TARGET;     // the talent being edited (ME when self-editing)
+let PF_OWNER_EDIT; // true when the owner edits another talent → show the rates column
+// Open the self-profile editor (any talent editing themselves).
+function openProfile() { PF_TARGET = ME; PF_OWNER_EDIT = false; PF_PHOTO = undefined; renderProfileForm(); $('#profileModal').classList.remove('hide'); }
+// Owner: edit a talent in the SAME overlay, plus the agreed-rates column.
+function openTalentEditor(email) {
+  const t = TALENTS.find(x => (x.email || '').toLowerCase() === (email || '').toLowerCase());
+  if (!t) return;
+  PF_TARGET = t; PF_OWNER_EDIT = true; PF_PHOTO = undefined; renderProfileForm();
+  $('#profileModal').classList.remove('hide');
+}
 function renderProfileForm() {
-  if (!ME) return;
-  const av = (ME.availability && typeof ME.availability === 'object') ? ME.availability : {};
-  const tz = ME.timezone || guessTz();
-  const tzOpts = tzList().map(z => `<option value="${esc(z)}" ${z === tz ? 'selected' : ''}>${esc(z)}</option>`).join('');
-  const photo = PF_PHOTO !== undefined ? PF_PHOTO : (ME.photo || '');
+  const U = PF_TARGET; if (!U) return;
+  $('#pfTitle').textContent = PF_OWNER_EDIT ? `Edit ${U.name || U.email}` : 'My profile';
+  $('#profileModal').querySelector('.modalc').classList.toggle('modalc--wide', PF_OWNER_EDIT);
+  const av = (U.availability && typeof U.availability === 'object') ? U.availability : {};
+  const tz = U.timezone || (PF_OWNER_EDIT ? '' : guessTz());
+  const tzOpts = (PF_OWNER_EDIT && !tz ? '<option value="">Not set</option>' : '') + tzList().map(z => `<option value="${esc(z)}" ${z === tz ? 'selected' : ''}>${esc(z)}</option>`).join('');
+  const photo = PF_PHOTO !== undefined ? PF_PHOTO : (U.photo || '');
   const days = PF_DAYS.map(([k, label]) => { const d = av[k] || {}; const on = !!d.on;
     return `<div class="pfday" data-day="${k}">
       <label class="pfday__t"><input type="checkbox" data-on ${on ? 'checked' : ''}><span>${label}</span></label>
       <div class="pfday__h"><input type="time" data-start value="${esc(d.start || '09:00')}" ${on ? '' : 'disabled'}><span>–</span><input type="time" data-end value="${esc(d.end || '17:00')}" ${on ? '' : 'disabled'}></div>
     </div>`; }).join('');
-  $('#pfBody').innerHTML = `
+  const left = `
     <div class="pfhead">
-      <label class="pfphoto" title="Change photo">${photo ? `<img src="${esc(photo)}" alt="">` : avatar(ME, 'lg')}<span class="pfphoto__edit">Change</span><input type="file" accept="image/*" hidden data-pf-photo></label>
+      <label class="pfphoto" title="Change photo">${photo ? `<img src="${esc(photo)}" alt="">` : avatar(U, 'lg')}<span class="pfphoto__edit">Change</span><input type="file" accept="image/*" hidden data-pf-photo></label>
       <div class="pffields">
-        <div class="field"><label>Name</label><input id="pfName" value="${esc(ME.name || '')}" placeholder="Your name"></div>
+        <div class="field"><label>Name</label><input id="pfName" value="${esc(U.name || '')}" placeholder="Name"></div>
         <div class="field"><label>New password <span class="field__opt">leave blank to keep · min 8 chars, 1 uppercase</span></label><input id="pfPass" type="password" autocomplete="new-password" placeholder="••••••"></div>
       </div>
     </div>
     <div class="field"><label>Time zone</label><select id="pfTz">${tzOpts}</select></div>
     <div class="field"><label>Working hours</label></div>
-    <div class="pfdays">${days}</div>
+    <div class="pfdays">${days}</div>`;
+  const rates = PF_OWNER_EDIT ? rateColumnHTML(U) : '';
+  $('#pfBody').innerHTML = `
+    <div class="pfgrid ${PF_OWNER_EDIT ? 'pfgrid--rates' : ''}">
+      <div class="pfgrid__main">${left}</div>
+      ${rates}
+    </div>
     <div class="err" id="pfErr" style="margin:6px 0"></div>
-    <button type="button" class="b-grad" id="pfSave" style="width:100%">Save profile</button>`;
+    <button type="button" class="b-grad" id="pfSave" style="width:100%">${PF_OWNER_EDIT ? 'Save talent' : 'Save profile'}</button>`;
   const body = $('#pfBody');
   body.querySelector('[data-pf-photo]').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { PF_PHOTO = await compress(f, 512, 0.8); renderProfileForm(); } catch (_) {} };
   body.querySelectorAll('.pfday').forEach(row => { const cb = row.querySelector('[data-on]'); cb.onchange = () => row.querySelectorAll('input[type=time]').forEach(t => t.disabled = !cb.checked); });
   body.querySelector('#pfSave').onclick = saveProfile;
+}
+// The agreed per-offer / per-upsell fee column (owner-only). Inputs in $, the
+// value stored in cents. Used by the dashboard margin calc.
+function rateColumnHTML(t) {
+  const r = (t.rates && typeof t.rates === 'object') ? t.rates : {};
+  const row = ([k, name, icon]) => { const v = r[k] != null ? (r[k] / 100) : '';
+    return `<label class="prate"><span class="prate__ic">${icon}</span><span class="prate__n">${esc(name)}</span><span class="prate__in"><i>$</i><input type="number" min="0" step="1" inputmode="numeric" data-rate="${k}" value="${v}" placeholder="0"></span></label>`; };
+  return `<div class="pfgrid__rates">
+    <div class="prate__h">Agreed fee per offer</div>
+    <div class="prate__sub">What you pay this talent. Drives the margin on the dashboard. Hidden from the talent.</div>
+    <div class="prate__grp">${RATE_OFFERS.map(row).join('')}</div>
+    <div class="prate__h" style="margin-top:14px">Upsells</div>
+    <div class="prate__grp">${RATE_UPSELLS.map(row).join('')}</div>
+  </div>`;
 }
 async function saveProfile() {
   const body = $('#pfBody'), errEl = $('#pfErr'); errEl.textContent = '';
@@ -478,14 +510,24 @@ async function saveProfile() {
     availability[row.dataset.day] = { on, start: row.querySelector('[data-start]').value || '09:00', end: row.querySelector('[data-end]').value || '17:00' }; });
   const name = $('#pfName').value.trim(), pass = $('#pfPass').value, timezone = $('#pfTz').value;
   if (pass) { const pe = pwError(pass); if (pe) { errEl.textContent = pe; return; } }
-  const payload = { action: 'update_me', name, timezone, availability };
+  const payload = PF_OWNER_EDIT
+    ? { action: 'update_talent', email: PF_TARGET.email, name, timezone, availability }
+    : { action: 'update_me', name, timezone, availability };
   if (pass) payload.password = pass;
   if (PF_PHOTO !== undefined) payload.photo = PF_PHOTO;
+  if (PF_OWNER_EDIT) {
+    const rates = {};
+    body.querySelectorAll('[data-rate]').forEach(inp => { const n = parseFloat(inp.value); if (isFinite(n) && n > 0) rates[inp.dataset.rate] = Math.round(n * 100); });
+    payload.rates = rates;
+  }
   const btn = $('#pfSave'), old = btn.textContent; btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
   try {
     const r = await api('/api/admin', payload);
-    if (r && r.ok) { ME = r.me || ME; if (CTX) CTX.session = ME; $('#profileModal').classList.add('hide'); renderSideMe(); renderAdminMe(); }
-    else { errEl.textContent = 'Error: ' + ((r && r.error) || 'could not save'); btn.disabled = false; btn.textContent = old; }
+    if (r && r.ok) {
+      $('#profileModal').classList.add('hide');
+      if (PF_OWNER_EDIT) { TALENTS = r.talents || TALENTS; ADMIN.talents = TALENTS; renderTeam(); if (!$('#sec-dashboard').classList.contains('hide')) renderDashboard(); }
+      else { ME = r.me || ME; if (CTX) CTX.session = ME; renderSideMe(); renderAdminMe(); }
+    } else { errEl.textContent = 'Error: ' + ((r && r.error) || 'could not save'); btn.disabled = false; btn.textContent = old; }
   } catch (e) { errEl.textContent = 'Network error.'; btn.disabled = false; btn.textContent = old; }
 }
 
@@ -553,10 +595,51 @@ function attnRow(a) {
     <span class="attn__meta">${esc(a.meta)}</span><span class="attn__go">${CHEV}</span>
   </button>`;
 }
+// Margin per order = revenue (o.amount) minus the assigned talent's agreed fee
+// for the plan + each purchased upsell. null when no talent or no rate is set.
+function orderCost(o) {
+  const t = talentObj(o.talent_email), r = t && t.rates;
+  if (!r) return null;
+  let cost = 0, known = false;
+  [o.plan, ...(Array.isArray(o.addons) ? o.addons : [])].forEach(k => { if (k && r[k] != null) { cost += r[k]; known = true; } });
+  return known ? cost : null;
+}
+// Roll margins up per talent for the dashboard breakdown.
+function marginByTalent(orders) {
+  const map = {};
+  orders.forEach(o => { if (!o.talent_email) return; const k = o.talent_email.toLowerCase();
+    const e = map[k] || (map[k] = { email: o.talent_email, rev: 0, pricedRev: 0, cost: 0, n: 0, priced: 0 });
+    e.n++; e.rev += (o.amount || 0); const c = orderCost(o);
+    if (c != null) { e.cost += c; e.pricedRev += (o.amount || 0); e.priced++; } });
+  return Object.values(map).sort((a, b) => (b.pricedRev - b.cost) - (a.pricedRev - a.cost));
+}
+function marginPanel(orders) {
+  const rows = marginByTalent(orders);
+  if (!rows.length) return '';
+  const body = rows.map(e => {
+    const profit = e.pricedRev - e.cost, pct = e.pricedRev ? Math.round(profit / e.pricedRev * 100) : null;
+    const t = talentObj(e.email) || { email: e.email };
+    const miss = e.priced < e.n ? `<span class="mtal__miss" title="${e.n - e.priced} project(s) have no agreed rate">${e.n - e.priced} unpriced</span>` : '';
+    return `<div class="mtal__row">
+      <div class="mtal__who">${avatar(t, 'avatar--xs')}<span class="mtal__nm">${esc(t.name || e.email)}</span>${miss}</div>
+      <div class="mtal__c mtal__rev">${fmtMoney(e.rev)}</div>
+      <div class="mtal__c mtal__pf">${e.priced ? fmtMoney(profit) : '—'}</div>
+      <div class="mtal__c mtal__pct ${pct != null && pct < 0 ? 'low' : ''}">${pct != null ? pct + '%' : '<span class="mtal__norate">set rate</span>'}</div>
+    </div>`;
+  }).join('');
+  return `<div class="panel mtal">
+    <div class="panel__h"><h3>Margin by talent</h3></div>
+    <div class="ph-sub">Revenue minus the agreed talent fee, this period</div>
+    <div class="mtal__head"><span>Talent</span><span class="mtal__c">Revenue</span><span class="mtal__c">Profit</span><span class="mtal__c">Margin</span></div>
+    ${body}</div>`;
+}
 function renderDashboard() {
   const O = ordersInPeriod(), L = ADMIN.leads, T = (ADMIN.talents || []).filter(t => !t.is_owner);
   const active = O.filter(o => o.state !== 'done').length, done = O.filter(o => o.state === 'done').length;
   const revenue = O.reduce((s, o) => s + (o.amount || 0), 0);
+  const priced = O.filter(o => orderCost(o) != null);
+  const pricedRev = priced.reduce((s, o) => s + (o.amount || 0), 0), cost = priced.reduce((s, o) => s + orderCost(o), 0);
+  const profit = pricedRev - cost, marginPct = pricedRev ? Math.round(profit / pricedRev * 100) : null;
   const attn = needsAttention(), shown = attn.slice(0, 6);
   $('#sec-dashboard').innerHTML = `
     <div class="sechead"><h2>Dashboard</h2>
@@ -564,6 +647,7 @@ function renderDashboard() {
     </div>
     <div class="kstrip">
       ${kCell('Revenue', fmtMoney(revenue), O.length + ' paid order' + (O.length === 1 ? '' : 's'))}
+      ${kCell('Margin', marginPct == null ? '—' : marginPct + '%', priced.length ? fmtMoney(profit) + ' profit' : 'set talent rates')}
       ${kCell('Active projects', active, done + ' completed')}
       ${kCell('Talents', T.length, 'in the studio')}
       ${kCell('Leads', L.length, 'unpaid / abandoned')}
@@ -572,6 +656,7 @@ function renderDashboard() {
       <div class="panel"><div class="panel__h"><h3>Revenue</h3><span class="panel__big">${fmtMoney(revenue)}</span></div><div class="ph-sub">Paid orders over the selected period</div>${lineChart(revSeries(O))}</div>
       <div class="panel"><div class="panel__h"><h3>Offers split</h3></div><div class="ph-sub">Packages bought in this period</div>${planPie(O)}</div>
     </div>
+    ${marginPanel(O)}
     <div class="panel attn">
       <div class="panel__h"><h3>Needs attention</h3>${attn.length ? `<span class="attn__count">${attn.length}</span>` : ''}</div>
       <div class="attn__list">${shown.length ? shown.map(attnRow).join('') : '<div class="attn__clear">✓ You\'re all caught up. Nothing needs your attention right now.</div>'}</div>
@@ -752,6 +837,9 @@ const npVisIcon = v => v === 'brand'
   : v === 'bundle'
   ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 7H4v13h16zM4 7l2-3h12l2 3M12 7v13M9 11h6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="3" width="12" height="18" rx="3"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg>';
+// Rate rows: [key, label, icon]. Keys match o.plan / o.addons so margin lines up.
+const RATE_OFFERS = [['starter', 'Ember', PLAN_ICON.starter], ['flame', 'Flame', PLAN_ICON.flame], ['burst', 'Meteor', PLAN_ICON.burst]];
+const RATE_UPSELLS = [['branding', 'Branding', npVisIcon('brand')], ['story3', 'Story pack · 3', npVisIcon('story')], ['story6', 'Story pack · 6', npVisIcon('story')], ['story9', 'Story pack · 9+1', npVisIcon('story')], ['bundle', 'Mega Bundle', npVisIcon('bundle')]];
 function npPlanPrice() { const base = NP_PLANS[NP.plan].price; return NP.billing === 'sub' ? Math.round(base * 0.9) : base; }
 function npAddonsTotal() { let s = 0; if (NP.branding) s += NP_ADDONS.branding.price; if (NP.story) { s += NP_ADDONS.story.opts.find(o => o.key === NP.story).price; } if (NP.bundle) s += NP_ADDONS.bundle.price; return s; }
 function npSelectedAddonKeys() { const k = []; if (NP.branding) k.push('branding'); if (NP.story) k.push(NP.story); if (NP.bundle) k.push('bundle'); return k; }
@@ -1630,18 +1718,9 @@ function openCardMenu(email, anchor) {
   m.innerHTML = `<button class="amenu__i" type="button" data-act="edit">${EDIT_IC}<span class="amenu__n">Edit talent</span></button><button class="amenu__i amenu__i--del" type="button" data-act="del">${TRASH_IC}<span class="amenu__n">Delete</span></button>`;
   document.body.appendChild(m);
   placeMenu(m, anchor, true);
-  m.querySelector('[data-act="edit"]').onclick = () => { closeCardMenu(); editTalent(email); };
+  m.querySelector('[data-act="edit"]').onclick = () => { closeCardMenu(); openTalentEditor(email); };
   m.querySelector('[data-act="del"]').onclick = () => { closeCardMenu(); deleteTalent(email); };
   setTimeout(() => { document.addEventListener('click', onCardOutside, true); document.addEventListener('keydown', onCardKey); }, 0);
-}
-async function editTalent(email) {
-  const t = TALENTS.find(x => x.email === email); if (!t) return;
-  const name = prompt('Name', t.name || ''); if (name === null) return;
-  const pass = prompt('New password (leave blank to keep current):', ''); if (pass === null) return;
-  if (pass) { const pe = pwError(pass); if (pe) { alert(pe); return; } }
-  const r = await api('/api/admin', { action: 'update_talent', email, name, ...(pass ? { password: pass } : {}) });
-  if (!r.ok) { alert('Error: ' + (r.error || '')); return; }
-  TALENTS = r.talents || TALENTS; renderTeam();
 }
 async function deleteTalent(email) {
   if (!confirm('Delete ' + email + '? Their projects will become unassigned.')) return;

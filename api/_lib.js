@@ -59,17 +59,19 @@ const uid = () => 'x' + Math.random().toString(36).slice(2, 10);
 export const MEM = db ? null : {
   talents: [
     { id: 'tal-owner', email: 'owner@brasero.studio', name: 'Studio Owner', is_owner: true, password_hash: hashPassword('owner123') },
-    { id: 'tal-1', email: 'talent@brasero.studio', name: 'Demo Talent', is_owner: false, password_hash: hashPassword('talent123') },
+    { id: 'tal-1', email: 'talent@brasero.studio', name: 'Demo Talent', is_owner: false, password_hash: hashPassword('talent123'),
+      // agreed fees paid to this talent, in cents (owner-only; demonstrates margin)
+      rates: { starter: 6000, flame: 12000, burst: 17000, branding: 9000, story3: 4000, story6: 6000, story9: 8000, bundle: 15000 } },
   ],
   orders: [
     { id: 'ord-demo', ref: 'DEMO1234', stripe_session_id: 'sess_demo', status: 'paid',
-      plan: 'flame', billing: 'sub', name: 'Demo Client', email: 'demo@brasero.studio',
+      plan: 'flame', billing: 'sub', amount: 21600, addons: ['branding'], name: 'Demo Client', email: 'demo@brasero.studio',
       talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
     { id: 'ord-todo', ref: 'TODO5678', stripe_session_id: 'sess_todo', status: 'paid',
-      plan: 'starter', billing: 'once', name: 'Nina Park', email: 'nina@example.com',
+      plan: 'starter', billing: 'once', amount: 12000, addons: [], name: 'Nina Park', email: 'nina@example.com',
       talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
     { id: 'ord-done', ref: 'DONE9001', stripe_session_id: 'sess_done', status: 'paid',
-      plan: 'burst', billing: 'sub', name: 'Leo Marchand', email: 'leo@example.com',
+      plan: 'burst', billing: 'sub', amount: 31500, addons: ['story6'], name: 'Leo Marchand', email: 'leo@example.com',
       talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
     // unpaid lead (abandoned checkout) - shows up in the CRM
     { id: 'ord-lead', ref: 'LEAD0001', stripe_session_id: 'sess_lead', status: 'pending',
@@ -583,7 +585,7 @@ export async function createTalent({ email, password, name, is_owner, photo, mus
   return { talent: pubTalent(data) };
 }
 
-export async function updateTalent({ email, name, password, is_owner, photo, availability, timezone }) {
+export async function updateTalent({ email, name, password, is_owner, photo, availability, timezone, rates }) {
   const t = await getTalentByEmail(email);
   if (!t) return { error: 'not_found' };
   const patch = {};
@@ -592,6 +594,8 @@ export async function updateTalent({ email, name, password, is_owner, photo, ava
   if (photo != null) patch.photo = photo;
   if (availability != null) patch.availability = availability;
   if (timezone != null) patch.timezone = timezone;
+  // rates = the per-offer/upsell fee agreed with this talent (owner-only data).
+  if (rates != null && typeof rates === 'object') patch.rates = rates;
   if (password) { patch.password_hash = hashPassword(password); patch.must_reset = false; }
   if (MEM) { Object.assign(t, patch); return { talent: pubTalent(t) }; }
   const { data, error } = await db.from('talents').update(patch).eq('id', t.id).select('*').maybeSingle();
@@ -613,11 +617,15 @@ export async function deleteTalent(email) {
   return { ok: true };
 }
 
+// Owner-only listing: like pubTalent but also carries `rates` (the agreed
+// per-offer fees). Never use the bare pubTalent path to expose rates to a
+// talent viewing themselves.
+const ownerTalent = t => t && ({ ...pubTalent(t), rates: (t.rates && typeof t.rates === 'object') ? t.rates : null });
 export async function listTalents() {
-  if (MEM) return MEM.talents.map(pubTalent);
+  if (MEM) return MEM.talents.map(ownerTalent);
   if (!db) return [];
-  const { data } = await db.from('talents').select('email,name,is_owner,photo,must_reset,availability,timezone').order('created_at', { ascending: true });
-  return (data || []).map(pubTalent);
+  const { data } = await db.from('talents').select('email,name,is_owner,photo,must_reset,availability,timezone,rates').order('created_at', { ascending: true });
+  return (data || []).map(ownerTalent);
 }
 
 // Orders assigned to a Talent (paid only).
