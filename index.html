@@ -535,18 +535,19 @@ img,svg{display:block}
 .spc__dots i:nth-child(1){background:#ff5a4d}.spc__dots i:nth-child(2){background:#ffbd2e}.spc__dots i:nth-child(3){background:#28c840}
 .spc__url{margin:0 auto;display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#8a8a8a;background:#fff;border:1px solid var(--sline);border-radius:100px;padding:6px 16px}
 .spc__url svg{width:12px;height:12px}
-.spc__body{display:grid;grid-template-columns:212px minmax(0,1fr) 264px}
+.spc__body{display:grid;grid-template-columns:212px minmax(0,1fr) 264px;min-height:560px}
 /* sidebar */
 .spc__side{border-right:1px solid var(--sline);display:flex;flex-direction:column;background:#fff;min-width:0}
 .spc__brand{display:flex;align-items:center;justify-content:space-between;gap:8px;height:54px;padding:0 14px;border-bottom:1px solid var(--sline)}
 .spc__brand-logo{height:17px;color:var(--ink)}
 .spc__brand-back{font-size:11px;font-weight:800;color:#8a8a8a;background:var(--ssoft);border-radius:100px;padding:5px 10px}
 .spc__profile{display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 14px 14px;border-bottom:1px solid var(--sline)}
-.spc__pav{width:58px;height:58px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px;margin-bottom:10px;position:relative;box-shadow:0 8px 20px rgba(248,80,0,.28)}
-.spc__pav::after{content:"";position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:7px;background:#fff;border:1px solid var(--sline);background-image:url(assets/plans/flame.svg);background-size:13px;background-position:center;background-repeat:no-repeat}
+.spc__pav{width:60px;height:60px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:23px;margin-bottom:11px;box-shadow:0 8px 20px rgba(248,80,0,.28)}
 .spc__pname{font-size:15px;font-weight:900;letter-spacing:-.02em}
 .spc__pig{font-size:12px;color:#8a8a8a;font-weight:600;margin-top:1px}
-.spc__pbadge{margin-top:9px;font-size:9.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#c64600;background:rgba(248,80,0,.1);padding:4px 11px;border-radius:100px}
+.spc__pbadge{margin-top:10px;display:inline-flex;align-items:center;gap:7px;background:var(--grad);padding:5px 13px;border-radius:100px;box-shadow:0 6px 14px rgba(248,80,0,.26)}
+.spc__pbadge img{height:10px;display:block}
+.spc__pbadge span{font-size:10px;font-weight:800;color:#fff}
 .spc__cats{padding:10px 10px;display:flex;flex-direction:column;gap:2px;flex:1}
 .spc__cat{display:flex;align-items:center;gap:10px;padding:11px 11px;border-radius:11px}
 .spc__cat.on{background:var(--ssoft);box-shadow:inset 3px 0 0 var(--orange)}
@@ -554,15 +555,13 @@ img,svg{display:block}
 .spc__cat-ic{width:34px;height:34px;border-radius:10px;background:rgba(248,80,0,.1);display:grid;place-items:center;flex-shrink:0}
 .spc__cat.on .spc__cat-ic{background:var(--grad)}
 .spc__cat--off .spc__cat-ic{background:#ececef;filter:grayscale(1)}
-.spc__cat-ic svg{width:17px;height:17px;color:var(--orange)}
-.spc__cat.on .spc__cat-ic svg{color:#fff}
-.spc__cat--off .spc__cat-ic svg{color:#9a9a9a}
+.spc__cat-ic svg{width:17px;height:17px}
+.spc__cat.on .spc__cat-ic svg{filter:brightness(0) invert(1)}
+.spc__cat--off .spc__cat-ic svg{filter:grayscale(1) opacity(.6)}
 .spc__cat-l{display:flex;flex-direction:column;line-height:1.25;margin-right:auto;min-width:0}
 .spc__cat-l b{font-size:14px;font-weight:900;letter-spacing:-.02em;color:var(--ink)}
 .spc__cat-l span{font-size:11.5px;color:#8a8a8a;font-weight:600}
 .spc__cat-chev{font-size:15px;color:#c9c9cd;font-weight:700}
-.spc__cat-badge{font-size:9px;font-weight:800;color:#c64600;background:rgba(248,80,0,.12);padding:3px 8px;border-radius:100px}
-.spc__add{margin:0 10px 12px;text-align:center;font-size:12px;font-weight:800;color:#fff;background:var(--grad);border-radius:100px;padding:10px;box-shadow:0 8px 18px rgba(248,80,0,.26)}
 /* main panel */
 .spc__main{display:flex;flex-direction:column;min-width:0;background:#fff}
 .spc__tabs{display:flex;gap:4px;padding:9px 12px 0;background:var(--ssoft);border-bottom:1px solid var(--sline)}
@@ -614,14 +613,42 @@ img,svg{display:block}
 .spc__composer-in{flex:1;font-size:12px;color:#9a9a9a;font-weight:600;background:var(--ssoft);border-radius:12px;padding:10px 13px}
 .spc__composer-send{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;flex-shrink:0;box-shadow:0 6px 14px rgba(248,80,0,.26)}
 .spc__composer-send svg{width:16px;height:16px;color:#fff}
-/* benefits row */
-.space__feats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1100px;margin:46px auto 0}
-.space__feat{text-align:left}
-.space__feat-ic{width:42px;height:42px;border-radius:12px;background:rgba(248,80,0,.1);display:grid;place-items:center;margin-bottom:12px}
-.space__feat-ic svg{width:21px;height:21px;color:var(--orange)}
-.space__feat h4{font-size:15.5px;font-weight:900;letter-spacing:-.02em;margin-bottom:5px}
-.space__feat p{font-size:13.5px;line-height:1.5;color:var(--grey)}
-@media(max-width:980px){.space__feats{grid-template-columns:repeat(2,1fr)}}
+/* benefits bento */
+.space__bento{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:980px;margin:48px auto 0}
+.bento{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.bento__viz{height:122px;border-radius:13px;background:var(--cream);border:1px solid var(--line);position:relative;overflow:hidden}
+.bento__txt h4{font-size:16px;font-weight:900;letter-spacing:-.02em;margin-bottom:5px}
+.bento__txt p{font-size:13.5px;line-height:1.5;color:var(--grey)}
+/* viz: expert chat */
+.bz-chat{position:absolute;inset:0;padding:14px;display:flex;flex-direction:column;gap:7px}
+.bz-chat__hd{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.bz-av{width:26px;height:26px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:12px;flex-shrink:0}
+.bz-av__l{font-size:10px;font-weight:800;color:var(--orange)}
+.bz-bub{font-size:11px;font-weight:600;padding:7px 11px;border-radius:12px;max-width:78%}
+.bz-bub--in{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px;color:#333}
+.bz-bub--out{align-self:flex-end;background:var(--grad);color:#fff;border-bottom-right-radius:4px}
+/* viz: approve */
+.bz-approve{position:absolute;inset:0;padding:14px;display:flex;align-items:center;gap:12px}
+.bz-slide{width:54px;aspect-ratio:1080/1350;border-radius:7px;border:1px solid var(--line);background:linear-gradient(150deg,#fff,#eee9e1);position:relative;flex-shrink:0}
+.bz-slide::before{content:"";position:absolute;top:7px;left:7px;width:24px;height:4px;border-radius:3px;background:var(--grad)}
+.bz-approve__col{display:flex;flex-direction:column;gap:8px}
+.bz-btn{font-size:11px;font-weight:800;padding:7px 13px;border-radius:100px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.bz-btn--ok{background:#16a34a;color:#fff}
+.bz-btn--ghost{background:#fff;border:1px solid var(--line);color:#666}
+/* viz: library */
+.bz-lib{position:absolute;inset:0;padding:13px;display:flex;flex-direction:column;gap:6px}
+.bz-cat{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:11.5px;font-weight:800;color:#333}
+.bz-cat.on{border-color:rgba(248,80,0,.3);box-shadow:inset 3px 0 0 var(--orange)}
+.bz-cat i{width:18px;height:18px;border-radius:5px;background:rgba(248,80,0,.12);flex-shrink:0}
+.bz-cat.on i{background:var(--grad)}
+/* viz: export */
+.bz-export{position:absolute;inset:0;display:grid;place-items:center}
+.bz-export__slide{width:60px;aspect-ratio:1080/1350;border-radius:8px;border:1px solid var(--line);background:linear-gradient(150deg,#fff,#eee9e1);position:relative;display:grid;place-items:end center;padding-bottom:8px}
+.bz-export__slide::before{content:"";position:absolute;top:8px;left:8px;width:26px;height:4px;border-radius:3px;background:var(--grad)}
+.bz-export__tag{font-size:8.5px;font-weight:800;color:#fff;background:var(--grad);padding:3px 7px;border-radius:100px}
+.bz-export__dl{position:absolute;right:18%;bottom:18%;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 6px 14px rgba(0,0,0,.12);display:grid;place-items:center;color:var(--orange)}
+.bz-export__dl svg{width:14px;height:14px}
+@media(max-width:760px){.space{padding:80px 0}.space__bento{grid-template-columns:1fr;max-width:420px}}
 @media(max-width:980px){
   .spc__body{grid-template-columns:190px minmax(0,1fr)}
   .spc__chat{display:none}
@@ -631,7 +658,6 @@ img,svg{display:block}
   .spc__side{display:none}
   .spc__gal{grid-template-columns:repeat(3,1fr)}
 }
-@media(max-width:760px){.space{padding:80px 0}.space__feats{grid-template-columns:1fr}}
 
 /* ===== FORMATS funnel (dark) ===== */
 .formats{padding:120px 0}
@@ -641,41 +667,49 @@ img,svg{display:block}
 .fmt-card{background:#141414;border:1px solid var(--line-light);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;position:relative;overflow:hidden}
 .fmt-card--lead{border-color:rgba(248,80,0,.4);box-shadow:0 24px 60px rgba(248,80,0,.14)}
 .fmt-card__glow{position:absolute;top:-60px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.4),transparent 72%);filter:blur(30px);pointer-events:none}
-.fmt-card__viz{height:132px;border-radius:14px;background:radial-gradient(120% 100% at 50% 0,#1b1b1b,#0c0c0c);border:1px solid var(--line-light);margin-bottom:20px;position:relative;overflow:hidden;display:grid;place-items:center}
-.fmt-card--lead .fmt-card__viz{border-color:rgba(248,80,0,.28)}
+/* viz panel — visual bleeds off the bottom, faded by a black gradient */
+.fmt-card__viz{height:184px;margin:-24px -24px 20px;background:radial-gradient(130% 90% at 50% 0,#1d1d1d,#0b0b0b);border-bottom:1px solid var(--line-light);border-radius:var(--radius) var(--radius) 0 0;position:relative;overflow:hidden}
+.fmt-card--lead .fmt-card__viz{background:radial-gradient(130% 90% at 50% 0,#241a16,#0b0b0b)}
+.fmt-card__viz::after{content:"";position:absolute;left:0;right:0;bottom:0;height:74px;background:linear-gradient(180deg,transparent,#141414);z-index:3;pointer-events:none}
 /* decks stack */
-.viz-decks{position:relative;width:74px;height:92px}
-.viz-decks i{position:absolute;inset:0;width:60px;height:80px;margin:auto;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:#1d1d1d}
-.viz-decks i:nth-child(1){transform:translateX(-22px) rotate(-9deg);opacity:.5}
-.viz-decks i:nth-child(2){transform:translateX(-9px) rotate(-3deg);opacity:.75}
-.viz-decks i:nth-child(3){background:#161616;border-color:rgba(248,80,0,.5)}
-.viz-decks i:nth-child(3)::before{content:"";position:absolute;top:11px;left:11px;width:30px;height:5px;border-radius:3px;background:var(--grad)}
-.viz-decks i:nth-child(3)::after{content:"";position:absolute;left:11px;right:18px;bottom:13px;height:4px;border-radius:3px;background:rgba(255,255,255,.22);box-shadow:0 -9px 0 rgba(255,255,255,.12)}
+.viz-decks{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);width:140px;height:150px}
+.viz-decks i{position:absolute;bottom:0;left:50%;width:86px;height:110px;margin-left:-43px;border-radius:13px;border:1px solid rgba(255,255,255,.14);background:#1f1f1f}
+.viz-decks i:nth-child(1){transform:translateX(-34px) rotate(-10deg);opacity:.45}
+.viz-decks i:nth-child(2){transform:translateX(-16px) rotate(-4deg);opacity:.72}
+.viz-decks i:nth-child(3){background:#171717;border-color:rgba(248,80,0,.5)}
+.viz-decks i:nth-child(3)::before{content:"";position:absolute;top:14px;left:14px;width:36px;height:6px;border-radius:3px;background:var(--grad)}
+.viz-decks i:nth-child(3)::after{content:"";position:absolute;left:14px;right:22px;bottom:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);box-shadow:0 -11px 0 rgba(255,255,255,.12)}
 /* story phone */
-.viz-story{position:relative;width:60px;height:104px;border-radius:13px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(160deg,#262626,#131313);overflow:hidden;padding:9px 8px}
-.viz-story__bar{display:flex;gap:3px;margin-bottom:9px}
+.viz-story{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:86px;height:158px;border-radius:17px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(160deg,#2b2b2b,#131313);overflow:hidden;padding:11px 10px}
+.viz-story__bar{display:flex;gap:3px;margin-bottom:11px}
 .viz-story__bar i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}
 .viz-story__bar i:first-child{background:var(--grad)}
-.viz-story__av{width:17px;height:17px;border-radius:50%;background:var(--grad)}
-.viz-story__poll{position:absolute;left:8px;right:8px;bottom:13px;height:18px;border-radius:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
-.viz-story__poll::before{content:"";position:absolute;inset:0;width:62%;border-radius:6px;background:rgba(248,80,0,.35)}
-/* brand kit */
-.viz-brand{display:flex;align-items:center;gap:12px}
-.viz-brand__sw{display:grid;grid-template-columns:repeat(2,17px);grid-auto-rows:17px;gap:4px}
-.viz-brand__sw i{border-radius:5px}
-.viz-brand__sw i:nth-child(1){background:var(--grad)}
-.viz-brand__sw i:nth-child(2){background:#fff}
-.viz-brand__sw i:nth-child(3){background:#5a5a5a}
-.viz-brand__sw i:nth-child(4){background:#f87000}
-.viz-brand__aa{width:48px;height:48px;border-radius:11px;border:1px solid rgba(255,255,255,.16);background:#1a1a1a;display:grid;place-items:center;font-weight:900;font-size:23px;color:#fff;letter-spacing:-.04em}
-.fmt-card__stage{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#7a7a7a;margin-bottom:9px}
-.fmt-card h3{font-size:clamp(20px,2vw,25px);font-weight:900;letter-spacing:-.025em;line-height:1.05;margin-bottom:4px}
+.viz-story__av{width:22px;height:22px;border-radius:50%;background:var(--grad)}
+.viz-story__poll{position:absolute;left:10px;right:10px;bottom:30px;height:22px;border-radius:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
+.viz-story__poll::before{content:"";position:absolute;inset:0;width:62%;border-radius:7px;background:rgba(248,80,0,.4)}
+/* branding — social profile mock */
+.viz-brand{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);width:162px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:13px;box-shadow:0 16px 34px rgba(0,0,0,.34)}
+.viz-brand__hd{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.viz-brand__av{width:32px;height:32px;border-radius:50%;background:var(--grad);flex-shrink:0}
+.viz-brand__id{display:flex;flex-direction:column;gap:4px}
+.viz-brand__id b{width:58px;height:7px;border-radius:3px;background:#1a1a1a}
+.viz-brand__id i{width:40px;height:5px;border-radius:3px;background:#cbcbcb}
+.viz-brand__hl{display:flex;gap:8px;margin-bottom:10px}
+.viz-brand__hl span{width:26px;height:26px;border-radius:50%;border:1.6px solid var(--orange);background:rgba(248,80,0,.08)}
+.viz-brand__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.viz-brand__grid span{aspect-ratio:1;border-radius:5px;background:linear-gradient(150deg,#f0ece6,#e0dbd2)}
+.viz-brand__grid span:nth-child(2){background:var(--grad)}
+.viz-brand__grid span:nth-child(4){background:#191919}
+.viz-brand__grid span:nth-child(6){background:#f87000}
+/* title with deliverable icon */
+.fmt-card h3{display:flex;align-items:center;gap:9px;font-size:clamp(20px,2vw,25px);font-weight:900;letter-spacing:-.025em;line-height:1.05;margin-bottom:5px}
+.fmt-card__tic{width:26px;height:26px;flex-shrink:0;display:grid;place-items:center}
+.fmt-card__tic svg{width:24px;height:24px}
 .fmt-card__job{display:block;font-size:14px;font-weight:800;letter-spacing:-.01em;color:#cfcfcf;margin-bottom:11px}
 .fmt-card--lead .fmt-card__job{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .fmt-card p{font-size:14px;line-height:1.55;color:#9a9a9a;margin-bottom:18px}
 .fmt-card__tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto}
 .fmt-card__tags span{font-size:11.5px;font-weight:700;color:#cfcfcf;background:rgba(255,255,255,.06);border:1px solid var(--line-light);padding:5px 11px;border-radius:100px}
-.fmt-card__badge{position:absolute;top:16px;right:16px;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#c64600;background:rgba(248,80,0,.14);padding:4px 9px;border-radius:100px}
 .fmt-arrow{display:grid;place-items:center;width:44px;color:#5a5a5a}
 .fmt-arrow svg{width:22px;height:22px}
 .fmt__foot{max-width:1120px;margin:26px auto 0;display:flex;align-items:center;justify-content:center;gap:13px;text-align:center;font-size:15px;font-weight:600;color:#cfcfcf}
@@ -853,39 +887,51 @@ img,svg{display:block}
 .reveal.show{opacity:1;transform:none}
 
 /* ============ MARKET / WHY VISUAL (dark) ============ */
-.market{padding:120px 0}
+.market{padding:120px 0 86px}
 .mkt__head{max-width:720px;margin:0 auto 46px;text-align:center}
 .mkt__head .h-lg{margin-bottom:16px}
 /* chart panel */
-.mkt-chart{max-width:860px;margin:0 auto;background:#141414;border:1px solid var(--line-light);border-radius:22px;padding:32px 34px}
+.mkt-chart{max-width:860px;margin:0 auto;background:#141414;border:1px solid var(--line-light);border-radius:22px;padding:34px 36px}
 .mkt-chart__cap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:26px}
 .mkt-chart__cap h3{font-size:15.5px;font-weight:900;letter-spacing:-.01em}
 .mkt-chart__cap span{font-size:11.5px;color:#7a7a7a;font-weight:600;white-space:nowrap}
-.mkt-bars{display:flex;flex-direction:column;gap:22px}
-.mkt-bar__top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:9px}
-.mkt-bar__name{font-size:15px;font-weight:700;color:#cfcfcf}
-.mkt-bar__tag{margin-left:9px;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#c64600;background:rgba(248,80,0,.14);padding:3px 9px;border-radius:100px}
-.mkt-bar__val{font-size:15px;font-weight:900;letter-spacing:-.02em;color:#cfcfcf;white-space:nowrap}
-.mkt-bar__track{height:14px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden}
-.mkt-bar__fill{display:block;height:100%;border-radius:100px;background:rgba(255,255,255,.2);width:0;transition:width 1.2s cubic-bezier(.22,.7,.3,1)}
-.mkt-bar--win .mkt-bar__name{color:#fff}
-.mkt-bar--win .mkt-bar__val{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.mkt-bar--win .mkt-bar__fill{background:var(--grad);box-shadow:0 0 26px rgba(248,80,0,.45)}
+.mkt-bars{display:flex;flex-direction:column;gap:16px}
+.mkt-bar__top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+.mkt-bar__name{font-size:14.5px;font-weight:700;color:#8a8a8a}
+.mkt-bar__tag{margin-left:9px;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:var(--grad);padding:3px 10px;border-radius:100px}
+.mkt-bar__val{font-size:14.5px;font-weight:900;letter-spacing:-.02em;color:#7a7a7a;white-space:nowrap}
+.mkt-bar__track{height:12px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden}
+.mkt-bar__fill{display:block;height:100%;border-radius:100px;background:rgba(255,255,255,.18);width:0;transition:width 1.2s cubic-bezier(.22,.7,.3,1)}
+/* winning carousel row — pulled forward */
+.mkt-bar--win{background:rgba(248,80,0,.07);border:1px solid rgba(248,80,0,.3);border-radius:14px;padding:15px 18px}
+.mkt-bar--win .mkt-bar__name{font-size:18px;color:#fff;font-weight:900;letter-spacing:-.02em}
+.mkt-bar--win .mkt-bar__val{font-size:23px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mkt-bar--win .mkt-bar__track{height:18px}
+.mkt-bar--win .mkt-bar__fill{background:var(--grad);box-shadow:0 0 28px rgba(248,80,0,.5)}
 .show .mkt-bar__fill{width:var(--w)}
 /* stats strip */
-.mkt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:860px;margin:16px auto 0}
-.mkt-stat{background:#141414;border:1px solid var(--line-light);border-radius:18px;padding:24px 22px;display:flex;flex-direction:column}
-.mkt-stat b{font-size:clamp(34px,3.6vw,44px);font-weight:900;letter-spacing:-.04em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:12px}
-.mkt-stat h4{font-size:14.5px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
-.mkt-stat p{font-size:12.5px;line-height:1.5;color:#9a9a9a;margin-bottom:auto}
-.mkt-stat span{font-size:10.5px;color:#6f6f6f;font-weight:600;margin-top:14px}
-.mkt-src{max-width:860px;margin:22px auto 0;font-size:11.5px;color:#6f6f6f;line-height:1.6;text-align:center}
+.mkt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:860px;margin:18px auto 0}
+.mkt-stat{background:#141414;border:1px solid var(--line-light);border-radius:18px;padding:30px 28px;display:flex;flex-direction:column}
+.mkt-stat b{font-size:clamp(36px,3.8vw,46px);font-weight:900;letter-spacing:-.04em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:18px}
+.mkt-stat h4{font-size:15px;font-weight:900;letter-spacing:-.02em;margin-bottom:9px}
+.mkt-stat p{font-size:13px;line-height:1.55;color:#9a9a9a;margin-bottom:auto}
+.mkt-stat span{font-size:10.5px;color:#6f6f6f;font-weight:600;margin-top:18px;padding-top:14px;border-top:1px solid var(--line-light)}
+.mkt-src{max-width:860px;margin:24px auto 0;font-size:11.5px;color:#6f6f6f;line-height:1.6;text-align:center}
 .mkt-src b{color:#9a9a9a;font-weight:700}
+/* transition bridge into collection */
+.mkt-bridge{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:66px}
+.mkt-bridge__txt{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#7a7a7a}
+.mkt-bridge__line{width:1.5px;height:46px;background:linear-gradient(180deg,transparent,rgba(248,80,0,.7))}
+.mkt-bridge__arrow{width:40px;height:40px;border-radius:50%;border:1px solid rgba(248,80,0,.4);display:grid;place-items:center;color:var(--orange);background:rgba(248,80,0,.08);animation:mktbob 2.4s ease-in-out infinite}
+.mkt-bridge__arrow svg{width:18px;height:18px}
+@keyframes mktbob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 @media(max-width:760px){
-  .market{padding:80px 0}
-  .mkt-chart{padding:26px 22px}
+  .market{padding:80px 0 64px}
+  .mkt-chart{padding:26px 20px}
   .mkt-chart__cap{flex-direction:column;gap:4px}
+  .mkt-bar--win{padding:14px}
   .mkt-stats{grid-template-columns:1fr}
+  .mkt-stat{padding:26px 22px}
 }
 
 /* ============================================================
@@ -1162,6 +1208,12 @@ html{overflow-x:hidden}
     </div>
 
     <p class="mkt-src reveal">Sources: <b>Socialinsider</b> Instagram engagement benchmarks 2026 (15M posts / 417k profiles) · <b>eMarketer / Meta</b> share of time on Reels 2025 · <b>Adam Mosseri</b> Instagram ranking signals, Jan 2025.</p>
+
+    <div class="mkt-bridge reveal">
+      <span class="mkt-bridge__txt">So we build decks worth saving</span>
+      <span class="mkt-bridge__line"></span>
+      <span class="mkt-bridge__arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg></span>
+    </div>
   </div>
 </section>
 
@@ -1454,7 +1506,7 @@ html{overflow-x:hidden}
               <span class="spc__pav">W</span>
               <div class="spc__pname">@wealth.notes</div>
               <div class="spc__pig">510k followers</div>
-              <span class="spc__pbadge">Flame · 6 decks</span>
+              <span class="spc__pbadge"><img src="assets/plans/flame-white.svg" alt="Flame"><span>· 6 decks</span></span>
             </div>
             <div class="spc__cats">
               <div class="spc__cat on">
@@ -1470,10 +1522,9 @@ html{overflow-x:hidden}
               <div class="spc__cat spc__cat--off">
                 <span class="spc__cat-ic"><svg viewBox="0 0 120 120"><use href="#ic-brand"/></svg></span>
                 <span class="spc__cat-l"><b>Branding</b><span>Visual system</span></span>
-                <span class="spc__cat-badge">Add-on</span>
+                <span class="spc__cat-chev">›</span>
               </div>
             </div>
-            <div class="spc__add">+ Add to this order</div>
           </aside>
 
           <div class="spc__main">
@@ -1532,26 +1583,50 @@ html{overflow-x:hidden}
       </div>
     </div>
 
-    <div class="space__feats">
-      <div class="space__feat reveal">
-        <span class="space__feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
-        <h4>A dedicated expert</h4>
-        <p>One creative who learns your brand and stays with you, not a rotating queue of freelancers.</p>
+    <div class="space__bento">
+      <div class="bento reveal">
+        <div class="bento__viz">
+          <div class="bz-chat">
+            <div class="bz-chat__hd"><span class="bz-av">M</span><span class="bz-av__l">Maya · your expert</span></div>
+            <span class="bz-bub bz-bub--in">Slide 2 is ready 👀</span>
+            <span class="bz-bub bz-bub--out">Love it, ship it</span>
+          </div>
+        </div>
+        <div class="bento__txt"><h4>A dedicated expert</h4><p>One creative who learns your brand and stays with you, not a rotating queue of freelancers.</p></div>
       </div>
-      <div class="space__feat reveal">
-        <span class="space__feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg></span>
-        <h4>Approve slide by slide</h4>
-        <p>Review each slide, request a tweak, approve in a click. Nothing ships without your yes.</p>
+
+      <div class="bento reveal">
+        <div class="bento__viz">
+          <div class="bz-approve">
+            <span class="bz-slide"></span>
+            <div class="bz-approve__col">
+              <span class="bz-btn bz-btn--ghost">Request a retouch</span>
+              <span class="bz-btn bz-btn--ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><path d="M5 12.5l4 4 10-10"/></svg>Approve</span>
+            </div>
+          </div>
+        </div>
+        <div class="bento__txt"><h4>Approve slide by slide</h4><p>Review each slide, request a tweak, approve in a click. Nothing ships without your yes.</p></div>
       </div>
-      <div class="space__feat reveal">
-        <span class="space__feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-        <h4>Everything in one place</h4>
-        <p>Decks, stories and brand assets in a single library you can come back to anytime.</p>
+
+      <div class="bento reveal">
+        <div class="bento__viz">
+          <div class="bz-lib">
+            <span class="bz-cat on"><i></i>Decks</span>
+            <span class="bz-cat"><i></i>Stories</span>
+            <span class="bz-cat"><i></i>Branding</span>
+          </div>
+        </div>
+        <div class="bento__txt"><h4>Everything in one place</h4><p>Decks, stories and brand assets in a single library you can come back to anytime.</p></div>
       </div>
-      <div class="space__feat reveal">
-        <span class="space__feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>
-        <h4>Export post-ready</h4>
-        <p>Final decks delivered at 1080×1350, ready to post. No reformatting, no back and forth.</p>
+
+      <div class="bento reveal">
+        <div class="bento__viz">
+          <div class="bz-export">
+            <span class="bz-export__slide"><span class="bz-export__tag">1080×1350</span></span>
+            <span class="bz-export__dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>
+          </div>
+        </div>
+        <div class="bento__txt"><h4>Export post-ready</h4><p>Final decks delivered at 1080×1350, ready to post. No reformatting, no back and forth.</p></div>
       </div>
     </div>
   </div>
@@ -1572,8 +1647,7 @@ html{overflow-x:hidden}
         <div class="fmt-card__viz">
           <div class="viz-decks"><i></i><i></i><i></i></div>
         </div>
-        <span class="fmt-card__stage">Acquire</span>
-        <h3>Decks</h3>
+        <h3><span class="fmt-card__tic"><svg viewBox="0 0 140 94"><use href="#ic-decks"/></svg></span>Decks</h3>
         <span class="fmt-card__job">Stop the scroll</span>
         <p>Scroll-stopping carousels engineered to be saved and shared, the format that brings new people to your page.</p>
         <div class="fmt-card__tags"><span>Reach</span><span>Saves</span><span>New follows</span></div>
@@ -1585,8 +1659,7 @@ html{overflow-x:hidden}
         <div class="fmt-card__viz">
           <div class="viz-story"><div class="viz-story__bar"><i></i><i></i><i></i></div><span class="viz-story__av"></span><span class="viz-story__poll"></span></div>
         </div>
-        <span class="fmt-card__stage">Convert</span>
-        <h3>Stories</h3>
+        <h3><span class="fmt-card__tic"><svg viewBox="0 0 134 122"><use href="#ic-story"/></svg></span>Stories</h3>
         <span class="fmt-card__job">Build the relationship</span>
         <p>On-brand story sets that warm up the audience decks bring in: polls, link taps and DMs that turn viewers into a community.</p>
         <div class="fmt-card__tags"><span>9:16</span><span>Link taps</span><span>DMs &amp; polls</span></div>
@@ -1595,12 +1668,14 @@ html{overflow-x:hidden}
       <div class="fmt-arrow reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
 
       <div class="fmt-card reveal">
-        <span class="fmt-card__badge">Add-on</span>
         <div class="fmt-card__viz">
-          <div class="viz-brand"><span class="viz-brand__aa">Aa</span><span class="viz-brand__sw"><i></i><i></i><i></i><i></i></span></div>
+          <div class="viz-brand">
+            <div class="viz-brand__hd"><span class="viz-brand__av"></span><span class="viz-brand__id"><b></b><i></i></span></div>
+            <div class="viz-brand__hl"><span></span><span></span><span></span></div>
+            <div class="viz-brand__grid"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
         </div>
-        <span class="fmt-card__stage">Compound</span>
-        <h3>Branding</h3>
+        <h3><span class="fmt-card__tic"><svg viewBox="0 0 120 120"><use href="#ic-brand"/></svg></span>Branding</h3>
         <span class="fmt-card__job">Become unmistakable</span>
         <p>A visual system, type, color, layout, so every post is instantly yours. The kind people screenshot and tag you in.</p>
         <div class="fmt-card__tags"><span>Brand system</span><span>Recognizable</span><span>Long-term moat</span></div>
