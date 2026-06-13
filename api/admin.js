@@ -209,7 +209,7 @@ export default async function handler(req, res) {
           const trackUrl = clientMagicLink(siteUrl(req), order.email, order.ref || '');
           await sendTo(order.email, `💬 A message about your Brasero order #${order.ref || ''}`, messageNotifyEmail({
             name: order.name, ref: order.ref, fromName: me.name || 'Brasero studio', body: notifyBody, about: dk ? dk.title : '',
-            ctaUrl: trackUrl, ctaLabel: 'Open the conversation →',
+            ctaUrl: trackUrl, ctaLabel: 'Open the conversation',
           }));
         }
       } catch (e) { console.error('msg notify client', e); }

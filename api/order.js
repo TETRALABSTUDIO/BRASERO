@@ -96,7 +96,7 @@ export default async function handler(req, res) {
           const talent = await getTalentByEmail(order.talent_email);
           await sendTo(order.talent_email, `💬 New message from ${order.name || 'your client'}`, messageNotifyEmail({
             name: talent?.name, ref: order.ref, fromName: order.name || 'Client', body: notifyBody, about,
-            ctaUrl: `${siteUrl(req)}/app.html`, ctaLabel: 'Open the panel →',
+            ctaUrl: `${siteUrl(req)}/app.html`, ctaLabel: 'Open the panel',
           }));
         }
       } catch (e) { console.error('msg notify', e); }

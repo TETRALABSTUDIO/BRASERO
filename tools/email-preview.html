@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brasero · Email gallery</title>
+<style>
+  :root{ --bg:#0e0d0c; --panel:#1a1817; --line:#2a2725; --ink:#f4f1ec; --muted:#9a938b; --orange:#f87000; --red:#ff1a00; }
+  *{ box-sizing:border-box }
+  body{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 -apple-system,Segoe UI,Roboto,Arial,sans-serif }
+  header{ position:sticky; top:0; z-index:5; background:rgba(14,13,12,.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); padding:18px 26px }
+  .htop{ display:flex; align-items:center; gap:14px; flex-wrap:wrap }
+  h1{ margin:0; font-size:20px; letter-spacing:-.5px }
+  h1 b{ background:linear-gradient(100deg,var(--red),var(--orange)); -webkit-background-clip:text; background-clip:text; color:transparent }
+  .count{ color:var(--muted); font-size:13px }
+  .filters{ margin-left:auto; display:flex; gap:8px; flex-wrap:wrap }
+  .filters button{ background:var(--panel); color:var(--ink); border:1px solid var(--line); padding:7px 14px; border-radius:100px; font-size:13px; cursor:pointer; transition:.15s }
+  .filters button:hover{ border-color:var(--orange) }
+  .filters button.on{ background:linear-gradient(100deg,var(--red),var(--orange)); border-color:transparent; font-weight:700 }
+  .wrap{ padding:26px; max-width:1700px; margin:0 auto }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(380px,1fr)); gap:22px }
+  .card{ margin:0; background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden; display:flex; flex-direction:column }
+  figcaption{ padding:16px 18px 14px; border-bottom:1px solid var(--line) }
+  .cap-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px }
+  .num{ color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums }
+  .badge{ font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; padding:4px 10px; border-radius:100px }
+  .badge-client{ background:rgba(248,112,0,.16); color:#ffb066 }
+  .badge-team{ background:rgba(90,140,255,.16); color:#9fc0ff }
+  .badge-lead-recovery{ background:rgba(120,210,120,.16); color:#9be79b }
+  figcaption h3{ margin:0 0 8px; font-size:16px; letter-spacing:-.3px }
+  .subj{ margin:0 0 6px; font-size:13px; color:var(--ink) }
+  .subj span{ display:inline-block; font-size:10px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-right:6px }
+  .src{ margin:0; font-size:11px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace }
+  .frame-wrap{ background:#ffffff; height:620px; overflow:hidden; position:relative }
+  iframe{ width:125%; height:125%; border:0; transform:scale(.8); transform-origin:top left; background:#ffffff }
+  footer{ padding:30px 26px 50px; color:var(--muted); font-size:12px; text-align:center }
+  code{ background:var(--panel); border:1px solid var(--line); padding:2px 6px; border-radius:6px }
+</style>
+</head>
+<body>
+<header>
+  <div class="htop">
+    <h1><b>brasero.</b> email gallery</h1>
+    <span class="count">16 templates</span>
+    <div class="filters">
+      <button class="on" data-f="all">All</button>
+      <button data-f="Client">Client</button><button data-f="Team">Team</button><button data-f="Lead recovery">Lead recovery</button>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="grid">
+    
+  <figure class="card" data-group="Client">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-client">Client</span>
+        <span class="num">#1</span>
+      </div>
+      <h3>Order confirmed</h3>
+      <p class="subj"><span>Subject</span> Your Brasero order is confirmed 🎉</p>
+      <p class="src">api/_lib.js · clientOrderEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Order confirmed, Jordan 🎉</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>Thanks for your order, payment received. Here's your recap.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:28px 30px 0&quot;>
+      <table width=&quot;380&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:380px;width:100%;text-align:left&quot;>
+        <tr><td style=&quot;padding:13px 2px;font-size:14px;color:#9a938b&quot;>Pack</td><td align=&quot;right&quot; style=&quot;padding:13px 2px;font-size:14px;font-weight:700&quot;>Growth</td></tr>
+        <tr><td style=&quot;padding:13px 2px;font-size:14px;color:#9a938b;border-top:1px solid #f0f0f0&quot;>Billing</td><td align=&quot;right&quot; style=&quot;padding:13px 2px;font-size:14px;font-weight:700;border-top:1px solid #f0f0f0&quot;>Subscription · monthly</td></tr>
+        <tr><td style=&quot;padding:13px 2px;font-size:14px;color:#9a938b;border-top:1px solid #f0f0f0&quot;>Account</td><td align=&quot;right&quot; style=&quot;padding:13px 2px;font-size:14px;font-weight:700;border-top:1px solid #f0f0f0&quot;>@jordanlee</td></tr>
+        <tr><td style=&quot;padding:13px 2px;font-size:14px;color:#9a938b;border-top:1px solid #f0f0f0&quot;>Order ref</td><td align=&quot;right&quot; style=&quot;padding:13px 2px;font-size:14px;font-weight:700;border-top:1px solid #f0f0f0&quot;>#A1B2C3</td></tr>
+        <tr><td style=&quot;padding:16px 2px;font-weight:700;border-top:2px solid #111111&quot;>Total paid</td><td align=&quot;right&quot; style=&quot;padding:16px 2px;font-weight:900;font-size:22px;border-top:2px solid #111111&quot;>$299 /mo</td></tr>
+      </table>
+    </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:30px 40px 0&quot;>
+    <p style=&quot;margin:0 0 14px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>What happens next</span></p>
+    <table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin:0 auto;text-align:left&quot;><tbody><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>We read your brief &amp; Instagram and map your hooks.</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>We write your scripts, you approve them in your space.</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>We design your decks, you approve or request a retouch.</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Your post-ready decks land right in your space.</td></tr></tbody></table>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Track your order</a></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><span style=&quot;font-size:12px;color:#9a938b&quot;>Follow production, approve scripts &amp; designs anytime.</span></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Client">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-client">Client</span>
+        <span class="num">#2</span>
+      </div>
+      <h3>Add-on confirmed</h3>
+      <p class="subj"><span>Subject</span> Your new Brasero items are on the way 🔥</p>
+      <p class="src">api/_lib.js · addonClientEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>More decks incoming, Jordan 🔥</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>Payment received. We've added 3 new Carousel decks to your order.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>They're now in production and will appear in your tracker. We'll email you at each step to review.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Open your tracker</a></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><span style=&quot;font-size:12px;color:#9a938b&quot;>Order #A1B2C3</span></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Client">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-client">Client</span>
+        <span class="num">#3</span>
+      </div>
+      <h3>Script ready to review</h3>
+      <p class="subj"><span>Subject</span> Your Brasero script is ready to review 👀</p>
+      <p class="src">api/_lib.js · reviewEmail (kind=script)</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>A deck needs your eyes, Jordan 👀</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>We've written the script for <b>5 myths about cold email</b>. Take a look, you can tweak the copy and approve it so we move it into design.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Review the script</a></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><span style=&quot;font-size:12px;color:#9a938b&quot;>Order #A1B2C3</span></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Client">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-client">Client</span>
+        <span class="num">#4</span>
+      </div>
+      <h3>Design ready to review</h3>
+      <p class="subj"><span>Subject</span> Your Brasero design is ready to review 👀</p>
+      <p class="src">api/_lib.js · reviewEmail (kind=design)</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>A deck needs your eyes, Jordan 👀</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>The design for <b>5 myths about cold email</b> is ready. Approve it, or send a retouch and we'll rework it.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Review the design</a></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><span style=&quot;font-size:12px;color:#9a938b&quot;>Order #A1B2C3</span></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Client">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-client">Client</span>
+        <span class="num">#5</span>
+      </div>
+      <h3>Magic sign-in link</h3>
+      <p class="subj"><span>Subject</span> Your Brasero sign-in link 🔥</p>
+      <p class="src">api/_lib.js · magicLinkEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Your sign-in link 🔥</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>Tap the button below to open your space and follow all your orders in one place. This link expires in 15 minutes.</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Open my space</a></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0;font-size:12px;color:#9a9a9a&quot;>If you didn't request this, you can safely ignore this email.</p></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Client">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-client">Client</span>
+        <span class="num">#6</span>
+      </div>
+      <h3>Message notification (to client)</h3>
+      <p class="subj"><span>Subject</span> 💬 A message about your Brasero order #A1B2C3</p>
+      <p class="src">api/_lib.js · messageNotifyEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>New message · #A1B2C3</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;><b>Brasero Studio</b> sent you a message about <b>5 myths about cold email</b>:</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:26px 44px 0&quot;>
+    <p style=&quot;margin:0 0 9px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>Message</span></p>
+    <p style=&quot;margin:0;font-size:15px;color:#333333;line-height:1.6;font-style:italic&quot;>“Hey! We just pushed an update to your first carousel, take a look when you get a sec.”</p>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Open the conversation</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Team">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-team">Team</span>
+        <span class="num">#7</span>
+      </div>
+      <h3>2FA verification code</h3>
+      <p class="subj"><span>Subject</span> Your Brasero verification code 🔒</p>
+      <p class="src">api/_lib.js · loginCodeEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Your verification code 🔒</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>Use this code to finish signing in to your Brasero studio space. It expires in 10 minutes.</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:30px 30px 6px&quot;><div style=&quot;font-size:42px;font-weight:800;letter-spacing:12px;color:#111111;text-align:center&quot;>4&nbsp;8&nbsp;1&nbsp;9&nbsp;2&nbsp;0</div></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0;font-size:12px;color:#9a9a9a&quot;>If you didn't try to sign in, someone may have your password, change it as soon as you can.</p></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Team">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-team">Team</span>
+        <span class="num">#8</span>
+      </div>
+      <h3>Talent invite</h3>
+      <p class="subj"><span>Subject</span> Join your Brasero studio space 🎨</p>
+      <p class="src">api/_lib.js · talentInviteEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Join your studio space 🎨</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>You've been invited to Brasero Studio to work on client carousels, stories &amp; branding.</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:30px 40px 0&quot;>
+    <p style=&quot;margin:0 0 14px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>Next steps</span></p>
+    <table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin:0 auto;text-align:left&quot;><tbody><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Create your password</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Add your name &amp; a profile photo</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>See every project assigned to you</td></tr></tbody></table>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Set up my account</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Team">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-team">Team</span>
+        <span class="num">#9</span>
+      </div>
+      <h3>Project assigned</h3>
+      <p class="subj"><span>Subject</span> 🚀 New project assigned to you</p>
+      <p class="src">api/_lib.js · talentAssignedEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>New project · #A1B2C3</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>A new project from <b>Acme Co</b> (Growth pack) has been assigned to you.</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:30px 40px 0&quot;>
+    <p style=&quot;margin:0 0 14px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>Next steps</span></p>
+    <table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin:0 auto;text-align:left&quot;><tbody><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Open the panel to see the elements</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Write the first scripts</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Send them to the client for approval</td></tr></tbody></table>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Open the panel</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Team">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-team">Team</span>
+        <span class="num">#10</span>
+      </div>
+      <h3>Client approved a script</h3>
+      <p class="subj"><span>Subject</span> ✅ Your client approved a script</p>
+      <p class="src">api/_lib.js · talentClientActionEmail (approved_script)</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Script approved · #A1B2C3</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>Your client approved the script for <b>5 myths about cold email</b>, time to design it.</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:30px 40px 0&quot;>
+    <p style=&quot;margin:0 0 14px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>Next steps</span></p>
+    <table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin:0 auto;text-align:left&quot;><tbody><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Open the element in the panel</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Create &amp; upload the slides</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Send the design for approval</td></tr></tbody></table>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Open the panel</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Team">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-team">Team</span>
+        <span class="num">#11</span>
+      </div>
+      <h3>Client approved a design</h3>
+      <p class="subj"><span>Subject</span> 🎉 Your client approved a design</p>
+      <p class="src">api/_lib.js · talentClientActionEmail (approved_design)</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Design approved · #A1B2C3</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>Your client approved the design for <b>5 myths about cold email</b>, it's done and live. 🎉</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>Nothing to do on this element, just move on to the next one in the order.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Open the panel</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Team">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-team">Team</span>
+        <span class="num">#12</span>
+      </div>
+      <h3>Client requested a retouch</h3>
+      <p class="subj"><span>Subject</span> ✏️ Your client requested a retouch</p>
+      <p class="src">api/_lib.js · talentClientActionEmail (revision)</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Retouch requested · #A1B2C3</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>Your client asked for a change on <b>5 myths about cold email</b>.</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:26px 44px 0&quot;>
+    <p style=&quot;margin:0 0 9px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>Client note</span></p>
+    <p style=&quot;margin:0;font-size:15px;color:#333333;line-height:1.6;font-style:italic&quot;>“Can we make the headline punchier and swap the blue accent for our brand orange?”</p>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:30px 40px 0&quot;>
+    <p style=&quot;margin:0 0 14px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>Next steps</span></p>
+    <table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin:0 auto;text-align:left&quot;><tbody><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Read the client note above</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Update the design</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Resend it for approval</td></tr></tbody></table>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Open the panel</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Team">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-team">Team</span>
+        <span class="num">#13</span>
+      </div>
+      <h3>Project completed</h3>
+      <p class="subj"><span>Subject</span> 🎉 Project completed</p>
+      <p class="src">api/_lib.js · talentProjectDoneEmail</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Project completed · #A1B2C3 🎉</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;><p style=&quot;margin:0 0 8px&quot;>Hi Jordan,</p><p style=&quot;margin:0&quot;>Every element of <b>Acme Co</b>'s order is approved &amp; delivered. Great work!</p></td></tr><tr><td align=&quot;center&quot; style=&quot;padding:30px 40px 0&quot;>
+    <p style=&quot;margin:0 0 14px&quot;><span style=&quot;font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent&quot;>Next steps</span></p>
+    <table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin:0 auto;text-align:left&quot;><tbody><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>The full project is now live in the client's space</td></tr><tr>
+    <td valign=&quot;top&quot; style=&quot;padding:1px 11px 11px 0&quot;><div style=&quot;width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700&quot;>&#10003;</div></td>
+    <td valign=&quot;top&quot; style=&quot;padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55&quot;>Check the panel for any new assignments</td></tr></tbody></table>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>View the project</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Lead recovery">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-lead-recovery">Lead recovery</span>
+        <span class="num">#14</span>
+      </div>
+      <h3>Step 1 · Reminder (day 1)</h3>
+      <p class="subj"><span>Subject</span> You're one step from done</p>
+      <p class="src">api/_lib.js · campaignEmail[0]</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>You're one step from done</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>Hi Jordan, you set up your Brasero order but didn't finish checkout, so nothing's in production yet.<br><br>The good news: we saved your brief. Everything you typed is still there, so finishing takes under a minute and your first decks start the same day.<br><br>Pick up exactly where you left off:</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com/checkout.html&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Finish my order</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Lead recovery">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-lead-recovery">Lead recovery</span>
+        <span class="num">#15</span>
+      </div>
+      <h3>Step 2 · Follow-up (day 3)</h3>
+      <p class="subj"><span>Subject</span> Here's exactly what you get</p>
+      <p class="src">api/_lib.js · campaignEmail[1]</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>Here's exactly what you get</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>Hi Jordan, posting consistently is the part that eats your week. We make it the easy part.<br><br>With your Brasero pack you get:<br><br><b>Carousels written by real strategists.</b> Sharp hooks, not recycled templates.<br><b>Designs built to stop the scroll.</b> Made to earn saves, shares and follows.<br><b>Delivered post-ready.</b> You review, approve, publish. That's it.<br><br>Brands use us to show up every week without burning out their team. Got a question before you commit? Just reply, a real person reads every email.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com/checkout.html&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Pick up where I left off</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  <figure class="card" data-group="Lead recovery">
+    <figcaption>
+      <div class="cap-top">
+        <span class="badge badge-lead-recovery">Lead recovery</span>
+        <span class="num">#16</span>
+      </div>
+      <h3>Step 3 · Last chance (day 5)</h3>
+      <p class="subj"><span>Subject</span> We're about to release your spot</p>
+      <p class="src">api/_lib.js · campaignEmail[2]</p>
+    </figcaption>
+    <div class="frame-wrap">
+      <iframe loading="lazy" srcdoc="<!doctype html><html><body style=&quot;margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111&quot;>
+  <table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;background:#ffffff;padding:44px 18px&quot;><tr><td align=&quot;center&quot;>
+    <table width=&quot;540&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;max-width:540px;width:100%;background:#ffffff&quot;>
+      <tr><td align=&quot;center&quot; style=&quot;padding:0 30px 40px&quot;>
+        <img src=&quot;https://www.braserodecks.com/assets/email-logo.png&quot; alt=&quot;Brasero&quot; height=&quot;30&quot; style=&quot;display:block;border:0;height:30px;width:auto;margin:0 auto&quot;>
+      </td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:4px 30px 0&quot;>
+    <h1 style=&quot;margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111&quot;>We're about to release your spot</h1>
+  </td></tr><tr><td align=&quot;center&quot; style=&quot;padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7&quot;>Hi Jordan, we've kept your brief warm for a few days, but we're about to free up your production slot for the next brand in line.<br><br>If the timing's just off, no hard feelings, reply and we'll hold it for you.<br><br>If you're in: your first decks can be in production today. And if your opening carousel isn't something you're proud to post, we'll rework it until it is, on us.<br><br>To make the decision easy, here's <b>10% off</b> your order. Use code <b>LASTCHANCE</b> at checkout. This is the last nudge you'll get from us.</td></tr><tr><td align=&quot;center&quot; style=&quot;padding:32px 30px 12px&quot;><a href=&quot;https://www.braserodecks.com/checkout.html&quot; style=&quot;display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px&quot;>Claim my 10% off</a></td></tr>
+      <tr><td align=&quot;center&quot; style=&quot;padding:42px 30px 0&quot;>
+        <p style=&quot;margin:0;font-size:12px;color:#b5ada3;line-height:1.6&quot;>© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>"></iframe>
+    </div>
+  </figure>
+  </div>
+</div>
+<footer>
+  Generated by <code>tools/email-preview.js</code> · templates live in <code>api/_lib.js</code> · re-run <code>node tools/email-preview.js</code> after edits.
+</footer>
+<script>
+  const btns = document.querySelectorAll('.filters button');
+  btns.forEach(b => b.addEventListener('click', () => {
+    btns.forEach(x => x.classList.remove('on')); b.classList.add('on');
+    const f = b.dataset.f;
+    document.querySelectorAll('.card').forEach(c => {
+      c.style.display = (f === 'all' || c.dataset.group === f) ? '' : 'none';
+    });
+  }));
+</script>
+</body>
+</html>

@@ -903,126 +903,119 @@ export async function sendTo(to, subject, html) {
 
 const LOGO_URL = 'https://www.braserodecks.com/assets/email-logo.png';
 
-// Shared branded shell: clean white card, logo header (no orange box) + dark footer.
+// Shared branded shell: pure white, centered, no card/box, generous air,
+// closes with a copyright footer on every email.
 export function emailShell(inner) {
-  return `<!doctype html><html><body style="margin:0;background:#f4f1ec;font-family:Arial,Helvetica,sans-serif;color:#111111">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ec;padding:30px 12px"><tr><td align="center">
-    <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 12px 34px rgba(0,0,0,.07)">
-      <tr><td style="padding:26px 30px 18px;border-bottom:1px solid #f0ece4">
-        <img src="${LOGO_URL}" alt="Brasero" height="28" style="display:block;border:0;height:28px;width:auto">
+  return `<!doctype html><html><body style="margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:44px 18px"><tr><td align="center">
+    <table width="540" cellpadding="0" cellspacing="0" style="max-width:540px;width:100%;background:#ffffff">
+      <tr><td align="center" style="padding:0 30px 40px">
+        <img src="${LOGO_URL}" alt="Brasero" height="30" style="display:block;border:0;height:30px;width:auto;margin:0 auto">
       </td></tr>
       ${inner}
+      <tr><td align="center" style="padding:42px 30px 0">
+        <p style="margin:0;font-size:12px;color:#b5ada3;line-height:1.6">© Brasero. All rights reserved.<br>braserodecks.com</p>
+      </td></tr>
     </table>
   </td></tr></table></body></html>`;
 }
 
 function ctaButton(url, label) {
-  return `<a href="${url}" style="display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 28px;border-radius:100px">${label}</a>`;
+  return `<a href="${url}" style="display:inline-block;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:15px 38px;border-radius:100px">${label}</a>`;
 }
 
-/* ---- structured email building blocks ---- */
+/* ---- structured email building blocks (centered, white, airy) ---- */
+// eyebrow kept in the signature for callers but intentionally not rendered.
 function emailHero(eyebrow, title) {
-  return `<tr><td style="padding:30px 30px 0">
-    ${eyebrow ? `<p style="margin:0 0 7px;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#f87000">${eyebrow}</p>` : ''}
-    <h1 style="margin:0;font-size:25px;letter-spacing:-.6px;line-height:1.15;color:#111111">${title}</h1>
+  return `<tr><td align="center" style="padding:4px 30px 0">
+    <h1 style="margin:0;font-size:28px;letter-spacing:-.7px;line-height:1.22;color:#111111">${title}</h1>
   </td></tr>`;
 }
 function emailText(html) {
-  return `<tr><td style="padding:16px 30px 0;font-size:15px;color:#333333;line-height:1.6">${html}</td></tr>`;
+  return `<tr><td align="center" style="padding:20px 38px 0;font-size:15px;color:#444444;line-height:1.7">${html}</td></tr>`;
+}
+// Sentence-case, orange-gradient (solid-orange fallback), slightly larger section label.
+function sectionLabel(text) {
+  return `<span style="font-size:16px;font-weight:700;color:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">${text}</span>`;
 }
 function noteBox(label, body) {
-  return `<tr><td style="padding:14px 30px 0">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff4ef;border-radius:10px"><tr>
-      <td width="4" style="background:#f87000"></td>
-      <td style="padding:12px 14px;font-size:14px;color:#444444;line-height:1.5"><b style="color:#c64600">${label}</b><br>${body}</td>
-    </tr></table>
+  return `<tr><td align="center" style="padding:26px 44px 0">
+    <p style="margin:0 0 9px">${sectionLabel(label)}</p>
+    <p style="margin:0;font-size:15px;color:#333333;line-height:1.6;font-style:italic">“${body}”</p>
   </td></tr>`;
 }
-function nextSteps(items) {
+// Bulleted, centered block with left-aligned rows. Each bullet is a small
+// gradient pill with a white checkmark (solid-orange fallback for Outlook).
+function nextSteps(items, label = 'Next steps') {
+  const check = `<div style="width:18px;height:18px;border-radius:50%;background:#f87000;background:linear-gradient(100deg,#ff1a00,#f87000);color:#ffffff;font-size:10px;line-height:18px;text-align:center;font-weight:700">&#10003;</div>`;
   const rows = items.map(s => `<tr>
-    <td width="22" valign="top"><div style="width:7px;height:7px;border-radius:50%;background:#f87000;margin:7px 0 0"></div></td>
-    <td style="font-size:14px;color:#3a3a3a;line-height:1.55;padding:0 0 9px 2px">${s}</td></tr>`).join('');
-  return `<tr><td style="padding:18px 30px 2px">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4ef;border-radius:12px"><tr><td style="padding:15px 18px">
-      <p style="margin:0 0 11px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#9a8f80">Next steps</p>
-      <table width="100%" cellpadding="0" cellspacing="0">${rows}</table>
-    </td></tr></table>
+    <td valign="top" style="padding:1px 11px 11px 0">${check}</td>
+    <td valign="top" style="padding:0 0 11px;font-size:14px;color:#444444;line-height:1.55">${s}</td></tr>`).join('');
+  return `<tr><td align="center" style="padding:30px 40px 0">
+    <p style="margin:0 0 14px">${sectionLabel(label)}</p>
+    <table cellpadding="0" cellspacing="0" style="margin:0 auto;text-align:left"><tbody>${rows}</tbody></table>
   </td></tr>`;
 }
 function emailCta(url, label) {
-  return `<tr><td style="padding:20px 30px 30px">${ctaButton(url, label)}</td></tr>`;
+  return `<tr><td align="center" style="padding:32px 30px 12px">${ctaButton(url, label)}</td></tr>`;
 }
 
 // "You have something to validate" email - script ready or design ready.
 export function reviewEmail({ name, kind, deckTitle, ref, url }) {
   const first = name ? name.split(' ')[0] : '';
   const isScript = kind === 'script';
-  const heading = isScript ? `Your script is ready to review` : `Your design is ready to review`;
   const blurb = isScript
     ? `We've written the script for <b>${deckTitle || 'your next deck'}</b>. Take a look, you can tweak the copy and approve it so we move it into design.`
     : `The design for <b>${deckTitle || 'your next deck'}</b> is ready. Approve it, or send a retouch and we'll rework it.`;
-  return emailShell(`
-    <tr><td style="padding:30px 28px 6px">
-      <h1 style="margin:0 0 8px;font-size:26px;letter-spacing:-1px">A deck needs your eyes${first ? ', ' + first : ''} 👀</h1>
-      <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">${heading}.</p>
-    </td></tr>
-    <tr><td style="padding:14px 28px 6px">
-      <p style="margin:0 0 16px;font-size:14px;color:#333333;line-height:1.55">${blurb}</p>
-      ${url ? ctaButton(url, isScript ? 'Review the script →' : 'Review the design →') : ''}
-    </td></tr>
-    <tr><td style="padding:14px 28px 26px;color:#9a9a9a;font-size:12px">Order #${ref || ''}</td></tr>`);
+  return emailShell(
+    emailHero('', `A deck needs your eyes${first ? ', ' + first : ''} 👀`) +
+    emailText(blurb) +
+    (url ? emailCta(url, isScript ? 'Review the script' : 'Review the design') : '') +
+    emailText(`<span style="font-size:12px;color:#9a938b">Order #${ref || ''}</span>`)
+  );
 }
 
 // Branded order-confirmation email sent to the customer.
 export function clientOrderEmail({ name, planName, billing, amountCents, handle, ref, trackUrl }) {
   const amount = amountCents != null ? '$' + (amountCents / 100).toFixed(amountCents % 100 ? 2 : 0) : '';
   const first = name ? name.split(' ')[0] : '';
-  const cell = 'padding:12px 16px;font-size:14px';
-  const top = 'border-top:1px solid #f0f0f0';
-  return `<!doctype html><html><body style="margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#111111">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:28px 0"><tr><td align="center">
-    <table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;border:1px solid #eeeeee;border-radius:18px;overflow:hidden">
-      <tr><td style="background:linear-gradient(100deg,#ff1a00,#f87000);padding:24px 28px">
-        <span style="color:#ffffff;font-size:22px;font-weight:900;letter-spacing:-1px">brasero.</span>
-      </td></tr>
-      <tr><td style="padding:30px 28px 6px">
-        <h1 style="margin:0 0 8px;font-size:26px;letter-spacing:-1px">Order confirmed${first ? ', ' + first : ''} 🎉</h1>
-        <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">Thanks for your order, payment received. Here's your recap.</p>
-      </td></tr>
-      <tr><td style="padding:18px 28px">
-        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:12px">
-          <tr><td style="${cell};color:#6b6b6b">Pack</td><td align="right" style="${cell};font-weight:700">${planName || '-'}</td></tr>
-          <tr><td style="${cell};color:#6b6b6b;${top}">Billing</td><td align="right" style="${cell};font-weight:700;${top}">${billing === 'sub' ? 'Subscription · monthly' : 'One-time'}</td></tr>
-          ${handle ? `<tr><td style="${cell};color:#6b6b6b;${top}">Account</td><td align="right" style="${cell};font-weight:700;${top}">${handle}</td></tr>` : ''}
-          ${ref ? `<tr><td style="${cell};color:#6b6b6b;${top}">Order ref</td><td align="right" style="${cell};font-weight:700;${top}">#${ref}</td></tr>` : ''}
-          <tr><td style="padding:14px 16px;font-weight:700;border-top:1px solid #eeeeee">Total paid</td><td align="right" style="padding:14px 16px;font-weight:900;font-size:20px;border-top:1px solid #eeeeee">${amount}${billing === 'sub' ? ' /mo' : ''}</td></tr>
-        </table>
-      </td></tr>
-      <tr><td style="padding:6px 28px 22px">
-        <h3 style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#f87000;margin:14px 0 10px">What happens next</h3>
-        <p style="margin:0 0 8px;font-size:14px;color:#333333">1 · We review your brief &amp; Instagram and map your hooks.</p>
-        <p style="margin:0 0 8px;font-size:14px;color:#333333">2 · We write &amp; design your first decks in your brand style.</p>
-        <p style="margin:0;font-size:14px;color:#333333">3 · You receive your post-ready decks by email.</p>
-      </td></tr>
-      ${trackUrl ? `<tr><td align="center" style="padding:6px 28px 28px">${ctaButton(trackUrl, 'Track your order →')}<p style="margin:12px 0 0;font-size:12px;color:#9a9a9a">Follow production, approve scripts &amp; designs anytime.</p></td></tr>` : ''}
-    </table>
-  </td></tr></table></body></html>`;
+  const cell = 'padding:13px 2px;font-size:14px';
+  const line = 'border-top:1px solid #f0f0f0';
+  const row = (k, v) => `<tr><td style="${cell};color:#9a938b;${line}">${k}</td><td align="right" style="${cell};font-weight:700;${line}">${v}</td></tr>`;
+  return emailShell(
+    emailHero('', `Order confirmed${first ? ', ' + first : ''} 🎉`) +
+    emailText(`Thanks for your order, payment received. Here's your recap.`) +
+    `<tr><td align="center" style="padding:28px 30px 0">
+      <table width="380" cellpadding="0" cellspacing="0" style="max-width:380px;width:100%;text-align:left">
+        <tr><td style="${cell};color:#9a938b">Pack</td><td align="right" style="${cell};font-weight:700">${planName || '-'}</td></tr>
+        ${row('Billing', billing === 'sub' ? 'Subscription · monthly' : 'One-time')}
+        ${handle ? row('Account', handle) : ''}
+        ${ref ? row('Order ref', '#' + ref) : ''}
+        <tr><td style="padding:16px 2px;font-weight:700;border-top:2px solid #111111">Total paid</td><td align="right" style="padding:16px 2px;font-weight:900;font-size:22px;border-top:2px solid #111111">${amount}${billing === 'sub' ? ' /mo' : ''}</td></tr>
+      </table>
+    </td></tr>` +
+    nextSteps([
+      'We read your brief &amp; Instagram and map your hooks.',
+      'We write your scripts, you approve them in your space.',
+      'We design your decks, you approve or request a retouch.',
+      'Your post-ready decks land right in your space.',
+    ], 'What happens next') +
+    (trackUrl ? emailCta(trackUrl, 'Track your order') +
+      emailText(`<span style="font-size:12px;color:#9a938b">Follow production, approve scripts &amp; designs anytime.</span>`) : '')
+  );
 }
 
 // Confirmation when a client adds extra decks to an existing order.
 export function addonClientEmail({ name, planName, count, ref, trackUrl }) {
   const first = name ? name.split(' ')[0] : '';
   const c = count || '';
-  return emailShell(`
-    <tr><td style="padding:30px 28px 6px">
-      <h1 style="margin:0 0 8px;font-size:26px;letter-spacing:-1px">More decks incoming${first ? ', ' + first : ''} 🔥</h1>
-      <p style="margin:0;color:#6b6b6b;font-size:15px;line-height:1.5">Payment received. We've added ${c} new ${planName || ''} deck${count === 1 ? '' : 's'} to your order.</p>
-    </td></tr>
-    <tr><td style="padding:14px 28px 6px">
-      <p style="margin:0 0 16px;font-size:14px;color:#333333;line-height:1.55">They're now in production and will appear in your tracker. We'll email you at each step to review.</p>
-      ${trackUrl ? ctaButton(trackUrl, 'Open your tracker →') : ''}
-    </td></tr>
-    <tr><td style="padding:14px 28px 26px;color:#9a9a9a;font-size:12px">Order #${ref || ''}</td></tr>`);
+  return emailShell(
+    emailHero('', `More decks incoming${first ? ', ' + first : ''} 🔥`) +
+    emailText(`Payment received. We've added ${c} new ${planName || ''} deck${count === 1 ? '' : 's'} to your order.`) +
+    emailText(`They're now in production and will appear in your tracker. We'll email you at each step to review.`) +
+    (trackUrl ? emailCta(trackUrl, 'Open your tracker') : '') +
+    emailText(`<span style="font-size:12px;color:#9a938b">Order #${ref || ''}</span>`)
+  );
 }
 
 // Passwordless sign-in link to the client's space (expires in 15 min).
@@ -1030,7 +1023,7 @@ export function magicLinkEmail({ name, url }) {
   return emailShell(
     emailHero('Sign in', 'Your sign-in link 🔥') +
     emailText(`${greet(name)}<p style="margin:0">Tap the button below to open your space and follow all your orders in one place. This link expires in 15 minutes.</p>`) +
-    emailCta(url || '#', 'Open my space →') +
+    emailCta(url || '#', 'Open my space') +
     emailText(`<p style="margin:0;font-size:12px;color:#9a9a9a">If you didn't request this, you can safely ignore this email.</p>`)
   );
 }
@@ -1041,7 +1034,7 @@ export function loginCodeEmail({ name, code }) {
   return emailShell(
     emailHero('Verify it\'s you', 'Your verification code 🔒') +
     emailText(`${greet(name)}<p style="margin:0">Use this code to finish signing in to your Brasero studio space. It expires in 10 minutes.</p>`) +
-    `<tr><td style="padding:22px 30px 4px"><div style="font-size:34px;font-weight:800;letter-spacing:8px;color:#111111;background:#f7f4ef;border-radius:12px;padding:18px 0;text-align:center">${spaced}</div></td></tr>` +
+    `<tr><td align="center" style="padding:30px 30px 6px"><div style="font-size:42px;font-weight:800;letter-spacing:12px;color:#111111;text-align:center">${spaced}</div></td></tr>` +
     emailText(`<p style="margin:0;font-size:12px;color:#9a9a9a">If you didn't try to sign in, someone may have your password, change it as soon as you can.</p>`)
   );
 }
@@ -1058,7 +1051,7 @@ export function talentInviteEmail({ name, setupUrl }) {
     emailHero('Talent invite', 'Join your studio space 🎨') +
     emailText(`${greet(name)}<p style="margin:0">You've been invited to Brasero Studio to work on client carousels, stories &amp; branding.</p>`) +
     nextSteps(['Create your password', 'Add your name &amp; a profile photo', 'See every project assigned to you']) +
-    emailCta(setupUrl || '#', 'Set up my account →')
+    emailCta(setupUrl || '#', 'Set up my account')
   );
 }
 
@@ -1068,7 +1061,7 @@ export function talentAssignedEmail({ name, ref, clientName, planName, panelUrl 
     emailHero('New project', `New project · #${ref || ''}`) +
     emailText(`${greet(name)}<p style="margin:0">A new project${clientName ? ` from <b>${clientName}</b>` : ''}${planName ? ` (${planName} pack)` : ''} has been assigned to you.</p>`) +
     nextSteps(['Open the panel to see the elements', 'Write the first scripts', 'Send them to the client for approval']) +
-    emailCta(panelUrl || '#', 'Open the panel →')
+    emailCta(panelUrl || '#', 'Open the panel')
   );
 }
 
@@ -1081,7 +1074,7 @@ export function talentClientActionEmail({ name, ref, deckTitle, kind, note, pane
       steps: ['Open the element in the panel', 'Create &amp; upload the slides', 'Send the design for approval'] },
     approved_design: { eyebrow: 'Client approved', title: `Design approved · #${ref || ''}`,
       intro: `Your client approved the design for <b>${t}</b>, it's done and live. 🎉`,
-      steps: ['Nothing to do on this element', 'Move on to the next one in the order'] },
+      done: `Nothing to do on this element, just move on to the next one in the order.` },
     revision: { eyebrow: 'Retouch requested', title: `Retouch requested · #${ref || ''}`,
       intro: `Your client asked for a change on <b>${t}</b>.`,
       steps: ['Read the client note above', 'Update the design', 'Resend it for approval'] },
@@ -1091,8 +1084,8 @@ export function talentClientActionEmail({ name, ref, deckTitle, kind, note, pane
     emailHero(c.eyebrow, c.title) +
     emailText(`${greet(name)}<p style="margin:0">${c.intro}</p>`) +
     (kind === 'revision' && note ? noteBox('Client note', String(note)) : '') +
-    nextSteps(c.steps) +
-    emailCta(panelUrl || '#', 'Open the panel →')
+    (c.done ? emailText(c.done) : nextSteps(c.steps)) +
+    emailCta(panelUrl || '#', 'Open the panel')
   );
 }
 
@@ -1102,7 +1095,7 @@ export function talentProjectDoneEmail({ name, ref, clientName, panelUrl }) {
     emailHero('Completed', `Project completed · #${ref || ''} 🎉`) +
     emailText(`${greet(name)}<p style="margin:0">Every element${clientName ? ` of <b>${clientName}</b>'s order` : ''} is approved &amp; delivered. Great work!</p>`) +
     nextSteps(['The full project is now live in the client\'s space', 'Check the panel for any new assignments']) +
-    emailCta(panelUrl || '#', 'View the project →')
+    emailCta(panelUrl || '#', 'View the project')
   );
 }
 
@@ -1113,7 +1106,7 @@ export function messageNotifyEmail({ name, ref, fromName, body, about, ctaUrl, c
     emailHero('New message', `New message · #${ref || ''}`) +
     emailText(`${greet(name)}<p style="margin:0"><b>${esc(fromName) || 'Someone'}</b> sent you a message${about ? ` about <b>${esc(about)}</b>` : ''}:</p>`) +
     noteBox('Message', esc(body)) +
-    emailCta(ctaUrl || '#', ctaLabel || 'Open the conversation →')
+    emailCta(ctaUrl || '#', ctaLabel || 'Open the conversation')
   );
 }
 
@@ -1136,15 +1129,31 @@ export function clientMagicLink(base, email, ref, days = 30) {
    The owner can send the next step manually, or flip `auto` on and let the daily
    cron (api/cron-campaigns) send each step once its delay (days) has elapsed. */
 export const CAMPAIGN_STEPS = [
-  { key: 'reminder', label: 'Reminder', delayDays: 1, eyebrow: 'You left something behind',
-    title: 'Your decks are one step away', lead: 'Hi {name}, you started a Brasero order but didn\'t finish checkout. Your brief is saved, so picking up where you left off takes less than a minute.',
+  // Step 1 (day 1), low-friction reminder: remove doubt, surface the saved brief, make restarting feel like nothing.
+  { key: 'reminder', label: 'Reminder', delayDays: 1, eyebrow: '',
+    title: 'You\'re one step from done',
+    lead: 'Hi {name}, you set up your Brasero order but didn\'t finish checkout, so nothing\'s in production yet.'
+      + '<br><br>The good news: we saved your brief. Everything you typed is still there, so finishing takes under a minute and your first decks start the same day.'
+      + '<br><br>Pick up exactly where you left off:',
     cta: 'Finish my order' },
-  { key: 'followup', label: 'Follow-up', delayDays: 3, eyebrow: 'Still thinking it over?',
-    title: 'Here\'s what you\'d get', lead: 'Hi {name}, a quick recap of your Brasero pack: on-brand, scroll-stopping carousels written and designed for you, ready to post. Got a question before you commit? Just reply to this email.',
+  // Step 2 (day 3), value + objection handling + soft social proof: make the offer concrete and de-risk the decision.
+  { key: 'followup', label: 'Follow-up', delayDays: 3, eyebrow: '',
+    title: 'Here\'s exactly what you get',
+    lead: 'Hi {name}, posting consistently is the part that eats your week. We make it the easy part.'
+      + '<br><br>With your Brasero pack you get:'
+      + '<br><br><b>Carousels written by real strategists.</b> Sharp hooks, not recycled templates.'
+      + '<br><b>Designs built to stop the scroll.</b> Made to earn saves, shares and follows.'
+      + '<br><b>Delivered post-ready.</b> You review, approve, publish. That\'s it.'
+      + '<br><br>Brands use us to show up every week without burning out their team. Got a question before you commit? Just reply, a real person reads every email.',
     cta: 'Pick up where I left off' },
-  { key: 'lastchance', label: 'Last chance', delayDays: 5, eyebrow: 'One last nudge',
-    title: 'We held your spot', lead: 'Hi {name}, we kept your brief warm but we\'ll be closing it soon. If now isn\'t the right time, no worries, reply and tell us, otherwise your decks are ready to start the moment you check out.',
-    cta: 'Complete my order' },
+  // Step 3 (day 5), urgency + risk reversal + discount: a real reason to act now, a guarantee, and a one-time code.
+  { key: 'lastchance', label: 'Last chance', delayDays: 5, eyebrow: '',
+    title: 'We\'re about to release your spot',
+    lead: 'Hi {name}, we\'ve kept your brief warm for a few days, but we\'re about to free up your production slot for the next brand in line.'
+      + '<br><br>If the timing\'s just off, no hard feelings, reply and we\'ll hold it for you.'
+      + '<br><br>If you\'re in: your first decks can be in production today. And if your opening carousel isn\'t something you\'re proud to post, we\'ll rework it until it is, on us.'
+      + '<br><br>To make the decision easy, here\'s <b>10% off</b> your order. Use code <b>LASTCHANCE</b> at checkout. This is the last nudge you\'ll get from us.',
+    cta: 'Claim my 10% off' },
 ];
 const escHtml = s => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 export function campaignEmail(lead, idx, base) {
