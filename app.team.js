@@ -962,13 +962,12 @@ function briefHTML() {
       return s; }
     if (k === 'inspo') { return String(v || '').split(',').map(s => s.trim()).filter(Boolean).map(u => { const user = u.replace(/^@/, '');
       return `<a class="biglink" href="https://instagram.com/${esc(user)}" target="_blank" rel="noopener">${esc(u)}</a>`; }).join('&nbsp;&nbsp;·&nbsp;&nbsp;'); }
-    if (k === 'logo') { const ln = b.logo_name || 'brand-logo';
-      return `<div class="bt__logo"><img src="${esc(b.logo)}" alt="Brand logo"></div>
-        <a class="bt__dl" href="${esc(b.logo)}" download="${esc(ln)}" title="Download ${esc(ln)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l4-4m-4 4l-4-4M5 21h14"/></svg>${esc(ln)}</a>`; }
+    if (k === 'logo') { return `<div class="bt__logo"><img src="${esc(b.logo)}" alt="Brand logo"></div>`; }
     return esc(String(v || ''));
   };
   const has = (k) => k === 'typo' ? (b.typo || b.typo_file) : b[k];
-  const icon = (k) => `<svg class="bt__ic" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${BRIEF_ICONS[k] || BRIEF_ICONS._d}</svg>`;
+  const icon = (k) => `<svg class="bt__ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${BRIEF_ICONS[k] || BRIEF_ICONS._d}</svg>`;
+  const DL_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l4-4m-4 4l-4-4M5 21h14"/></svg>';
   const TILES = [
     ['page', 'Page / brand', 1, ''],
     ['goal', '#1 goal', 1, ''],
@@ -985,8 +984,10 @@ function briefHTML() {
   ];
   const COVERED = new Set(TILES.map(t => t[0]).concat('handle', 'logo_name'));
   Object.keys(b).filter(k => !COVERED.has(k) && !/_file(_name)?$/.test(k) && b[k]).forEach(k => TILES.push([k, BRIEF_LABELS[k] || k, 2, '']));
-  const tiles = TILES.filter(([k]) => has(k)).map(([k, label, span, cls]) =>
-    `<div class="bt bt--${span} ${cls}"><div class="bt__k">${icon(k)}<span>${esc(label)}</span></div><div class="bt__v">${val(k)}</div></div>`).join('');
+  const tiles = TILES.filter(([k]) => has(k)).map(([k, label, span, cls]) => {
+    const act = (k === 'logo' && b.logo) ? `<a class="bt__dl" href="${esc(b.logo)}" download="${esc(b.logo_name || 'brand-logo')}" title="Download ${esc(b.logo_name || 'logo')}">${DL_ARROW}</a>` : '';
+    return `<div class="bt bt--${span} ${cls}"><div class="bt__k">${icon(k)}<span>${esc(label)}</span>${act}</div><div class="bt__v">${val(k)}</div></div>`;
+  }).join('');
   const body = tiles ? `<div class="bento">${tiles}</div>` : '<div class="bempty">No brief was filled in for this project yet.</div>';
   return `<div class="briefin">${head}${body}</div>`;
 }
