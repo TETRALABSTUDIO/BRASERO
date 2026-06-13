@@ -238,6 +238,13 @@ function shellHTML() {
       </div>
     </div>
 
+    <div class="modal modal--panel hide" id="profileModal">
+      <div class="modalc">
+        <div class="modalc__h"><h3>My profile</h3><button type="button" class="mx" id="pfClose">✕</button></div>
+        <div id="pfBody"></div>
+      </div>
+    </div>
+
     <div class="lb" id="lb"><img id="lbImg" alt=""><button type="button" class="lb__dl" id="lbDl">⬇ Download</button></div>
     <div class="impbar hide" id="impBar"></div>
 
@@ -355,12 +362,14 @@ function impersonating() { return !!localStorage.getItem('brasero_owner_session'
 function ownerTok() { return localStorage.getItem('brasero_owner_session') || ((ME && ME.is_owner) ? TOKEN : ''); }
 function showSwitcher() { return !!ownerTok(); }
 function clearNav() { ['brasero_last_ref', 'brasero_nav', 'brasero_last_tab', 'brasero_open_tabs'].forEach(k => { try { localStorage.removeItem(k); } catch (_) {} }); }
+const ACCT_GEAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
 function meActions(logoutId) {
   const sw = showSwitcher() ? `<button type="button" class="acctsw__ic" data-acct-menu title="Switch account">${ACCT_UP}</button>` : '';
-  return `<div class="acctsw">${sw}<button type="button" class="acctsw__ic" id="${logoutId}" title="Sign out">${ACCT_OUT}</button><div class="acctsw__menu hide" data-acct-list></div></div>`;
+  return `<div class="acctsw"><button type="button" class="acctsw__ic" data-profile title="Edit my profile">${ACCT_GEAR}</button>${sw}<button type="button" class="acctsw__ic" id="${logoutId}" title="Sign out">${ACCT_OUT}</button><div class="acctsw__menu hide" data-acct-list></div></div>`;
 }
 function wireAcct(rootEl, logoutId) {
   if (logoutId) { const lo = R.querySelector('#' + logoutId); if (lo) lo.onclick = doLogout; }
+  const pf = rootEl.querySelector('[data-profile]'); if (pf) pf.onclick = openProfile;
   const bk = rootEl.querySelector('[data-imp-back]'); if (bk) bk.onclick = switchBack;
   const btn = rootEl.querySelector('[data-acct-menu]'), menu = rootEl.querySelector('[data-acct-list]');
   if (!btn || !menu) return;
@@ -411,6 +420,59 @@ function renderAdminMe() {
   const el = $('#adminMe'); if (!el || !ME) return;
   el.innerHTML = `${avatar(ME, 'sm')}<div class="side__me-info"><span class="side__me-name">${esc(ME.name || ME.email.split('@')[0])}</span><span class="rolebadge owner">Owner</span></div>${meActions('adminLogout')}`;
   wireAcct(el, 'adminLogout');
+}
+
+/* ----- self profile editor (name · password · photo · weekly hours · time zone) ----- */
+const PF_DAYS = [['mon', 'Monday'], ['tue', 'Tuesday'], ['wed', 'Wednesday'], ['thu', 'Thursday'], ['fri', 'Friday'], ['sat', 'Saturday'], ['sun', 'Sunday']];
+function tzList() { try { const z = Intl.supportedValuesOf('timeZone'); if (z && z.length) return z; } catch (_) {} return ['UTC', 'Europe/Paris', 'Europe/London', 'Europe/Madrid', 'America/New_York', 'America/Chicago', 'America/Los_Angeles', 'America/Sao_Paulo', 'Asia/Dubai', 'Asia/Tokyo', 'Australia/Sydney']; }
+function guessTz() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (_) { return ''; } }
+let PF_PHOTO; // undefined = keep current photo
+function openProfile() { PF_PHOTO = undefined; renderProfileForm(); $('#profileModal').classList.remove('hide'); }
+function renderProfileForm() {
+  if (!ME) return;
+  const av = (ME.availability && typeof ME.availability === 'object') ? ME.availability : {};
+  const tz = ME.timezone || guessTz();
+  const tzOpts = tzList().map(z => `<option value="${esc(z)}" ${z === tz ? 'selected' : ''}>${esc(z)}</option>`).join('');
+  const photo = PF_PHOTO !== undefined ? PF_PHOTO : (ME.photo || '');
+  const days = PF_DAYS.map(([k, label]) => { const d = av[k] || {}; const on = !!d.on;
+    return `<div class="pfday" data-day="${k}">
+      <label class="pfday__t"><input type="checkbox" data-on ${on ? 'checked' : ''}><span>${label}</span></label>
+      <div class="pfday__h"><input type="time" data-start value="${esc(d.start || '09:00')}" ${on ? '' : 'disabled'}><span>–</span><input type="time" data-end value="${esc(d.end || '17:00')}" ${on ? '' : 'disabled'}></div>
+    </div>`; }).join('');
+  $('#pfBody').innerHTML = `
+    <div class="pfhead">
+      <label class="pfphoto" title="Change photo">${photo ? `<img src="${esc(photo)}" alt="">` : avatar(ME, 'lg')}<span class="pfphoto__edit">Change</span><input type="file" accept="image/*" hidden data-pf-photo></label>
+      <div class="pffields">
+        <div class="field"><label>Name</label><input id="pfName" value="${esc(ME.name || '')}" placeholder="Your name"></div>
+        <div class="field"><label>New password <span class="field__opt">leave blank to keep</span></label><input id="pfPass" type="password" autocomplete="new-password" placeholder="••••••"></div>
+      </div>
+    </div>
+    <div class="field"><label>Time zone</label><select id="pfTz">${tzOpts}</select></div>
+    <div class="field"><label>Working hours</label></div>
+    <div class="pfdays">${days}</div>
+    <div class="err" id="pfErr" style="margin:6px 0"></div>
+    <button type="button" class="b-grad" id="pfSave" style="width:100%">Save profile</button>`;
+  const body = $('#pfBody');
+  body.querySelector('[data-pf-photo]').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { PF_PHOTO = await compress(f, 512, 0.8); renderProfileForm(); } catch (_) {} };
+  body.querySelectorAll('.pfday').forEach(row => { const cb = row.querySelector('[data-on]'); cb.onchange = () => row.querySelectorAll('input[type=time]').forEach(t => t.disabled = !cb.checked); });
+  body.querySelector('#pfSave').onclick = saveProfile;
+}
+async function saveProfile() {
+  const body = $('#pfBody'), errEl = $('#pfErr'); errEl.textContent = '';
+  const availability = {};
+  body.querySelectorAll('.pfday').forEach(row => { const on = row.querySelector('[data-on]').checked;
+    availability[row.dataset.day] = { on, start: row.querySelector('[data-start]').value || '09:00', end: row.querySelector('[data-end]').value || '17:00' }; });
+  const name = $('#pfName').value.trim(), pass = $('#pfPass').value, timezone = $('#pfTz').value;
+  if (pass && pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  const payload = { action: 'update_me', name, timezone, availability };
+  if (pass) payload.password = pass;
+  if (PF_PHOTO !== undefined) payload.photo = PF_PHOTO;
+  const btn = $('#pfSave'), old = btn.textContent; btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  try {
+    const r = await api('/api/admin', payload);
+    if (r && r.ok) { ME = r.me || ME; if (CTX) CTX.session = ME; $('#profileModal').classList.add('hide'); renderSideMe(); renderAdminMe(); }
+    else { errEl.textContent = 'Error: ' + ((r && r.error) || 'could not save'); btn.disabled = false; btn.textContent = old; }
+  } catch (e) { errEl.textContent = 'Network error.'; btn.disabled = false; btn.textContent = old; }
 }
 
 /* ----- dashboard ----- */
@@ -1458,6 +1520,14 @@ function statNums(c) {
     <div class="tstat"><b style="color:var(--c-done)">${c.done}</b><span>Completed</span></div>
   </div>`;
 }
+function hoursSummary(t) {
+  const av = (t.availability && typeof t.availability === 'object') ? t.availability : null;
+  const tz = t.timezone ? `<div class="thours__tz">🌍 ${esc(t.timezone)}</div>` : '';
+  if (!av) return tz + '<div class="none">No hours set yet.</div>';
+  const rows = PF_DAYS.map(([k, label]) => { const d = av[k] || {};
+    return `<div class="thours__row"><span class="thours__d">${label.slice(0, 3)}</span><span class="thours__v ${d.on ? '' : 'off'}">${d.on ? `${esc(d.start || '')}–${esc(d.end || '')}` : 'Off'}</span></div>`; }).join('');
+  return tz + `<div class="thours">${rows}</div>`;
+}
 function renderTeam() {
   const unassigned = ORDERS.filter(o => !o.talent_email);
   $('#teamGrid').innerHTML = TALENTS.map(t => {
@@ -1474,6 +1544,7 @@ function renderTeam() {
         <div class="tcard__id"><div style="min-width:0;margin-right:auto"><div class="nm">${esc(t.name || 'Unnamed')}</div><div class="em">${esc(t.email)}</div></div><span class="rolebadge ${t.is_owner ? 'owner' : 'talent'}">${t.is_owner ? 'Owner' : 'Talent'}</span></div>
         ${mid}
         <div><div class="sec">Projects</div>${chips}${assignSel}</div>
+        <div><div class="sec">Availability</div>${hoursSummary(t)}</div>
         <div class="actions"><button class="b-ghost b-sm" data-edit>Edit</button><button class="b-del b-sm" data-del>Delete</button></div>
       </div>
     </div>`;
@@ -1583,6 +1654,7 @@ function wireStatic() {
   // talents modal
   $('#openTalentModal').onclick = () => { $('#talentForm').reset(); $('#tErr').textContent = ''; $('#tCreated').classList.add('hide'); $('#talentModal').classList.remove('hide'); setTimeout(() => $('#tEmail').focus(), 30); };
   $('#tmClose').onclick = () => $('#talentModal').classList.add('hide');
+  $('#pfClose').onclick = () => $('#profileModal').classList.add('hide');
   $('#talentForm').addEventListener('submit', submitTalent);
   // chat composer
   $('#assetBtn').addEventListener('click', e => { e.stopPropagation(); renderAssetMenu(); $('#assetMenu').classList.toggle('hide'); });

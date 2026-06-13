@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 
     /* ----- self profile (any talent) ----- */
     if (action === 'update_me') {
-      const r = await updateTalent({ email: me.email, name: b.name, photo: b.photo, password: b.password });
+      const r = await updateTalent({ email: me.email, name: b.name, photo: b.photo, password: b.password, availability: b.availability, timezone: b.timezone });
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
       return res.json({ ok: true, me: { ...r.talent, is_owner: isOwner } });
     }

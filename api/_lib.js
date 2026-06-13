@@ -545,7 +545,7 @@ export async function createManualOrder({ name, email, instagram, handle, plan, 
 }
 
 /* ---- Talent accounts + project assignment ---- */
-const pubTalent = t => t && ({ email: t.email, name: t.name || '', is_owner: !!t.is_owner, photo: t.photo || '', must_reset: !!t.must_reset });
+const pubTalent = t => t && ({ email: t.email, name: t.name || '', is_owner: !!t.is_owner, photo: t.photo || '', must_reset: !!t.must_reset, availability: (t.availability && typeof t.availability === 'object') ? t.availability : null, timezone: t.timezone || '' });
 
 export async function getTalentByEmail(email) {
   if (!STORE || !email) return null;
@@ -573,13 +573,15 @@ export async function createTalent({ email, password, name, is_owner, photo, mus
   return { talent: pubTalent(data) };
 }
 
-export async function updateTalent({ email, name, password, is_owner, photo }) {
+export async function updateTalent({ email, name, password, is_owner, photo, availability, timezone }) {
   const t = await getTalentByEmail(email);
   if (!t) return { error: 'not_found' };
   const patch = {};
   if (name != null) patch.name = name;
   if (is_owner != null) patch.is_owner = !!is_owner;
   if (photo != null) patch.photo = photo;
+  if (availability != null) patch.availability = availability;
+  if (timezone != null) patch.timezone = timezone;
   if (password) { patch.password_hash = hashPassword(password); patch.must_reset = false; }
   if (MEM) { Object.assign(t, patch); return { talent: pubTalent(t) }; }
   const { data, error } = await db.from('talents').update(patch).eq('id', t.id).select('*').maybeSingle();
@@ -604,7 +606,7 @@ export async function deleteTalent(email) {
 export async function listTalents() {
   if (MEM) return MEM.talents.map(pubTalent);
   if (!db) return [];
-  const { data } = await db.from('talents').select('email,name,is_owner,photo,must_reset').order('created_at', { ascending: true });
+  const { data } = await db.from('talents').select('email,name,is_owner,photo,must_reset,availability,timezone').order('created_at', { ascending: true });
   return (data || []).map(pubTalent);
 }
 
