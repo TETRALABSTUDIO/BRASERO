@@ -1436,7 +1436,7 @@ function renderDeckDetail() {
 const AE_GROUPS = [
   { key: 'decks', title: 'Carousels', sub: 'Add any number of carousels', icon: 'carousel', type: 'carousel', mode: 'qty', unit: 'carousel' },
   { key: 'stories', title: 'Stories', sub: 'Add any number of stories', icon: 'story', type: 'story', mode: 'qty', unit: 'story' },
-  { key: 'branding', title: 'Branding', sub: 'Full branding pack', icon: 'branding', type: 'branding', mode: 'pack', item: 'brand_full', note: 'Profile photo, X / LinkedIn / Facebook banners, LinkedIn CTAs' },
+  { key: 'branding', title: 'Branding', sub: 'Full branding pack', icon: 'branding', type: 'branding', mode: 'pack', item: 'brand_full', note: 'Profile photo, X / LinkedIn / Facebook / YouTube banners, LinkedIn CTAs' },
 ];
 let aeCat = null;
 function aeSyncN() { const c = $('#aeCount'); if (!c) return 1; let n = Math.max(1, Math.min(50, Number(c.value) || 1)); if ($('#aeN')) $('#aeN').textContent = n; return n; }

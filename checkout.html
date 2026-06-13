@@ -218,7 +218,7 @@ const chk='<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" f
 
 /* one-time upsell add-ons (prices enforced server-side too) */
 const ADDONS={
-  branding:{name:'Social media branding',price:210,desc:'Matching profile photo, X / LinkedIn / Facebook banners, plus LinkedIn CTA buttons, all in your brand style.'},
+  branding:{name:'Social media branding',price:210,desc:'Matching profile photo, X / LinkedIn / Facebook / YouTube banners, plus LinkedIn CTA buttons, all in your brand style.'},
   story3:{name:'Story pack',count:3,price:100},
   story6:{name:'Story pack',count:6,price:150},
   story9:{name:'Story pack',count:9,price:190,free:true},
@@ -231,7 +231,7 @@ const addonsSum=()=>[...selectedAddons].reduce((s,k)=>s+ADDONS[k].price,0);
 const addonLabel=k=>{const a=ADDONS[k];return a.count?`${a.name} · ${a.count} stor${a.count>1?'ies':'y'}`:a.name;};
 
 /* feature bullets shown in the upsell cards (2 columns) */
-const BRANDING_FEATS=['Profile photo','LinkedIn CTAs','X / Twitter banner','LinkedIn banner','Facebook banner','On-brand style'];
+const BRANDING_FEATS=['Profile photo','LinkedIn CTAs','X / Twitter banner','LinkedIn banner','Facebook banner','YouTube banner'];
 const STORY_FEATS=['Custom written','On-brand design','You approve each','Post-ready files'];
 const BUNDLE_FEATS=['Full social branding','9 stories + 1 free','Everything in-brand','One-time payment'];
 const featsHTML=arr=>`<ul class="addon__feats">${arr.map(f=>`<li>${f}</li>`).join('')}</ul>`;

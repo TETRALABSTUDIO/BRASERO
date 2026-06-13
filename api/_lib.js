@@ -102,7 +102,10 @@ export const MEM = db ? null : {
     { id: 'dk-6', order_id: 'ord-demo', position: 4, status: 'writing', type: 'branding', title: 'X / Twitter banner' },
     { id: 'dk-7', order_id: 'ord-demo', position: 5, status: 'designing', type: 'branding', title: 'LinkedIn banner',
       brand: { headline: 'We help founders grow on LinkedIn', links: ['https://brasero.studio', 'https://linkedin.com/in/demo'], metrics: [{ name: 'Clients', value: '200+' }, { name: 'Posts shipped', value: '1.2k' }] } },
-    { id: 'dk-8', order_id: 'ord-demo', position: 6, status: 'writing', type: 'branding', title: 'LinkedIn CTA buttons' },
+    { id: 'dk-9', order_id: 'ord-demo', position: 6, status: 'design_review', type: 'branding', title: 'YouTube banner',
+      brand: { headline: 'We help founders grow on LinkedIn', links: ['https://brasero.studio'], metrics: [{ name: 'Clients', value: '200+' }] },
+      design_urls: ['assets/carousels/1-1.jpg'] },
+    { id: 'dk-8', order_id: 'ord-demo', position: 7, status: 'writing', type: 'branding', title: 'LinkedIn CTA buttons' },
     { id: 'dk-5', order_id: 'ord-done', position: 0, status: 'done',
       title: 'Launch announcement', script: 'We are live!',
       design_urls: ['assets/carousels/3-1.jpg'], design_validated_at: new Date().toISOString() },
@@ -462,11 +465,12 @@ export const ITEMS = {
   brand_x:   { name: 'X / Twitter banner',   amount: 7000,  type: 'branding' },
   brand_li:  { name: 'LinkedIn banner',      amount: 7000,  type: 'branding' },
   brand_fb:  { name: 'Facebook banner',      amount: 7000,  type: 'branding' },
+  brand_yt:  { name: 'YouTube banner',       amount: 7000,  type: 'branding' },
   brand_cta: { name: 'LinkedIn CTA buttons', amount: 5000,  type: 'branding' },
 };
 // The deck-row titles created for a given item key.
 function itemTitles(key) {
-  if (key === 'brand_full') return ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'LinkedIn CTA buttons'];
+  if (key === 'brand_full') return ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'YouTube banner', 'LinkedIn CTA buttons'];
   const it = ITEMS[key];
   if (!it) return [];
   if (it.type === 'branding') return [it.name];
@@ -492,7 +496,7 @@ export async function addItemsToOrder(ref, key) {
 // The full set of production elements an order's offer implies, by type.
 // Carousels come from the plan (or an explicit count); upsells add stories/branding.
 function expectedElements({ plan, addons, decks }) {
-  const brandTitles = ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'LinkedIn CTA buttons'];
+  const brandTitles = ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'YouTube banner', 'LinkedIn CTA buttons'];
   const nCarousel = decks != null ? Math.max(0, Math.min(50, Number(decks) || 0)) : (PLAN_DECKS[plan] || 0);
   let nStory = 0, branding = [];
   for (const key of addonKeys(addons)) {

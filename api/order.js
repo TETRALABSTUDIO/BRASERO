@@ -1,6 +1,6 @@
 import { findOrderByRef, ordersForClient, decksForOrder, decksMetaForOrder, orderProgress, orderRef,
-  publicOrder, getDeck, deckImages, listMessages, addMessage, getTalentByEmail, sendTo, send,
-  messageNotifyEmail, siteUrl, clientFromAuth, ownsOrder } from './_lib.js';
+  publicOrder, getDeck, patchDeck, deckImages, listMessages, addMessage, getTalentByEmail, sendTo, send,
+  messageNotifyEmail, talentClientActionEmail, sanitizeBrand, siteUrl, clientFromAuth, ownsOrder } from './_lib.js';
 
 // POST { action, ... } authenticated by a client session (Bearer token). The
 // magic-link session aggregates every order the client owns.
@@ -47,6 +47,36 @@ export default async function handler(req, res) {
       const d = deckId ? await getDeck(deckId) : null;
       if (!d || d.order_id !== order.id) return res.status(404).json({ ok: false, error: 'not_found' });
       return res.json({ ok: true, images: deckImages(d) });
+    }
+
+    // Unified branding: the client fills ONE shared brief; we write the relevant
+    // slice (sanitizeBrand picks it by deck title) to EVERY branding deck still in
+    // 'writing' and move them all into design at once.
+    if (action === 'submit_brand') {
+      const shared = (req.body && typeof req.body.brand === 'object' && req.body.brand) ? req.body.brand : {};
+      const allDecks = await decksForOrder(order.id);
+      const pending = allDecks.filter((d) => (d.type || '') === 'branding' && d.status === 'writing');
+      if (!pending.length) return res.status(409).json({ ok: false, error: 'nothing_to_submit' });
+      for (const d of pending) {
+        await patchDeck(d.id, { brand: sanitizeBrand(d.title, shared), status: 'designing' });
+      }
+      // Notify the studio inbox + the assigned talent once.
+      try {
+        const subj = `🎨 Branding details submitted (#${order.ref || ''})`;
+        await send(subj, `<h2>${subj}</h2>
+          <p><b>Client:</b> ${order.name || '-'} · ${order.email}</p>
+          <p><b>Order:</b> #${order.ref || ''} · ${order.plan || ''}</p>
+          <p>${pending.length} branding element${pending.length > 1 ? 's' : ''} moved into design.</p>`);
+        if (order.talent_email) {
+          const talent = await getTalentByEmail(order.talent_email);
+          await sendTo(order.talent_email, '🎨 Branding details are in - time to design',
+            talentClientActionEmail({ name: talent?.name, ref, deckTitle: 'Branding', kind: 'approved_script', note: '', panelUrl: `${siteUrl(req)}/app.html` }));
+        }
+      } catch (e) { console.error('brand notify', e); }
+      const decks = await decksForOrder(order.id);
+      let talent = null;
+      if (order.talent_email) { const t = await getTalentByEmail(order.talent_email); if (t) talent = { name: t.name || '', photo: t.photo || '' }; }
+      return res.json({ ok: true, order: publicOrder(order, decks), talent, messages: await listMessages(order.id) });
     }
 
     if (action === 'send_message') {
