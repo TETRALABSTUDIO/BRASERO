@@ -536,6 +536,25 @@ let DPERIOD = '6m';
 const PERIODS = [['30d', '30 days'], ['90d', '90 days'], ['6m', '6 months'], ['12m', '12 months'], ['all', 'All']];
 function periodCutoff() { const now = new Date(); if (DPERIOD === '30d') return Date.now() - 30 * 864e5; if (DPERIOD === '90d') return Date.now() - 90 * 864e5; if (DPERIOD === '6m') { const d = new Date(now); d.setMonth(d.getMonth() - 6); return d.getTime(); } if (DPERIOD === '12m') { const d = new Date(now); d.setMonth(d.getMonth() - 12); return d.getTime(); } return 0; }
 function ordersInPeriod() { const c = periodCutoff(); return ADMIN.orders.filter(o => !c || (o.created_at && new Date(o.created_at).getTime() >= c)); }
+// Catmull-Rom → cubic-bezier smoothing: turns a point list into a fluid curve.
+function smoothD(pts, t) {
+  if (!pts.length) return '';
+  if (pts.length < 3) return pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  t = t == null ? 0.18 : t;
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) * t, c1y = p1[1] + (p2[1] - p0[1]) * t;
+    const c2x = p2[0] - (p3[0] - p1[0]) * t, c2y = p2[1] - (p3[1] - p1[1]) * t;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+// Smooth area: the curve, dropped to a baseline and closed (the "smoke" fill).
+function smoothArea(pts, baseY) {
+  if (!pts.length) return '';
+  return smoothD(pts) + ` L ${pts[pts.length - 1][0].toFixed(1)} ${baseY} L ${pts[0][0].toFixed(1)} ${baseY} Z`;
+}
 // `valfn` lets the same buckets carry revenue OR margin (default: revenue).
 function revSeries(orders, valfn) {
   valfn = valfn || (o => o.amount || 0);
@@ -558,15 +577,12 @@ function lineChart(series, s2) {
   const max = Math.max(1, ...series.map(s => s.value), ...(s2 || []).map(s => s.value));
   const xs = i => n <= 1 ? W / 2 : pad + i * (W - 2 * pad) / (n - 1), ys = v => H - (v / max) * (H - 24) - 8;
   if (!series.length) return '<div class="ph-sub">No data.</div>';
-  const lineFor = s => s.map((p, i) => (i ? 'L' : 'M') + xs(i).toFixed(1) + ' ' + ys(p.value).toFixed(1)).join(' ');
   const pts = series.map((s, i) => [xs(i), ys(s.value)]);
-  const area = `M${pts[0][0].toFixed(1)} ${H} ` + pts.map(p => 'L' + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') + ` L${pts[n - 1][0].toFixed(1)} ${H} Z`;
   const dots = pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.4" fill="#fff" stroke="url(#tgrad)" stroke-width="2.2"/>`).join('');
-  const marginLine = s2 ? `<path d="${lineFor(s2)}" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 5"/>` : '';
+  const marginLine = s2 ? `<path d="${smoothD(s2.map((p, i) => [xs(i), ys(p.value)]))}" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 5"/>` : '';
   const labels = series.map((s, i) => `<text class="axl" x="${xs(i).toFixed(1)}" y="${H + 14}" text-anchor="middle">${esc(s.label)}</text>`).join('');
   return `<svg class="linec" viewBox="0 0 ${W} ${H + 20}" preserveAspectRatio="xMidYMid meet">
-    <defs><linearGradient id="areaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f87000" stop-opacity=".22"/><stop offset="1" stop-color="#f87000" stop-opacity="0"/></linearGradient></defs>
-    <path d="${area}" fill="url(#areaG)"/><path d="${lineFor(series)}" fill="none" stroke="url(#tgrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>${marginLine}${dots}${labels}</svg>`;
+    <path d="${smoothArea(pts, H)}" fill="url(#sparkArea)"/><path d="${smoothD(pts)}" fill="none" stroke="url(#tgrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>${marginLine}${dots}${labels}</svg>`;
 }
 function planPie(orders) {
   const colors = { starter: '#f9a857', flame: '#f87000', burst: '#cf3500' }, names = { starter: 'Ember', flame: 'Flame', burst: 'Meteor' };
@@ -1683,19 +1699,19 @@ function revMonths(orders, months, valfn) {
   orders.forEach(o => { if (!o.created_at) return; const d = new Date(o.created_at); const k = d.getFullYear() + '-' + d.getMonth(); const m = out.find(x => x.key === k); if (m) m.v += valfn(o); });
   return out.map(x => x.v);
 }
-function sparkPath(vals, W, H, max, pad) {
-  const n = vals.length, p = pad == null ? 4 : pad;
-  const xs = i => n <= 1 ? W / 2 : p + i * (W - 2 * p) / (n - 1), ys = v => H - p - (max ? v / max : 0) * (H - 2 * p);
-  return { d: vals.map((v, i) => (i ? 'L' : 'M') + xs(i).toFixed(1) + ' ' + ys(v).toFixed(1)).join(' '), lx: xs(n - 1), ly: ys(vals[n - 1] || 0) };
-}
-// Two-line sparkline: studio revenue (muted) + this talent's revenue (accent).
+// Two-line sparkline: studio revenue (muted) + this talent's revenue (accent),
+// with a smooth curve and the gradient "smoke" under the talent's line.
 function miniRevChart(studio, mine) {
-  const W = 200, H = 60, max = Math.max(1, ...studio, ...mine);
-  const s = sparkPath(studio, W, H, max), m = sparkPath(mine, W, H, max);
+  const W = 200, H = 60, p = 4, max = Math.max(1, ...studio, ...mine);
+  const n = Math.max(studio.length, mine.length);
+  const xs = i => n <= 1 ? W / 2 : p + i * (W - 2 * p) / (n - 1), ys = v => H - p - (max ? v / max : 0) * (H - 2 * p);
+  const sp = studio.map((v, i) => [xs(i), ys(v)]), mp = mine.map((v, i) => [xs(i), ys(v)]);
+  const last = mp[mp.length - 1] || [W / 2, H - p];
   return `<svg class="mrev" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
-    <path d="${s.d}" fill="none" stroke="var(--faint)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".55" vector-effect="non-scaling-stroke"/>
-    <path d="${m.d}" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-    <circle cx="${m.lx.toFixed(1)}" cy="${m.ly.toFixed(1)}" r="2.4" fill="#fff" stroke="url(#tgrad)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+    <path d="${smoothArea(mp, H - p)}" fill="url(#sparkArea)"/>
+    <path d="${smoothD(sp)}" fill="none" stroke="var(--faint)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".55" vector-effect="non-scaling-stroke"/>
+    <path d="${smoothD(mp)}" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.4" fill="#fff" stroke="url(#tgrad)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
 }
 // This talent's revenue / cost / margin across their assigned orders.
 function talentMargin(mine) {
