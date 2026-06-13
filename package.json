@@ -9,6 +9,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
     "nodemailer": "^6.9.14",
+    "opentype.js": "^2.0.0",
     "sharp": "^0.35.1",
     "stripe": "^16.8.0"
   }

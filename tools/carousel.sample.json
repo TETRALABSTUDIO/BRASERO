@@ -2,13 +2,14 @@
   "slides": [
     {
       "kicker": "Brasero",
-      "text": "5 erreurs qui tuent ton deck d'investisseur",
-      "visual": "Moody warm gradient studio backdrop, soft amber light, premium minimal, subtle film grain"
+      "text": "5 erreurs qui tuent ton *deck d'investisseur*",
+      "visual": "A single dramatic spotlight on an empty dark stage, smoke and ember particles floating, deep blacks, cinematic, conceptual"
     },
     {
-      "kicker": "Brasero",
-      "text": "On transforme ton idée en deck qui lève",
-      "visual": "Warm ember glow rising over a deep dark gradient, premium, aspirational, no text"
+      "kicker": "La promesse",
+      "text": "On transforme ton idée en *deck qui lève*",
+      "body": "Structure, recit et design premium. Tu pitches, on transforme. Pret en quelques jours, pas en quelques semaines.",
+      "visual": "Warm ember glow rising from darkness, abstract spark trails ascending, premium aspirational mood, deep dark gradient"
     }
   ]
 }
