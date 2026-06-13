@@ -239,12 +239,12 @@ function boardHTML() {
       <div class="board__detail" id="deckDetail"></div>
       <div class="cmdbar" id="deckCmd"></div>
     </div>
+    <div class="chat__scrim" id="chatScrim"></div>
     <aside class="board__chat" id="boardChat">
-      <button type="button" class="chat__rail" id="chatOpen" title="Open messages"><span class="chat__dot hide" id="chatDot"></span><span class="chat__rail-l">Messages</span></button>
       <div class="chat__panel">
         <div class="chat__head">
           <div class="expert" id="chatExpert"></div>
-          <button type="button" class="chat__collapse" id="chatToggle" title="Hide chat">⟩</button>
+          <button type="button" class="chat__collapse" id="chatToggle" title="Close messages" aria-label="Close messages">✕</button>
         </div>
         <div class="chat__thread" id="chatThread"></div>
         <form class="chat__composer" id="chatForm">
@@ -261,6 +261,7 @@ function boardHTML() {
         </form>
       </div>
     </aside>
+    <button class="msgfab" id="msgFab" type="button" title="Messages" aria-label="Messages"><span class="msgfab__dot hide" id="chatDotFab"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.1 7.6L3 21l1.9-5.9A8.4 8.4 0 1 1 21 11.5z"/></svg></button>
   </div>
   <div class="lb" id="lb"><img id="lbImg" alt=""><button type="button" class="btn btn--grad btn--sm lb__dl" id="lbDl">⬇ Download</button></div>
   <div class="modal" id="addModal">
@@ -455,7 +456,7 @@ function renderAtts() {
 }
 /* image compression for chat attachments */
 /* ---- live chat polling ---- */
-function setUnread(on) { q('#chatDot')?.classList.toggle('hide', !on); q('#chatDotHead')?.classList.toggle('hide', !on); }
+function setUnread(on) { q('#chatDotFab')?.classList.toggle('hide', !on); q('#chatDotHead')?.classList.toggle('hide', !on); }
 async function pollMessages() {
   if (!REF || document.hidden) return;
   try {
@@ -464,15 +465,14 @@ async function pollMessages() {
       const grew = d.messages.length > MESSAGES.length;
       const newFromStudio = grew && d.messages.slice(MESSAGES.length).some((m) => m.sender === 'studio');
       MESSAGES = d.messages; renderMessages();
-      if (newFromStudio && q('#board')?.classList.contains('chat-collapsed')) setUnread(true);
+      if (newFromStudio && !q('#board')?.classList.contains('chat-open')) setUnread(true);
     }
   } catch (e) {}
 }
 function startMsgPoll() { stopMsgPoll(); MSGPOLL = setInterval(pollMessages, 7000); }
 function stopMsgPoll() { if (MSGPOLL) { clearInterval(MSGPOLL); MSGPOLL = null; } }
 
-const CHAT_KEY = 'brasero_chat_collapsed';
-function setChatCollapsed(c) { q('#board')?.classList.toggle('chat-collapsed', c); if (!c) setUnread(false); try { localStorage.setItem(CHAT_KEY, c ? '1' : ''); } catch (e) {} }
+function setChatOpen(open) { q('#board')?.classList.toggle('chat-open', open); if (open) { setUnread(false); q('#chatInput')?.focus(); } }
 
 /* ---- add-to-order modal ---- */
 function optionHTML(it) {
@@ -635,10 +635,11 @@ function bindBoard() {
   });
   q('#chatAtts').addEventListener('click', (e) => { const b = e.target.closest('[data-att]'); if (!b) return; chatImgs.splice(Number(b.dataset.att), 1); renderAtts(); });
 
-  // chat collapse
-  q('#chatToggle').addEventListener('click', () => setChatCollapsed(true));
-  q('#chatOpen').addEventListener('click', () => setChatCollapsed(false));
-  try { if (localStorage.getItem(CHAT_KEY)) q('#board').classList.add('chat-collapsed'); } catch (e) {}
+  // chat slide-over
+  q('#chatToggle').addEventListener('click', () => setChatOpen(false));
+  q('#msgFab').addEventListener('click', () => setChatOpen(true));
+  q('#chatScrim').addEventListener('click', () => setChatOpen(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && q('#board')?.classList.contains('chat-open')) setChatOpen(false); });
 
   // lightbox controls
   q('#lb').addEventListener('click', () => q('#lb').classList.remove('open'));

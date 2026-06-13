@@ -118,12 +118,12 @@ function shellHTML() {
           <div class="board__detail" id="deckDetail"></div>
           <div class="cmdbar" id="deckCmd"></div>
         </div>
+        <div class="chat__scrim" id="chatScrim"></div>
         <aside class="board__chat" id="boardChat">
-          <button type="button" class="chat__rail" id="chatOpen" title="Open messages"><span class="chat__dot hide" id="chatDot"></span><span class="chat__rail-l">Messages</span></button>
           <div class="chat__panel">
             <div class="chat__head">
               <div class="expert" id="chatExpert"></div>
-              <button type="button" class="chat__collapse" id="chatToggle" title="Hide chat">⟩</button>
+              <button type="button" class="chat__collapse" id="chatToggle" title="Close messages" aria-label="Close messages">✕</button>
             </div>
             <div class="chat__thread" id="chatThread"></div>
             <form class="chat__composer" id="chatForm">
@@ -153,6 +153,7 @@ function shellHTML() {
           </div>
           <button class="helpfab" id="helpFab" type="button" title="How it works" aria-label="How it works"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.4c.8.7 1 1.3 1 2.6h6c0-1.3.2-1.9 1-2.6A6 6 0 0 0 12 3z"/></svg></button>
         </div>
+        <button class="msgfab" id="msgFab" type="button" title="Messages" aria-label="Messages"><span class="msgfab__dot hide" id="chatDotFab"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.1 7.6L3 21l1.9-5.9A8.4 8.4 0 1 1 21 11.5z"/></svg></button>
       </div>
     </div>
 
@@ -1330,7 +1331,7 @@ function renderAtts() {
 }
 let lbUrl = '';
 let MSGPOLL = null;
-function setUnread(on) { $('#chatDot')?.classList.toggle('hide', !on); $('#chatDotHead')?.classList.toggle('hide', !on); }
+function setUnread(on) { $('#chatDotFab')?.classList.toggle('hide', !on); $('#chatDotHead')?.classList.toggle('hide', !on); }
 async function pollMessages() {
   if (!REF || document.hidden) return;
   try {
@@ -1339,14 +1340,13 @@ async function pollMessages() {
       const grew = r.messages.length > MESSAGES.length;
       const newFromClient = grew && r.messages.slice(MESSAGES.length).some(m => m.sender !== 'studio');
       MESSAGES = r.messages; renderMessages();
-      if (newFromClient && $('#board')?.classList.contains('chat-collapsed')) setUnread(true);
+      if (newFromClient && !$('#board')?.classList.contains('chat-open')) setUnread(true);
     }
   } catch (e) {}
 }
 function startMsgPoll() { stopMsgPoll(); MSGPOLL = setInterval(pollMessages, 7000); }
 function stopMsgPoll() { if (MSGPOLL) { clearInterval(MSGPOLL); MSGPOLL = null; } }
-const CHAT_KEY = 'brasero_chat_collapsed';
-function setChatCollapsed(c) { $('#board')?.classList.toggle('chat-collapsed', c); if (!c) setUnread(false); try { localStorage.setItem(CHAT_KEY, c ? '1' : ''); } catch (e) {} }
+function setChatOpen(open) { $('#board')?.classList.toggle('chat-open', open); if (open) { setUnread(false); $('#chatInput')?.focus(); } }
 
 /* ---------- decks ---------- */
 const PILL = { writing: ['pill--wait', 'Writing'], script_review: ['pill--act', 'Script · awaiting client'], designing: ['pill--act', 'Designing'], design_review: ['pill--act', 'Design · awaiting client'], revision: ['pill--act', 'Retouch requested'], done: ['pill--done', 'Done ✓'] };
@@ -1958,9 +1958,10 @@ function wireStatic() {
     } catch (err) {} finally { btn.disabled = false; }
   });
   $('#chatInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#chatForm').requestSubmit(); } });
-  $('#chatToggle').addEventListener('click', () => setChatCollapsed(true));
-  $('#chatOpen').addEventListener('click', () => setChatCollapsed(false));
-  try { if (localStorage.getItem(CHAT_KEY)) $('#board').classList.add('chat-collapsed'); } catch (e) {}
+  $('#chatToggle').addEventListener('click', () => setChatOpen(false));
+  $('#msgFab').addEventListener('click', () => setChatOpen(true));
+  $('#chatScrim').addEventListener('click', () => setChatOpen(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#board')?.classList.contains('chat-open')) setChatOpen(false); });
   // lightbox
   $('#lb').addEventListener('click', () => $('#lb').classList.remove('open'));
   $('#lbDl').addEventListener('click', e => { e.stopPropagation(); if (!lbUrl) return; const a = document.createElement('a'); a.href = lbUrl; a.download = 'chat-image.jpg'; document.body.appendChild(a); a.click(); a.remove(); });
