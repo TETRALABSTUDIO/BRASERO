@@ -465,6 +465,9 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .bt__v b{font-weight:700}
 .bt__logo{display:inline-flex;padding:14px 16px;background:repeating-conic-gradient(#f1ece3 0% 25%,#fff 0% 50%) 0/16px 16px;border:1px solid var(--line);border-radius:14px}
 .bt__logo img{max-width:200px;max-height:86px;display:block;object-fit:contain}
+.bt__dl{display:flex;width:fit-content;align-items:center;gap:7px;margin-top:11px;background:#fff;border:1px solid var(--line);color:var(--ink);font-weight:700;font-size:12.5px;padding:7px 14px;border-radius:100px;text-decoration:none;cursor:pointer;transition:transform .2s,border-color .2s,color .2s}
+.bt__dl:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-1px)}
+.bt__dl svg{width:15px;height:15px;flex-shrink:0}
 .bt__colors{display:flex;gap:16px;flex-wrap:wrap}
 .bt__colors span{display:flex;flex-direction:column;gap:9px;align-items:flex-start}
 .bt__colors i{width:64px;height:64px;border-radius:16px;border:1px solid rgba(0,0,0,.06);display:block}

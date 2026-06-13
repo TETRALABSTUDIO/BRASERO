@@ -964,7 +964,7 @@ function briefHTML() {
       return `<a class="biglink" href="https://instagram.com/${esc(user)}" target="_blank" rel="noopener">${esc(u)}</a>`; }).join('&nbsp;&nbsp;·&nbsp;&nbsp;'); }
     if (k === 'logo') { const ln = b.logo_name || 'brand-logo';
       return `<div class="bt__logo"><img src="${esc(b.logo)}" alt="Brand logo"></div>
-        <a class="biglink" href="${esc(b.logo)}" download="${esc(ln)}">⬇ ${esc(ln)}</a>`; }
+        <a class="bt__dl" href="${esc(b.logo)}" download="${esc(ln)}" title="Download ${esc(ln)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l4-4m-4 4l-4-4M5 21h14"/></svg>${esc(ln)}</a>`; }
     return esc(String(v || ''));
   };
   const has = (k) => k === 'typo' ? (b.typo || b.typo_file) : b[k];
