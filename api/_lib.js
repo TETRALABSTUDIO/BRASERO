@@ -12,15 +12,15 @@ export const db = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE
   : null;
 
 /* ---- Auth primitives (Talent accounts) ---- */
-// Tokens are HMAC-signed with this. A known fallback would make every session
-// forgeable, so in a deployed env we refuse to start without a real secret;
-// the dev fallback only applies to local runs (no VERCEL / not production).
-const SESSION_SECRET = process.env.SESSION_SECRET || process.env.ADMIN_TOKEN || (() => {
-  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
-    throw new Error('SESSION_SECRET (or ADMIN_TOKEN) must be set in production');
-  }
-  return 'brasero-dev-secret';
-})();
+// Tokens are HMAC-signed with this. A known fallback makes sessions forgeable,
+// so in a deployed env we warn loudly when neither secret is set. We do NOT
+// throw here: this module is imported by every serverless function, so a
+// module-load throw would take the whole API down. Set SESSION_SECRET in the
+// Vercel env to silence the warning and stop signing with the public fallback.
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.ADMIN_TOKEN || 'brasero-dev-secret';
+if (SESSION_SECRET === 'brasero-dev-secret' && (process.env.VERCEL || process.env.NODE_ENV === 'production')) {
+  console.error('[SECURITY] SESSION_SECRET (or ADMIN_TOKEN) is not set in production — sessions are signed with a public fallback. Set SESSION_SECRET in the Vercel env.');
+}
 const b64url = b => Buffer.from(b).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 const unb64url = s => Buffer.from(s.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
 
