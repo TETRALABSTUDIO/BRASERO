@@ -507,10 +507,17 @@ function renderDetail() {
 }
 
 /* ============================================================================
-   UNIFIED BRANDING ELEMENT - one element, a profile mockup the client switches
-   per platform. The client fills ONE shared brief; we render it per platform.
-   The order keeps its individual branding decks (profile / banners / CTA); they
-   are the per-platform "slots" that hold each delivered render.
+   UNIFIED BRANDING ELEMENT - one element. The client fills ONE shared brief; the
+   studio designs it and uploads a render per platform, which the client then sees
+   and approves. The order keeps its individual branding decks (profile / banners /
+   CTA) as the per-platform "slots" that hold each delivered render.
+
+   NOTE: the in-editor "live preview" mockup was removed from the client view (the
+   client just fills the brief, then sees the delivered renders). The mockup engine
+   below (PLAT_GLYPH / PLATFORMS / platChips / brandMockup / bindBrandPlats) is KEPT
+   ASIDE on purpose - it's the basis for the upcoming DELIVERY flow where the studio
+   composes the per-platform render the client receives as their preview. Do not
+   delete; it is intentionally not wired into the live client editor.
    ========================================================================== */
 const PLAT_GLYPH = {
   instagram: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>`,
@@ -575,24 +582,24 @@ function brandMockup(decks, brief, plat) {
     </div>
   </div>`;
 }
-function brandExtra(decks, plat) {
-  const rel = brandPlatDecks(decks, plat);
-  let html = '';
-  rel.forEach((d) => {
-    if (d.status === 'design_review') {
-      html += `<div class="bm-act"><div class="bm-act__h"><b>${esc(d.title)}</b><span class="pill pill--act">Ready for you</span></div>
-        ${imgCount(d) ? galleryGrid(d) : ''}
-        <div class="actions"><button class="btn btn--grad btn--sm" data-act="validate_design" data-id="${d.id}">Approve ✓</button>
-          <button class="btn btn--ghost btn--sm" data-act="toggle_rev" data-id="${d.id}">Request a retouch</button></div>
-        <div class="revbox" id="rev-${d.id}"><textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:80px"></textarea>
-          <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div></div></div>`;
-    } else if (d.status === 'done') {
-      html += `<div class="bm-act"><div class="bm-act__h"><b>${esc(d.title)}</b><span class="pill pill--done">Approved ✓</span>${imgCount(d) ? `<button class="btn btn--ghost btn--sm" data-act="download_deck" data-id="${d.id}">${DL_ICON} Download</button>` : ''}</div></div>`;
-    } else {
-      html += `<div class="bm-act bm-act--wait"><b>${esc(d.title)}</b> · in production, we'll notify you the moment it's ready.</div>`;
-    }
-  });
-  return `<div id="bmExtra" class="bm-extra">${html || `<div class="bm-act bm-act--wait">In production, we'll email you as each platform is ready.</div>`}</div>`;
+// Delivered branding: one block per branding deck (the render the studio uploaded),
+// with the client's approve / retouch / download actions. No live mockup.
+function brandDeckBlock(d) {
+  if (d.status === 'design_review') {
+    return `<div class="bm-act"><div class="bm-act__h"><b>${esc(d.title)}</b><span class="pill pill--act">Ready for you</span></div>
+      ${imgCount(d) ? galleryGrid(d) : ''}
+      <div class="actions"><button class="btn btn--grad btn--sm" data-act="validate_design" data-id="${d.id}">Approve ✓</button>
+        <button class="btn btn--ghost btn--sm" data-act="toggle_rev" data-id="${d.id}">Request a retouch</button></div>
+      <div class="revbox" id="rev-${d.id}"><textarea class="script" placeholder="What would you like us to change?" data-rev="${d.id}" style="min-height:80px"></textarea>
+        <div class="actions"><button class="btn btn--grad btn--sm" data-act="request_revision" data-id="${d.id}">Send retouch →</button></div></div></div>`;
+  }
+  if (d.status === 'done') {
+    return `<div class="bm-act"><div class="bm-act__h"><b>${esc(d.title)}</b><span class="pill pill--done">Approved ✓</span>${imgCount(d) ? `<button class="btn btn--ghost btn--sm" data-act="download_deck" data-id="${d.id}">${DL_ICON} Download</button>` : ''}</div>${imgCount(d) ? galleryGrid(d) : ''}</div>`;
+  }
+  return `<div class="bm-act bm-act--wait"><b>${esc(d.title)}</b> · in production, we'll notify you the moment it's ready.</div>`;
+}
+function brandDeliverables(decks) {
+  return `<div class="bm-extra">${decks.map(brandDeckBlock).join('')}</div>`;
 }
 /* shared brief form (one set of details for every platform) - single column,
    it lives in the LEFT column next to the sticky mockup preview */
@@ -656,38 +663,36 @@ function renderBranding() {
   const decks = brandingDecks();
   if (!decks.length) { det.innerHTML = `<div class="empty">Branding isn't part of this order yet.</div>`; cmd.innerHTML = ''; return; }
   const anyWriting = decks.some((d) => d.status === 'writing');
-  const brief = (anyWriting && q('.brandshared')) ? gatherSharedBrand() : mergedBrief(decks);
-  const preview = `<div class="bm-preview">${platChips()}<div class="bm-stage">${brandMockup(decks, brief, brandPlat)}</div><p class="bm-hint">Live preview · switch platform to see each one.</p></div>`;
   if (anyWriting) {
-    det.innerHTML = `<p class="detail__instr">🎨 <b>Set up your branding</b>, fill your details once, we design it for every platform.</p>
-      <div class="bm-layout"><div class="bm-main">${brandSharedForm(brief)}</div>${preview}</div>`;
+    // brief phase: the client just fills the shared details (no live preview).
+    const brief = q('.brandshared') ? gatherSharedBrand() : mergedBrief(decks);
+    det.innerHTML = `<p class="detail__instr">🎨 <b>Set up your branding</b>, fill your details once, we design it for every platform and send you the result.</p>
+      ${brandSharedForm(brief)}`;
     cmd.innerHTML = `<div class="cmdbar__row"><span class="cmdbar__hint">Your details apply to every platform.</span><div class="actions"><button class="btn btn--grad btn--sm" data-act="submit_brand">Send details →</button></div></div>`;
     bindBrandForm();
   } else {
-    det.innerHTML = `<p class="detail__instr">🖼️ <b>Your branding</b>, switch platform to preview each render, then approve it or ask for a retouch.</p>
-      <div class="bm-layout"><div class="bm-main">${brandExtra(decks, brandPlat)}<div class="bb-wrap"><div class="bb-wrap__h">Your details</div>${briefRecap(brief)}</div></div>${preview}</div>`;
+    // delivered phase: the renders the studio sent, per platform, to review.
+    det.innerHTML = `<p class="detail__instr">🖼️ <b>Your branding</b>, review each render below, then approve it or ask for a retouch.</p>
+      ${brandDeliverables(decks)}
+      <div class="bb-wrap"><div class="bb-wrap__h">Your details</div>${briefRecap(mergedBrief(decks))}</div>`;
     cmd.innerHTML = '';
+    // load any delivered render images, then repaint
+    const need = decks.filter((d) => imgCount(d) && !imagesLoaded(d));
+    if (need.length) Promise.all(need.map(loadDeckImages)).then(() => { if (SELECTED === 'brand') renderBranding(); });
   }
-  bindBrandPlats();
   bindBrandActions();
-  // lazily fetch the active platform's renders, then repaint the stage + actions
-  const need = brandPlatDecks(decks, brandPlat).filter((d) => !imagesLoaded(d));
-  if (need.length) Promise.all(need.map(loadDeckImages)).then(() => { if (SELECTED === 'brand') renderBranding(); });
 }
-// switch platform WITHOUT rebuilding the form (keeps half-typed inputs): repaint
-// only the mockup, and in the delivered phase the per-platform action column.
+// [KEPT ASIDE - delivery flow] switch the mockup's platform and repaint the stage.
 function bindBrandPlats() {
   qa('.bm-plat').forEach((b) => b.addEventListener('click', () => {
     if (brandPlat === b.dataset.plat) return;
     brandPlat = b.dataset.plat;
     const decks = brandingDecks();
-    const anyWriting = decks.some((d) => d.status === 'writing');
-    const brief = anyWriting ? gatherSharedBrand() : mergedBrief(decks);
+    const brief = q('.brandshared') ? gatherSharedBrand() : mergedBrief(decks);
     qa('.bm-plat').forEach((x) => x.classList.toggle('on', x === b));
     const stage = q('.bm-stage'); if (stage) stage.innerHTML = brandMockup(decks, brief, brandPlat);
-    if (!anyWriting) { const main = q('.bm-main'); if (main) { main.innerHTML = brandExtra(decks, brandPlat) + `<div class="bb-wrap"><div class="bb-wrap__h">Your details</div>${briefRecap(brief)}</div>`; bindBrandActions(); } }
     const need = brandPlatDecks(decks, brandPlat).filter((d) => !imagesLoaded(d));
-    if (need.length) Promise.all(need.map(loadDeckImages)).then(() => { if (SELECTED === 'brand') { const st = q('.bm-stage'); if (st) st.innerHTML = brandMockup(brandingDecks(), anyWriting ? gatherSharedBrand() : mergedBrief(brandingDecks()), brandPlat); } });
+    if (need.length) Promise.all(need.map(loadDeckImages)).then(() => { if (SELECTED === 'brand') { const st = q('.bm-stage'); if (st) st.innerHTML = brandMockup(brandingDecks(), q('.brandshared') ? gatherSharedBrand() : mergedBrief(brandingDecks()), brandPlat); } });
   }));
 }
 function bindBrandActions() {
