@@ -27,19 +27,12 @@ function clientColor(o) {
   if (!c) return null;
   return c[0] === '#' ? c : '#' + c;
 }
-function darken(hex, f = 0.42) {
-  let h = hex.replace('#', '');
-  if (h.length === 3) h = h.split('').map(c => c + c).join('');
-  h = h.slice(0, 6);
-  const d = i => Math.round(parseInt(h.slice(i, i + 2), 16) * (1 - f)).toString(16).padStart(2, '0');
-  return '#' + d(0) + d(2) + d(4);
-}
-const USER_GLYPH = '<svg class="iav__usr" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12.4a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 1.3c-4.4 0-8 2.4-8 6.3 0 .4.3.7.7.7h14.6c.4 0 .7-.3.7-.7 0-3.9-3.6-6.3-8-6.3Z"/></svg>';
+const USER_GLYPH = '<svg class="iav__usr" viewBox="0 0 247 247" fill="none" aria-hidden="true"><g opacity="0.5"><mask id="cliph_m" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="247" height="247"><circle cx="123.5" cy="123.5" r="123.5" fill="url(#cliph_g0)"/></mask><g mask="url(#cliph_m)"><circle opacity="0.55" cx="123.5" cy="123.5" r="123.5" fill="url(#cliph_g1)"/><path d="M227.909 251.032C227.909 308.487 181.333 355.063 123.879 355.063C66.4242 355.063 19.8483 308.487 19.8483 251.032C19.8483 193.578 66.4242 147.002 123.879 147.002C181.333 147.002 227.909 193.578 227.909 251.032Z" fill="url(#cliph_g2)"/><path d="M186.781 105.278C186.781 140.686 158.077 169.39 122.669 169.39C87.261 169.39 58.5573 140.686 58.5573 105.278C58.5573 69.8704 87.261 41.1666 122.669 41.1666C158.077 41.1666 186.781 69.8704 186.781 105.278Z" fill="url(#cliph_g3)"/></g></g><defs><linearGradient id="cliph_g0" x1="3.53923" y1="71.5444" x2="250.539" y2="186.224" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="#E3E3E3"/></linearGradient><linearGradient id="cliph_g1" x1="3.53923" y1="71.5444" x2="250.539" y2="186.224" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="#E3E3E3"/></linearGradient><linearGradient id="cliph_g2" x1="22.8295" y1="207.267" x2="230.89" y2="303.868" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="#E3E3E3"/></linearGradient><linearGradient id="cliph_g3" x1="60.3945" y1="78.307" x2="188.618" y2="137.84" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="#E3E3E3"/></linearGradient></defs></svg>';
 function clientAv(o, cls) {
   const col = clientColor(o);
-  // bubble = brand colour, the default-user glyph a shade darker (tonal); when no
-  // brand colour is on file, the gradient + white glyph carry over.
-  const style = col ? ` style="background:${esc(col)};color:${darken(col)}"` : '';
+  // bubble = brand colour; the default-user placeholder (light frosted silhouette)
+  // sits on top. With no brand colour on file the gradient bubble carries over.
+  const style = col ? ` style="background:${esc(col)}"` : '';
   return `<span class="iav ${cls || ''}"${style}>${USER_GLYPH}</span>`;
 }
 
