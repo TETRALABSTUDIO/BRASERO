@@ -18,7 +18,28 @@ const $$ = s => [...R.querySelectorAll(s)];
 const esc = s => (s || '').toString().replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const initials = s => { const p = (s || '').trim().split(/[\s@.]+/).filter(Boolean); return ((p[0] || '?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); };
 function avatar(t, size, extra) { return t.photo ? `<img class="avatar ${size}" src="${esc(t.photo)}" ${extra || ''}>` : `<div class="avatar ${size}" ${extra || ''}>${esc(initials(t.name || t.email))}</div>`; }
-function clientAv(o, cls) { const nm = (o && (o.name || o.instagram)) || 'Client'; return `<span class="iav ${cls || ''}" data-ini="${esc(initials(nm))}"></span>`; }
+/* The client's primary brand colour (first hex of the brief's palette), used to
+   tint their avatar bubble. Falls back to the brand gradient when unknown. */
+function clientColor(o) {
+  const raw = o && o.answers && o.answers.colors;
+  if (!raw) return null;
+  const c = String(raw).split(',').map(s => s.trim()).find(x => /^#?[0-9a-f]{3,8}$/i.test(x));
+  if (!c) return null;
+  return c[0] === '#' ? c : '#' + c;
+}
+function textOn(hex) {
+  let h = hex.replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  h = h.slice(0, 6);
+  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? '#1a1a1a' : '#fff';
+}
+function clientAv(o, cls) {
+  const nm = (o && (o.name || o.instagram)) || 'Client';
+  const col = clientColor(o);
+  const style = col ? ` style="background:${esc(col)};color:${textOn(col)}"` : '';
+  return `<span class="iav ${cls || ''}" data-ini="${esc(initials(nm))}"${style}></span>`;
+}
 
 const PLAN_NAMES = { starter: 'Ember', flame: 'Flame', burst: 'Meteor' };
 const PLAN_LOGO = { starter: 'ember', flame: 'flame', burst: 'meteor' };
