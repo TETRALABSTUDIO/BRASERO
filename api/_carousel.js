@@ -54,21 +54,30 @@ function font(weight = 900) {
 
 /* ---------- Step 1: background visual via OpenAI Images ---------- */
 // Returns a PNG Buffer. Throws a clear error on missing key / API failure.
-export async function generateBackground(visualPrompt, { format = 'square', apiKey, quality = 'medium' } = {}) {
+export async function generateBackground(visualPrompt, { format = 'square', apiKey, quality = 'medium', transparent = false } = {}) {
   const key = apiKey || process.env.OPENAI_API_KEY;
   if (!key) throw new Error('OPENAI_API_KEY is not set (put it in .env, never in code).');
   const fmt = FORMATS[format] || FORMATS.square;
 
-  // Brasero look: cinematic, dark, ember-lit, premium. Explicitly NOT beige
-  // (brand bans the legacy cream palette) and NO baked-in text.
-  const styled = `${visualPrompt}.
+  // Two modes:
+  //  - dark full background (cinematic, ember-lit) for dark slides;
+  //  - transparent CUTOUT object for light/canvas slides (placed beside text).
+  // Both explicitly NOT beige (brand bans the legacy cream palette), no text.
+  const styled = transparent
+    ? `${visualPrompt}.
+
+A single isolated subject, centered, on a fully transparent background. Product-cutout style: no ground, no floor, no shadow, no scene, no backdrop. Sharp focus, premium, dramatic warm ember rim light. No text, no words, no logo, no watermark.`
+    : `${visualPrompt}.
 
 Cinematic premium editorial photograph. Deep near-black background with one dramatic warm ember light source, subtle orange/amber glow, high contrast, refined and minimal, generous calm negative space for a text overlay. Sophisticated, modern, slightly surreal conceptual mood. No text, no words, no letters, no logo, no watermark. NOT beige, NOT cream, NOT vintage paper, NOT grungy.`;
+
+  const body = { model: 'gpt-image-1', prompt: styled, size: fmt.size, n: 1, quality };
+  if (transparent) body.background = 'transparent';
 
   const res = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'gpt-image-1', prompt: styled, size: fmt.size, n: 1, quality }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
@@ -125,8 +134,10 @@ function layout(tokens, f, size, maxW) {
 // Build the SVG overlay for a dark (image) slide.
 function overlaySvg({ w, h, title = '', kicker = '', body = '', index, total, theme = 'dark' }) {
   const pad = Math.round(w * 0.075);
+  const light = theme === 'light';
   const maxW = w - pad * 2;
-  const fg = theme === 'light' ? BRAND.ink : BRAND.white;
+  const fg = light ? BRAND.ink : BRAND.white;       // headline
+  const bodyFg = light ? '#52525b' : BRAND.white;   // muted body (ink-2 on light)
   const fBlack = font(900), fBold = font(700), fMed = font(500);
 
   // Fit headline: shrink until it wraps to <= 4 lines.
@@ -194,7 +205,7 @@ function overlaySvg({ w, h, title = '', kicker = '', body = '', index, total, th
   bodyLines.forEach((ln, i) => {
     const baseline = bodyTop + i * Math.round(bodySize * 1.32) + bodySize;
     const s = ln.map(t => t.w).join(' ');
-    svg += glyphs(fMed, s, pad, baseline, bodySize, fg);
+    svg += glyphs(fMed, s, pad, baseline, bodySize, bodyFg);
   });
 
   // Masthead: Brasero flame mark top-left.
@@ -226,26 +237,47 @@ function overlaySvg({ w, h, title = '', kicker = '', body = '', index, total, th
   </svg>`);
 }
 
-// Compose one finished slide PNG (Buffer) from a background + text fields.
-export async function composeSlide(bgBuffer, { title, kicker, body, index, total, format = 'square', theme = 'dark' } = {}) {
+// Compose one finished slide PNG (Buffer).
+//  - dark theme: bgBuffer is a full cinematic image (cover-fit).
+//  - light theme: near-white Brasero canvas; optional `object` is a transparent
+//    cutout placed upper-right, text sits bottom-left.
+export async function composeSlide(bgBuffer, { title, kicker, body, index, total, format = 'square', theme = 'dark', object } = {}) {
   const fmt = FORMATS[format] || FORMATS.square;
-  const bg = await sharp(bgBuffer).resize(fmt.w, fmt.h, { fit: 'cover' }).png();
+  const layers = [];
+  let base;
+
+  if (theme === 'light') {
+    base = sharp({ create: { width: fmt.w, height: fmt.h, channels: 3, background: '#f5f5f7' } }).png();
+    if (object) {
+      const objW = Math.round(fmt.w * 0.62);
+      const obj = await sharp(object).resize(objW, objW, { fit: 'inside' }).png().toBuffer();
+      const meta = await sharp(obj).metadata();
+      layers.push({ input: obj, left: fmt.w - meta.width + Math.round(fmt.w * 0.04), top: Math.round(fmt.h * 0.06) });
+    }
+  } else {
+    base = sharp(bgBuffer).resize(fmt.w, fmt.h, { fit: 'cover' }).png();
+  }
+
   const svg = overlaySvg({ w: fmt.w, h: fmt.h, title, kicker, body, index, total, theme });
-  return bg.composite([{ input: svg, top: 0, left: 0 }]).png().toBuffer();
+  layers.push({ input: svg, top: 0, left: 0 });
+  return base.composite(layers).png().toBuffer();
 }
 
 /* ---------- Orchestrator: full carousel ---------- */
-// slides: [{ text, visual, kicker?, body? }]  ->  [{ index, buffer }]
+// slides: [{ text, visual, kicker?, body?, theme? }]  ->  [{ index, buffer }]
+// theme 'dark' (default) = cinematic full background; 'light' = white canvas + cutout object.
 export async function generateCarousel(slides, { format = 'square', apiKey, quality = 'medium', onProgress } = {}) {
   const total = slides.length;
   const out = [];
   for (let i = 0; i < slides.length; i++) {
     const s = slides[i];
-    onProgress?.(`slide ${i + 1}/${total} — generating background…`);
-    const bg = await generateBackground(s.visual || s.text, { format, apiKey, quality });
+    const theme = s.theme === 'light' ? 'light' : 'dark';
+    onProgress?.(`slide ${i + 1}/${total} — generating ${theme === 'light' ? 'cutout' : 'background'}…`);
+    const img = await generateBackground(s.visual || s.text, { format, apiKey, quality, transparent: theme === 'light' });
     onProgress?.(`slide ${i + 1}/${total} — compositing text…`);
-    const buffer = await composeSlide(bg, {
-      title: s.text, kicker: s.kicker, body: s.body, index: i + 1, total, format,
+    const buffer = await composeSlide(theme === 'light' ? null : img, {
+      title: s.text, kicker: s.kicker, body: s.body, index: i + 1, total, format, theme,
+      object: theme === 'light' ? img : undefined,
     });
     out.push({ index: i + 1, buffer });
   }
