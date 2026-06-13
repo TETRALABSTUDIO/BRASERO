@@ -1154,19 +1154,11 @@ function renderAE() {
 function openAddElems(group) { aeCat = AE_GROUPS.some(g => g.key === group) ? group : null; renderAE(); $('#addElemModal').classList.remove('hide'); }
 
 function imagesOf(d) { return Array.isArray(d.design_urls) && d.design_urls.length ? d.design_urls : (d.design_url ? [d.design_url] : []); }
-const T_INSTR = {
-  writing: '✍️ Write the script for this element, then send it to the client for approval.',
-  script_review: '📤 Script sent, awaiting the client’s approval. You can still update &amp; resend.',
-  designing: '🎨 Script approved, upload the design and send it to the client.',
-  design_review: '📤 Design sent, awaiting the client’s approval.',
-  revision: '✏️ The client requested a retouch, update the design and resend.',
-  done: '✅ Approved by the client, ready to post.',
-};
 function tThumb(u, editable) { return `<figure><img src="${esc(u)}" alt="">${editable ? '<button class="x" data-x title="Remove">✕</button>' : ''}</figure>`; }
 function slidesEditorHTML(d) {
   const slides = parseSlides(d.script);
   const rows = slides.map((h, i) => `<div class="slide" data-slide>
-    <div class="slide__bar"><span class="slide__n">Slide ${i + 1}</span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div>
+    <div class="slide__bar"><button type="button" class="slide__drag" draggable="true" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n">Slide ${i + 1}</span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div>
     <div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
   return `<div class="rt-toolbar">
       <button type="button" data-rt="title" title="Title">Title</button>
@@ -1177,6 +1169,22 @@ function slidesEditorHTML(d) {
     <button type="button" class="b-ghost b-sm slide__add" data-slide-add>+ Add slide</button>`;
 }
 function renumberSlides(det) { det.querySelectorAll('.slides [data-slide] .slide__n').forEach((el, i) => el.textContent = 'Slide ' + (i + 1)); }
+/* drag-and-drop slide reordering (talent + owner) */
+function slideDropTarget(slidesEl, y) {
+  const els = [...slidesEl.querySelectorAll('[data-slide]:not(.slide--drag)')];
+  let best = null, bestOff = -Infinity;
+  for (const el of els) { const box = el.getBoundingClientRect(); const off = y - box.top - box.height / 2;
+    if (off < 0 && off > bestOff) { bestOff = off; best = el; } }
+  return best;
+}
+function wireSlideDnD(slidesEl, det) {
+  if (!slidesEl) return;
+  let drag = null;
+  slidesEl.addEventListener('dragstart', e => { if (!e.target.closest('[data-slide-drag]')) return; const s = e.target.closest('[data-slide]'); if (!s) return; drag = s; s.classList.add('slide--drag'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', ''); } catch (_) {} } });
+  slidesEl.addEventListener('dragover', e => { if (!drag) return; e.preventDefault(); const after = slideDropTarget(slidesEl, e.clientY); if (after == null) slidesEl.appendChild(drag); else if (after !== drag) slidesEl.insertBefore(drag, after); });
+  slidesEl.addEventListener('drop', e => { if (drag) e.preventDefault(); });
+  slidesEl.addEventListener('dragend', () => { if (!drag) return; drag.classList.remove('slide--drag'); drag = null; renumberSlides(det); });
+}
 function buildScaffoldSlides(n, b, o) {
   b = b || {};
   const niche = (b.niche || '').trim();
@@ -1204,7 +1212,7 @@ function buildScaffoldSlides(n, b, o) {
 }
 function fillScaffold(det, slidesEl, n) {
   const arr = buildScaffoldSlides(n, BRIEF, CURORDER);
-  slidesEl.innerHTML = arr.map(h => `<div class="slide" data-slide><div class="slide__bar"><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
+  slidesEl.innerHTML = arr.map(h => `<div class="slide" data-slide><div class="slide__bar"><button type="button" class="slide__drag" draggable="true" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
   renumberSlides(det);
 }
 function detailHTML(d) {
@@ -1217,20 +1225,19 @@ function detailHTML(d) {
       <button type="button" class="autofill__step" data-af-inc aria-label="More slides">+</button>
       <button type="button" class="autofill__go" data-af-go>Fill</button>
     </div>` : '';
-  const head = `<div class="detail__head"><input class="detail__titleinput" data-f="title" value="${esc(d.title)}">${autofill}${owner ? '<button class="b-del b-sm" data-a="delete_deck">Delete</button>' : ''}</div>`;
-  const instr = `<p class="detail__instr">${T_INSTR[d.status] || ''}</p>`;
+  const counter = !scriptEdit ? `<span class="imgcount"><span data-count>${imagesOf(d).length}</span>/10</span>` : '';
+  const head = `<div class="detail__head"><input class="detail__titleinput" data-f="title" value="${esc(d.title)}">${counter}${autofill}${owner ? '<button class="b-del b-sm" data-a="delete_deck">Delete</button>' : ''}</div>`;
   let body;
   if (scriptEdit) {
     body = slidesEditorHTML(d);
   } else {
     const imgs = imagesOf(d), editable = d.status !== 'done';
     const note = (d.status === 'revision' && d.revision_note) ? `<p class="note-line"><b>Client retouch:</b> ${esc(d.revision_note)}</p>` : '';
-    const grid = `<div class="imgcount"><span data-count>${imgs.length}</span>/10 images</div>
-      <div class="gal" data-imgs>${imgs.map(u => tThumb(u, editable)).join('')}${editable ? '<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>' : ''}</div>`;
-    const sc = d.script ? `<details class="tscript"><summary>View approved script</summary>${slidesViewHTML(d.script)}</details>` : '';
+    const grid = `<div class="gal" data-imgs>${imgs.map(u => tThumb(u, editable)).join('')}${editable ? '<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>' : ''}</div>`;
+    const sc = d.script ? `<div class="tscript"><div class="tscript__h">Approved script</div>${slidesViewHTML(d.script)}</div>` : '';
     body = note + grid + sc;
   }
-  return head + instr + `<div class="detail__body">${body}</div>`;
+  return head + `<div class="detail__body">${body}</div>`;
 }
 function cmdHTML(d) {
   const [pc, pl] = PILL[d.status] || PILL.writing, imgs = imagesOf(d);
@@ -1262,9 +1269,10 @@ function bind(d) {
     }
   }));
   const slidesEl = det.querySelector('.slides[data-f="script"]');
+  wireSlideDnD(slidesEl, det);
   const addBtn = det.querySelector('[data-slide-add]');
   if (addBtn && slidesEl) addBtn.onclick = () => { const div = document.createElement('div'); div.className = 'slide'; div.setAttribute('data-slide', '');
-    div.innerHTML = '<div class="slide__bar"><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body></div>';
+    div.innerHTML = '<div class="slide__bar"><button type="button" class="slide__drag" draggable="true" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n"></span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div><div class="slide__edit" contenteditable="true" data-slide-body></div>';
     slidesEl.appendChild(div); renumberSlides(det); div.querySelector('[data-slide-body]').focus(); };
   const afEl = det.querySelector('[data-autofill]');
   if (afEl && slidesEl) {
