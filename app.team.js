@@ -143,7 +143,7 @@ function shellHTML() {
       </div>
     </div>
 
-    <div class="modal hide" id="newModal">
+    <div class="modal modal--panel hide" id="newModal">
       <div class="modalc modalc--wide">
         <div class="modalc__h"><h3>New project</h3><button type="button" class="mx" id="npClose">✕</button></div>
         <form id="npForm">
@@ -206,7 +206,7 @@ function shellHTML() {
       </div>
     </div>
 
-    <div class="modal hide" id="talentModal">
+    <div class="modal modal--panel hide" id="talentModal">
       <div class="modalc">
         <div class="modalc__h"><h3>Create a talent account</h3><button type="button" class="mx" id="tmClose">✕</button></div>
         <p style="font-size:13px;color:var(--grey);margin:-8px 0 16px">We generate a temporary password to share with them. They change it on first login.</p>
@@ -228,7 +228,7 @@ function shellHTML() {
     <div class="lb" id="lb"><img id="lbImg" alt=""><button type="button" class="lb__dl" id="lbDl">⬇ Download</button></div>
     <div class="impbar hide" id="impBar"></div>
 
-    <div class="modal hide" id="addElemModal">
+    <div class="modal modal--panel hide" id="addElemModal">
       <div class="modalc">
         <div class="modalc__h"><h3>Add elements</h3><button type="button" class="mx" id="aeClose">✕</button></div>
         <p style="font-size:13px;color:var(--grey);margin:-8px 0 16px">The same packs a client can add, added straight to this order, no charge.</p>
@@ -236,7 +236,7 @@ function shellHTML() {
       </div>
     </div>
 
-    <div class="modal hide" id="briefModal">
+    <div class="modal modal--panel hide" id="briefModal">
       <div class="briefpage">
         <div class="briefpage__top">
           <div class="briefpage__id" id="briefHead"></div>
