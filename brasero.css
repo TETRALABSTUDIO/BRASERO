@@ -78,16 +78,17 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
    AUTH / LOGIN (shell entry: magic-link request + owner/talent login)
    ========================================================================== */
 .authwrap{width:100%;min-height:100vh;margin:0;padding:40px 20px;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-.authwrap h1,.authwrap p,.authwrap form,.authwrap .authnote,.authwrap .authswap{width:100%;max-width:380px}
-.authwrap .logo-svg{height:36px;margin-bottom:20px;color:var(--ink)}
-.authwrap h1{font-size:23px;font-weight:900;letter-spacing:-.03em}
-.authwrap p{color:var(--grey);font-size:13.5px;line-height:1.5;margin:8px 0 20px}
-.authwrap .field{margin-bottom:14px}
-.authwrap .field input{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 18px;font-size:15px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:border-color .15s,box-shadow .15s}
-.authwrap .field input:focus{background:#fff;border-color:var(--orange);box-shadow:0 0 0 4px rgba(248,80,0,.10)}
-.authswap{margin-top:18px;font-size:13px;color:var(--grey);text-align:center}
-.authswap button{background:none;border:none;color:var(--orange);font-weight:800;padding:0;font-size:13px}
-.authnote{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:16px;font-size:13.5px;color:var(--ink);line-height:1.5;text-align:center}
+.authwrap .logo-svg{height:34px;margin-bottom:22px;color:var(--ink)}
+.authwrap p{color:var(--grey);font-size:14px;line-height:1.55;margin:0 0 26px;max-width:440px}
+.authform{display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px}
+.authform input{height:54px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px;font-size:15px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:border-color .15s,box-shadow .15s}
+.authform input::placeholder{color:#aaa}
+.authform input:focus{border-color:var(--orange);box-shadow:0 0 0 4px rgba(248,80,0,.10)}
+.authform .btn{width:100%;height:54px;padding:0 24px;border-radius:14px}
+.authform .err{margin:0}
+.authnote{margin-top:4px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:15px 18px;font-size:13.5px;color:var(--ink);line-height:1.5;text-align:center;width:100%;max-width:360px}
+.authswap{margin-top:22px}
+.authswap button{background:none;border:none;color:var(--orange);font-weight:800;padding:0;font-size:13.5px;cursor:pointer}
 .setupav{display:grid;place-items:center;cursor:pointer;margin:0 auto 16px;width:76px;height:76px;border-radius:50%;background:var(--soft);border:2px dashed var(--line);overflow:hidden}
 .setupav:hover{border-color:var(--orange)}
 .setupav img{width:100%;height:100%;display:block;object-fit:cover}
