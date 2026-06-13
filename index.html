@@ -231,6 +231,9 @@ img,svg{display:block}
 .cstat{flex:1;min-width:78px}
 .cstat b{display:block;font-size:clamp(22px,2.3vw,30px);font-weight:900;letter-spacing:-.03em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .cstat span{font-size:12px;color:#9a9a9a;font-weight:500;display:block;margin-top:5px;line-height:1.2}
+.cformats{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+.cformats span{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#dcdcdc;background:rgba(255,255,255,.05);border:1px solid var(--line-light);border-radius:100px;padding:7px 14px}
+.cformats svg{width:15px;height:15px;color:var(--orange)}
 
 .carousel{position:relative}
 .ctrack{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:4px 2px 10px;scrollbar-width:none}
@@ -616,38 +619,55 @@ img,svg{display:block}
 /* benefits bento */
 .space__bento{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:980px;margin:48px auto 0}
 .bento{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
-.bento__viz{height:122px;border-radius:13px;background:var(--cream);border:1px solid var(--line);position:relative;overflow:hidden}
+.bento__viz{height:142px;border-radius:13px;background:var(--cream);border:1px solid var(--line);position:relative;overflow:hidden}
 .bento__txt h4{font-size:16px;font-weight:900;letter-spacing:-.02em;margin-bottom:5px}
 .bento__txt p{font-size:13.5px;line-height:1.5;color:var(--grey)}
 /* viz: expert chat */
-.bz-chat{position:absolute;inset:0;padding:14px;display:flex;flex-direction:column;gap:7px}
-.bz-chat__hd{display:flex;align-items:center;gap:8px;margin-bottom:2px}
-.bz-av{width:26px;height:26px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:12px;flex-shrink:0}
-.bz-av__l{font-size:10px;font-weight:800;color:var(--orange)}
-.bz-bub{font-size:11px;font-weight:600;padding:7px 11px;border-radius:12px;max-width:78%}
+.bz-chat{position:absolute;inset:0;padding:13px 14px;display:flex;flex-direction:column;gap:8px}
+.bz-chat__hd{display:flex;align-items:center;gap:9px}
+.bz-av{width:30px;height:30px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px;flex-shrink:0;position:relative}
+.bz-av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:9px;height:9px;border-radius:50%;background:#16a34a;border:2px solid var(--cream)}
+.bz-chat__nm{display:flex;flex-direction:column;line-height:1.2}
+.bz-chat__nm b{font-size:12px;font-weight:900;color:#1c1c1c}
+.bz-chat__nm span{font-size:9.5px;font-weight:800;color:var(--orange)}
+.bz-bub{font-size:11px;font-weight:600;line-height:1.35;padding:7px 11px;border-radius:13px;max-width:82%}
 .bz-bub--in{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px;color:#333}
 .bz-bub--out{align-self:flex-end;background:var(--grad);color:#fff;border-bottom-right-radius:4px}
 /* viz: approve */
-.bz-approve{position:absolute;inset:0;padding:14px;display:flex;align-items:center;gap:12px}
-.bz-slide{width:54px;aspect-ratio:1080/1350;border-radius:7px;border:1px solid var(--line);background:linear-gradient(150deg,#fff,#eee9e1);position:relative;flex-shrink:0}
-.bz-slide::before{content:"";position:absolute;top:7px;left:7px;width:24px;height:4px;border-radius:3px;background:var(--grad)}
-.bz-approve__col{display:flex;flex-direction:column;gap:8px}
-.bz-btn{font-size:11px;font-weight:800;padding:7px 13px;border-radius:100px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.bz-approve{position:absolute;inset:0;padding:14px;display:flex;align-items:center;gap:14px}
+.bz-slide{width:62px;aspect-ratio:1080/1350;border-radius:8px;border:1px solid var(--line);background:linear-gradient(150deg,#fff,#efe9e1);position:relative;flex-shrink:0;padding:9px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 5px 12px rgba(0,0,0,.06)}
+.bz-slide::before{content:"";position:absolute;top:9px;left:9px;width:28px;height:5px;border-radius:3px;background:var(--grad)}
+.bz-slide b{display:block;height:4px;border-radius:2px;background:rgba(0,0,0,.16)}
+.bz-slide b+b{margin-top:4px;width:62%}
+.bz-approve__col{display:flex;flex-direction:column;gap:7px;min-width:0}
+.bz-approve__lbl{font-size:10px;font-weight:800;color:#9a9a9a}
+.bz-btn{font-size:11px;font-weight:800;padding:7px 14px;border-radius:100px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;justify-content:center}
 .bz-btn--ok{background:#16a34a;color:#fff}
 .bz-btn--ghost{background:#fff;border:1px solid var(--line);color:#666}
+.bz-btn svg{width:11px;height:11px}
 /* viz: library */
-.bz-lib{position:absolute;inset:0;padding:13px;display:flex;flex-direction:column;gap:6px}
-.bz-cat{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:11.5px;font-weight:800;color:#333}
+.bz-lib{position:absolute;inset:0;padding:12px;display:flex;flex-direction:column;gap:6px}
+.bz-cat{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 9px}
 .bz-cat.on{border-color:rgba(248,80,0,.3);box-shadow:inset 3px 0 0 var(--orange)}
-.bz-cat i{width:18px;height:18px;border-radius:5px;background:rgba(248,80,0,.12);flex-shrink:0}
-.bz-cat.on i{background:var(--grad)}
+.bz-cat__ic{width:22px;height:22px;border-radius:6px;background:rgba(248,80,0,.1);display:grid;place-items:center;flex-shrink:0}
+.bz-cat.on .bz-cat__ic{background:var(--grad)}
+.bz-cat__ic svg{width:13px;height:13px}
+.bz-cat.on .bz-cat__ic svg{filter:brightness(0) invert(1)}
+.bz-cat__l{display:flex;flex-direction:column;line-height:1.18;margin-right:auto}
+.bz-cat__l b{font-size:11px;font-weight:900;color:#222}
+.bz-cat__l span{font-size:9px;color:#9a9a9a;font-weight:600}
+.bz-cat__chev{font-size:12px;color:#cdcdcd;font-weight:700}
 /* viz: export */
-.bz-export{position:absolute;inset:0;display:grid;place-items:center}
-.bz-export__slide{width:60px;aspect-ratio:1080/1350;border-radius:8px;border:1px solid var(--line);background:linear-gradient(150deg,#fff,#eee9e1);position:relative;display:grid;place-items:end center;padding-bottom:8px}
-.bz-export__slide::before{content:"";position:absolute;top:8px;left:8px;width:26px;height:4px;border-radius:3px;background:var(--grad)}
-.bz-export__tag{font-size:8.5px;font-weight:800;color:#fff;background:var(--grad);padding:3px 7px;border-radius:100px}
-.bz-export__dl{position:absolute;right:18%;bottom:18%;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 6px 14px rgba(0,0,0,.12);display:grid;place-items:center;color:var(--orange)}
-.bz-export__dl svg{width:14px;height:14px}
+.bz-export{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:15px}
+.bz-export__slide{width:70px;aspect-ratio:1080/1350;border-radius:9px;border:1px solid var(--line);background:linear-gradient(150deg,#fff,#efe9e1);position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:10px;box-shadow:0 7px 18px rgba(0,0,0,.1)}
+.bz-export__slide::before{content:"";position:absolute;top:10px;left:10px;width:30px;height:5px;border-radius:3px;background:var(--grad)}
+.bz-export__slide b{display:block;height:4px;border-radius:2px;background:rgba(0,0,0,.16)}
+.bz-export__slide b+b{margin-top:4px;width:58%}
+.bz-export__tag{position:absolute;top:8px;right:8px;font-size:8px;font-weight:800;color:#fff;background:var(--grad);padding:3px 7px;border-radius:100px}
+.bz-export__col{display:flex;flex-direction:column;gap:8px;align-items:center}
+.bz-export__dl{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#1c1c1c;background:#fff;border:1px solid var(--line);border-radius:100px;padding:8px 13px;box-shadow:0 5px 12px rgba(0,0,0,.07)}
+.bz-export__dl svg{width:13px;height:13px;color:var(--orange)}
+.bz-export__fmt{font-size:9.5px;font-weight:700;color:#9a9a9a}
 @media(max-width:760px){.space{padding:80px 0}.space__bento{grid-template-columns:1fr;max-width:420px}}
 @media(max-width:980px){
   .spc__body{grid-template-columns:190px minmax(0,1fr)}
@@ -659,65 +679,67 @@ img,svg{display:block}
   .spc__gal{grid-template-columns:repeat(3,1fr)}
 }
 
-/* ===== FORMATS funnel (dark) ===== */
+/* ===== FORMATS (dark) — 4 uniform cards ===== */
 .formats{padding:120px 0}
-.fmt__head{max-width:740px;margin:0 auto 54px;text-align:center}
+.fmt__head{max-width:740px;margin:0 auto 50px;text-align:center}
 .fmt__head .h-lg{margin-bottom:16px}
-.fmt__flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:0;max-width:1120px;margin:0 auto}
+.fmt__flow{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:1000px;margin:0 auto}
 .fmt-card{background:#141414;border:1px solid var(--line-light);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;position:relative;overflow:hidden}
-.fmt-card--lead{border-color:rgba(248,80,0,.4);box-shadow:0 24px 60px rgba(248,80,0,.14)}
-.fmt-card__glow{position:absolute;top:-60px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(closest-side,rgba(248,80,0,.4),transparent 72%);filter:blur(30px);pointer-events:none}
-/* viz panel — visual bleeds off the bottom, faded by a black gradient */
-.fmt-card__viz{height:184px;margin:-24px -24px 20px;background:radial-gradient(130% 90% at 50% 0,#1d1d1d,#0b0b0b);border-bottom:1px solid var(--line-light);border-radius:var(--radius) var(--radius) 0 0;position:relative;overflow:hidden}
-.fmt-card--lead .fmt-card__viz{background:radial-gradient(130% 90% at 50% 0,#241a16,#0b0b0b)}
-.fmt-card__viz::after{content:"";position:absolute;left:0;right:0;bottom:0;height:74px;background:linear-gradient(180deg,transparent,#141414);z-index:3;pointer-events:none}
-/* decks stack */
-.viz-decks{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);width:140px;height:150px}
-.viz-decks i{position:absolute;bottom:0;left:50%;width:86px;height:110px;margin-left:-43px;border-radius:13px;border:1px solid rgba(255,255,255,.14);background:#1f1f1f}
-.viz-decks i:nth-child(1){transform:translateX(-34px) rotate(-10deg);opacity:.45}
-.viz-decks i:nth-child(2){transform:translateX(-16px) rotate(-4deg);opacity:.72}
-.viz-decks i:nth-child(3){background:#171717;border-color:rgba(248,80,0,.5)}
-.viz-decks i:nth-child(3)::before{content:"";position:absolute;top:14px;left:14px;width:36px;height:6px;border-radius:3px;background:var(--grad)}
-.viz-decks i:nth-child(3)::after{content:"";position:absolute;left:14px;right:22px;bottom:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);box-shadow:0 -11px 0 rgba(255,255,255,.12)}
-/* story phone */
-.viz-story{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:86px;height:158px;border-radius:17px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(160deg,#2b2b2b,#131313);overflow:hidden;padding:11px 10px}
-.viz-story__bar{display:flex;gap:3px;margin-bottom:11px}
-.viz-story__bar i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}
-.viz-story__bar i:first-child{background:var(--grad)}
-.viz-story__av{width:22px;height:22px;border-radius:50%;background:var(--grad)}
-.viz-story__poll{position:absolute;left:10px;right:10px;bottom:30px;height:22px;border-radius:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
-.viz-story__poll::before{content:"";position:absolute;inset:0;width:62%;border-radius:7px;background:rgba(248,80,0,.4)}
-/* branding — social profile mock */
-.viz-brand{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);width:162px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:13px;box-shadow:0 16px 34px rgba(0,0,0,.34)}
-.viz-brand__hd{display:flex;align-items:center;gap:9px;margin-bottom:11px}
-.viz-brand__av{width:32px;height:32px;border-radius:50%;background:var(--grad);flex-shrink:0}
-.viz-brand__id{display:flex;flex-direction:column;gap:4px}
-.viz-brand__id b{width:58px;height:7px;border-radius:3px;background:#1a1a1a}
-.viz-brand__id i{width:40px;height:5px;border-radius:3px;background:#cbcbcb}
-.viz-brand__hl{display:flex;gap:8px;margin-bottom:10px}
-.viz-brand__hl span{width:26px;height:26px;border-radius:50%;border:1.6px solid var(--orange);background:rgba(248,80,0,.08)}
-.viz-brand__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.viz-brand__grid span{aspect-ratio:1;border-radius:5px;background:linear-gradient(150deg,#f0ece6,#e0dbd2)}
-.viz-brand__grid span:nth-child(2){background:var(--grad)}
-.viz-brand__grid span:nth-child(4){background:#191919}
-.viz-brand__grid span:nth-child(6){background:#f87000}
+/* viz panel — dark, fills width, visual bleeds off the bottom into a black fade */
+.fmt-card__viz{height:200px;margin:-24px -24px 22px;background:radial-gradient(130% 90% at 50% 0,#1e1e1e,#0a0a0a);border-bottom:1px solid var(--line-light);border-radius:var(--radius) var(--radius) 0 0;position:relative;overflow:hidden}
+.fmt-card__viz::after{content:"";position:absolute;left:0;right:0;bottom:0;height:78px;background:linear-gradient(180deg,transparent,#141414);z-index:3;pointer-events:none}
+/* decks — fanned stack across the width */
+.fv-decks{position:absolute;bottom:-30px;left:0;right:0;display:flex;justify-content:center;align-items:flex-end}
+.fv-decks i{width:108px;height:142px;border-radius:15px;border:1px solid rgba(255,255,255,.14);background:#1d1d1d;position:relative;flex-shrink:0}
+.fv-decks i:nth-child(1){transform:rotate(-9deg) translateY(14px);margin-right:-34px;opacity:.5}
+.fv-decks i:nth-child(3){transform:rotate(9deg) translateY(14px);margin-left:-34px;opacity:.5}
+.fv-decks i:nth-child(2){z-index:2;background:#171717;border-color:rgba(248,80,0,.5)}
+.fv-decks i:nth-child(2)::before{content:"";position:absolute;top:16px;left:16px;width:46px;height:7px;border-radius:3px;background:var(--grad)}
+.fv-decks i:nth-child(2)::after{content:"";position:absolute;left:16px;right:26px;bottom:48px;height:6px;border-radius:3px;background:rgba(255,255,255,.24);box-shadow:0 -14px 0 rgba(255,255,255,.13)}
+/* stories — two phones */
+.fv-story{position:absolute;bottom:-26px;left:0;right:0;display:flex;justify-content:center;align-items:flex-end;gap:18px}
+.fv-phone{width:92px;height:164px;border-radius:19px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(160deg,#2b2b2b,#121212);position:relative;overflow:hidden;padding:12px 10px;flex-shrink:0}
+.fv-phone:nth-child(2){transform:translateY(-12px) scale(1.03)}
+.fv-phone .bars{display:flex;gap:3px;margin-bottom:11px}
+.fv-phone .bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}
+.fv-phone .bars i:first-child{background:var(--grad)}
+.fv-phone .av{width:22px;height:22px;border-radius:50%;background:var(--grad)}
+.fv-phone .poll{position:absolute;left:10px;right:10px;bottom:30px;height:20px;border-radius:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
+.fv-phone .poll::before{content:"";position:absolute;inset:0;width:60%;border-radius:6px;background:rgba(248,80,0,.4)}
+/* statics — two designed single posts */
+.fv-static{position:absolute;bottom:-24px;left:0;right:0;display:flex;justify-content:center;align-items:flex-end;gap:14px}
+.fv-post{width:132px;aspect-ratio:4/5;border-radius:15px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(155deg,#242424,#0e0e0e);position:relative;overflow:hidden;padding:15px;display:flex;flex-direction:column;justify-content:flex-end;flex-shrink:0}
+.fv-post:nth-child(2){transform:translateY(-10px)}
+.fv-post::before{content:"";position:absolute;top:15px;left:15px;width:42px;height:6px;border-radius:3px;background:var(--grad)}
+.fv-post b{display:block;height:8px;border-radius:3px;background:rgba(255,255,255,.85);width:82%}
+.fv-post i{display:block;height:6px;border-radius:3px;background:rgba(255,255,255,.4);width:56%;margin-top:7px}
+/* branding — dark social profile mock */
+.fv-brand{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);width:88%;max-width:320px;background:#191919;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;box-shadow:0 18px 42px rgba(0,0,0,.45)}
+.fv-brand__hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.fv-brand__av{width:44px;height:44px;border-radius:50%;background:var(--grad);flex-shrink:0}
+.fv-brand__id{display:flex;flex-direction:column;gap:6px}
+.fv-brand__id b{width:84px;height:8px;border-radius:3px;background:#fff;display:block}
+.fv-brand__id i{width:56px;height:6px;border-radius:3px;background:#5a5a5a;display:block}
+.fv-brand__hl{display:flex;gap:11px;margin-bottom:13px}
+.fv-brand__hl span{width:36px;height:36px;border-radius:50%;border:1.8px solid var(--orange);background:rgba(248,80,0,.1)}
+.fv-brand__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fv-brand__grid span{aspect-ratio:1;border-radius:7px;background:#262626}
+.fv-brand__grid span:nth-child(1){background:var(--grad)}
+.fv-brand__grid span:nth-child(5){background:#f87000}
+.fv-brand__grid span:nth-child(3){background:#303030}
 /* title with deliverable icon */
-.fmt-card h3{display:flex;align-items:center;gap:9px;font-size:clamp(20px,2vw,25px);font-weight:900;letter-spacing:-.025em;line-height:1.05;margin-bottom:5px}
+.fmt-card h3{display:flex;align-items:center;gap:9px;font-size:clamp(20px,2vw,24px);font-weight:900;letter-spacing:-.025em;line-height:1.05;margin-bottom:5px}
 .fmt-card__tic{width:26px;height:26px;flex-shrink:0;display:grid;place-items:center}
 .fmt-card__tic svg{width:24px;height:24px}
-.fmt-card__job{display:block;font-size:14px;font-weight:800;letter-spacing:-.01em;color:#cfcfcf;margin-bottom:11px}
-.fmt-card--lead .fmt-card__job{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.fmt-card__job{display:block;font-size:14px;font-weight:800;letter-spacing:-.01em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:11px}
 .fmt-card p{font-size:14px;line-height:1.55;color:#9a9a9a;margin-bottom:18px}
 .fmt-card__tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto}
 .fmt-card__tags span{font-size:11.5px;font-weight:700;color:#cfcfcf;background:rgba(255,255,255,.06);border:1px solid var(--line-light);padding:5px 11px;border-radius:100px}
-.fmt-arrow{display:grid;place-items:center;width:44px;color:#5a5a5a}
-.fmt-arrow svg{width:22px;height:22px}
-.fmt__foot{max-width:1120px;margin:26px auto 0;display:flex;align-items:center;justify-content:center;gap:13px;text-align:center;font-size:15px;font-weight:600;color:#cfcfcf}
+.fmt__foot{max-width:1000px;margin:24px auto 0;display:flex;align-items:center;justify-content:center;gap:13px;text-align:center;font-size:15px;font-weight:600;color:#cfcfcf}
 .fmt__foot b{color:#fff;font-weight:900}
-@media(max-width:900px){
+@media(max-width:760px){
   .formats{padding:80px 0}
-  .fmt__flow{grid-template-columns:1fr}
-  .fmt-arrow{width:auto;height:40px;transform:rotate(90deg)}
+  .fmt__flow{grid-template-columns:1fr;max-width:440px}
 }
 
 /* ===== TESTIMONIALS (dark) uniform ===== */
@@ -750,17 +772,16 @@ img,svg{display:block}
 @media(max-width:600px){.testi__grid{grid-template-columns:1fr}}
 
 /* ===== GUARANTEE inline (inside pricing) ===== */
-.pgtee{max-width:980px;margin:22px auto 0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 20px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:14px 26px}
-.pgtee__shield{width:32px;height:32px;border-radius:10px;background:var(--grad);display:grid;place-items:center;flex-shrink:0;box-shadow:0 8px 18px rgba(248,80,0,.28)}
-.pgtee__shield svg{width:17px;height:17px;color:#fff}
-.pgtee>strong{font-size:14.5px;font-weight:900;letter-spacing:-.02em;color:var(--ink)}
+.pgtee{max-width:940px;margin:24px auto 0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px 22px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 26px}
+.pgtee__shield{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;flex-shrink:0;box-shadow:0 8px 18px rgba(248,80,0,.28)}
+.pgtee__shield svg{width:18px;height:18px;color:#fff}
+.pgtee>strong{font-size:15px;font-weight:900;letter-spacing:-.02em;color:var(--ink)}
 .pgtee__item{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--ink)}
-.pgtee__item svg{width:15px;height:15px;color:#16a34a;flex-shrink:0}
-.pgtee__link{margin-left:auto;font-size:13px;font-weight:800;color:var(--orange)}
+.pgtee__item svg{width:16px;height:16px;color:#16a34a;flex-shrink:0}
+.pgtee__link{font-size:13px;font-weight:800;color:var(--orange)}
 .pgtee__link:hover{color:var(--red)}
-@media(max-width:820px){
-  .pgtee{border-radius:20px;justify-content:flex-start;gap:10px 16px}
-  .pgtee__link{margin-left:0}
+@media(max-width:720px){
+  .pgtee{justify-content:flex-start;text-align:left}
 }
 
 /* ===== PACKAGES (light) ===== */
@@ -1081,7 +1102,7 @@ html{overflow-x:hidden}
 
       <h1>A visual<span class="decks-accent"><i></i><i></i><i></i></span>system<br>your page is<br><span class="grad-text">known for.</span></h1>
 
-      <p class="hero__lead">Decks, stories and branding, built to make your page unmistakable.</p>
+      <p class="hero__lead">Decks, stories and static posts, in a brand system that's unmistakably yours.</p>
 
       <div class="hero__by">
         <span class="hero__by-av"><img src="assets/team.jpg" alt="" onerror="this.style.display='none'"></span>
@@ -1180,8 +1201,8 @@ html{overflow-x:hidden}
           <span class="mkt-bar__track"><i class="mkt-bar__fill" style="--w:94%"></i></span>
         </div>
         <div class="mkt-bar">
-          <div class="mkt-bar__top"><span class="mkt-bar__name">Static image</span><span class="mkt-bar__val">↓ −17% YoY</span></div>
-          <span class="mkt-bar__track"><i class="mkt-bar__fill" style="--w:42%"></i></span>
+          <div class="mkt-bar__top"><span class="mkt-bar__name">Single image</span><span class="mkt-bar__val">0.34%</span></div>
+          <span class="mkt-bar__track"><i class="mkt-bar__fill" style="--w:62%"></i></span>
         </div>
       </div>
     </div>
@@ -1225,13 +1246,19 @@ html{overflow-x:hidden}
       <div class="cleft">
         <div class="collection__head">
           <h2 class="h-lg">Built to be<br>saved &amp; shared.</h2>
-          <p class="lead muted">A selection of work shipped for thematic pages across finance, mindset, fitness and tech: decks, stories and brand systems engineered to be saved, shared, and remembered.</p>
+          <p class="lead muted">A selection of work shipped for thematic pages across finance, mindset, fitness and tech: decks, stories, static posts and brand systems engineered to be saved, shared, and remembered.</p>
         </div>
         <div class="cstats" id="cstats">
           <div class="cstat"><b data-to="1800" data-suffix="+" data-comma="1">0</b><span>Visuals shipped</span></div>
           <div class="cstat"><b data-to="89" data-suffix="M+">0</b><span>Total views</span></div>
           <div class="cstat"><b data-to="3.1" data-suffix="x" data-dec="1">0</b><span>Avg. save-rate lift</span></div>
           <div class="cstat"><b data-to="120" data-suffix="+">0</b><span>Pages &amp; creators</span></div>
+        </div>
+        <div class="cformats">
+          <span><svg viewBox="0 0 140 94"><use href="#ic-decks"/></svg>Decks</span>
+          <span><svg viewBox="0 0 134 122"><use href="#ic-story"/></svg>Stories</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>Static posts</span>
+          <span><svg viewBox="0 0 120 120"><use href="#ic-brand"/></svg>Branding</span>
         </div>
       </div>
 
@@ -1587,7 +1614,7 @@ html{overflow-x:hidden}
       <div class="bento reveal">
         <div class="bento__viz">
           <div class="bz-chat">
-            <div class="bz-chat__hd"><span class="bz-av">M</span><span class="bz-av__l">Maya · your expert</span></div>
+            <div class="bz-chat__hd"><span class="bz-av">M</span><span class="bz-chat__nm"><b>Maya</b><span>Your expert · online</span></span></div>
             <span class="bz-bub bz-bub--in">Slide 2 is ready 👀</span>
             <span class="bz-bub bz-bub--out">Love it, ship it</span>
           </div>
@@ -1598,10 +1625,11 @@ html{overflow-x:hidden}
       <div class="bento reveal">
         <div class="bento__viz">
           <div class="bz-approve">
-            <span class="bz-slide"></span>
+            <span class="bz-slide"><b></b><b></b></span>
             <div class="bz-approve__col">
-              <span class="bz-btn bz-btn--ghost">Request a retouch</span>
-              <span class="bz-btn bz-btn--ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><path d="M5 12.5l4 4 10-10"/></svg>Approve</span>
+              <span class="bz-approve__lbl">Slide 2 / 8</span>
+              <span class="bz-btn bz-btn--ghost">Retouch</span>
+              <span class="bz-btn bz-btn--ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10"/></svg>Approve</span>
             </div>
           </div>
         </div>
@@ -1611,9 +1639,9 @@ html{overflow-x:hidden}
       <div class="bento reveal">
         <div class="bento__viz">
           <div class="bz-lib">
-            <span class="bz-cat on"><i></i>Decks</span>
-            <span class="bz-cat"><i></i>Stories</span>
-            <span class="bz-cat"><i></i>Branding</span>
+            <span class="bz-cat on"><span class="bz-cat__ic"><svg viewBox="0 0 140 94"><use href="#ic-decks"/></svg></span><span class="bz-cat__l"><b>Decks</b><span>6 elements</span></span><span class="bz-cat__chev">›</span></span>
+            <span class="bz-cat"><span class="bz-cat__ic"><svg viewBox="0 0 134 122"><use href="#ic-story"/></svg></span><span class="bz-cat__l"><b>Stories</b><span>3 elements</span></span><span class="bz-cat__chev">›</span></span>
+            <span class="bz-cat"><span class="bz-cat__ic"><svg viewBox="0 0 120 120"><use href="#ic-brand"/></svg></span><span class="bz-cat__l"><b>Branding</b><span>System</span></span><span class="bz-cat__chev">›</span></span>
           </div>
         </div>
         <div class="bento__txt"><h4>Everything in one place</h4><p>Decks, stories and brand assets in a single library you can come back to anytime.</p></div>
@@ -1622,11 +1650,14 @@ html{overflow-x:hidden}
       <div class="bento reveal">
         <div class="bento__viz">
           <div class="bz-export">
-            <span class="bz-export__slide"><span class="bz-export__tag">1080×1350</span></span>
-            <span class="bz-export__dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>
+            <span class="bz-export__slide"><span class="bz-export__tag">1080×1350</span><b></b><b></b></span>
+            <div class="bz-export__col">
+              <span class="bz-export__dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Export</span>
+              <span class="bz-export__fmt">PNG · ready</span>
+            </div>
           </div>
         </div>
-        <div class="bento__txt"><h4>Export post-ready</h4><p>Final decks delivered at 1080×1350, ready to post. No reformatting, no back and forth.</p></div>
+        <div class="bento__txt"><h4>Export post-ready</h4><p>Final work delivered post-ready, decks, stories and statics, ready to post. No reformatting.</p></div>
       </div>
     </div>
   </div>
@@ -1637,15 +1668,14 @@ html{overflow-x:hidden}
   <div class="glow" style="top:-80px;right:-60px"></div>
   <div class="wrap">
     <div class="fmt__head reveal">
-      <h2 class="h-lg">Decks, stories, brand.<br>Built to work together.</h2>
-      <p class="lead muted">We don't sell formats à la carte. Each one has a job: decks bring people in, stories turn them into a relationship, and a brand system makes the whole page unmistakable.</p>
+      <h2 class="h-lg">Decks, stories, statics,<br>one brand system.</h2>
+      <p class="lead muted">We make every visual your page needs, and a brand system that makes all of it unmistakably yours. Each format has a job; together they compound.</p>
     </div>
 
     <div class="fmt__flow">
-      <div class="fmt-card fmt-card--lead reveal">
-        <div class="fmt-card__glow"></div>
+      <div class="fmt-card reveal">
         <div class="fmt-card__viz">
-          <div class="viz-decks"><i></i><i></i><i></i></div>
+          <div class="fv-decks"><i></i><i></i><i></i></div>
         </div>
         <h3><span class="fmt-card__tic"><svg viewBox="0 0 140 94"><use href="#ic-decks"/></svg></span>Decks</h3>
         <span class="fmt-card__job">Stop the scroll</span>
@@ -1653,36 +1683,48 @@ html{overflow-x:hidden}
         <div class="fmt-card__tags"><span>Reach</span><span>Saves</span><span>New follows</span></div>
       </div>
 
-      <div class="fmt-arrow reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
-
       <div class="fmt-card reveal">
         <div class="fmt-card__viz">
-          <div class="viz-story"><div class="viz-story__bar"><i></i><i></i><i></i></div><span class="viz-story__av"></span><span class="viz-story__poll"></span></div>
+          <div class="fv-story">
+            <div class="fv-phone"><div class="bars"><i></i><i></i><i></i></div><span class="av"></span></div>
+            <div class="fv-phone"><div class="bars"><i></i><i></i><i></i></div><span class="av"></span><span class="poll"></span></div>
+          </div>
         </div>
         <h3><span class="fmt-card__tic"><svg viewBox="0 0 134 122"><use href="#ic-story"/></svg></span>Stories</h3>
         <span class="fmt-card__job">Build the relationship</span>
-        <p>On-brand story sets that warm up the audience decks bring in: polls, link taps and DMs that turn viewers into a community.</p>
+        <p>On-brand story sets that warm up your audience: polls, link taps and DMs that turn viewers into a community.</p>
         <div class="fmt-card__tags"><span>9:16</span><span>Link taps</span><span>DMs &amp; polls</span></div>
       </div>
 
-      <div class="fmt-arrow reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+      <div class="fmt-card reveal">
+        <div class="fmt-card__viz">
+          <div class="fv-static">
+            <div class="fv-post"><b></b><i></i></div>
+            <div class="fv-post"><b></b><i></i></div>
+          </div>
+        </div>
+        <h3><span class="fmt-card__tic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></span>Static posts</h3>
+        <span class="fmt-card__job">Land one idea</span>
+        <p>Single designed posts that say one thing, beautifully. Perfect for quotes, announcements and bold statements.</p>
+        <div class="fmt-card__tags"><span>1080×1350</span><span>One message</span><span>On-brand</span></div>
+      </div>
 
       <div class="fmt-card reveal">
         <div class="fmt-card__viz">
-          <div class="viz-brand">
-            <div class="viz-brand__hd"><span class="viz-brand__av"></span><span class="viz-brand__id"><b></b><i></i></span></div>
-            <div class="viz-brand__hl"><span></span><span></span><span></span></div>
-            <div class="viz-brand__grid"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="fv-brand">
+            <div class="fv-brand__hd"><span class="fv-brand__av"></span><span class="fv-brand__id"><b></b><i></i></span></div>
+            <div class="fv-brand__hl"><span></span><span></span><span></span></div>
+            <div class="fv-brand__grid"><span></span><span></span><span></span><span></span><span></span><span></span></div>
           </div>
         </div>
         <h3><span class="fmt-card__tic"><svg viewBox="0 0 120 120"><use href="#ic-brand"/></svg></span>Branding</h3>
         <span class="fmt-card__job">Become unmistakable</span>
-        <p>A visual system, type, color, layout, so every post is instantly yours. The kind people screenshot and tag you in.</p>
+        <p>The visual system, type, color, layout, that makes every deck, story and post instantly recognizable as yours.</p>
         <div class="fmt-card__tags"><span>Brand system</span><span>Recognizable</span><span>Long-term moat</span></div>
       </div>
     </div>
 
-    <p class="fmt__foot reveal">It compounds: <b>more reach</b> feeds <b>more relationship</b>, and a strong brand makes both <b>impossible to ignore</b>.</p>
+    <p class="fmt__foot reveal">It compounds: <b>more reach</b> feeds <b>more relationship</b>, and one brand makes all of it <b>impossible to ignore</b>.</p>
   </div>
 </section>
 
@@ -1725,7 +1767,7 @@ html{overflow-x:hidden}
   <div class="wrap">
     <div class="pack__head reveal">
       <h2 class="h-lg">Pick your<br>growth speed.</h2>
-      <p class="lead">Simple, flat pricing. Every element is a deck or a story set, your choice, with your brand system on top. Pay once, or subscribe to keep the same expert, priority in the queue, and 10% off every cycle.</p>
+      <p class="lead">Simple, flat pricing. Every element is a deck, a story set or a static post, your choice, with your brand system on top. Pay once, or subscribe to keep the same expert, priority in the queue, and 10% off every cycle.</p>
       <div class="bill">
         <button data-mode="once" class="on">One-time</button>
         <button data-mode="sub">Subscribe <span class="save">−10%</span></button>
@@ -1738,7 +1780,7 @@ html{overflow-x:hidden}
         <div class="plan__price" data-price="120"><b class="plan__now">$120</b><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
           <div class="deckcount" data-count="3" data-cap="3 elements included"></div>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Decks or stories, your call</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Decks, stories or statics</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting + 1 revision each</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Branding available as add-on</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered to your client space in 72h</li>
@@ -1753,7 +1795,7 @@ html{overflow-x:hidden}
         <div class="plan__price" data-price="240"><span class="grad-text plan__now">$240</span><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
           <div class="deckcount" data-count="6" data-cap="6 elements included"></div>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Decks or stories, your mix</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Decks, stories or statics, your mix</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting + 2 revisions each</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Brand system included</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered to your client space in 72h</li>
@@ -1772,7 +1814,7 @@ html{overflow-x:hidden}
         <div class="plan__price" data-price="350"><b class="plan__now">$350</b><s class="plan__was"></s><span class="plan__off"></span><span class="plan__per">one-time</span></div>
         <ul>
           <div class="deckcount deckcount--gold" data-count="10" data-cap="9 elements <em class='cap-free'>+1 FREE</em>"></div>
-          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Decks or stories, your mix</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Decks, stories or statics, your mix</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copywriting + 4 revisions each</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Brand system included</li>
           <li><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="url(#chk)"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delivered in 48h · priority</li>
@@ -1812,10 +1854,10 @@ html{overflow-x:hidden}
       <a href="#packages" class="btn btn--grad"><span class="btn-decks"><i></i><i></i><i></i></span>Start a project</a>
     </div>
     <div class="acc reveal">
-      <div class="acc__item"><button class="acc__q">What's an "element"?<span class="ico"></span></button><div class="acc__a"><p>An element is one deliverable, and you pick what it is: a deck (a 6 to 10-slide carousel at 1080×1350) or a story set (a sequence of 9:16 stories). We handle the hook, the copy and the design for all of them. Mix and match however you want each cycle.</p></div></div>
-      <div class="acc__item"><button class="acc__q">Do you do stories and branding too, or just decks?<span class="ico"></span></button><div class="acc__a"><p>All three, as one system. Decks bring people in, stories turn them into a relationship, and a brand system makes everything unmistakably yours. Branding is included from Flame up and available as an add-on on Ember.</p></div></div>
+      <div class="acc__item"><button class="acc__q">What's an "element"?<span class="ico"></span></button><div class="acc__a"><p>An element is one deliverable, and you pick what it is: a deck (a 6 to 10-slide carousel), a story set (a sequence of 9:16 stories), or a static post (a single designed image). We handle the hook, the copy and the design for all of them. Mix and match however you want each cycle.</p></div></div>
+      <div class="acc__item"><button class="acc__q">Do you do stories, statics and branding too, or just decks?<span class="ico"></span></button><div class="acc__a"><p>All of it, as one system. Decks and static posts bring people in, stories turn them into a relationship, and a brand system makes everything unmistakably yours. Branding is included from Flame up and available as an add-on on Ember.</p></div></div>
       <div class="acc__item"><button class="acc__q">Do you write the copy or just design?<span class="ico"></span></button><div class="acc__a"><p>Both. Every piece starts with strategy and copywriting, then moves into design. You can also hand us your own copy if you prefer, pricing stays the same.</p></div></div>
-      <div class="acc__item"><button class="acc__q">How do I receive the work?<span class="ico"></span></button><div class="acc__a"><p>Finished decks and stories are exported post-ready (1080×1350 for decks, 1080×1920 for stories) and delivered to your private client space. Drafts land within 72 hours on Ember and Flame, with priority 48-hour delivery on Meteor.</p></div></div>
+      <div class="acc__item"><button class="acc__q">How do I receive the work?<span class="ico"></span></button><div class="acc__a"><p>Everything is exported post-ready (1080×1350 for decks and statics, 1080×1920 for stories) and delivered to your private client space. Drafts land within 72 hours on Ember and Flame, with priority 48-hour delivery on Meteor.</p></div></div>
       <div class="acc__item"><button class="acc__q">What's the difference between the packages?<span class="ico"></span></button><div class="acc__a"><p>Ember includes 3 elements with 1 revision each, Flame includes 6 elements and 2 revisions with your brand system, and Meteor includes 9 elements plus 1 free (10 total) with 4 revisions, branding and priority turnaround. Every element can be a deck or a story set, and copywriting is included throughout.</p></div></div>
       <div class="acc__item"><button class="acc__q">Which niches do you work with?<span class="ico"></span></button><div class="acc__a"><p>We specialize in thematic pages and creators. Finance, mindset, fitness, tech, business and productivity are our most common, but we adapt to any niche with a clear point of view.</p></div></div>
       <div class="acc__item"><button class="acc__q">Can I cancel anytime?<span class="ico"></span></button><div class="acc__a"><p>Yes. Packages are month-to-month with no long lock-in. Pause or cancel whenever, and you keep everything we've created for you.</p></div></div>
