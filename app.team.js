@@ -79,20 +79,22 @@ function shellHTML() {
         <aside class="board__list">
           <div class="side__brand" id="sideTop">
             <svg class="logo-svg" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg>
+            <div class="side__actions">
+              <button type="button" class="oswitch hide" id="toDash" title="Back to dashboard" aria-label="Back to dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <button type="button" class="oswitch" id="switcherBtn" title="Switch project" aria-label="Switch project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></button>
+            </div>
+            <div class="switcher__menu hide" id="switcherMenu"></div>
           </div>
           <div class="side__order" id="orderProfile">
             <div class="cprofile">
               <div class="cprofile__av" id="oAvatar"></div>
-              <h2 class="cprofile__name" id="oName"></h2>
+              <div class="cprofile__nrow">
+                <h2 class="cprofile__name" id="oName"></h2>
+                <button type="button" class="cprofile__brief" id="briefBtn" title="View the brief" aria-label="View the brief"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></button>
+              </div>
               <div class="cprofile__ig" id="oIg"></div>
               <div class="side__badges" id="oBadges"></div>
             </div>
-          </div>
-          <div class="side__tools" id="sideTools">
-            <button type="button" class="stool" id="briefBtn" title="View the brief"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Brief</span></button>
-            <button type="button" class="stool" id="switcherBtn" title="Switch project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><span>Project</span></button>
-            <button type="button" class="stool hide" id="toDash" title="Back to dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Dashboard</span></button>
-            <div class="switcher__menu hide" id="switcherMenu"></div>
           </div>
           <div id="deckList"></div>
           <div class="side__foot"><button class="b-grad b-sm" id="addDeck" style="width:100%">+ Add element</button></div>
@@ -897,9 +899,7 @@ async function openOrder(ref, restore) {
   $('#oName').textContent = o.name || o.email || 'Client';
   const user = igUser(o.instagram || o.handle), ig = $('#oIg');
   if (user) { ig.textContent = '@' + user; ig.style.display = ''; } else { ig.textContent = ''; ig.style.display = 'none'; }
-  const badges = [`<span class="obadge"><b>#${esc(o.ref)}</b></span>`];
-  if (o.plan && PLAN_LOGO[o.plan]) badges.push(`<span class="obadge obadge--plan"><img class="plan-logo" src="assets/plans/${PLAN_LOGO[o.plan]}.svg" alt="${esc(planName(o.plan))} pack"></span>`);
-  else if (o.plan) badges.push(`<span class="obadge">${esc(planName(o.plan))} pack</span>`);
+  const badges = [`<span class="dl">#${esc(o.ref)}</span>`];
   badges.push(dlBadge(d.order, kindsOfDecks(d.decks)));
   $('#oBadges').innerHTML = badges.join('');
   const foot = R.querySelector('.side__foot'); if (foot) foot.style.display = (ME && ME.is_owner) ? '' : 'none';
@@ -1489,7 +1489,7 @@ function wireDocOnce() {
   if (docWired) return;
   docWired = true;
   document.addEventListener('click', e => { if (!e.target.closest('.acctsw') && R) R.querySelectorAll('[data-acct-list]').forEach(m => m.classList.add('hide')); });
-  document.addEventListener('click', e => { if (R && !e.target.closest('#sideTools')) R.querySelector('#switcherMenu')?.classList.add('hide'); });
+  document.addEventListener('click', e => { if (R && !e.target.closest('#sideTop')) R.querySelector('#switcherMenu')?.classList.add('hide'); });
   document.addEventListener('click', e => { if (R && !e.target.closest('#assetPick')) R.querySelector('#assetMenu')?.classList.add('hide'); });
   // chat image lightbox
   document.addEventListener('click', e => { const ci = e.target.closest && e.target.closest('.msg__img'); if (ci && ci.dataset.full && R) { lbUrl = ci.dataset.full; R.querySelector('#lbImg').src = lbUrl; R.querySelector('#lb').classList.add('open'); } });

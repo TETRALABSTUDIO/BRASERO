@@ -217,19 +217,13 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 .side__brand .logo-svg{height:30px;color:var(--ink)}
 .side__brand .btn,.side__actions{margin-left:auto}
 .side__actions{display:flex;align-items:center;gap:7px}
-.side__order{padding:20px 20px 16px}
+.side__order{padding:20px}
 .side__order.switcher{flex:0 0 auto;position:relative}
 .side__order-top{display:flex;align-items:flex-start;gap:8px}
 .side__order-top h2{flex:1;min-width:0}
 .oswitch{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
 .oswitch:hover{color:var(--orange);border-color:var(--orange)}
 .oswitch svg{width:16px;height:16px}
-
-/* boxed action toolbar (between profile and elements) */
-.side__tools{position:relative;display:flex;gap:4px;margin:0 18px 16px;padding:5px;background:var(--soft);border:1px solid var(--line);border-radius:13px}
-.stool{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;border:none;border-radius:9px;padding:9px 6px;font-family:inherit;font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:var(--grey);cursor:pointer;transition:background .15s,color .15s}
-.stool:hover{background:#fff;color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.06)}
-.stool svg{width:15px;height:15px;flex-shrink:0}
 
 /* profile block (board sidebar) */
 .profile{display:flex;flex-direction:column;align-items:center;text-align:center}
@@ -678,7 +672,11 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 /* client profile card in the board sidebar */
 .cprofile{display:flex;flex-direction:column;align-items:center;text-align:center}
 .cprofile__av{margin-bottom:13px}
+.cprofile__nrow{display:flex;align-items:center;justify-content:center;gap:8px}
 .cprofile__name{font-size:18px;font-weight:900;letter-spacing:-.025em;line-height:1.2}
+.cprofile__brief{flex-shrink:0;width:28px;height:28px;border-radius:8px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--grey);padding:0}
+.cprofile__brief:hover{color:var(--orange);border-color:var(--orange)}
+.cprofile__brief svg{width:15px;height:15px}
 .cprofile__ig{font-size:13.5px;color:var(--grey);font-weight:600;margin-top:3px}
 .cprofile .side__badges{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}
 .cprofile__row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:13px}
