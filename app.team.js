@@ -1013,7 +1013,7 @@ function renderMessages() {
     const about = m.deck_id ? `<span class="msg__about">${TYPE_ICON[deckTypeById(m.deck_id)] || ''} ${esc(deckTitleById(m.deck_id) || 'Element')}</span>` : '';
     const who = esc(m.sender_name || (m.sender === 'studio' ? 'You' : 'Client'));
     const bubble = m.body ? `<div class="msg__bubble">${esc(m.body)}</div>` : '';
-    const imgs = (m.images && m.images.length) ? `<div class="msg__imgs">${m.images.map(u => `<button type="button" class="msg__img" data-full="${esc(u)}" title="View"><img src="${esc(u)}" alt="attachment"></button>`).join('')}</div>` : '';
+    const imgs = (m.images && m.images.length) ? `<div class="msg__imgs">${m.images.map(u => `<button type="button" class="msg__img" data-full="${esc(u)}" title="View"><img src="${esc(u)}" alt="attachment" loading="lazy" decoding="async"></button>`).join('')}</div>` : '';
     const del = (ME && ME.is_owner && m.id) ? `<button type="button" class="msg__del" data-del-msg="${esc(m.id)}" title="Delete this message">✕</button>` : '';
     return `<div class="msg ${cls}">${about}${bubble}${imgs}<span class="msg__meta">${who} · ${fmtMsgTime(m.created_at)}${del}</span></div>`;
   }).join('');
@@ -1164,7 +1164,7 @@ function renderAE() {
 function openAddElems(group) { aeCat = AE_GROUPS.some(g => g.key === group) ? group : null; renderAE(); $('#addElemModal').classList.remove('hide'); }
 
 function imagesOf(d) { return Array.isArray(d.design_urls) && d.design_urls.length ? d.design_urls : (d.design_url ? [d.design_url] : []); }
-function tThumb(u, editable) { return `<figure><img src="${esc(u)}" alt="">${editable ? '<button class="x" data-x title="Remove">✕</button>' : ''}</figure>`; }
+function tThumb(u, editable) { return `<figure><img src="${esc(u)}" alt="" loading="lazy" decoding="async">${editable ? '<button class="x" data-x title="Remove">✕</button>' : ''}</figure>`; }
 function slidesEditorHTML(d) {
   const slides = parseSlides(d.script);
   const rows = slides.map((h, i) => `<div class="slide" data-slide>
@@ -1189,16 +1189,27 @@ function slideDropTarget(slidesEl, y) {
 }
 function wireSlideDnD(slidesEl, det) {
   if (!slidesEl) return;
-  let drag = null, armed = null;
-  const disarm = () => { if (armed) { armed.removeAttribute('draggable'); armed = null; } };
-  // The slide carries draggable; we only arm it when the grab starts on the
-  // handle, so editing/selecting text in the slide never starts a drag.
-  slidesEl.addEventListener('mousedown', e => { const h = e.target.closest('[data-slide-drag]'); if (!h) return; armed = h.closest('[data-slide]'); if (armed) armed.setAttribute('draggable', 'true'); });
-  slidesEl.addEventListener('mouseup', disarm);
-  slidesEl.addEventListener('dragstart', e => { const s = e.target.closest('[data-slide]'); if (!s || s !== armed) return; drag = s; s.classList.add('slide--drag'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', ''); } catch (_) {} } });
-  slidesEl.addEventListener('dragover', e => { if (!drag) return; e.preventDefault(); const after = slideDropTarget(slidesEl, e.clientY); if (after == null) slidesEl.appendChild(drag); else if (after !== drag) slidesEl.insertBefore(drag, after); });
-  slidesEl.addEventListener('drop', e => { if (drag) e.preventDefault(); });
-  slidesEl.addEventListener('dragend', () => { if (drag) { drag.classList.remove('slide--drag'); drag.removeAttribute('draggable'); drag = null; } armed = null; renumberSlides(det); });
+  // Pointer-based reorder: reliable, and unlike HTML5 drag it never fights the
+  // contenteditable slide bodies (we only act when the grab starts on a handle).
+  let el = null, startY = 0, moving = false;
+  slidesEl.addEventListener('pointerdown', e => {
+    const h = e.target.closest('[data-slide-drag]'); if (!h) return;
+    el = h.closest('[data-slide]'); if (!el) return;
+    startY = e.clientY; moving = false;
+    try { slidesEl.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  });
+  slidesEl.addEventListener('pointermove', e => {
+    if (!el) return;
+    if (!moving) { if (Math.abs(e.clientY - startY) < 4) return; moving = true; el.classList.add('slide--drag'); }
+    e.preventDefault();
+    const after = slideDropTarget(slidesEl, e.clientY);
+    if (after == null) { if (slidesEl.lastElementChild !== el) slidesEl.appendChild(el); }
+    else if (after !== el) slidesEl.insertBefore(el, after);
+  });
+  const end = e => { if (!el) return; try { slidesEl.releasePointerCapture(e.pointerId); } catch (_) {} el.classList.remove('slide--drag'); el = null; moving = false; renumberSlides(det); };
+  slidesEl.addEventListener('pointerup', end);
+  slidesEl.addEventListener('pointercancel', end);
 }
 function buildScaffoldSlides(n, b, o) {
   b = b || {};
