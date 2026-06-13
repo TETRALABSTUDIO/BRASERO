@@ -176,7 +176,7 @@ a{color:inherit;text-decoration:none}
   <section class="card" id="left">
     <div class="steps"><i class="on"></i><i></i><i></i></div>
     <h1 class="co__title">Your details</h1>
-    <p class="co__sub">We'll use these to set up your project and send your decks.</p>
+    <p class="co__sub">We'll use these to set up your project and send your work.</p>
     <form id="contact">
       <div class="field"><label>Full name</label><input name="name" required placeholder="Jane Doe"></div>
       <div class="field"><label>Email</label><input name="email" type="email" required placeholder="jane@brand.com"></div>
@@ -204,9 +204,9 @@ a{color:inherit;text-decoration:none}
    Set to null to force the simulated demo. */
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
 const PLANS={
-  starter:{name:'Ember',logo:'assets/plans/ember.svg',price:120,feat:false,items:['3 carousel decks','Copywriting included','1 revision per carousel','Delivered by email in 72h']},
-  flame:{name:'Flame',logo:'assets/plans/flame.svg',price:240,feat:true,items:['6 carousel decks','Copywriting included','2 revisions per carousel','Delivered by email in 72h']},
-  burst:{name:'Meteor',logo:'assets/plans/meteor.svg',price:350,feat:true,items:['9 carousel decks + 1 free','Copywriting included','4 revisions per carousel','Delivered by email in 48h · priority']},
+  starter:{name:'Ember',logo:'assets/plans/ember.svg',price:120,feat:false,items:['3 elements (decks or stories)','Copywriting + 1 revision each','Branding available as add-on','Delivered to your client space in 72h']},
+  flame:{name:'Flame',logo:'assets/plans/flame.svg',price:240,feat:true,items:['6 elements (decks or stories)','Copywriting + 2 revisions each','Brand system included','Delivered to your client space in 72h']},
+  burst:{name:'Meteor',logo:'assets/plans/meteor.svg',price:350,feat:true,items:['9 elements + 1 free (10 total)','Copywriting + 4 revisions each','Brand system included','Delivered in 48h · priority']},
 };
 const qp=new URLSearchParams(location.search);
 const key=PLANS[qp.get('plan')]?qp.get('plan'):'flame';
@@ -379,7 +379,7 @@ function renderRecap(){
   const adds=[...selectedAddons], aSum=addonsSum(), total=price()+aSum;
   document.getElementById('recap').innerHTML=`
     <div class="recap__top"><img class="recap__logo" src="${plan.logo}" alt="${plan.name}" style="height:30px;width:auto">${plan.feat?'<span class="badge">Popular</span>':''}</div>
-    <p class="recap__sub">Custom carousel decks, done-for-you.</p>
+    <p class="recap__sub">Decks, stories &amp; branding, done-for-you.</p>
     <div class="bill">
       <button data-m="once" class="${sub?'':'on'}">One-time</button>
       <button data-m="sub" class="${sub?'on':''}">Subscribe <span class="save">−10%</span></button>
