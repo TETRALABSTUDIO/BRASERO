@@ -107,6 +107,7 @@ function shellHTML() {
               </div>
               <div class="cprofile__ig" id="oIg"></div>
               <div class="side__badges" id="oBadges"></div>
+              <button type="button" class="cprofile__cv hide" id="clientView" title="Copy a link to open this project's client view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg> <span>Copy client link</span></button>
             </div>
           </div>
           <div id="deckList"></div>
@@ -1192,6 +1193,7 @@ async function openOrder(ref, restore) {
   const badges = [`<span class="dl">#${esc(o.ref)}</span>`];
   badges.push(dlBadge(d.order, kindsOfDecks(d.decks)));
   $('#oBadges').innerHTML = badges.join('');
+  $('#clientView').classList.toggle('hide', !(ME && ME.is_owner));
   const foot = R.querySelector('.side__foot'); if (foot) foot.style.display = (ME && ME.is_owner) ? '' : 'none';
   renderSideMe();
   SELDECK = null; CAT = null;
@@ -1933,6 +1935,15 @@ function wireStatic() {
   $('#bmClose').onclick = () => $('#briefModal').classList.add('hide');
   $('#switcherBtn').onclick = e => { e.stopPropagation(); renderSwitcher(); $('#switcherMenu').classList.toggle('hide'); };
   $('#toDash').onclick = () => showAdmin('dashboard');
+  $('#clientView').onclick = async () => {
+    const btn = $('#clientView'), label = btn.querySelector('span'), old = label.textContent;
+    try {
+      const r = await api('/api/admin', { action: 'client_link', ref: REF });
+      if (!r || !r.ok || !r.url) { alert(r && r.error === 'no_email' ? 'This project has no client email yet.' : 'Could not generate the client link.'); return; }
+      try { await navigator.clipboard.writeText(r.url); label.textContent = 'Copied ✓'; setTimeout(() => { label.textContent = old; }, 1800); }
+      catch (_) { prompt('Open this link in a private window to test the client view:', r.url); }
+    } catch (e) { alert('Network error.'); }
+  };
   $('#switcherMenu').addEventListener('click', e => {
     const it = e.target.closest('[data-ref]');
     if (it) { $('#switcherMenu').classList.add('hide'); if (it.dataset.ref !== REF) openOrder(it.dataset.ref); return; }

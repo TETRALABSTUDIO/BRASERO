@@ -836,6 +836,10 @@ button.bm-metric-add{margin-top:2px}
 .cprofile__ig{font-size:13.5px;color:var(--grey);font-weight:600;margin-top:3px}
 .cprofile .side__badges{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}
 .cprofile__row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:13px}
+.cprofile__cv{margin-top:14px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink-2);background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:7px 14px;cursor:pointer}
+.cprofile__cv:hover{color:var(--orange);border-color:var(--orange)}
+.cprofile__cv.hide{display:none}
+.cprofile__cv svg{width:15px;height:15px}
 /* deadline badge */
 .dl{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:100px;background:rgba(0,0,0,.05);color:#555;white-space:nowrap}
 .dl.soon,.dl.late{background:rgba(220,38,38,.12);color:#c0291f}

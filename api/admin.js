@@ -184,6 +184,15 @@ export default async function handler(req, res) {
       return res.json({ ok: true, messages: await listMessages(order.id) });
     }
 
+    // Owner/talent: a ready magic link to open this project's client view (for
+    // testing / sharing) without waiting on the sign-in email.
+    if (action === 'client_link') {
+      if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
+      if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
+      if (!order.email) return res.status(400).json({ ok: false, error: 'no_email' });
+      return res.json({ ok: true, url: clientMagicLink(siteUrl(req), order.email, order.ref || '') });
+    }
+
     if (action === 'send_message') {
       if (!order) return res.status(404).json({ ok: false, error: 'not_found' });
       if (!owns(order)) return res.status(403).json({ ok: false, error: 'forbidden' });
