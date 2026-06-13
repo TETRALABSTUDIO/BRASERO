@@ -6,7 +6,7 @@
    design system; talks to /api/order + /api/deck with the client session token
    (api() attaches the Authorization header), so no ref+email is needed.
    ========================================================================== */
-import { api, post, clearToken, esc, initials, igUser } from './app.core.js';
+import { api, post, clearToken, esc, initials, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML } from './app.core.js';
 
 /* ---- module state ---- */
 let R = null;            // mount root (<main id="app">), stable across view swaps
@@ -83,24 +83,8 @@ function fanHTML(n) {
   return h;
 }
 
-/* ---- slide-based script (read-only view + editable) ---- */
-function parseSlides(s) {
-  if (s) {
-    try { const a = JSON.parse(s); if (Array.isArray(a) && a.length && a.every((x) => typeof x === 'string')) return a; } catch (e) {}
-    if (s.trim()) return [esc(s).replace(/\n/g, '<br>')];
-  }
-  return [''];
-}
-function sanitizeSlide(html) {
-  const t = document.createElement('div'); t.innerHTML = html || '';
-  t.querySelectorAll('script,style,iframe,object,embed,link,meta,img').forEach((n) => n.remove());
-  t.querySelectorAll('*').forEach((n) => { [...n.attributes].forEach((a) => { const nm = a.name.toLowerCase(); if (nm.startsWith('on') || ['href', 'src', 'srcset', 'class', 'id'].includes(nm)) n.removeAttribute(a.name); }); });
-  return t.innerHTML.trim();
-}
-function slidesViewHTML(script) {
-  return `<div class="slides">${parseSlides(script).map((h, i) => { const c = sanitizeSlide(h);
-    return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i + 1}</span></div><div class="slide__view">${c || '<span class="slide__empty">Empty</span>'}</div></div>`; }).join('')}</div>`;
-}
+/* ---- slide-based script ---- parseSlides / sanitizeSlide / slidesViewHTML
+   are shared (app.core.js); the editable variant stays client-local. */
 function slidesEditHTML(script) {
   return `<div class="slides" data-edit-slides>${parseSlides(script).map((h, i) => { const c = sanitizeSlide(h);
     return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i + 1}</span></div><div class="slide__edit" contenteditable="true" data-slide-body>${c}</div></div>`; }).join('')}</div>`;
@@ -418,7 +402,6 @@ function renderDetail() {
 function deckTitleById(id) { const d = DECKS.find((x) => String(x.id) === String(id)); return d ? d.title : ''; }
 function deckTypeById(id) { const d = DECKS.find((x) => String(x.id) === String(id)); return d ? (d.type || 'carousel') : 'carousel'; }
 function talentName() { return (TALENT && TALENT.name) ? TALENT.name : 'Your Brasero designer'; }
-function fmtMsgTime(iso) { try { const d = new Date(iso); return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
 function renderExpert() {
   const el = q('#chatExpert'); if (!el) return;
   const nm = talentName(), ph = TALENT && TALENT.photo;
@@ -456,19 +439,6 @@ function renderAtts() {
   w.innerHTML = chatImgs.map((u, i) => `<div class="att"><img src="${u}" alt=""><button type="button" data-att="${i}" title="Remove">✕</button></div>`).join('');
 }
 /* image compression for chat attachments */
-function compress(file, max = 1280, qual = 0.72) {
-  return new Promise((res) => {
-    const img = new Image();
-    img.onload = () => {
-      let w = img.width, h = img.height;
-      if (w > max || h > max) { const s = max / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); }
-      const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h); res(c.toDataURL('image/jpeg', qual));
-    };
-    img.onerror = () => res('');
-    const fr = new FileReader(); fr.onload = () => (img.src = fr.result); fr.readAsDataURL(file);
-  });
-}
-
 /* ---- live chat polling ---- */
 function setUnread(on) { q('#chatDot')?.classList.toggle('hide', !on); q('#chatDotHead')?.classList.toggle('hide', !on); }
 async function pollMessages() {

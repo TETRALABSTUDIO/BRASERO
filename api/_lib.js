@@ -186,16 +186,6 @@ function matchRef(o, REF) {
   return (o.ref && o.ref.toUpperCase() === REF) || orderRef(o.stripe_session_id) === REF;
 }
 
-export async function findOrderByRefEmail(ref, email) {
-  if (!STORE || !ref || !email) return null;
-  const REF = String(ref).trim().toUpperCase().replace(/^#/, '');
-  const EM = String(email).trim().toLowerCase();
-  if (MEM) return MEM.orders.find(o => (o.email || '').toLowerCase() === EM && matchRef(o, REF)) || null;
-  const { data, error } = await db.from('orders').select('*').ilike('email', String(email).trim());
-  if (error) { console.error('findOrder', error); return null; }
-  return (data || []).find(o => matchRef(o, REF)) || null;
-}
-
 // Admin lookup by ref alone (no email). Resilient to legacy rows.
 export async function findOrderByRef(ref) {
   if (!STORE || !ref) return null;

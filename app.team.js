@@ -7,7 +7,7 @@
    module assumes an authenticated session (it only adds the must_reset screen).
    Client code never loads this file (clients load app.client.js).
    ========================================================================== */
-import { API } from './app.core.js';
+import { API, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML } from './app.core.js';
 
 /* ---- module state ---- */
 let R = null, CTX = null;                 // mount root + ctx, stable across re-mounts
@@ -18,7 +18,6 @@ const $$ = s => [...R.querySelectorAll(s)];
 const esc = s => (s || '').toString().replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const initials = s => { const p = (s || '').trim().split(/[\s@.]+/).filter(Boolean); return ((p[0] || '?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); };
 function avatar(t, size, extra) { return t.photo ? `<img class="avatar ${size}" src="${esc(t.photo)}" ${extra || ''}>` : `<div class="avatar ${size}" ${extra || ''}>${esc(initials(t.name || t.email))}</div>`; }
-function igUser(s) { s = (s || '').toString().trim(); if (!s) return ''; const m = s.replace(/\/+$/, '').match(/instagram\.com\/([^/?#]+)/i); return (m ? m[1] : s).replace(/^@/, '').trim(); }
 function clientAv(o, cls) { const nm = (o && (o.name || o.instagram)) || 'Client'; return `<span class="iav ${cls || ''}" data-ini="${esc(initials(nm))}"></span>`; }
 
 const PLAN_NAMES = { starter: 'Ember', flame: 'Flame', burst: 'Meteor' };
@@ -39,15 +38,8 @@ async function apiAs(token, body) { try { const r = await fetch(API + '/api/admi
 
 function doLogout() { ['brasero_session', 'brasero_owner_session', 'brasero_owner_name', 'brasero_owner_email'].forEach(k => localStorage.removeItem(k)); TOKEN = ''; ME = null; location.href = 'app.html'; }
 
-/* ---- image compression (talent photo, deck images, chat attachments) ---- */
-function compress(file, max = 1280, q = 0.72) {
-  return new Promise(res => {
-    const img = new Image();
-    img.onload = () => { let { width: w, height: h } = img; if (w > max || h > max) { const s = max / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); } const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h); res(c.toDataURL('image/jpeg', q)); };
-    img.onerror = () => res('');
-    const fr = new FileReader(); fr.onload = () => { img.src = fr.result; }; fr.readAsDataURL(file);
-  });
-}
+/* compress / fmtMsgTime / parseSlides / sanitizeSlide / slidesViewHTML are
+   shared (app.core.js); the slide editor + renumber helpers stay team-local. */
 
 const STUDIO_LOGO = '<svg class="logo" viewBox="0 0 798 220" fill="none" style="height:46px"><use href="#brasero-studio"/></svg>';
 
@@ -998,7 +990,6 @@ let MESSAGES = [];
 let chatAsset = '';
 function deckTitleById(id) { const d = DECKS.find(x => String(x.id) === String(id)); return d ? d.title : ''; }
 function deckTypeById(id) { const d = DECKS.find(x => String(x.id) === String(id)); return d ? (d.type || 'carousel') : 'carousel'; }
-function fmtMsgTime(iso) { try { const d = new Date(iso); return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
 function renderExpert() {
   const el = $('#chatExpert'); if (!el) return;
   const nm = (CURORDER && CURORDER.name) ? CURORDER.name : 'Client';
@@ -1173,17 +1164,6 @@ const T_INSTR = {
   done: '✅ Approved by the client, ready to post.',
 };
 function tThumb(u, editable) { return `<figure><img src="${esc(u)}" alt="">${editable ? '<button class="x" data-x title="Remove">✕</button>' : ''}</figure>`; }
-function parseSlides(s) {
-  if (s) { try { const a = JSON.parse(s); if (Array.isArray(a) && a.length && a.every(x => typeof x === 'string')) return a; } catch (e) {}
-    if (s.trim()) return [esc(s).replace(/\n/g, '<br>')]; }
-  return [''];
-}
-function sanitizeSlide(html) {
-  const t = document.createElement('div'); t.innerHTML = html || '';
-  t.querySelectorAll('script,style,iframe,object,embed,link,meta,img').forEach(n => n.remove());
-  t.querySelectorAll('*').forEach(n => { [...n.attributes].forEach(a => { const nm = a.name.toLowerCase(); if (nm.startsWith('on') || ['href', 'src', 'srcset', 'class', 'id'].includes(nm)) n.removeAttribute(a.name); }); });
-  return t.innerHTML.trim();
-}
 function slidesEditorHTML(d) {
   const slides = parseSlides(d.script);
   const rows = slides.map((h, i) => `<div class="slide" data-slide>
@@ -1196,10 +1176,6 @@ function slidesEditorHTML(d) {
     </div>
     <div class="slides" data-f="script">${rows}</div>
     <button type="button" class="b-ghost b-sm slide__add" data-slide-add>+ Add slide</button>`;
-}
-function slidesViewHTML(script) {
-  return `<div class="slides">${parseSlides(script).map((h, i) => { const c = sanitizeSlide(h);
-    return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i + 1}</span></div><div class="slide__view">${c || '<span class="slide__empty">Empty</span>'}</div></div>`; }).join('')}</div>`;
 }
 function renumberSlides(det) { det.querySelectorAll('.slides [data-slide] .slide__n').forEach((el, i) => el.textContent = 'Slide ' + (i + 1)); }
 function buildScaffoldSlides(n, b, o) {
