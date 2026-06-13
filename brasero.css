@@ -1116,3 +1116,24 @@ button.bm-metric-add{margin-top:2px}
 .ig-chip button{border:none;background:none;color:#b9b5ae;font-size:12px;cursor:pointer;padding:0;line-height:1}
 .ig-chip button:hover{color:#c33}
 .ig-hint{font-size:12px;color:var(--grey);font-weight:600}
+
+/* ----- Emails gallery (owner panel) ----- */
+.echips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.echip{background:#fff;border:1px solid var(--line);color:var(--ink);padding:8px 16px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.echip:hover{border-color:var(--orange)}
+.echip.on{background:var(--grad);border-color:transparent;color:#fff}
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:20px}
+.ecard{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.ecard.hide{display:none}
+.ecard__cap{padding:16px 18px 14px;border-bottom:1px solid var(--line)}
+.ecard__top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ecard__n{color:var(--faint);font-size:12px;font-weight:700}
+.ebadge{font-size:11px;font-weight:800;letter-spacing:.3px;padding:4px 11px;border-radius:100px}
+.eb-client{background:rgba(248,112,0,.13);color:#c75800}
+.eb-team{background:rgba(70,120,255,.12);color:#3a63d6}
+.eb-lead-recovery{background:rgba(40,170,90,.13);color:#1f8f51}
+.ecard__cap h3{margin:0 0 7px;font-size:15px;font-weight:800;letter-spacing:-.02em}
+.ecard__subj{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.45}
+.ecard__subj span{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);margin-right:5px;font-weight:800}
+.ecard__frame{background:#fff;height:560px;overflow:hidden;position:relative}
+.ecard__frame iframe{width:142.85%;height:142.85%;border:0;transform:scale(.7);transform-origin:top left;background:#fff}

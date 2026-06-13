@@ -10,72 +10,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-import {
-  clientOrderEmail, addonClientEmail, reviewEmail, magicLinkEmail, loginCodeEmail,
-  talentInviteEmail, talentAssignedEmail, talentClientActionEmail, talentProjectDoneEmail,
-  messageNotifyEmail, campaignEmail, CAMPAIGN_STEPS,
-} from '../api/_lib.js';
+import { emailGallerySamples } from '../api/_lib.js';
 
-const BASE = 'https://www.braserodecks.com';
-const NAME = 'Jordan Lee';
-const REF = 'A1B2C3';
-
-// Each entry: { group, name, subject, html, file }
-const emails = [
-  // ---- Client-facing ----
-  { group: 'Client', name: 'Order confirmed', subject: 'Your Brasero order is confirmed 🎉',
-    file: 'api/_lib.js · clientOrderEmail',
-    html: clientOrderEmail({ name: NAME, planName: 'Growth', billing: 'sub', amountCents: 29900, handle: '@jordanlee', ref: REF, trackUrl: BASE }) },
-  { group: 'Client', name: 'Add-on confirmed', subject: 'Your new Brasero items are on the way 🔥',
-    file: 'api/_lib.js · addonClientEmail',
-    html: addonClientEmail({ name: NAME, planName: 'Carousel', count: 3, ref: REF, trackUrl: BASE }) },
-  { group: 'Client', name: 'Script ready to review', subject: 'Your Brasero script is ready to review 👀',
-    file: 'api/_lib.js · reviewEmail (kind=script)',
-    html: reviewEmail({ name: NAME, kind: 'script', deckTitle: '5 myths about cold email', ref: REF, url: BASE }) },
-  { group: 'Client', name: 'Design ready to review', subject: 'Your Brasero design is ready to review 👀',
-    file: 'api/_lib.js · reviewEmail (kind=design)',
-    html: reviewEmail({ name: NAME, kind: 'design', deckTitle: '5 myths about cold email', ref: REF, url: BASE }) },
-  { group: 'Client', name: 'Magic sign-in link', subject: 'Your Brasero sign-in link 🔥',
-    file: 'api/_lib.js · magicLinkEmail',
-    html: magicLinkEmail({ name: NAME, url: BASE }) },
-  { group: 'Client', name: 'Message notification (to client)', subject: '💬 A message about your Brasero order #' + REF,
-    file: 'api/_lib.js · messageNotifyEmail',
-    html: messageNotifyEmail({ name: NAME, ref: REF, fromName: 'Brasero Studio', body: 'Hey! We just pushed an update to your first carousel, take a look when you get a sec.', about: '5 myths about cold email', ctaUrl: BASE, ctaLabel: 'Open the conversation' }) },
-
-  // ---- Team / Talent-facing ----
-  { group: 'Team', name: '2FA verification code', subject: 'Your Brasero verification code 🔒',
-    file: 'api/_lib.js · loginCodeEmail',
-    html: loginCodeEmail({ name: NAME, code: '481920' }) },
-  { group: 'Team', name: 'Talent invite', subject: 'Join your Brasero studio space 🎨',
-    file: 'api/_lib.js · talentInviteEmail',
-    html: talentInviteEmail({ name: NAME, setupUrl: BASE }) },
-  { group: 'Team', name: 'Project assigned', subject: '🚀 New project assigned to you',
-    file: 'api/_lib.js · talentAssignedEmail',
-    html: talentAssignedEmail({ name: NAME, ref: REF, clientName: 'Acme Co', planName: 'Growth', panelUrl: BASE }) },
-  { group: 'Team', name: 'Client approved a script', subject: '✅ Your client approved a script',
-    file: 'api/_lib.js · talentClientActionEmail (approved_script)',
-    html: talentClientActionEmail({ name: NAME, ref: REF, deckTitle: '5 myths about cold email', kind: 'approved_script', panelUrl: BASE }) },
-  { group: 'Team', name: 'Client approved a design', subject: '🎉 Your client approved a design',
-    file: 'api/_lib.js · talentClientActionEmail (approved_design)',
-    html: talentClientActionEmail({ name: NAME, ref: REF, deckTitle: '5 myths about cold email', kind: 'approved_design', panelUrl: BASE }) },
-  { group: 'Team', name: 'Client requested a retouch', subject: '✏️ Your client requested a retouch',
-    file: 'api/_lib.js · talentClientActionEmail (revision)',
-    html: talentClientActionEmail({ name: NAME, ref: REF, deckTitle: '5 myths about cold email', kind: 'revision', note: 'Can we make the headline punchier and swap the blue accent for our brand orange?', panelUrl: BASE }) },
-  { group: 'Team', name: 'Project completed', subject: '🎉 Project completed',
-    file: 'api/_lib.js · talentProjectDoneEmail',
-    html: talentProjectDoneEmail({ name: NAME, ref: REF, clientName: 'Acme Co', panelUrl: BASE }) },
-
-  // ---- Lead recovery campaign ----
-  { group: 'Lead recovery', name: 'Step 1 · Reminder (day 1)', subject: CAMPAIGN_STEPS[0].title,
-    file: 'api/_lib.js · campaignEmail[0]',
-    html: campaignEmail({ name: NAME }, 0, BASE).html },
-  { group: 'Lead recovery', name: 'Step 2 · Follow-up (day 3)', subject: CAMPAIGN_STEPS[1].title,
-    file: 'api/_lib.js · campaignEmail[1]',
-    html: campaignEmail({ name: NAME }, 1, BASE).html },
-  { group: 'Lead recovery', name: 'Step 3 · Last chance (day 5)', subject: CAMPAIGN_STEPS[2].title,
-    file: 'api/_lib.js · campaignEmail[2]',
-    html: campaignEmail({ name: NAME }, 2, BASE).html },
-];
+// Single source of truth, shared with the owner-panel "Emails" page (api/admin.js).
+const emails = emailGallerySamples('https://www.braserodecks.com')
+  .map(e => ({ ...e, file: 'api/_lib.js' }));
 
 const groups = [...new Set(emails.map(e => e.group))];
 

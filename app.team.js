@@ -70,6 +70,7 @@ function shellHTML() {
           <button class="navi" type="button" data-sec="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Projects</button>
           <button class="navi" type="button" data-sec="talents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 20a5.5 5.5 0 0 0-3-4.9"/></svg> Talents</button>
           <button class="navi" type="button" data-sec="crm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2 3h6l2-3h4"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg> CRM</button>
+          <button class="navi" type="button" data-sec="emails"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> Emails</button>
         </nav>
         <div class="aside__foot">
           <button class="b-grad b-sm" id="newProject" type="button" style="width:100%">+ New project</button>
@@ -84,6 +85,7 @@ function shellHTML() {
           <div class="tgrid" id="teamGrid"></div>
         </section>
         <section class="asec hide" id="sec-crm"></section>
+        <section class="asec hide" id="sec-emails"></section>
       </main>
     </div>
 
@@ -346,7 +348,7 @@ const fmtMoney = c => '$' + Math.round((c || 0) / 100).toLocaleString('en-US');
 const fmtDate = s => { if (!s) return '-'; try { return new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch (e) { return '-'; } };
 function talentObj(email) { return email ? (ADMIN.talents || []).find(x => (x.email || '').toLowerCase() === email.toLowerCase()) : null; }
 function talentName(email) { if (!email) return 'Unassigned'; const t = talentObj(email); return t ? (t.name || t.email) : email; }
-const SECS = ['dashboard', 'projects', 'talents', 'crm'];
+const SECS = ['dashboard', 'projects', 'talents', 'crm', 'emails'];
 function showAdmin(sec) { stopMsgPoll(); document.body.classList.remove('appmode'); $('#detail').classList.add('hide'); $('#adminApp').classList.remove('hide'); renderAdminMe(); navTo(sec || 'dashboard'); }
 function navTo(sec) {
   try { localStorage.setItem('brasero_nav', sec); } catch (e) {}
@@ -356,6 +358,7 @@ function navTo(sec) {
   else if (sec === 'projects') renderProjectsSection();
   else if (sec === 'talents') loadTeam();
   else if (sec === 'crm') renderCRMSection();
+  else if (sec === 'emails') renderEmailsSection();
 }
 /* profile actions: sign-out pill + (owner) account switcher */
 const ACCT_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 12l6-6 6 6"/></svg>';
@@ -853,6 +856,45 @@ function bindCRM() {
     if (r.ok) { setLeadCampaign(r.ref, r.campaign); renderCRMSection(); }
     else alert('Error: ' + (r.error || ''));
   });
+}
+
+/* ----- Emails: gallery of every template the app sends, rendered live from the
+   server (api_lib) with sample data. Owner-only (this whole shell is). ----- */
+let EMAILS_CACHE = null;
+async function renderEmailsSection() {
+  const sec = $('#sec-emails');
+  if (!EMAILS_CACHE) {
+    sec.innerHTML = `<div class="sechead"><h2>Emails</h2><span class="sechead__sub">Loading templates…</span></div>`;
+    try { const r = await api('/api/admin', { action: 'email_gallery' }); if (r.ok) EMAILS_CACHE = r.emails || []; } catch (e) {}
+    if (!EMAILS_CACHE) { sec.innerHTML = `<div class="sechead"><h2>Emails</h2><span class="sechead__sub">Couldn't load templates.</span></div>`; return; }
+  }
+  const list = EMAILS_CACHE, groups = [...new Set(list.map(e => e.group))];
+  const cls = g => 'eb-' + g.replace(/\s+/g, '-').toLowerCase();
+  const card = (e, i) => `<figure class="ecard" data-group="${esc(e.group)}">
+    <figcaption class="ecard__cap">
+      <div class="ecard__top"><span class="ebadge ${cls(e.group)}">${esc(e.group)}</span><span class="ecard__n">#${i + 1}</span></div>
+      <h3>${esc(e.name)}</h3>
+      <p class="ecard__subj"><span>Subject</span> ${esc(e.subject)}</p>
+    </figcaption>
+    <div class="ecard__frame"><iframe loading="lazy" srcdoc="${esc(e.html)}"></iframe></div>
+  </figure>`;
+  sec.innerHTML = `
+    <div class="sechead"><h2>Emails</h2><span class="sechead__sub">${list.length} templates the app sends</span></div>
+    <div class="echips" id="emailChips">
+      <button class="echip on" type="button" data-f="all">All</button>
+      ${groups.map(g => `<button class="echip" type="button" data-f="${esc(g)}">${esc(g)}</button>`).join('')}
+    </div>
+    <div class="egrid" id="emailGrid">${list.map(card).join('')}</div>`;
+  bindEmails();
+}
+function bindEmails() {
+  const chips = $('#emailChips'); if (!chips) return;
+  chips.onclick = e => {
+    const b = e.target.closest('.echip'); if (!b) return;
+    chips.querySelectorAll('.echip').forEach(x => x.classList.toggle('on', x === b));
+    const f = b.dataset.f;
+    $('#emailGrid').querySelectorAll('.ecard').forEach(c => c.classList.toggle('hide', !(f === 'all' || c.dataset.group === f)));
+  };
 }
 
 /* type icons + per-deck progress */

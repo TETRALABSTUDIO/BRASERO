@@ -3,7 +3,7 @@ import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOr
   assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl, clientMagicLink,
   signToken, randomPassword, tempPassword, PLANS, ADDONS, amountFor, addonKeys, talentInviteEmail, talentAssignedEmail,
   listMessages, addMessage, deleteMessage, messageNotifyEmail,
-  CAMPAIGN_STEPS, sendCampaignStep, setOrderCampaign } from './_lib.js';
+  CAMPAIGN_STEPS, sendCampaignStep, setOrderCampaign, emailGallerySamples } from './_lib.js';
 
 // Talents never receive the client's price or contact details (email/phone/amount/billing).
 const pub = (o, isOwner) => ({
@@ -59,6 +59,12 @@ export default async function handler(req, res) {
         campaign: (o.campaign && typeof o.campaign === 'object') ? o.campaign : null,
       }));
       return res.json({ ok: true, orders, leads, talents: await listTalents() });
+    }
+
+    /* ----- owner email gallery: every template rendered with sample data ----- */
+    if (action === 'email_gallery') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      return res.json({ ok: true, emails: emailGallerySamples(siteUrl(req)) });
     }
 
     // Password policy for user-chosen passwords: 8+ chars and at least one uppercase.
