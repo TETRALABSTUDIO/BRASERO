@@ -27,18 +27,20 @@ function clientColor(o) {
   if (!c) return null;
   return c[0] === '#' ? c : '#' + c;
 }
-function textOn(hex) {
+function darken(hex, f = 0.42) {
   let h = hex.replace('#', '');
   if (h.length === 3) h = h.split('').map(c => c + c).join('');
   h = h.slice(0, 6);
-  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? '#1a1a1a' : '#fff';
+  const d = i => Math.round(parseInt(h.slice(i, i + 2), 16) * (1 - f)).toString(16).padStart(2, '0');
+  return '#' + d(0) + d(2) + d(4);
 }
+const USER_GLYPH = '<svg class="iav__usr" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12.4a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 1.3c-4.4 0-8 2.4-8 6.3 0 .4.3.7.7.7h14.6c.4 0 .7-.3.7-.7 0-3.9-3.6-6.3-8-6.3Z"/></svg>';
 function clientAv(o, cls) {
-  const nm = (o && (o.name || o.instagram)) || 'Client';
   const col = clientColor(o);
-  const style = col ? ` style="background:${esc(col)};color:${textOn(col)}"` : '';
-  return `<span class="iav ${cls || ''}" data-ini="${esc(initials(nm))}"${style}></span>`;
+  // bubble = brand colour, the default-user glyph a shade darker (tonal); when no
+  // brand colour is on file, the gradient + white glyph carry over.
+  const style = col ? ` style="background:${esc(col)};color:${darken(col)}"` : '';
+  return `<span class="iav ${cls || ''}"${style}>${USER_GLYPH}</span>`;
 }
 
 const PLAN_NAMES = { starter: 'Ember', flame: 'Flame', burst: 'Meteor' };
