@@ -7,13 +7,17 @@
    button naming unified (canonical .btn--*, short .b-* kept as aliases).
    ========================================================================== */
 
-/* ---- tokens ---- */
+/* ---- tokens (Ember Minimal: white canvas, hairlines, orange as a rare accent) ---- */
 :root{
-  --ink:#111;--soft:#f5f5f7;--grey:#6b6b6b;--line:rgba(0,0,0,.10);
+  --ink:#111;--ink-2:#52525b;--grey:#6b6b6b;--faint:#9b9b9f;
+  --soft:#f5f5f7;--wash:#fafafa;
+  --line:rgba(15,15,16,.08);--line-2:rgba(15,15,16,.05);
   --orange:#f87000;--grad:linear-gradient(100deg,#ff1a00,#f87000);
   --ok:#15803d;--okbg:rgba(22,163,74,.12);--wait:#b45309;--waitbg:rgba(245,158,11,.13);
   --c-todo:#dc2626;--c-prog:#2563eb;--c-done:#16a34a;
+  --r-sm:10px;--r:14px;--r-lg:18px;
 }
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Satoshi',system-ui,sans-serif;background:#f3f3f5;color:var(--ink);-webkit-font-smoothing:antialiased}
 body.appmode{overflow:hidden}
@@ -103,28 +107,32 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 /* ============================================================================
    OWNER ADMIN SHELL (sidebar nav + main; lazy-loaded owner bundle)
    ========================================================================== */
-.adminapp{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:250px minmax(0,1fr);background:#fff}
+.adminapp{position:fixed;inset:0;z-index:25;display:grid;grid-template-columns:236px minmax(0,1fr);background:#fff}
 .adminapp.hide{display:none}
 .aside{display:flex;flex-direction:column;min-height:0;background:#fff;border-right:1px solid var(--line)}
-.aside__brand{height:78px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);flex-shrink:0}
-.aside__brand .logo-svg{height:30px;color:var(--ink)}
-.aside__nav{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding:14px 12px}
-.navi{position:relative;display:flex;align-items:center;gap:12px;height:44px;flex-shrink:0;width:100%;background:none;border:none;border-radius:11px;cursor:pointer;font-family:inherit;font-size:14.5px;font-weight:700;color:#3d3d3d;letter-spacing:-.01em;padding:0 12px;transition:background .12s,color .12s}
-.navi svg{width:20px;height:20px;flex-shrink:0}
-.navi:hover{background:var(--soft)}
-.navi.on{background:var(--soft);color:var(--ink);font-weight:800}
-.aside__foot{padding:14px;border-top:1px solid var(--line)}
-.amain{min-height:0;overflow-y:auto;padding:30px 36px 70px;background:#fff}
+.aside__brand{height:64px;display:flex;align-items:center;justify-content:flex-start;padding:0 20px;border-bottom:1px solid var(--line);flex-shrink:0}
+.aside__brand .logo-svg,.aside__brand .logo{height:26px;color:var(--ink)}
+.aside__nav{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding:16px 12px}
+.navi{position:relative;display:flex;align-items:center;gap:11px;height:42px;flex-shrink:0;width:100%;background:none;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--ink-2);letter-spacing:-.01em;padding:0 12px;transition:background .12s,color .12s}
+.navi:hover{transform:none}
+.navi svg{width:19px;height:19px;flex-shrink:0;color:var(--faint);transition:color .12s}
+.navi:hover{background:var(--wash);color:var(--ink)}
+.navi:hover svg{color:var(--ink-2)}
+.navi.on{background:var(--soft);color:var(--ink);font-weight:700}
+.navi.on svg{color:var(--orange)}
+.aside__foot{padding:14px 12px;border-top:1px solid var(--line)}
+.amain{min-height:0;overflow-y:auto;padding:26px 32px 70px;background:#fff}
 .asec.hide{display:none}
-.sechead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:24px}
-.sechead h2{font-size:27px;font-weight:900;letter-spacing:-.035em}
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.sechead h2{font-size:22px;font-weight:800;letter-spacing:-.025em}
 .sechead .muted{color:var(--grey);font-weight:600;font-size:14px}
-@media(max-width:920px){.adminapp{grid-template-columns:210px minmax(0,1fr)}}
+@media(max-width:920px){.adminapp{grid-template-columns:200px minmax(0,1fr)}}
 
 /* period selector */
-.period{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:3px}
-.period button{background:none;border:none;border-radius:100px;padding:7px 14px;font-size:13px;font-weight:700;color:var(--grey)}
-.period button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.period{display:inline-flex;background:var(--soft);border-radius:100px;padding:3px}
+.period button{background:none;border:none;border-radius:100px;padding:6px 13px;font-size:12.5px;font-weight:700;color:var(--grey)}
+.period button:hover{transform:none;color:var(--ink)}
+.period button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.10)}
 
 /* KPI cards */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
@@ -622,9 +630,10 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .search{position:relative;min-width:230px}
 .search input{padding-left:36px}
 .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4}
-.vswitch{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:4px}
-.vswitch button{padding:7px 14px;font-size:12.5px;color:var(--grey);background:transparent;border-radius:100px}
-.vswitch button.on{background:var(--grad);color:#fff}
+.vswitch{display:flex;gap:3px;background:var(--soft);border-radius:100px;padding:3px}
+.vswitch button{padding:6px 14px;font-size:12.5px;font-weight:700;color:var(--grey);background:transparent;border-radius:100px}
+.vswitch button:hover{transform:none;color:var(--ink)}
+.vswitch button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.10)}
 .kc__head{display:flex;align-items:center;gap:10px;padding-right:28px}
 .kc__head .kc__n{padding-right:0}
 .rname{display:flex;align-items:center;gap:10px}
