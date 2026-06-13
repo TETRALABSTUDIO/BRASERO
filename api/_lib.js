@@ -62,6 +62,8 @@ export const MEM = db ? null : {
     { id: 'tal-1', email: 'talent@brasero.studio', name: 'Demo Talent', is_owner: false, password_hash: hashPassword('talent123'),
       // agreed fees paid to this talent, in cents (owner-only; demonstrates margin)
       rates: { starter: 6000, flame: 12000, burst: 17000, branding: 9000, story3: 4000, story6: 6000, story9: 8000, bundle: 15000 } },
+    { id: 'tal-2', email: 'gaby@brasero.studio', name: 'Gaby Lopez', is_owner: false, password_hash: hashPassword('talent123'),
+      rates: { starter: 7000, flame: 14000, burst: 20000, branding: 11000, story3: 5000, story6: 7000, story9: 9000, bundle: 18000 } },
   ],
   orders: [
     { id: 'ord-demo', ref: 'DEMO1234', stripe_session_id: 'sess_demo', status: 'paid',
@@ -69,10 +71,10 @@ export const MEM = db ? null : {
       talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
     { id: 'ord-todo', ref: 'TODO5678', stripe_session_id: 'sess_todo', status: 'paid',
       plan: 'starter', billing: 'once', amount: 12000, addons: [], name: 'Nina Park', email: 'nina@example.com',
-      talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
+      talent_email: 'talent@brasero.studio', created_at: new Date(Date.now() - 38 * 864e5).toISOString() },
     { id: 'ord-done', ref: 'DONE9001', stripe_session_id: 'sess_done', status: 'paid',
       plan: 'burst', billing: 'sub', amount: 31500, addons: ['story6'], name: 'Leo Marchand', email: 'leo@example.com',
-      talent_email: 'talent@brasero.studio', created_at: new Date().toISOString() },
+      talent_email: 'gaby@brasero.studio', created_at: new Date(Date.now() - 72 * 864e5).toISOString() },
     // unpaid lead (abandoned checkout) - shows up in the CRM
     { id: 'ord-lead', ref: 'LEAD0001', stripe_session_id: 'sess_lead', status: 'pending',
       plan: 'flame', billing: 'once', name: 'Marc Abandon', email: 'marc@lead.com', instagram: '@marc',

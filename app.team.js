@@ -536,30 +536,37 @@ let DPERIOD = '6m';
 const PERIODS = [['30d', '30 days'], ['90d', '90 days'], ['6m', '6 months'], ['12m', '12 months'], ['all', 'All']];
 function periodCutoff() { const now = new Date(); if (DPERIOD === '30d') return Date.now() - 30 * 864e5; if (DPERIOD === '90d') return Date.now() - 90 * 864e5; if (DPERIOD === '6m') { const d = new Date(now); d.setMonth(d.getMonth() - 6); return d.getTime(); } if (DPERIOD === '12m') { const d = new Date(now); d.setMonth(d.getMonth() - 12); return d.getTime(); } return 0; }
 function ordersInPeriod() { const c = periodCutoff(); return ADMIN.orders.filter(o => !c || (o.created_at && new Date(o.created_at).getTime() >= c)); }
-function revSeries(orders) {
+// `valfn` lets the same buckets carry revenue OR margin (default: revenue).
+function revSeries(orders, valfn) {
+  valfn = valfn || (o => o.amount || 0);
   const now = new Date();
   if (DPERIOD === '30d') {
     const out = []; for (let i = 5; i >= 0; i--) { const end = now.getTime() - i * 5 * 864e5; out.push({ start: end - 5 * 864e5, end, label: new Date(end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), value: 0 }); }
-    orders.forEach(o => { const t = new Date(o.created_at).getTime(); const b = out.find(x => t > x.start && t <= x.end); if (b) b.value += (o.amount || 0); });
+    orders.forEach(o => { const t = new Date(o.created_at).getTime(); const b = out.find(x => t > x.start && t <= x.end); if (b) b.value += valfn(o); });
     return out.map(b => ({ label: b.label, value: b.value }));
   }
   const months = DPERIOD === '90d' ? 3 : DPERIOD === '12m' ? 12 : 6, out = [];
   for (let i = months - 1; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); out.push({ key: d.getFullYear() + '-' + d.getMonth(), label: d.toLocaleDateString('en-US', { month: 'short' }), value: 0 }); }
-  orders.forEach(o => { const d = new Date(o.created_at); const k = d.getFullYear() + '-' + d.getMonth(); const m = out.find(x => x.key === k); if (m) m.value += (o.amount || 0); });
+  orders.forEach(o => { const d = new Date(o.created_at); const k = d.getFullYear() + '-' + d.getMonth(); const m = out.find(x => x.key === k); if (m) m.value += valfn(o); });
   return out.map(m => ({ label: m.label, value: m.value }));
 }
-function lineChart(series) {
-  const W = 600, H = 150, pad = 10, max = Math.max(1, ...series.map(s => s.value)), n = series.length;
+// Margin contributed by one order (revenue - talent cost); 0 when not priced.
+const orderProfit = o => { const c = orderCost(o); return c == null ? 0 : (o.amount || 0) - c; };
+// Optional `s2` draws a second line (e.g. margin) on the same scale, no area.
+function lineChart(series, s2) {
+  const W = 600, H = 150, pad = 10, n = series.length;
+  const max = Math.max(1, ...series.map(s => s.value), ...(s2 || []).map(s => s.value));
   const xs = i => n <= 1 ? W / 2 : pad + i * (W - 2 * pad) / (n - 1), ys = v => H - (v / max) * (H - 24) - 8;
+  if (!series.length) return '<div class="ph-sub">No data.</div>';
+  const lineFor = s => s.map((p, i) => (i ? 'L' : 'M') + xs(i).toFixed(1) + ' ' + ys(p.value).toFixed(1)).join(' ');
   const pts = series.map((s, i) => [xs(i), ys(s.value)]);
-  if (!pts.length) return '<div class="ph-sub">No data.</div>';
-  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
   const area = `M${pts[0][0].toFixed(1)} ${H} ` + pts.map(p => 'L' + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') + ` L${pts[n - 1][0].toFixed(1)} ${H} Z`;
   const dots = pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.4" fill="#fff" stroke="url(#tgrad)" stroke-width="2.2"/>`).join('');
+  const marginLine = s2 ? `<path d="${lineFor(s2)}" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 5"/>` : '';
   const labels = series.map((s, i) => `<text class="axl" x="${xs(i).toFixed(1)}" y="${H + 14}" text-anchor="middle">${esc(s.label)}</text>`).join('');
   return `<svg class="linec" viewBox="0 0 ${W} ${H + 20}" preserveAspectRatio="xMidYMid meet">
     <defs><linearGradient id="areaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f87000" stop-opacity=".22"/><stop offset="1" stop-color="#f87000" stop-opacity="0"/></linearGradient></defs>
-    <path d="${area}" fill="url(#areaG)"/><path d="${line}" fill="none" stroke="url(#tgrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}</svg>`;
+    <path d="${area}" fill="url(#areaG)"/><path d="${lineFor(series)}" fill="none" stroke="url(#tgrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>${marginLine}${dots}${labels}</svg>`;
 }
 function planPie(orders) {
   const colors = { starter: '#f9a857', flame: '#f87000', burst: '#cf3500' }, names = { starter: 'Ember', flame: 'Flame', burst: 'Meteor' };
@@ -604,35 +611,6 @@ function orderCost(o) {
   [o.plan, ...(Array.isArray(o.addons) ? o.addons : [])].forEach(k => { if (k && r[k] != null) { cost += r[k]; known = true; } });
   return known ? cost : null;
 }
-// Roll margins up per talent for the dashboard breakdown.
-function marginByTalent(orders) {
-  const map = {};
-  orders.forEach(o => { if (!o.talent_email) return; const k = o.talent_email.toLowerCase();
-    const e = map[k] || (map[k] = { email: o.talent_email, rev: 0, pricedRev: 0, cost: 0, n: 0, priced: 0 });
-    e.n++; e.rev += (o.amount || 0); const c = orderCost(o);
-    if (c != null) { e.cost += c; e.pricedRev += (o.amount || 0); e.priced++; } });
-  return Object.values(map).sort((a, b) => (b.pricedRev - b.cost) - (a.pricedRev - a.cost));
-}
-function marginPanel(orders) {
-  const rows = marginByTalent(orders);
-  if (!rows.length) return '';
-  const body = rows.map(e => {
-    const profit = e.pricedRev - e.cost, pct = e.pricedRev ? Math.round(profit / e.pricedRev * 100) : null;
-    const t = talentObj(e.email) || { email: e.email };
-    const miss = e.priced < e.n ? `<span class="mtal__miss" title="${e.n - e.priced} project(s) have no agreed rate">${e.n - e.priced} unpriced</span>` : '';
-    return `<div class="mtal__row">
-      <div class="mtal__who">${avatar(t, 'avatar--xs')}<span class="mtal__nm">${esc(t.name || e.email)}</span>${miss}</div>
-      <div class="mtal__c mtal__rev">${fmtMoney(e.rev)}</div>
-      <div class="mtal__c mtal__pf">${e.priced ? fmtMoney(profit) : '—'}</div>
-      <div class="mtal__c mtal__pct ${pct != null && pct < 0 ? 'low' : ''}">${pct != null ? pct + '%' : '<span class="mtal__norate">set rate</span>'}</div>
-    </div>`;
-  }).join('');
-  return `<div class="panel mtal">
-    <div class="panel__h"><h3>Margin by talent</h3></div>
-    <div class="ph-sub">Revenue minus the agreed talent fee, this period</div>
-    <div class="mtal__head"><span>Talent</span><span class="mtal__c">Revenue</span><span class="mtal__c">Profit</span><span class="mtal__c">Margin</span></div>
-    ${body}</div>`;
-}
 function renderDashboard() {
   const O = ordersInPeriod(), L = ADMIN.leads, T = (ADMIN.talents || []).filter(t => !t.is_owner);
   const active = O.filter(o => o.state !== 'done').length, done = O.filter(o => o.state === 'done').length;
@@ -653,10 +631,13 @@ function renderDashboard() {
       ${kCell('Leads', L.length, 'unpaid / abandoned')}
     </div>
     <div class="panels">
-      <div class="panel"><div class="panel__h"><h3>Revenue</h3><span class="panel__big">${fmtMoney(revenue)}</span></div><div class="ph-sub">Paid orders over the selected period</div>${lineChart(revSeries(O))}</div>
+      <div class="panel">
+        <div class="panel__h"><h3>Revenue &amp; margin</h3><span class="panel__big">${fmtMoney(revenue)}</span></div>
+        <div class="chartleg"><span class="rleg rleg--rev"><i></i>Revenue</span><span class="rleg rleg--margin"><i></i>Margin${priced.length ? ' · ' + fmtMoney(profit) : ''}</span></div>
+        ${lineChart(revSeries(O), revSeries(O, orderProfit))}
+      </div>
       <div class="panel"><div class="panel__h"><h3>Offers split</h3></div><div class="ph-sub">Packages bought in this period</div>${planPie(O)}</div>
     </div>
-    ${marginPanel(O)}
     <div class="panel attn">
       <div class="panel__h"><h3>Needs attention</h3>${attn.length ? `<span class="attn__count">${attn.length}</span>` : ''}</div>
       <div class="attn__list">${shown.length ? shown.map(attnRow).join('') : '<div class="attn__clear">✓ You\'re all caught up. Nothing needs your attention right now.</div>'}</div>
@@ -1694,6 +1675,52 @@ function workStrip(t, c) {
     ${cell(t.timezone ? esc(tzShort(t.timezone)) : '—', 'timezone')}
   </div>`;
 }
+// Per-month totals over the last `months` (default 6), for the card sparkline.
+function revMonths(orders, months, valfn) {
+  months = months || 6; valfn = valfn || (o => o.amount || 0);
+  const now = new Date(), out = [];
+  for (let i = months - 1; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); out.push({ key: d.getFullYear() + '-' + d.getMonth(), v: 0 }); }
+  orders.forEach(o => { if (!o.created_at) return; const d = new Date(o.created_at); const k = d.getFullYear() + '-' + d.getMonth(); const m = out.find(x => x.key === k); if (m) m.v += valfn(o); });
+  return out.map(x => x.v);
+}
+function sparkPath(vals, W, H, max, pad) {
+  const n = vals.length, p = pad == null ? 4 : pad;
+  const xs = i => n <= 1 ? W / 2 : p + i * (W - 2 * p) / (n - 1), ys = v => H - p - (max ? v / max : 0) * (H - 2 * p);
+  return { d: vals.map((v, i) => (i ? 'L' : 'M') + xs(i).toFixed(1) + ' ' + ys(v).toFixed(1)).join(' '), lx: xs(n - 1), ly: ys(vals[n - 1] || 0) };
+}
+// Two-line sparkline: studio revenue (muted) + this talent's revenue (accent).
+function miniRevChart(studio, mine) {
+  const W = 200, H = 60, max = Math.max(1, ...studio, ...mine);
+  const s = sparkPath(studio, W, H, max), m = sparkPath(mine, W, H, max);
+  return `<svg class="mrev" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <path d="${s.d}" fill="none" stroke="var(--faint)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".55" vector-effect="non-scaling-stroke"/>
+    <path d="${m.d}" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${m.lx.toFixed(1)}" cy="${m.ly.toFixed(1)}" r="2.4" fill="#fff" stroke="url(#tgrad)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+// This talent's revenue / cost / margin across their assigned orders.
+function talentMargin(mine) {
+  let rev = 0, pricedRev = 0, cost = 0, priced = 0;
+  mine.forEach(o => { rev += (o.amount || 0); const c = orderCost(o); if (c != null) { cost += c; pricedRev += (o.amount || 0); priced++; } });
+  const profit = pricedRev - cost, pct = pricedRev ? Math.round(profit / pricedRev * 100) : null;
+  return { rev, profit, pct, priced, n: mine.length };
+}
+// Revenue/margin block folded into the talent card: stats left, sparkline right.
+function talentRevBlock(t, mine) {
+  const studio = revMonths(ORDERS, 6), his = revMonths(mine, 6), m = talentMargin(mine);
+  const unpriced = m.n - m.priced;
+  const stat = (l, v, cls) => `<div class="trev__s ${cls || ''}"><span>${l}</span><b>${v}</b></div>`;
+  return `<div class="tcard__rev">
+    <div class="tcard__rev-stats">
+      ${stat('Revenue', fmtMoney(m.rev))}
+      ${stat('Profit', m.priced ? fmtMoney(m.profit) : '—')}
+      ${stat('Margin', m.pct != null ? m.pct + '%' : '<span class="trev__norate">set rates</span>', m.pct != null && m.pct < 0 ? 'low' : '')}
+    </div>
+    <div class="tcard__rev-chart">
+      <div class="trev__leg"><span class="rleg rleg--his"><i></i>His</span><span class="rleg rleg--studio"><i></i>Studio</span>${unpriced ? `<span class="trev__miss" title="${unpriced} project(s) without an agreed rate">${unpriced} unpriced</span>` : ''}</div>
+      ${miniRevChart(studio, his)}
+    </div>
+  </div>`;
+}
 const KEBAB_IC = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>';
 const TRASH_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7"/></svg>';
 function placeMenu(m, anchor, alignRight) {
@@ -1744,7 +1771,7 @@ function renderTeam() {
         <div class="tcard__idn"><div class="nm">${esc(t.name || 'Unnamed')}</div><div class="em" title="${esc(t.email)}">${esc(t.email)}</div></div>
       </div>
       ${t.is_owner ? '<div class="tcard__owner">Owners see and manage every project.</div>'
-        : workStrip(t, c) + `<div class="tcard__sec"><div class="sec">Projects</div>${chips}${assignSel}</div>`}
+        : workStrip(t, c) + talentRevBlock(t, mine) + `<div class="tcard__sec"><div class="sec">Projects</div>${chips}${assignSel}</div>`}
     </div>`;
   }).join('') || '<div class="none">No talents yet.</div>';
   bindTeam();
