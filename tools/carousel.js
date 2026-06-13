@@ -4,7 +4,7 @@
    (OpenAI background + branded text overlay), writes PNGs to an output folder.
 
    Setup:  copy .env.example to .env and put your OPENAI_API_KEY in it.
-   Usage:  node tools/carousel.js [spec.json] [--format square|story|wide] [--out dir]
+   Usage:  node tools/carousel.js [spec.json] [--format square|story|wide] [--quality low|medium|high] [--out dir]
    Default spec: tools/carousel.sample.json   Default out: tools/out/carousel/
 
    The pipeline lives in api/_carousel.js so the future serverless endpoint
@@ -32,10 +32,15 @@ const positional = args.filter((a, i) => !a.startsWith('--') && !(i > 0 && args[
 
 const specPath = path.resolve(root, positional[0] || 'tools/carousel.sample.json');
 const format = flag('format', 'square');
+const quality = flag('quality', 'medium'); // low ~$0.01/img · medium ~$0.04 · high ~$0.17
 const outDir = path.resolve(root, flag('out', 'tools/out/carousel'));
 
 if (!FORMATS[format]) {
   console.error(`Unknown --format "${format}". Use: ${Object.keys(FORMATS).join(', ')}`);
+  process.exit(1);
+}
+if (!['low', 'medium', 'high'].includes(quality)) {
+  console.error(`Unknown --quality "${quality}". Use: low, medium, high`);
   process.exit(1);
 }
 if (!process.env.OPENAI_API_KEY) {
@@ -54,7 +59,7 @@ if (!Array.isArray(slides) || !slides.length) {
   process.exit(1);
 }
 
-console.log(`\n🎠 Carousel — ${slides.length} slides, format "${format}" (${FORMATS[format].size})`);
+console.log(`\n🎠 Carousel — ${slides.length} slides, format "${format}" (${FORMATS[format].size}), quality "${quality}"`);
 console.log(`   spec: ${path.relative(root, specPath)}`);
 console.log(`   out:  ${path.relative(root, outDir)}/\n`);
 
@@ -63,7 +68,7 @@ fs.mkdirSync(outDir, { recursive: true });
 try {
   const results = await generateCarousel(slides, {
     format,
-    quality: 'high',
+    quality,
     onProgress: msg => console.log(`   · ${msg}`),
   });
   for (const r of results) {
