@@ -178,17 +178,24 @@ function renderTwoFactor(email, password, pending) {
       ${LOGO}
       <p>We emailed a 6-digit code to <b>${masked}</b>.<br>Enter it below to finish signing in.</p>
       <form id="codeForm" class="authform">
-        <input id="cCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required
-          style="text-align:center;letter-spacing:.4em;font-size:20px;font-weight:700">
+        <input id="cCode" class="codein" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" required>
         <button class="btn btn--grad" type="submit" id="cBtn">Verify &amp; sign in</button>
         <div class="err" id="cErr"></div>
       </form>
       <div class="authswap">
         <button type="button" id="cResend">Resend code</button>
-        <span style="opacity:.4"> · </span>
+        <span class="sep">·</span>
         <button type="button" id="cBack">Use a different account</button>
       </div>
     </div>`;
+
+  const codeInput = document.getElementById('cCode');
+  codeInput.focus();
+  codeInput.addEventListener('input', () => {
+    const v = codeInput.value.replace(/\D/g, '').slice(0, 6);
+    if (v !== codeInput.value) codeInput.value = v;
+    if (v.length === 6) codeForm.requestSubmit();
+  });
 
   const codeForm = document.getElementById('codeForm');
   codeForm.addEventListener('submit', async (e) => {
