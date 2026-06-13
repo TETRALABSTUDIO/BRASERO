@@ -77,7 +77,8 @@ div.avatar{display:grid;place-items:center;color:#fff;font-weight:900;background
 /* ============================================================================
    AUTH / LOGIN (shell entry: magic-link request + owner/talent login)
    ========================================================================== */
-.authwrap{max-width:430px;margin:12vh auto;background:#fff;border:1px solid var(--line);border-radius:22px;padding:32px;box-shadow:0 18px 50px rgba(0,0,0,.08)}
+.authwrap{width:100%;min-height:100vh;margin:0;padding:40px 20px;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.authwrap h1,.authwrap p,.authwrap form,.authwrap .authnote,.authwrap .authswap{width:100%;max-width:380px}
 .authwrap .logo-svg{height:36px;margin-bottom:20px;color:var(--ink)}
 .authwrap h1{font-size:23px;font-weight:900;letter-spacing:-.03em}
 .authwrap p{color:var(--grey);font-size:13.5px;line-height:1.5;margin:8px 0 20px}
