@@ -788,33 +788,69 @@ function renderProjectsSection() {
   $('#sec-projects').querySelector('[data-newproj]').onclick = openNewModal;
   renderProjectsBody();
 }
-const MAIL_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6"/></svg>';
+const BOLT_IC = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>';
+// Display labels for the recovery sequence (keep in sync with CAMPAIGN_STEPS in _lib.js).
+const CAMP_STEPS = ['Reminder', 'Follow-up', 'Last chance'];
+function campCell(l) {
+  const c = l.campaign || { step: 0, auto: false };
+  const step = c.step || 0, total = CAMP_STEPS.length;
+  const segs = CAMP_STEPS.map((_, i) => `<i class="camp__seg ${i < step ? 'on' : ''} ${i === step && c.auto ? 'next' : ''}"></i>`).join('');
+  const lbl = step === 0 ? 'Not started'
+    : step >= total ? '✓ Sequence complete'
+    : `${step}/${total} sent · next: ${CAMP_STEPS[step]}`;
+  return `<div class="camp"><div class="camp__bar">${segs}</div><div class="camp__lbl ${step >= total ? 'done' : ''}">${lbl}${c.auto ? '<span class="camp__autotag">auto</span>' : ''}</div></div>`;
+}
+function campActions(l) {
+  const c = l.campaign || { step: 0, auto: false };
+  const step = c.step || 0, total = CAMP_STEPS.length, done = step >= total;
+  const main = done
+    ? '<span class="campdone">Completed</span>'
+    : `<button class="qa qa--go" type="button" data-camp-next="${esc(l.ref)}" title="Send the &quot;${esc(CAMP_STEPS[step])}&quot; email now">${step === 0 ? '▸ Launch' : '▸ Next step'}</button>`;
+  return `<div class="campact">${main}<button class="camptoggle ${c.auto ? 'on' : ''}" type="button" data-camp-auto="${esc(l.ref)}" title="Auto-send the next step when it's due">${BOLT_IC}Auto</button></div>`;
+}
 function renderCRMSection() {
   const L = ADMIN.leads || [];
   const onboarded = L.filter(l => l.onboarded).length, abandoned = L.length - onboarded;
   const pipeline = L.reduce((s, l) => s + (l.amount || 0), 0);
+  const inCampaign = L.filter(l => l.campaign && (l.campaign.step || 0) > 0).length;
   const funCell = (lab, v, s, tone) => `<div class="funcell"><div class="funcell__l">${tone ? `<i class="lstage__d lstage__d--${tone}"></i>` : ''}${lab}</div><div class="funcell__v">${v}</div><div class="funcell__s">${s}</div></div>`;
   const dotLabel = l => l.onboarded
-    ? '<span class="lstage"><i class="lstage__d lstage__d--warm"></i>Onboarded · unpaid</span>'
-    : '<span class="lstage"><i class="lstage__d lstage__d--cold"></i>Abandoned checkout</span>';
+    ? '<span class="lstage"><i class="lstage__d lstage__d--warm"></i>Onboarded</span>'
+    : '<span class="lstage"><i class="lstage__d lstage__d--cold"></i>Abandoned</span>';
   const sub = l => [l.email, l.handle].filter(Boolean).map(esc).join(' · ') || '—';
   const rows = L.length ? L.map(l => `<tr>
       <td><div class="lname">${esc(l.name || 'Unknown')}</div><div class="lsub">${sub(l)}</div></td>
-      <td>${esc(planName(l.plan) || '—')}</td>
       <td class="ta-r">${l.amount ? fmtMoney(l.amount) : '—'}</td>
-      <td>${dotLabel(l)}</td>
-      <td class="lmuted">${fmtDate(l.created_at)}</td>
-      <td class="crow__act">${l.email ? `<a class="qa" href="mailto:${esc(l.email)}?subject=${encodeURIComponent('Your BRASERO order')}" title="Email this lead">${MAIL_IC} Email</a>` : ''}</td>
-    </tr>`).join('') : '<tr><td colspan="6" class="emptyrow">No leads yet. Unpaid or abandoned checkouts show up here.</td></tr>';
+      <td>${dotLabel(l)}<div class="lmuted lmuted--sm">${fmtDate(l.created_at)}</div></td>
+      <td>${campCell(l)}</td>
+      <td class="crow__act">${campActions(l)}</td>
+    </tr>`).join('') : '<tr><td colspan="5" class="emptyrow">No leads yet. Unpaid or abandoned checkouts show up here.</td></tr>';
   $('#sec-crm').innerHTML = `
     <div class="sechead"><h2>CRM</h2><span class="sechead__sub">${L.length} lead${L.length === 1 ? '' : 's'} to recover</span></div>
     <div class="funnel">
       ${funCell('In pipeline', L.length, 'unpaid leads')}
-      ${funCell('Onboarded', onboarded, 'filled the brief', 'warm')}
+      ${funCell('In campaign', inCampaign, 'being nudged')}
       ${funCell('Abandoned', abandoned, 'left at checkout', 'cold')}
       ${funCell('Pipeline value', fmtMoney(pipeline), 'est. if recovered')}
     </div>
-    <div class="tbl tbl--crm"><table><thead><tr><th>Lead</th><th>Pack</th><th class="ta-r">Est. value</th><th>Stage</th><th>Date</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    <div class="tbl tbl--crm"><table><thead><tr><th>Lead</th><th class="ta-r">Est. value</th><th>Stage</th><th>Campaign</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  bindCRM();
+}
+function setLeadCampaign(ref, campaign) {
+  const l = (ADMIN.leads || []).find(x => x.ref === ref); if (l) l.campaign = campaign;
+}
+function bindCRM() {
+  $('#sec-crm').querySelectorAll('[data-camp-next]').forEach(b => b.onclick = async () => {
+    b.disabled = true; b.textContent = 'Sending…';
+    const r = await api('/api/admin', { action: 'campaign', op: 'send_next', ref: b.dataset.campNext });
+    if (r.ok) { setLeadCampaign(r.ref, r.campaign); renderCRMSection(); }
+    else { b.disabled = false; alert(r.error === 'complete' ? 'Sequence already complete.' : 'Error: ' + (r.error || '')); }
+  });
+  $('#sec-crm').querySelectorAll('[data-camp-auto]').forEach(b => b.onclick = async () => {
+    const r = await api('/api/admin', { action: 'campaign', op: 'set_auto', ref: b.dataset.campAuto });
+    if (r.ok) { setLeadCampaign(r.ref, r.campaign); renderCRMSection(); }
+    else alert('Error: ' + (r.error || ''));
+  });
 }
 
 /* type icons + per-deck progress */

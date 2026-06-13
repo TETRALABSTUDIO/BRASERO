@@ -78,10 +78,12 @@ export const MEM = db ? null : {
     // unpaid leads - show up in the CRM (one abandoned, one onboarded-but-unpaid)
     { id: 'ord-lead', ref: 'LEAD0001', stripe_session_id: 'sess_lead', status: 'pending',
       plan: 'flame', billing: 'once', name: 'Marc Abandon', email: 'marc@lead.com', instagram: '@marc',
-      amount: 24000, created_at: new Date(Date.now() - 2 * 864e5).toISOString() },
+      amount: 24000, created_at: new Date(Date.now() - 2 * 864e5).toISOString(),
+      campaign: { step: 1, auto: false, history: [{ i: 0, at: new Date(Date.now() - 1 * 864e5).toISOString() }], updatedAt: new Date(Date.now() - 1 * 864e5).toISOString() } },
     { id: 'ord-lead2', ref: 'LEAD0002', stripe_session_id: 'sess_lead2', status: 'pending',
       plan: 'burst', billing: 'once', name: 'Sara Klein', email: 'sara@lead.com', instagram: '@sara',
-      amount: 35000, onboarding_at: new Date(Date.now() - 1 * 864e5).toISOString(), created_at: new Date(Date.now() - 3 * 864e5).toISOString() },
+      amount: 35000, onboarding_at: new Date(Date.now() - 1 * 864e5).toISOString(), created_at: new Date(Date.now() - 3 * 864e5).toISOString(),
+      campaign: { step: 2, auto: true, history: [{ i: 0, at: new Date(Date.now() - 5 * 864e5).toISOString() }, { i: 1, at: new Date(Date.now() - 2 * 864e5).toISOString() }], updatedAt: new Date(Date.now() - 2 * 864e5).toISOString() } },
   ],
   decks: [
     { id: 'dk-1', order_id: 'ord-demo', position: 0, status: 'script_review',
@@ -1090,4 +1092,72 @@ export function siteUrl(req) {
 export function clientMagicLink(base, email, ref, days = 30) {
   const token = signToken({ email: String(email || '').toLowerCase(), magic: true }, days);
   return `${base}/app.html?magic=${encodeURIComponent(token)}${ref ? `&order=${encodeURIComponent(ref)}` : ''}`;
+}
+
+/* ---- Lead-recovery email campaign ----
+   A fixed sequence of nudges sent to a lead who didn't pay. `campaign` lives on
+   the order row: { step: <# sent 0..N>, auto: bool, history: [{i,at}], updatedAt }.
+   The owner can send the next step manually, or flip `auto` on and let the daily
+   cron (api/cron-campaigns) send each step once its delay (days) has elapsed. */
+export const CAMPAIGN_STEPS = [
+  { key: 'reminder', label: 'Reminder', delayDays: 1, eyebrow: 'You left something behind',
+    title: 'Your decks are one step away', lead: 'Hi {name}, you started a Brasero order but didn\'t finish checkout. Your brief is saved, so picking up where you left off takes less than a minute.',
+    cta: 'Finish my order' },
+  { key: 'followup', label: 'Follow-up', delayDays: 3, eyebrow: 'Still thinking it over?',
+    title: 'Here\'s what you\'d get', lead: 'Hi {name}, a quick recap of your Brasero pack: on-brand, scroll-stopping carousels written and designed for you, ready to post. Got a question before you commit? Just reply to this email.',
+    cta: 'Pick up where I left off' },
+  { key: 'lastchance', label: 'Last chance', delayDays: 5, eyebrow: 'One last nudge',
+    title: 'We held your spot', lead: 'Hi {name}, we kept your brief warm but we\'ll be closing it soon. If now isn\'t the right time, no worries, reply and tell us, otherwise your decks are ready to start the moment you check out.',
+    cta: 'Complete my order' },
+];
+const escHtml = s => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+export function campaignEmail(lead, idx, base) {
+  const s = CAMPAIGN_STEPS[idx]; if (!s) return null;
+  const name = escHtml((lead.name || '').split(' ')[0] || 'there');
+  const url = `${base}/checkout.html`;
+  const html = emailShell(
+    emailHero(s.eyebrow, s.title) +
+    emailText(s.lead.replace('{name}', name)) +
+    emailCta(url, s.cta)
+  );
+  return { subject: s.title, html };
+}
+// Persist a lead's campaign state onto its order row.
+export async function setOrderCampaign(ref, campaign) {
+  const o = await findOrderByRef(ref);
+  if (!o) return { error: 'not_found' };
+  if (MEM) { o.campaign = campaign; return { ok: true, campaign }; }
+  const { error } = await db.from('orders').update({ campaign }).eq('id', o.id);
+  if (error) return { error: error.message };
+  return { ok: true, campaign };
+}
+// Send step `idx` of the sequence to a lead and return the advanced campaign.
+export async function sendCampaignStep(order, idx, base) {
+  const mail = campaignEmail(order, idx, base);
+  if (!mail) return { error: 'bad_step' };
+  await sendTo(order.email, mail.subject, mail.html);
+  const c = (order.campaign && typeof order.campaign === 'object') ? order.campaign : { step: 0, auto: false, history: [] };
+  const campaign = { step: idx + 1, auto: !!c.auto, history: [...(c.history || []), { i: idx, at: nowISO() }], updatedAt: nowISO() };
+  const r = await setOrderCampaign(order.ref, campaign);
+  return r.error ? r : { ok: true, campaign };
+}
+const nowISO = () => new Date().toISOString();
+// Cron: for every unpaid lead with auto on, send the next step once its delay
+// (counted from the lead's creation, then from each prior send) has elapsed.
+export async function runDueCampaigns(base) {
+  const all = await listAllOrders();
+  const leads = all.filter(o => o.status !== 'paid');
+  const now = Date.now(), sent = [];
+  for (const o of leads) {
+    const c = (o.campaign && typeof o.campaign === 'object') ? o.campaign : null;
+    if (!c || !c.auto) continue;
+    const step = c.step || 0;
+    if (step >= CAMPAIGN_STEPS.length) continue;
+    const last = step === 0 ? (o.created_at ? new Date(o.created_at).getTime() : now) : new Date(c.updatedAt || o.created_at).getTime();
+    const dueMs = (CAMPAIGN_STEPS[step].delayDays || 0) * 864e5;
+    if (now - last < dueMs) continue;
+    const r = await sendCampaignStep(o, step, base);
+    if (r.ok) sent.push({ ref: o.ref, step: step + 1 });
+  }
+  return { ok: true, sent };
 }

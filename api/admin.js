@@ -2,7 +2,8 @@ import { verifyToken, getTalentByEmail, findOrderByRef, getOrderById, decksForOr
   decksMetaForOrder, adminListOrders, listAllOrders, ordersForTalent, createDeck, deleteDeck, listTalents, createTalent, updateTalent, deleteTalent,
   assignOrder, updateOrder, deleteOrder, syncOrderElements, createManualOrder, populateOrderElements, addItemsToOrder, orderState, orderRef, sendTo, reviewEmail, siteUrl, clientMagicLink,
   signToken, randomPassword, tempPassword, PLANS, ADDONS, amountFor, addonKeys, talentInviteEmail, talentAssignedEmail,
-  listMessages, addMessage, deleteMessage, messageNotifyEmail } from './_lib.js';
+  listMessages, addMessage, deleteMessage, messageNotifyEmail,
+  CAMPAIGN_STEPS, sendCampaignStep, setOrderCampaign } from './_lib.js';
 
 // Talents never receive the client's price or contact details (email/phone/amount/billing).
 const pub = (o, isOwner) => ({
@@ -55,6 +56,7 @@ export default async function handler(req, res) {
         ref: o.ref || '', name: o.name || '', email: o.email || '', plan: o.plan || '', billing: o.billing || '',
         amount: o.amount || 0, status: o.status || 'pending', handle: o.instagram || o.handle || '',
         created_at: o.created_at, onboarded: !!o.onboarding_at,
+        campaign: (o.campaign && typeof o.campaign === 'object') ? o.campaign : null,
       }));
       return res.json({ ok: true, orders, leads, talents: await listTalents() });
     }
@@ -103,6 +105,25 @@ export default async function handler(req, res) {
       const r = await deleteTalent(b.email);
       if (r.error) return res.status(400).json({ ok: false, error: r.error });
       return res.json({ ok: true, talents: await listTalents(), orders: await enrich(await adminListOrders()) });
+    }
+    // Lead-recovery campaign: send the next nudge, or toggle auto-send.
+    if (action === 'campaign') {
+      if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });
+      const order = await findOrderByRef(b.ref);
+      if (!order || order.status === 'paid') return res.status(404).json({ ok: false, error: 'not_found' });
+      const c = (order.campaign && typeof order.campaign === 'object') ? order.campaign : { step: 0, auto: false, history: [] };
+      if (b.op === 'set_auto') {
+        const campaign = { ...c, step: c.step || 0, history: c.history || [], auto: !c.auto, updatedAt: new Date().toISOString() };
+        const r = await setOrderCampaign(b.ref, campaign);
+        if (r.error) return res.status(400).json({ ok: false, error: r.error });
+        return res.json({ ok: true, ref: order.ref, campaign });
+      }
+      // send_next (default): send the next step in the sequence
+      const step = c.step || 0;
+      if (step >= CAMPAIGN_STEPS.length) return res.status(400).json({ ok: false, error: 'complete' });
+      const r = await sendCampaignStep(order, step, siteUrl(req));
+      if (r.error) return res.status(400).json({ ok: false, error: r.error });
+      return res.json({ ok: true, ref: order.ref, campaign: r.campaign });
     }
     if (action === 'assign_order') {
       if (!isOwner) return res.status(403).json({ ok: false, error: 'forbidden' });

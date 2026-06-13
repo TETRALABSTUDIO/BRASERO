@@ -221,6 +221,24 @@ td.ta-r{font-weight:700}
 .qa:hover{border-color:var(--orange);color:var(--orange)}
 .qa svg{width:13px;height:13px}
 @media(hover:none){.qa{opacity:1}}
+.lmuted--sm{font-size:11px;margin-top:3px}
+/* CRM lead-recovery campaign: progress bar + controls */
+.camp{min-width:150px}
+.camp__bar{display:flex;gap:3px;margin-bottom:6px;max-width:150px}
+.camp__seg{height:4px;flex:1;border-radius:2px;background:var(--soft)}
+.camp__seg.on{background:var(--orange)}
+.camp__seg.next{background:rgba(248,80,0,.32);animation:camppulse 1.5s ease-in-out infinite}
+@keyframes camppulse{0%,100%{opacity:.45}50%{opacity:1}}
+.camp__lbl{font-size:11.5px;font-weight:700;color:var(--grey);display:flex;align-items:center;gap:7px}
+.camp__lbl.done{color:var(--c-done)}
+.camp__autotag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--orange);background:rgba(248,80,0,.10);border-radius:100px;padding:1px 6px}
+.campact{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.qa--go{opacity:1;white-space:nowrap}
+.camptoggle{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--grey);background:#fff;border:1px solid var(--line);border-radius:100px;padding:5px 11px;cursor:pointer;transition:border-color .12s,color .12s,background .12s}
+.camptoggle svg{width:12px;height:12px}
+.camptoggle:hover{border-color:var(--line-2);color:var(--ink)}
+.camptoggle.on{color:var(--orange);border-color:var(--orange);background:rgba(248,80,0,.06)}
+.campdone{font-size:12px;font-weight:700;color:var(--c-done);white-space:nowrap}
 
 /* owner kanban */
 .kboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}

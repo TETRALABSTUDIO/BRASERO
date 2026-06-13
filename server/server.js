@@ -10,6 +10,7 @@ import orderHandler from '../api/order.js';
 import deckHandler from '../api/deck.js';
 import adminHandler from '../api/admin.js';
 import authHandler from '../api/auth.js';
+import cronCampaignsHandler from '../api/cron-campaigns.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -225,6 +226,7 @@ app.post('/api/order', orderHandler);
 app.post('/api/deck', deckHandler);
 app.post('/api/auth', authHandler);
 app.post('/api/admin', adminHandler);
+app.get('/api/cron-campaigns', cronCampaignsHandler);
 
 /* Optional: serve the static site from this same server (single deploy) */
 if (process.env.SERVE_STATIC === '1') {
