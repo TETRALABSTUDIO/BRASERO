@@ -6,7 +6,7 @@
    design system; talks to /api/order + /api/deck with the client session token
    (api() attaches the Authorization header), so no ref+email is needed.
    ========================================================================== */
-import { api, post, clearToken, esc, initials, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML } from './app.core.js';
+import { api, post, clearToken, esc, initials, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML, slideMeta } from './app.core.js';
 
 /* ---- module state ---- */
 let R = null;            // mount root (<main id="app">), stable across view swaps
@@ -86,8 +86,9 @@ function fanHTML(n) {
 /* ---- slide-based script ---- parseSlides / sanitizeSlide / slidesViewHTML
    are shared (app.core.js); the editable variant stays client-local. */
 function slidesEditHTML(script) {
-  return `<div class="slides" data-edit-slides>${parseSlides(script).map((h, i) => { const c = sanitizeSlide(h);
-    return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i + 1}</span></div><div class="slide__edit" contenteditable="true" data-slide-body>${c}</div></div>`; }).join('')}</div>`;
+  const slides = parseSlides(script);
+  return `<div class="slides" data-edit-slides>${slides.map((h, i) => { const c = sanitizeSlide(h), m = slideMeta(i, slides.length);
+    return `<div class="slide ${m.cls}"><div class="slide__bar"><span class="slide__n">${m.label}</span></div><div class="slide__edit" contenteditable="true" data-slide-body>${c}</div></div>`; }).join('')}</div>`;
 }
 /* Deck images are fetched on demand (the board list ships only image_count) and
    cached by id, so opening a project no longer downloads every deck's design. */
@@ -380,9 +381,10 @@ function detailBody(d) {
 }
 function galleryGrid(d) {
   if (!imgCount(d)) return '';
-  if (!imagesLoaded(d)) return `<div class="gal">${Array.from({ length: Math.min(imgCount(d), 10) }, () => '<figure class="gal__skel"></figure>').join('')}</div>`;
+  const gc = 'gal gal--' + (d.type || 'carousel');
+  if (!imagesLoaded(d)) return `<div class="${gc}">${Array.from({ length: Math.min(imgCount(d), 10) }, () => '<figure class="gal__skel"></figure>').join('')}</div>`;
   const name = slug(d.title);
-  return `<div class="gal">${imagesOf(d).map((u, i) => `<figure><img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}" data-name="${esc(name)}-${String(i + 1).padStart(2, '0')}"></figure>`).join('')}</div>`;
+  return `<div class="${gc}">${imagesOf(d).map((u, i) => `<figure><img src="${esc(u)}" alt="" loading="lazy" data-full="${esc(u)}" data-name="${esc(name)}-${String(i + 1).padStart(2, '0')}"></figure>`).join('')}</div>`;
 }
 function cmdBar(d) {
   const [pc, pl] = TAG[d.status] || TAG.writing;

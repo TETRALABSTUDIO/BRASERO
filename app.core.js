@@ -137,9 +137,17 @@ export function sanitizeSlide(html) {
   t.querySelectorAll('*').forEach((n) => { [...n.attributes].forEach((a) => { const nm = a.name.toLowerCase(); if (nm.startsWith('on') || ['href', 'src', 'srcset', 'class', 'id'].includes(nm)) n.removeAttribute(a.name); }); });
   return t.innerHTML.trim();
 }
+/* The first slide of a deck/story is always the Hook, the last the Call to
+   action; both get a faint orange tint. Middle slides are just numbered. */
+export function slideMeta(i, total) {
+  if (i === 0) return { label: 'Hook', cls: 'slide--hook' };
+  if (i === total - 1) return { label: 'Call to action', cls: 'slide--cta' };
+  return { label: 'Slide ' + (i + 1), cls: '' };
+}
 export function slidesViewHTML(script) {
-  return `<div class="slides">${parseSlides(script).map((h, i) => { const c = sanitizeSlide(h);
-    return `<div class="slide"><div class="slide__bar"><span class="slide__n">Slide ${i + 1}</span></div><div class="slide__view">${c || '<span class="slide__empty">Empty</span>'}</div></div>`; }).join('')}</div>`;
+  const slides = parseSlides(script);
+  return `<div class="slides">${slides.map((h, i) => { const c = sanitizeSlide(h), m = slideMeta(i, slides.length);
+    return `<div class="slide ${m.cls}"><div class="slide__bar"><span class="slide__n">${m.label}</span></div><div class="slide__view">${c || '<span class="slide__empty">Empty</span>'}</div></div>`; }).join('')}</div>`;
 }
 
 /* Tiny query helpers. */

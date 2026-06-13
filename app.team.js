@@ -7,7 +7,7 @@
    module assumes an authenticated session (it only adds the must_reset screen).
    Client code never loads this file (clients load app.client.js).
    ========================================================================== */
-import { API, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML } from './app.core.js';
+import { API, igUser, compress, fmtMsgTime, parseSlides, sanitizeSlide, slidesViewHTML, slideMeta } from './app.core.js';
 
 /* ---- module state ---- */
 let R = null, CTX = null;                 // mount root + ctx, stable across re-mounts
@@ -1475,9 +1475,9 @@ async function loadDeckImages(d) {
 function tThumb(u, editable) { return `<figure><img src="${esc(u)}" alt="" loading="lazy" decoding="async">${editable ? '<button class="x" data-x title="Remove">✕</button>' : ''}</figure>`; }
 function slidesEditorHTML(d) {
   const slides = parseSlides(d.script);
-  const rows = slides.map((h, i) => `<div class="slide" data-slide>
-    <div class="slide__bar"><button type="button" class="slide__drag" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n">Slide ${i + 1}</span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div>
-    <div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`).join('');
+  const rows = slides.map((h, i) => { const m = slideMeta(i, slides.length); return `<div class="slide ${m.cls}" data-slide>
+    <div class="slide__bar"><button type="button" class="slide__drag" data-slide-drag title="Reorder" aria-label="Reorder">⠿</button><span class="slide__n">${m.label}</span><button type="button" class="slide__del" data-slide-del title="Remove slide">✕</button></div>
+    <div class="slide__edit" contenteditable="true" data-slide-body>${sanitizeSlide(h)}</div></div>`; }).join('');
   return `<div class="rt-toolbar">
       <button type="button" data-rt="title" title="Title">Title</button>
       <button type="button" data-rt="bold" title="Bold"><b>B</b></button>
@@ -1486,7 +1486,12 @@ function slidesEditorHTML(d) {
     <div class="slides" data-f="script">${rows}</div>
     <button type="button" class="b-ghost b-sm slide__add" data-slide-add>+ Add slide</button>`;
 }
-function renumberSlides(det) { det.querySelectorAll('.slides [data-slide] .slide__n').forEach((el, i) => el.textContent = 'Slide ' + (i + 1)); }
+function renumberSlides(det) {
+  const slides = [...det.querySelectorAll('.slides [data-slide]')];
+  slides.forEach((el, i) => { const m = slideMeta(i, slides.length);
+    const n = el.querySelector('.slide__n'); if (n) n.textContent = m.label;
+    el.classList.remove('slide--hook', 'slide--cta'); if (m.cls) el.classList.add(m.cls); });
+}
 /* drag-and-drop slide reordering (talent + owner) */
 function slideDropTarget(slidesEl, y) {
   const els = [...slidesEl.querySelectorAll('[data-slide]:not(.slide--drag)')];
@@ -1620,9 +1625,10 @@ function detailHTML(d) {
   } else {
     const editable = d.status !== 'done';
     const note = (d.status === 'revision' && d.revision_note) ? `<p class="note-line"><b>Client retouch:</b> ${esc(d.revision_note)}</p>` : '';
+    const gc = 'gal gal--' + (d.type || 'carousel');
     const grid = imagesLoaded(d)
-      ? `<div class="gal" data-imgs>${imagesOf(d).map(u => tThumb(u, editable)).join('')}${editable ? '<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>' : ''}</div>`
-      : `<div class="gal" data-imgs data-loading>${Array.from({ length: Math.min(imgCount(d), 10) }, () => '<figure class="gal__skel"></figure>').join('')}</div>`;
+      ? `<div class="${gc}" data-imgs>${imagesOf(d).map(u => tThumb(u, editable)).join('')}${editable ? '<label class="adder">+ Add<br>images<input type="file" accept="image/*" multiple hidden data-file></label>' : ''}</div>`
+      : `<div class="${gc}" data-imgs data-loading>${Array.from({ length: Math.min(imgCount(d), 10) }, () => '<figure class="gal__skel"></figure>').join('')}</div>`;
     const sc = d.script ? `<div class="tscript"><div class="tscript__h">Approved script</div>${slidesViewHTML(d.script)}</div>` : '';
     body = note + grid + sc;
   }

@@ -420,6 +420,11 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .slide__edit{min-height:46px;padding:10px 12px;font-size:15px;line-height:1.6;color:var(--ink);outline:none;border:1px solid var(--line);border-radius:11px;background:#fff;transition:border .2s,box-shadow .2s}
 .slide__edit:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,80,0,.10)}
 .slide__empty{color:#c4c4c4}
+/* first slide = Hook, last = Call to action: faint orange tint + accent label */
+.slide--hook .slide__n,.slide--cta .slide__n{color:var(--orange);font-weight:800}
+.slide--hook .slide__edit,.slide--cta .slide__edit{background:rgba(248,80,0,.05);border-color:rgba(248,80,0,.28)}
+.slide--hook .slide__edit:focus,.slide--cta .slide__edit:focus{background:#fff}
+.slide--hook .slide__view,.slide--cta .slide__view{background:rgba(248,80,0,.05);border-radius:11px;padding:10px 12px}
 .revbox{margin-top:14px;display:none}
 .revbox.open{display:block}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
@@ -436,6 +441,9 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .gal figure:hover img{transform:scale(1.04)}
 .board__detail .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .board__detail .gal figure{width:100%;height:auto;aspect-ratio:1080/1350}
+/* story = 9:16 portrait, carousel/branding = 4:5 (the editor is identical, only the format changes) */
+.board__detail .gal--story figure,.board__detail .gal--story .adder{aspect-ratio:1080/1920}
+.board__detail .gal--story{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
 .imgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 /* delete button on uploaded thumbnails (gallery figures, editable detail) */
 .gal figure .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;border:none;font-size:13px;display:grid;place-items:center;padding:0;line-height:1;cursor:pointer;z-index:2}
@@ -481,7 +489,7 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .chat__scrim{position:fixed;inset:0;z-index:59;background:rgba(20,16,14,.18);opacity:0;visibility:hidden;transition:opacity .26s}
 .board.chat-open .chat__scrim{opacity:1;visibility:visible}
 .chat__panel{display:flex;flex-direction:column;flex:1;min-height:0}
-.msgfab{position:fixed;right:24px;bottom:24px;z-index:56;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid var(--line);box-shadow:0 8px 22px rgba(0,0,0,.12);cursor:pointer;color:var(--ink);padding:0;transition:.18s}
+.msgfab{position:fixed;right:24px;bottom:92px;z-index:56;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid var(--line);box-shadow:0 8px 22px rgba(0,0,0,.12);cursor:pointer;color:var(--ink);padding:0;transition:.18s}
 .msgfab:hover{color:var(--orange);border-color:var(--orange);transform:translateY(-1px)}
 .msgfab svg{width:21px;height:21px;pointer-events:none}
 .msgfab__dot{position:absolute;top:7px;right:8px;width:10px;height:10px;border-radius:50%;background:var(--grad);border:2px solid #fff}
@@ -653,7 +661,7 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 /* ============================================================================
    "How it works" floating guide (client board)
    ========================================================================== */
-.board__guide{position:absolute;right:24px;bottom:84px;z-index:55;display:flex;flex-direction:column;align-items:flex-end}
+.board__guide{position:absolute;right:24px;bottom:152px;z-index:55;display:flex;flex-direction:column;align-items:flex-end}
 .board__guide.hide{display:none}
 .helpfab{position:static;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#fff;border:none;box-shadow:0 10px 26px rgba(248,80,0,.34);cursor:pointer;padding:0}
 .helpfab:hover{transform:translateY(-1px)}
@@ -674,7 +682,7 @@ textarea.script:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(248,8
 .tut-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:.22s}
 .tut-dots i.on{background:var(--orange);width:18px;border-radius:100px}
 .tut-foot .btn{padding:7px 14px;font-size:12.5px}
-@media(max-width:980px){.board__guide{position:fixed;right:24px;bottom:80px}}
+@media(max-width:980px){.board__guide{position:fixed;right:24px;bottom:152px}}
 
 /* ============================================================================
    "My orders" — client account home (Phase 3 fills the list; styles here)
