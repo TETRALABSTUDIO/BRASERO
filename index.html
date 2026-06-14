@@ -206,9 +206,10 @@ img,svg{display:block}
 @media(max-width:560px){.hslide{width:208px}.hslide.s2{--tx:-92%;--ty:-66%}.hslide.s3{--tx:-8%;--ty:-30%}.hchip,.hmini,.hgig{display:none}}
 
 /* ===== COLLECTION (dark) ===== */
-.collection{padding:118px 0 14px;overflow:visible;position:relative;background:transparent;isolation:isolate;z-index:1}
-.collection::before{content:"";position:absolute;inset:0 0 -80px 0;background:var(--black);transform:skewY(-3deg);transform-origin:left;z-index:-1}   /* dark band is tilted; its slanted bottom edge carries into the next section, clearing the mini fans */
+.collection{padding:118px 0 96px;overflow:visible;position:relative}
 .collection>.wrap{position:relative}
+/* dark tilted slab sits BEHIND the profile card; its slanted bottom edge passes behind the card so the card overhangs onto the cream */
+.cright::before{content:"";position:absolute;left:50%;top:-24px;bottom:78px;width:min(96%,452px);transform:translateX(-50%) skewY(-3.2deg);background:#0c0c0c;border-radius:30px;box-shadow:0 44px 90px rgba(0,0,0,.28);z-index:0}
 .cwrap{display:grid;grid-template-columns:1.22fr .78fr;gap:54px;align-items:center}
 .cright{order:-1;position:relative}
 .cright::after{display:none}
@@ -227,12 +228,12 @@ img,svg{display:block}
 .cstack--big.in-r{animation:fanInR .4s cubic-bezier(.22,.7,.3,1)}
 .cstack--big.in-l{animation:fanInL .4s cubic-bezier(.22,.7,.3,1)}
 @media(max-width:1150px) and (min-width:901px){.cright{gap:10px}.cstack--big{width:288px;height:366px;margin:-64px 0}.cstack--big .cstack__card{width:206px}}
-@media(max-width:900px){.collection{padding:80px 0}.collection::before{clip-path:none}.cwrap{grid-template-columns:1fr;gap:40px}.cright{order:0}.cright::after{display:none}.cleft .collection__head .lead{max-width:none}.cstack--big{width:300px;height:390px;margin:0}.cstack--big .cstack__card{width:216px}.cfan{min-height:400px;transform:none}}
+@media(max-width:900px){.collection{padding:80px 0}.cright::before{display:none}.cwrap{grid-template-columns:1fr;gap:40px}.cright{order:0}.cright::after{display:none}.cleft .collection__head .lead{max-width:none}.cstack--big{width:300px;height:390px;margin:0}.cstack--big .cstack__card{width:216px}.cfan{min-height:400px;transform:none}}
 .cstat{flex:1;min-width:78px}
 .cstat b{display:block;font-size:clamp(22px,2.3vw,30px);font-weight:900;letter-spacing:-.03em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.cstat span{font-size:12px;color:#9a9a9a;font-weight:500;display:block;margin-top:5px;line-height:1.2}
+.cstat span{font-size:12px;color:var(--grey);font-weight:500;display:block;margin-top:5px;line-height:1.2}
 .cformats{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
-.cformats span{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#dcdcdc;background:rgba(255,255,255,.05);border:1px solid var(--line-light);border-radius:100px;padding:7px 14px}
+.cformats span{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:100px;padding:7px 14px}
 .cformats svg{width:15px;height:15px;color:var(--orange)}
 
 /* ===== collection : example branded social profile ===== */
@@ -1400,17 +1401,11 @@ html{overflow-x:hidden}
     </div>
 
     <p class="mkt-src reveal">Sources: <b>Socialinsider</b> Instagram engagement benchmarks 2026 (15M posts / 417k profiles) · <b>eMarketer / Meta</b> share of time on Reels 2025 · <b>Adam Mosseri</b> Instagram ranking signals, Jan 2025.</p>
-
-    <div class="mkt-bridge reveal">
-      <span class="mkt-bridge__txt">So we make every post worth saving</span>
-      <span class="mkt-bridge__line"></span>
-      <span class="mkt-bridge__arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg></span>
-    </div>
   </div>
 </section>
 
 <!-- ============ COLLECTION (dark) ============ -->
-<section class="sec sec--dark collection" id="collection">
+<section class="sec sec--light collection" id="collection">
   <div class="glow" style="top:-120px;right:-80px"></div>
   <div class="wrap">
     <div class="cwrap reveal">
