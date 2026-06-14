@@ -38,11 +38,12 @@ const TAG = {
 const TYPE_ICON = {
   carousel: `<svg class="ti" viewBox="0 0 140 94" fill="none"><use href="#ic-decks"/></svg>`,
   story: `<svg class="ti" viewBox="0 0 134 122" fill="none"><use href="#ic-story"/></svg>`,
+  static: `<svg class="ti" viewBox="0 0 140 94" fill="none"><use href="#ic-decks"/></svg>`,
   branding: `<svg class="ti" viewBox="0 0 120 120" fill="none"><use href="#ic-brand"/></svg>`,
 };
 const LOGO = '<svg class="logo-svg" viewBox="0 0 798 189" fill="none"><use href="#brasero-mark"/></svg>';
 const DL_ICON = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h13"/></svg>';
-const DECK_CATS = [{ key: 'carousel', label: 'Decks' }, { key: 'story', label: 'Stories' }, { key: 'branding', label: 'Branding' }];
+const DECK_CATS = [{ key: 'carousel', label: 'Decks' }, { key: 'story', label: 'Stories' }, { key: 'static', label: 'Statics' }, { key: 'branding', label: 'Branding' }];
 
 /* client avatar = white bubble + branding glyph + the plan icon as a corner badge
    (same layout as the team board's profile box). */

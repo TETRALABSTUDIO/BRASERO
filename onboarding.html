@@ -500,7 +500,7 @@ function submit(){
       <div class="oc-head">
         ${av}
         <div class="who-t"><b>${esc(order.handle||order.name||'Your account')}</b><span>${esc(order.name||'')}</span></div>
-        ${order.planName?`<span class="oc-badge">${esc(order.planName)}</span>`:''}
+        ${(order.planName||order.label)?`<span class="oc-badge">${esc(order.planName||order.label)}</span>`:''}
       </div>
       ${amount?`<div class="oc-row"><span>Billing</span><b>${sub?'Subscription · monthly':'One-time payment'}</b></div>`:''}
       ${order.email?`<div class="oc-row"><span>Email</span><b>${esc(order.email)}</b></div>`:''}

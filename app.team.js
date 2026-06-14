@@ -901,6 +901,7 @@ function bindEmails() {
 const TYPE_ICON = {
   carousel: `<svg class="ti" viewBox="0 0 140 94" fill="none"><use href="#ic-decks"/></svg>`,
   story: `<svg class="ti" viewBox="0 0 134 122" fill="none"><use href="#ic-story"/></svg>`,
+  static: `<svg class="ti" viewBox="0 0 140 94" fill="none"><use href="#ic-decks"/></svg>`,
   branding: `<svg class="ti" viewBox="0 0 120 120" fill="none"><use href="#ic-brand"/></svg>`,
 };
 const DPCT = { writing: 12, script_review: 34, designing: 58, design_review: 80, revision: 72, done: 100 };
@@ -1397,7 +1398,7 @@ const PILL = { writing: ['pill--wait', 'Writing'], script_review: ['pill--act', 
 // Branding 'writing' = waiting on the client's brief, not us writing a script.
 function pillFor(d) { if ((d.type || '') === 'branding' && d.status === 'writing') return ['pill--wait', 'Awaiting client']; return PILL[d.status] || PILL.writing; }
 let DECKS = [], SELDECK = null, CAT = null;
-const DECK_CATS = [{ key: 'carousel', label: 'Decks' }, { key: 'story', label: 'Stories' }, { key: 'branding', label: 'Branding' }];
+const DECK_CATS = [{ key: 'carousel', label: 'Decks' }, { key: 'story', label: 'Stories' }, { key: 'static', label: 'Statics' }, { key: 'branding', label: 'Branding' }];
 function decksOfCat(k) { return DECKS.filter(d => (d.type || 'carousel') === k); }
 let TABS = [], ATAB = null;
 const BRIEF_TAB_ICON = `<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="url(#tgrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13a0 0 0 0 1 0 0H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>`;

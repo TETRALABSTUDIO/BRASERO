@@ -1,10 +1,32 @@
-import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId, addonLineItems, addonKeys, ITEMS } from './_lib.js';
+import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId, addonLineItems, addonKeys, ITEMS, cartItems, cartAmount, cartLineItems, cartLabel } from './_lib.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item } = req.body || {};
+    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, cart } = req.body || {};
     const SITE = siteUrl(req);
+
+    // Modular checkout ("compose your pack"): a brand-new order built from à-la-carte
+    // modules, always a one-time payment. Prices come from the server catalogue.
+    if (cart && !addon_ref) {
+      const items = cartItems(cart);
+      const amount = cartAmount(cart);
+      if (!items.length || amount <= 0) return res.status(400).json({ error: 'Empty cart' });
+      const compact = {};
+      for (const it of items) compact[it.key] = it.qty;       // sanitized cart, server-priced
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        customer_email: email || undefined,
+        allow_promotion_codes: true,
+        line_items: cartLineItems(cart),
+        success_url: `${SITE}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${SITE}/checkout.html`,
+        metadata: { cart: JSON.stringify(compact), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
+      });
+      try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan: '', billing: 'once', amount, name, email, instagram, handle }); }
+      catch (e) { console.error('saveOrder failed', e); }
+      return res.json({ url: session.url, label: cartLabel(cart), amount });
+    }
 
     // Tracker upsell: add one catalogue item (carousels / stories / branding) to an existing order.
     if (addon_ref && addon_item && ITEMS[addon_item]) {

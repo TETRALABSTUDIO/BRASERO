@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { saveOrder, markPaid, saveOnboarding, verifyPaidSession, onboardingDone, sendTo, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, stripePriceId, addonLineItems, addonKeys, clientMagicLink, ITEMS } from '../api/_lib.js';
+import { saveOrder, markPaid, saveOnboarding, verifyPaidSession, onboardingDone, sendTo, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, stripePriceId, addonLineItems, addonKeys, clientMagicLink, ITEMS, cartItems, cartAmount, cartLineItems, cartLabel, populateFromCart } from '../api/_lib.js';
 import orderHandler from '../api/order.js';
 import deckHandler from '../api/deck.js';
 import adminHandler from '../api/admin.js';
@@ -76,22 +76,26 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
       return res.json({ received: true });
     }
 
-    markPaid(s.id, s.amount_total).catch(console.error);
-    const to = s.customer_email || m.email;
+    let cart = null;
+    if (m.cart) { try { cart = JSON.parse(m.cart); } catch (e) { console.error('bad cart metadata', e); } }
+    const offerLabel = cart ? cartLabel(cart) : (PLANS[m.plan]?.name || m.plan);
     const ref = s.id.slice(-8).toUpperCase();
+    markPaid(s.id, s.amount_total)
+      .then(order => { if (order && cart) return populateFromCart(order.id, cart); })
+      .catch(console.error);
+    const to = s.customer_email || m.email;
     const trackUrl = to ? clientMagicLink(SITE_URL, to, ref) : '';
     sendTo(to, 'Your Brasero order is confirmed 🎉', clientOrderEmail({
-      name: m.name, planName: PLANS[m.plan]?.name || m.plan, billing: m.billing,
+      name: m.name, planName: offerLabel, billing: cart ? 'once' : m.billing,
       amountCents: s.amount_total, handle: m.handle, ref, trackUrl,
     })).catch(console.error);
-    send(`💸 New ${m.plan || ''} order - ${m.name || s.customer_email}`,
+    send(`💸 New order - ${m.name || s.customer_email}`,
       `<h2>Payment received</h2>
-       <p><b>Plan:</b> ${m.plan} (${m.billing === 'sub' ? 'subscription' : 'one-time'})</p>
+       <p><b>Order:</b> ${offerLabel || '-'} (${cart ? 'one-time' : (m.billing === 'sub' ? 'subscription' : 'one-time')})</p>
        <p><b>Amount:</b> $${(s.amount_total / 100).toFixed(2)}</p>
        <p><b>Name:</b> ${m.name || '-'}</p>
        <p><b>Email:</b> ${s.customer_email || m.email || '-'}</p>
        <p><b>Instagram:</b> ${m.handle || ''} ${m.instagram ? `(${m.instagram})` : ''}</p>
-       <p><b>Add-ons:</b> ${m.addons || '-'}</p>
        <p><b>Stripe session:</b> ${s.id}</p>`
     ).catch(console.error);
   }
@@ -107,7 +111,27 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 /* Create a Stripe Checkout Session and return its URL */
 app.post('/api/checkout-session', async (req, res) => {
   try {
-    const { plan, billing, name, email, handle, instagram, addon_ref, addons, addon_item } = req.body || {};
+    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, cart } = req.body || {};
+
+    // Modular checkout ("compose your pack"): à-la-carte modules, one-time payment.
+    if (cart && !addon_ref) {
+      const items = cartItems(cart);
+      const amount = cartAmount(cart);
+      if (!items.length || amount <= 0) return res.status(400).json({ error: 'Empty cart' });
+      const compact = {};
+      for (const it of items) compact[it.key] = it.qty;
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        customer_email: email || undefined,
+        line_items: cartLineItems(cart),
+        success_url: `${SITE_URL}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${SITE_URL}/checkout.html`,
+        metadata: { cart: JSON.stringify(compact), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
+      });
+      try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan: '', billing: 'once', amount, name, email, instagram, handle }); }
+      catch (e) { console.error('saveOrder failed', e); }
+      return res.json({ url: session.url, label: cartLabel(cart), amount });
+    }
 
     // Tracker upsell: add one catalogue item (carousels / stories / branding) to an existing order.
     if (addon_ref && addon_item && ITEMS[addon_item]) {

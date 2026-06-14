@@ -882,6 +882,85 @@ export function addonKeys(addons) {
   return Array.isArray(addons) ? addons.filter(a => ADDONS[a]) : [];
 }
 
+/* ===== Modular catalogue ("compose your pack") =====
+   The new checkout is a pure module builder: the client picks how many of each
+   module they want, every module has ONE flat unit price, paid once. This is the
+   single source of truth for module prices (cents) - never trust the client.
+   `type` maps each module to a deck row (carousel | story | static | branding)
+   so the board can seed + icon it. The legacy PLANS/ADDONS/ITEMS above stay only
+   to read/seed orders placed before this model (and the owner's manual-order tool). */
+export const MODULES = {
+  carousel:  { name: 'Carousel',           type: 'carousel', unit: 4000, group: 'content'  },
+  story:     { name: 'Story',              type: 'story',    unit: 3000, group: 'content'  },
+  static:    { name: 'Static post',        type: 'static',   unit: 2500, group: 'content'  },
+  brand_pfp: { name: 'Profile photo',      type: 'branding', unit: 6000, group: 'branding' },
+  brand_li:  { name: 'LinkedIn banner',    type: 'branding', unit: 7000, group: 'branding' },
+  brand_x:   { name: 'X / Twitter banner', type: 'branding', unit: 7000, group: 'branding' },
+  brand_fb:  { name: 'Facebook banner',    type: 'branding', unit: 7000, group: 'branding' },
+  brand_yt:  { name: 'YouTube banner',     type: 'branding', unit: 7000, group: 'branding' },
+  brand_cta: { name: 'LinkedIn CTA buttons', type: 'branding', unit: 5000, group: 'branding' },
+};
+// Normalize a client-supplied cart {key:qty} → [{key, qty, ...module}] keeping only
+// known modules with a positive integer quantity (capped, so a bad client can't seed 10k decks).
+export function cartItems(cart) {
+  const c = (cart && typeof cart === 'object') ? cart : {};
+  const out = [];
+  for (const key of Object.keys(MODULES)) {
+    const qty = Math.max(0, Math.min(99, Math.floor(Number(c[key]) || 0)));
+    if (qty > 0) out.push({ key, qty, ...MODULES[key] });
+  }
+  return out;
+}
+// Total price (cents) of a module cart.
+export function cartAmount(cart) {
+  return cartItems(cart).reduce((s, it) => s + it.unit * it.qty, 0);
+}
+// Stripe one-time line items, one row per module (quantity = how many).
+export function cartLineItems(cart) {
+  return cartItems(cart).map(it => ({
+    quantity: it.qty,
+    price_data: { currency: 'usd', unit_amount: it.unit, product_data: { name: `Brasero - ${it.name}` } },
+  }));
+}
+// Human recap, grouped by deck type, e.g. "2 carousels · 3 stories · 2 branding pieces".
+export function cartLabel(cart) {
+  const items = cartItems(cart);
+  if (!items.length) return '';
+  const byType = {};
+  for (const it of items) byType[it.type] = (byType[it.type] || 0) + it.qty;
+  const noun = { carousel: 'carousel', story: 'story', static: 'static', branding: 'branding piece' };
+  const plural = (base, n) => n <= 1 ? base : (base.endsWith('y') ? base.slice(0, -1) + 'ies' : base + 's');
+  return ['carousel', 'story', 'static', 'branding'].filter(t => byType[t])
+    .map(t => `${byType[t]} ${plural(noun[t], byType[t])}`).join(' · ');
+}
+// Seed an order's board from a module cart. Idempotent: content modules top up to
+// the wanted count per type, branding modules add any same-named piece not present.
+export async function populateFromCart(orderId, cart) {
+  const items = cartItems(cart);
+  const existing = await decksForOrder(orderId);
+  const have = {};
+  for (const d of existing) { const t = d.type || 'carousel'; have[t] = (have[t] || 0) + 1; }
+  const made = {};
+  let pos = existing.length, created = 0;
+  const LABEL = { carousel: 'Deck', story: 'Story', static: 'Static' };
+  for (const it of items) {
+    if (it.type === 'branding') {
+      for (let q = 0; q < it.qty; q++) {
+        const title = it.qty > 1 ? `${it.name} ${q + 1}` : it.name;
+        if (existing.some(d => d.title === title)) continue;
+        if (await createDeck(orderId, { title, position: pos++, type: 'branding' })) created++;
+      }
+    } else {
+      const base = (have[it.type] || 0) + (made[it.type] || 0);
+      for (let i = 0; i < it.qty; i++) {
+        if (await createDeck(orderId, { title: `${LABEL[it.type]} ${base + i + 1}`, position: pos++, type: it.type })) created++;
+      }
+      made[it.type] = (made[it.type] || 0) + it.qty;
+    }
+  }
+  return { created };
+}
+
 const mailer = process.env.SMTP_HOST ? nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT || 587),
