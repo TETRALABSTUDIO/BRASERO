@@ -896,7 +896,14 @@ export const MODULES = {
   // Branding is sold as ONE block (not à la carte): a single module that seeds the
   // full set of brand pieces. Qty is capped at 1 in cartItems.
   branding: { name: 'Social media branding', type: 'branding', unit: 21000, group: 'branding',
-              pieces: ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'YouTube banner', 'LinkedIn CTA buttons'] },
+              // Per-platform deliverables (the complete pack = $210, vs $50/platform). Seeded as branding deck rows.
+              pieces: [
+                'Instagram profile image', 'Instagram story highlight 1', 'Instagram story highlight 2', 'Instagram story highlight 3', 'Instagram story highlight 4',
+                'X / Twitter profile image', 'X / Twitter banner',
+                'LinkedIn profile image', 'LinkedIn banner', 'LinkedIn CTA buttons',
+                'Facebook profile image', 'Facebook banner',
+                'YouTube profile image', 'YouTube banner',
+              ] },
 };
 // Normalize a client-supplied cart {key:qty} → [{key, qty, ...module}] keeping only
 // known modules with a positive integer quantity (capped, so a bad client can't seed 10k decks).
