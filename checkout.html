@@ -236,7 +236,7 @@ const chk='<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" f
 
 function loadFormula(){
   try{ const f=JSON.parse(sessionStorage.getItem('brasero_formula')); if(f&&f.plan&&f.mix) return f; }catch(e){}
-  return {plan:'flame',planName:'Flame',price:240,mix:{carousel:6}}; // fallback if they skip the composer
+  return {plan:'flame',planName:'Flame',billing:'once',price:240,formulaPrice:240,brandingExtra:0,mix:{carousel:6}}; // fallback if they skip the composer
 }
 const formula=loadFormula();
 const mixLines=()=>Object.keys(MOD_LABEL).filter(k=>(formula.mix||{})[k]>0).map(k=>({k,n:formula.mix[k]}));
@@ -299,12 +299,14 @@ igInput.addEventListener('input',()=>{ig=null;igResult.innerHTML='';addBtn.disab
 
 function renderRecap(){
   const lines=mixLines(), name=formula.planName||TIER_NAMES[formula.plan]||'Your formula';
-  const brandRow=formula.branding?`<div class="recap__addon">${chk}<span>Social media branding</span><b>${formula.brandingIncluded?'Included':'Added'}</b></div>`:'';
+  const sub=formula.billing==='sub', be=formula.brandingExtra||0;
+  const brandRow=formula.branding?`<div class="recap__addon">${chk}<span>Social media branding</span><b>${formula.brandingIncluded?'Included':(sub?'+'+fmt(be):'Added')}</b></div>`:'';
   document.getElementById('recap').innerHTML=`
-    <div class="recap__top"><b class="recap__name">${name}</b><span class="badge">Pay once</span></div>
-    <p class="recap__sub">The formula you composed on the homepage. One price, everything included.</p>
+    <div class="recap__top"><b class="recap__name">${name}</b><span class="badge">${sub?'Subscription':'Pay once'}</span></div>
+    <p class="recap__sub">The formula you composed on the homepage. ${sub?'Delivered every month, −10% on the formula.':'One price, everything included.'}</p>
     <div class="recap__addons">${lines.map(l=>`<div class="recap__addon">${chk}<span>${MOD_LABEL[l.k]}</span><b>× ${l.n}</b></div>`).join('')}${brandRow}</div>
-    <div class="recap__row recap__total"><span>${mixCount()} elements · one-time</span><div class="tot"><b>${fmt(formula.price)}</b></div></div>
+    <div class="recap__row recap__total"><span>${mixCount()} elements · ${sub?'monthly':'one-time'}</span><div class="tot"><b>${fmt(sub?(formula.formulaPrice||formula.price):formula.price)}</b>${sub?'<em>/mo</em>':''}</div></div>
+    ${sub&&be?`<p class="recap__fine">Branding is billed once (+${fmt(be)}); the formula renews monthly.</p>`:''}
     <p class="recap__fine">Strategy, copywriting, design &amp; revisions included. Want to tweak the mix? <a href="index.html#packages" style="color:var(--orange);font-weight:700">Re-compose your formula</a> or adjust it with us before production.</p>`;
 }
 renderRecap();
@@ -321,7 +323,8 @@ document.getElementById('contact').addEventListener('submit',async e=>{
   if(!ig && u) ig=await addInstagram(u);
   const order={name:fd.get('name'),email:fd.get('email'),instagram,niche:fd.get('niche'),
     handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone'),
-    plan:formula.plan,planName:formula.planName||TIER_NAMES[formula.plan],price:formula.price,mix:formula.mix,branding:!!formula.branding,label:mixLabel()};
+    plan:formula.plan,planName:formula.planName||TIER_NAMES[formula.plan],billing:formula.billing||'once',
+    price:formula.price,mix:formula.mix,branding:!!formula.branding,label:mixLabel()};
   sessionStorage.setItem('brasero_order',JSON.stringify(order));
   await proceedToPayment(order);
 });
@@ -331,7 +334,7 @@ async function proceedToPayment(order){
   const btn=payBtn; if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
   try{
     const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({plan:order.plan,mix:order.mix,branding:order.branding,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,niche:order.niche})});
+      body:JSON.stringify({plan:order.plan,billing:order.billing,mix:order.mix,branding:order.branding,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,niche:order.niche})});
     const d=await r.json();
     if(d.label) order.planName=d.label;
     sessionStorage.setItem('brasero_order',JSON.stringify(order));

@@ -868,15 +868,20 @@ img,svg{display:block}
 
 /* ===== drag-and-drop formula composer ===== */
 .cmp{margin-top:8px}
+.cmp__bill{display:inline-flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:100px;padding:5px;margin-bottom:16px;box-shadow:0 6px 18px rgba(0,0,0,.05)}
+.cmp__bill button{font-family:inherit;border:none;background:none;cursor:pointer;font-size:13.5px;font-weight:800;color:var(--grey);padding:10px 20px;border-radius:100px;transition:color .25s,background .25s,box-shadow .25s;display:inline-flex;align-items:center;gap:7px}
+.cmp__bill button.on{color:#fff;background:var(--grad);box-shadow:0 8px 18px rgba(248,80,0,.28)}
+.cmp__save{font-size:11px;font-weight:900;color:#16a34a}.cmp__bill button.on .cmp__save{color:#fff}
 .cmp__tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.cmp__tier{position:relative;display:flex;align-items:center;gap:13px;text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:15px 18px;transition:border .2s,box-shadow .2s,transform .15s}
+.cmp__tier{position:relative;display:flex;align-items:center;gap:15px;text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px 20px;transition:border .2s,box-shadow .2s,transform .15s}
 .cmp__tier:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.07)}
 .cmp__tier.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
-.cmp__tlogo{height:34px;width:auto;max-width:42px;object-fit:contain;flex-shrink:0}
+.cmp__tlogo{height:52px;width:auto;max-width:60px;object-fit:contain;flex-shrink:0}
 .cmp__tinfo{flex:1;min-width:0}
-.cmp__tinfo b{font-size:16px;font-weight:900;letter-spacing:-.02em;display:block}
-.cmp__tinfo span{font-size:11.5px;color:var(--grey);font-weight:600;display:block;margin-top:2px}
-.cmp__tprice{font-size:19px;font-weight:900;letter-spacing:-.03em;flex-shrink:0;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cmp__tinfo b{font-size:19px;font-weight:900;letter-spacing:-.02em;display:block}
+.cmp__tsub{font-size:13px;color:#444;font-weight:700;display:block;margin-top:3px;line-height:1.3}
+.cmp__tprice{font-size:22px;font-weight:900;letter-spacing:-.03em;flex-shrink:0;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cmp__tprice em{font-style:normal;font-size:11px;font-weight:700;-webkit-text-fill-color:var(--grey);color:var(--grey)}
 .cmp__pop{position:absolute;top:-9px;right:14px;font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--grad);padding:3px 9px;border-radius:100px;box-shadow:0 4px 10px rgba(248,80,0,.3)}
 .cmp__board{display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:start}
 .cmp__palette{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.05);position:sticky;top:16px}
@@ -906,20 +911,33 @@ img,svg{display:block}
 .cmp__slot .cmp__sic{width:40px;height:32px;display:grid;place-items:center}
 .cmp__slot .cmp__sic svg{width:100%;height:100%}
 .cmp__slot small{font-size:11.5px;font-weight:800;color:#222}
-.cmp__slot .cmp__free{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;letter-spacing:.03em;color:#3d2a00;background:linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a);padding:2px 7px;border-radius:100px;white-space:nowrap}
+.cmp__slot .cmp__free{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;letter-spacing:.03em;color:#3d2a00;background:linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a);padding:2px 7px;border-radius:100px;white-space:nowrap;box-shadow:0 3px 8px rgba(200,144,26,.35)}
+/* the "+1 FREE" slot: gold gradient dashed outline instead of grey */
+.cmp__slot.empty.is-free{border:none;background-color:#fffdf6;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 110 114'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23fde08a'/%3E%3Cstop offset='.5' stop-color='%23e8b53a'/%3E%3Cstop offset='1' stop-color='%23c8901a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='1.5' y='1.5' width='107' height='111' rx='13' fill='none' stroke='url(%23g)' stroke-width='2.5' stroke-dasharray='7 6'/%3E%3C/svg%3E")}
+.cmp__slot.empty.is-free .cmp__plus{background:linear-gradient(135deg,#e8b53a,#c8901a);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:600}
+.cmp__slot.is-free.filled{border-color:#e8b53a}
 .cmp__rm{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;border:none;background:#111;color:#fff;font-size:12px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:transform .15s,background .2s;z-index:2}
 .cmp__rm:hover{transform:scale(1.12);background:var(--orange)}
 .cmp__brand{margin-bottom:16px}
-.cmp__bcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font-family:inherit;padding:13px 15px;border:1.5px solid var(--line);border-radius:14px;background:var(--soft);cursor:pointer;transition:border .2s,box-shadow .2s,background .2s}
+.cmp__bcard{display:flex;flex-direction:column;gap:12px;width:100%;text-align:left;font-family:inherit;padding:16px 17px;border:1.5px solid var(--line);border-radius:16px;background:var(--soft);cursor:pointer;transition:border .2s,box-shadow .2s,background .2s}
 .cmp__bcard:hover{border-color:var(--orange)}
 .cmp__bcard.on{border-color:var(--orange);background:#fff;box-shadow:0 0 0 2px rgba(248,80,0,.12)}
-.cmp__bcard.locked{cursor:default;border-color:rgba(248,80,0,.45);background:linear-gradient(100deg,#fff,#fff6f1)}
+.cmp__bcard.locked{cursor:default;border:2px solid transparent;background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box;box-shadow:0 10px 26px rgba(248,80,0,.14)}
+.cmp__bhead{display:flex;align-items:center;gap:12px;width:100%}
+.cmp__bic{width:34px;height:28px;flex-shrink:0}
 .cmp__bbody{flex:1;min-width:0}
-.cmp__bbody b{font-size:14.5px;font-weight:800;display:block}
-.cmp__bbody small{font-size:11.5px;color:var(--grey);font-weight:600}
-.cmp__bctl{font-size:13px;font-weight:800;color:var(--orange);white-space:nowrap}
+.cmp__bbody b{font-size:15.5px;font-weight:900;letter-spacing:-.01em;display:block}
+.cmp__bbody small{font-size:12px;color:var(--grey);font-weight:600;display:block;margin-top:1px}
+.cmp__bctl{font-size:13.5px;font-weight:800;color:var(--orange);white-space:nowrap;flex-shrink:0}
 .cmp__bcard.on .cmp__bctl{color:#15803d}
-.cmp__binc{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:var(--grad);padding:5px 11px;border-radius:100px}
+.cmp__binc{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:#fff;background:var(--grad);padding:7px 14px;border-radius:100px;white-space:nowrap;flex-shrink:0;box-shadow:0 6px 14px rgba(248,80,0,.32)}
+.cmp__binc svg{width:13px;height:13px}
+.cmp__bfeats{list-style:none;display:flex;flex-direction:column;gap:10px;margin:0;padding:12px 2px 0;border-top:1px solid var(--line);width:100%}
+.cmp__bcard.locked .cmp__bfeats{border-top-color:rgba(248,80,0,.18)}
+.cmp__bfeats li{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:#333;line-height:1.25}
+.cmp__bfic{width:26px;height:26px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;background:var(--grad);box-shadow:0 4px 10px rgba(248,80,0,.25)}
+.cmp__bfic svg{width:15px;height:15px;color:#fff}
+.cmp__per{font-size:15px;font-weight:700;color:var(--grey);margin-left:3px}
 .cmp__foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line)}
 .cmp__price b{font-size:34px;font-weight:900;letter-spacing:-.03em}
 .cmp__price em{font-style:normal;font-size:12.5px;color:var(--grey);font-weight:600;margin-left:8px}
@@ -1886,6 +1904,7 @@ html{overflow-x:hidden}
     </div>
 
     <div class="cmp reveal" id="composer">
+      <div class="cmp__bill" id="cmpBill"></div>
       <div class="cmp__tiers" id="cmpTiers"></div>
       <div class="cmp__board">
         <div class="cmp__palette">
@@ -2044,8 +2063,8 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 (function(){
   const root=document.getElementById('composer'); if(!root) return;
   const TIERS=[
-    {key:'starter',n:3, price:120,name:'Ember', logo:'assets/plans/ember.svg',  sub:'3 elements · paid once'},
-    {key:'flame',  n:6, price:240,name:'Flame', logo:'assets/plans/flame.svg',  sub:'6 elements · paid once', popular:true},
+    {key:'starter',n:3, price:120,name:'Ember', logo:'assets/plans/ember.svg',  sub:'3 elements'},
+    {key:'flame',  n:6, price:240,name:'Flame', logo:'assets/plans/flame.svg',  sub:'6 elements', popular:true},
     {key:'burst',  n:10,price:350,name:'Meteor',logo:'assets/plans/meteor.svg', sub:'9 + 1 free · branding included', free:1, brandIncluded:true},
   ];
   const MODS={
@@ -2053,7 +2072,12 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     story:   {label:'Story',  sub:'9:16 set',    svg:'#ic-story',vb:'0 0 134 122'},
     static:  {label:'Static', sub:'single post', svg:'#ic-decks',vb:'0 0 140 94'},
   };
-  const BRAND={label:'Social media branding',sub:'Profile photo, banners & CTAs',svg:'#ic-brand',vb:'0 0 120 120',price:210};
+  const BRAND={label:'Social media branding',svg:'#ic-brand',vb:'0 0 120 120',price:210};
+  const BFEATS=[
+    {ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5"/></svg>', t:'On-brand profile photo'},
+    {ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 14l5-4 4 3 3-2 6 4"/></svg>', t:'LinkedIn, X, Facebook &amp; YouTube banners'},
+    {ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9" width="19" height="6" rx="3"/><path d="M7 12h6"/></svg>', t:'LinkedIn CTA buttons'},
+  ];
   const ORDER=['carousel','story','static'];
   const SING={carousel:'deck',story:'story',static:'static'};
   const PLURAL={carousel:'decks',story:'stories',static:'statics'};
@@ -2061,27 +2085,37 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   const fmt=n=>'$'+n.toLocaleString('en-US');
   const ic=m=>`<svg viewBox="${m.vb}" fill="none"><use href="${m.svg}"/></svg>`;
   const grip='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';
-  let tierKey='flame', slots=[], brandingOn=false;
+  let tierKey='flame', slots=[], brandingOn=false, billing='once';
   const tier=()=>TIERS.find(t=>t.key===tierKey);
   const brandIncluded=()=>!!tier().brandIncluded;
   const brandActive=()=>brandIncluded()||brandingOn;
   const filled=()=>slots.filter(Boolean).length;
   function reset(){ slots=Array(tier().n).fill(null); brandingOn=false; }   // EMPTY slots, no pre-fill
   function counts(){ const c={}; slots.forEach(k=>{ if(k) c[k]=(c[k]||0)+1; }); return c; }
-  function price(){ return tier().price + (brandingOn&&!brandIncluded()?BRAND.price:0); }
+  const formulaPrice=()=>billing==='sub'?Math.round(tier().price*0.9):tier().price;
+  const brandingExtra=()=>brandingOn&&!brandIncluded()?BRAND.price:0;
+  const totalOnce=()=>formulaPrice()+brandingExtra();          // single number for one-time
 
-  const elTiers=document.getElementById('cmpTiers'), elCards=document.getElementById('cmpCards'),
+  const elBill=document.getElementById('cmpBill'),
+        elTiers=document.getElementById('cmpTiers'), elCards=document.getElementById('cmpCards'),
         elSlots=document.getElementById('cmpSlots'), elBrand=document.getElementById('cmpBrand'),
         elMix=document.getElementById('cmpMix'), elPrice=document.getElementById('cmpPrice'),
         elTitle=document.getElementById('cmpTitle'), elPnote=document.getElementById('cmpPnote'),
         elGo=document.getElementById('cmpGo');
 
+  function renderBill(){
+    elBill.innerHTML=`<button type="button" class="${billing==='once'?'on':''}" data-bill="once">One-time</button>
+      <button type="button" class="${billing==='sub'?'on':''}" data-bill="sub">Subscribe <span class="cmp__save">−10%</span></button>`;
+  }
   function renderTiers(){
-    elTiers.innerHTML=TIERS.map(t=>`<button type="button" class="cmp__tier ${t.key===tierKey?'on':''}" data-tier="${t.key}">
+    elTiers.innerHTML=TIERS.map(t=>{
+      const p=billing==='sub'?Math.round(t.price*0.9):t.price;
+      return `<button type="button" class="cmp__tier ${t.key===tierKey?'on':''}" data-tier="${t.key}">
       ${t.popular?'<span class="cmp__pop">Most popular</span>':''}
       <img class="cmp__tlogo" src="${t.logo}" alt="${t.name}">
-      <span class="cmp__tinfo"><b>${t.name}</b><span>${t.sub}</span></span>
-      <span class="cmp__tprice">${fmt(t.price)}</span></button>`).join('');
+      <span class="cmp__tinfo"><b>${t.name}</b><span class="cmp__tsub">${t.sub}</span></span>
+      <span class="cmp__tprice">${fmt(p)}${billing==='sub'?'<em>/mo</em>':''}</span></button>`;
+    }).join('');
   }
   function renderCards(){
     elCards.innerHTML=ORDER.map(k=>`<div class="cmp__card" data-card="${k}">
@@ -2091,28 +2125,33 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   function renderSlots(){
     elSlots.innerHTML=slots.map((k,i)=>{
       const free=tier().free&&i===slots.length-1;
-      if(!k) return `<div class="cmp__slot empty" data-slot="${i}">${free?'<span class="cmp__free">+1 FREE</span>':''}<span class="cmp__plus">+</span></div>`;
-      return `<div class="cmp__slot filled" data-slot="${i}"><button type="button" class="cmp__rm" data-rm="${i}" aria-label="Remove">✕</button>${free?'<span class="cmp__free">+1 FREE</span>':''}<span class="cmp__sic">${ic(MODS[k])}</span><small>${MODS[k].label}</small></div>`;
+      if(!k) return `<div class="cmp__slot empty ${free?'is-free':''}" data-slot="${i}">${free?'<span class="cmp__free">+1 FREE</span>':''}<span class="cmp__plus">+</span></div>`;
+      return `<div class="cmp__slot filled ${free?'is-free':''}" data-slot="${i}"><button type="button" class="cmp__rm" data-rm="${i}" aria-label="Remove">✕</button>${free?'<span class="cmp__free">+1 FREE</span>':''}<span class="cmp__sic">${ic(MODS[k])}</span><small>${MODS[k].label}</small></div>`;
     }).join('');
   }
   function renderBrand(){
     const inc=brandIncluded();
     elBrand.innerHTML=`<button type="button" class="cmp__bcard ${brandActive()?'on':''} ${inc?'locked':''}" ${inc?'':'data-brand'}>
-      <span class="cmp__ic">${ic(BRAND)}</span>
-      <span class="cmp__bbody"><b>${BRAND.label}</b><small>${BRAND.sub}</small></span>
-      ${inc?'<span class="cmp__binc">Included</span>':`<span class="cmp__bctl">${brandingOn?'✓ Added '+fmt(BRAND.price):'+ Add '+fmt(BRAND.price)}</span>`}</button>`;
+      <span class="cmp__bhead">
+        <span class="cmp__ic cmp__bic">${ic(BRAND)}</span>
+        <span class="cmp__bbody"><b>${BRAND.label}</b><small>A full, matching brand system across all your platforms.</small></span>
+        ${inc?'<span class="cmp__binc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10"/></svg>Included free</span>':`<span class="cmp__bctl">${brandingOn?'✓ Added · '+fmt(BRAND.price):'+ Add · '+fmt(BRAND.price)}</span>`}
+      </span>
+      <ul class="cmp__bfeats">${BFEATS.map(f=>`<li><span class="cmp__bfic">${f.ic}</span>${f.t}</li>`).join('')}</ul></button>`;
   }
   function renderRecap(){
-    const c=counts(), n=filled(), N=tier().n, full=n===N;
+    const c=counts(), n=filled(), N=tier().n, full=n===N, sub=billing==='sub';
     const parts=ORDER.filter(k=>c[k]).map(k=>`${c[k]} ${noun(k,c[k])}`);
     if(brandActive()) parts.push('branding');
     elMix.textContent=parts.join(' · ');
-    elPrice.textContent=fmt(price());
+    elPrice.innerHTML=sub?`${fmt(formulaPrice())}<span class="cmp__per">/mo</span>`:fmt(totalOnce());
     elTitle.textContent=`${tier().name} · ${n}/${N} placed`;
     elGo.disabled=!full;
-    elPnote.textContent=full?(brandActive()?'paid once · branding included':'paid once'):`place ${N-n} more element${N-n>1?'s':''}`;
+    if(!full) elPnote.textContent=`place ${N-n} more element${N-n>1?'s':''}`;
+    else if(sub) elPnote.textContent=brandingExtra()?`−10% every month · +${fmt(brandingExtra())} branding once`:(brandActive()?'−10% monthly · branding included':'−10% · billed monthly');
+    else elPnote.textContent=brandActive()?(brandIncluded()?'paid once · branding included':'paid once · branding added'):'paid once';
   }
-  function renderAll(){ renderTiers(); renderCards(); renderSlots(); renderBrand(); renderRecap(); }
+  function renderAll(){ renderBill(); renderTiers(); renderCards(); renderSlots(); renderBrand(); renderRecap(); }
 
   function quickAdd(k){ const i=slots.indexOf(null); if(i<0)return; slots[i]=k; renderSlots(); renderRecap(); }
 
@@ -2147,6 +2186,8 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     document.addEventListener('pointermove',mv); document.addEventListener('pointerup',up);
   });
 
+  // billing toggle (one-time / subscribe −10%)
+  elBill.addEventListener('click',e=>{ const b=e.target.closest('[data-bill]'); if(!b)return; billing=b.dataset.bill; renderBill(); renderTiers(); renderRecap(); });
   // tier select
   elTiers.addEventListener('click',e=>{ const b=e.target.closest('[data-tier]'); if(!b)return; tierKey=b.dataset.tier; reset(); renderAll(); });
   // slots: tap empty to add next module-of-choice (defaults to deck), ✕ to remove
@@ -2159,7 +2200,12 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
   elGo.addEventListener('click',()=>{
     if(filled()!==tier().n) return;
-    sessionStorage.setItem('brasero_formula',JSON.stringify({plan:tierKey,planName:tier().name,price:price(),mix:counts(),branding:brandActive(),brandingIncluded:brandIncluded()}));
+    const sub=billing==='sub';
+    sessionStorage.setItem('brasero_formula',JSON.stringify({
+      plan:tierKey,planName:tier().name,billing,mix:counts(),
+      branding:brandActive(),brandingIncluded:brandIncluded(),brandingExtra:brandingExtra(),
+      formulaPrice:formulaPrice(),price:sub?formulaPrice():totalOnce()
+    }));
     location.href='checkout.html';
   });
 

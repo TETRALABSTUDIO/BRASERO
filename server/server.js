@@ -119,32 +119,35 @@ app.post('/api/checkout-session', async (req, res) => {
     if (plan && PLANS[plan] && mix && !addon_ref) {
       const content = {};
       for (const it of cartItems(mix)) if (it.type !== 'branding') content[it.key] = it.qty;
+      const bill = billing === 'sub' ? 'sub' : 'once';
       const brandIncluded = plan === 'burst';
       const brandCharged = !!branding && !brandIncluded;
       const seedMix = { ...content, ...((brandIncluded || !!branding) ? { branding: 1 } : {}) };
-      let line_items, amount;
-      const priceId = stripePriceId(plan, 'once') || process.env.STRIPE_PRICE_ID;
+      let line_items, amount, mode;
+      const priceId = stripePriceId(plan, bill) || process.env.STRIPE_PRICE_ID;
       if (priceId) {
         const priceObj = await stripe.prices.retrieve(priceId);
+        mode = priceObj.recurring ? 'subscription' : 'payment';
         amount = priceObj.unit_amount;
         line_items = [{ price: priceId, quantity: 1 }];
       } else {
-        amount = amountFor(plan, 'once');
-        line_items = [{ quantity: 1, price_data: { currency: 'usd', unit_amount: amount, product_data: { name: `Brasero - ${PLANS[plan].name} formula` } } }];
+        mode = bill === 'sub' ? 'subscription' : 'payment';
+        amount = amountFor(plan, bill);
+        line_items = [{ quantity: 1, price_data: { currency: 'usd', unit_amount: amount, product_data: { name: `Brasero - ${PLANS[plan].name} formula` }, ...(mode === 'subscription' ? { recurring: { interval: 'month' } } : {}) } }];
       }
       if (brandCharged) {
         amount += MODULES.branding.unit;
         line_items.push({ quantity: 1, price_data: { currency: 'usd', unit_amount: MODULES.branding.unit, product_data: { name: 'Brasero - Social media branding' } } });
       }
       const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
+        mode,
         customer_email: email || undefined,
         line_items,
         success_url: `${SITE_URL}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${SITE_URL}/checkout.html`,
-        metadata: { plan, billing: 'once', mix: JSON.stringify(seedMix), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
+        metadata: { plan, billing: bill, mix: JSON.stringify(seedMix), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
       });
-      try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing: 'once', amount, name, email, instagram, handle }); }
+      try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing: bill, amount, name, email, instagram, handle }); }
       catch (e) { console.error('saveOrder failed', e); }
       return res.json({ url: session.url, label: PLANS[plan].name, amount });
     }
