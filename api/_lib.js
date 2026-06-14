@@ -890,23 +890,23 @@ export function addonKeys(addons) {
    so the board can seed + icon it. The legacy PLANS/ADDONS/ITEMS above stay only
    to read/seed orders placed before this model (and the owner's manual-order tool). */
 export const MODULES = {
-  carousel:  { name: 'Carousel',           type: 'carousel', unit: 4000, group: 'content'  },
-  story:     { name: 'Story',              type: 'story',    unit: 3000, group: 'content'  },
-  static:    { name: 'Static post',        type: 'static',   unit: 2500, group: 'content'  },
-  brand_pfp: { name: 'Profile photo',      type: 'branding', unit: 6000, group: 'branding' },
-  brand_li:  { name: 'LinkedIn banner',    type: 'branding', unit: 7000, group: 'branding' },
-  brand_x:   { name: 'X / Twitter banner', type: 'branding', unit: 7000, group: 'branding' },
-  brand_fb:  { name: 'Facebook banner',    type: 'branding', unit: 7000, group: 'branding' },
-  brand_yt:  { name: 'YouTube banner',     type: 'branding', unit: 7000, group: 'branding' },
-  brand_cta: { name: 'LinkedIn CTA buttons', type: 'branding', unit: 5000, group: 'branding' },
+  carousel: { name: 'Carousel',     type: 'carousel', unit: 4000,  group: 'content'  },
+  story:    { name: 'Story',        type: 'story',    unit: 3000,  group: 'content'  },
+  static:   { name: 'Static post',  type: 'static',   unit: 2500,  group: 'content'  },
+  // Branding is sold as ONE block (not à la carte): a single module that seeds the
+  // full set of brand pieces. Qty is capped at 1 in cartItems.
+  branding: { name: 'Social media branding', type: 'branding', unit: 21000, group: 'branding',
+              pieces: ['Profile photo', 'X / Twitter banner', 'LinkedIn banner', 'Facebook banner', 'YouTube banner', 'LinkedIn CTA buttons'] },
 };
 // Normalize a client-supplied cart {key:qty} → [{key, qty, ...module}] keeping only
 // known modules with a positive integer quantity (capped, so a bad client can't seed 10k decks).
+// Branding is a one-block module, so it caps at 1.
 export function cartItems(cart) {
   const c = (cart && typeof cart === 'object') ? cart : {};
   const out = [];
   for (const key of Object.keys(MODULES)) {
-    const qty = Math.max(0, Math.min(99, Math.floor(Number(c[key]) || 0)));
+    const cap = key === 'branding' ? 1 : 99;
+    const qty = Math.max(0, Math.min(cap, Math.floor(Number(c[key]) || 0)));
     if (qty > 0) out.push({ key, qty, ...MODULES[key] });
   }
   return out;
@@ -922,19 +922,20 @@ export function cartLineItems(cart) {
     price_data: { currency: 'usd', unit_amount: it.unit, product_data: { name: `Brasero - ${it.name}` } },
   }));
 }
-// Human recap, grouped by deck type, e.g. "2 carousels · 3 stories · 2 branding pieces".
+// Human recap, e.g. "2 carousels · 3 stories · social branding".
 export function cartLabel(cart) {
   const items = cartItems(cart);
   if (!items.length) return '';
   const byType = {};
   for (const it of items) byType[it.type] = (byType[it.type] || 0) + it.qty;
-  const noun = { carousel: 'carousel', story: 'story', static: 'static', branding: 'branding piece' };
+  const noun = { carousel: 'carousel', story: 'story', static: 'static' };
   const plural = (base, n) => n <= 1 ? base : (base.endsWith('y') ? base.slice(0, -1) + 'ies' : base + 's');
-  return ['carousel', 'story', 'static', 'branding'].filter(t => byType[t])
-    .map(t => `${byType[t]} ${plural(noun[t], byType[t])}`).join(' · ');
+  const parts = ['carousel', 'story', 'static'].filter(t => byType[t]).map(t => `${byType[t]} ${plural(noun[t], byType[t])}`);
+  if (byType.branding) parts.push('social branding');
+  return parts.join(' · ');
 }
 // Seed an order's board from a module cart. Idempotent: content modules top up to
-// the wanted count per type, branding modules add any same-named piece not present.
+// the wanted count per type; the branding block adds its full set of pieces (by name).
 export async function populateFromCart(orderId, cart) {
   const items = cartItems(cart);
   const existing = await decksForOrder(orderId);
@@ -945,8 +946,7 @@ export async function populateFromCart(orderId, cart) {
   const LABEL = { carousel: 'Deck', story: 'Story', static: 'Static' };
   for (const it of items) {
     if (it.type === 'branding') {
-      for (let q = 0; q < it.qty; q++) {
-        const title = it.qty > 1 ? `${it.name} ${q + 1}` : it.name;
+      for (const title of (it.pieces || [it.name])) {
         if (existing.some(d => d.title === title)) continue;
         if (await createDeck(orderId, { title, position: pos++, type: 'branding' })) created++;
       }

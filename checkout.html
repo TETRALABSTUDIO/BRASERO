@@ -168,6 +168,9 @@ a{color:inherit;text-decoration:none}
 .stepper button:hover{transform:translateY(-1px)}
 .stepper button:disabled{opacity:.32;cursor:default;transform:none;box-shadow:none}
 .stepper b{min-width:24px;text-align:center;font-size:15px;font-weight:900}
+.modtog{font-family:inherit;font-size:13px;font-weight:800;padding:9px 16px;border-radius:100px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap;transition:border .2s,background .2s,color .2s,transform .15s}
+.modtog:hover{transform:translateY(-1px);border-color:rgba(248,80,0,.5)}
+.modtog.on{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(248,80,0,.28)}
 .recap__empty{font-size:13.5px;color:var(--grey);font-weight:600;padding:14px 0;line-height:1.5}
 @media(max-width:860px){.co{grid-template-columns:1fr}.recap{order:-1}}
 </style>
@@ -226,19 +229,14 @@ const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'ht
 /* ===== Module catalogue (flat unit price, paid once) =====
    Keys + prices MUST match MODULES in api/_lib.js (the server re-prices every cart). */
 const MODULES={
-  carousel: {name:'Carousel',          group:'content',  unit:40, desc:'A 6 to 10-slide swipeable deck. Hook, copywriting and design, done for you.'},
-  story:    {name:'Story',             group:'content',  unit:30, desc:'A vertical 9:16 story, designed to be tapped through.'},
-  static:   {name:'Static post',       group:'content',  unit:25, desc:'A single designed post. One idea, made to be saved and shared.'},
-  brand_pfp:{name:'Profile photo',     group:'branding', unit:60, desc:'A clean, on-brand profile picture across your platforms.'},
-  brand_li: {name:'LinkedIn banner',   group:'branding', unit:70, desc:'1584×396 cover, on brand.'},
-  brand_x:  {name:'X / Twitter banner',group:'branding', unit:70, desc:'1500×500 header, on brand.'},
-  brand_fb: {name:'Facebook banner',   group:'branding', unit:70, desc:'Page cover, on brand.'},
-  brand_yt: {name:'YouTube banner',    group:'branding', unit:70, desc:'Channel art, safe-area aware.'},
-  brand_cta:{name:'LinkedIn CTA buttons',group:'branding',unit:50,desc:'Custom featured-section call-to-action buttons.'},
+  carousel: {name:'Carousel',    group:'content',  unit:40, desc:'A 6 to 10-slide swipeable deck. Hook, copywriting and design, done for you.'},
+  story:    {name:'Story',       group:'content',  unit:30, desc:'A vertical 9:16 story, designed to be tapped through.'},
+  static:   {name:'Static post', group:'content',  unit:25, desc:'A single designed post. One idea, made to be saved and shared.'},
+  branding: {name:'Social media branding', group:'branding', unit:210, toggle:true, desc:'One complete brand block: profile photo, X / LinkedIn / Facebook / YouTube banners and LinkedIn CTA buttons, all matching.'},
 };
 const GROUPS=[
   {key:'content', title:'Your content', sub:'Decks, stories and static posts. Mix any number, any way.', keys:['carousel','story','static']},
-  {key:'branding',title:'Your brand',   sub:'Add the brand pieces you want, à la carte.',              keys:['brand_pfp','brand_li','brand_x','brand_fb','brand_yt','brand_cta']},
+  {key:'branding',title:'Your brand',   sub:'A complete, matching brand system, added as one block.',    keys:['branding']},
 ];
 const qp=new URLSearchParams(location.search);
 const fmt=n=>'$'+n.toLocaleString('en-US');
@@ -257,11 +255,15 @@ function stepperHTML(k){
   const n=qtyOf(k);
   return `<span class="stepper"><button type="button" data-step="${k}" data-d="-1" aria-label="Remove one" ${n?'':'disabled'}>−</button><b>${n}</b><button type="button" data-step="${k}" data-d="1" aria-label="Add one">+</button></span>`;
 }
+function ctlHTML(k){
+  if(MODULES[k].toggle){ const on=qtyOf(k)>0; return `<button type="button" class="modtog ${on?'on':''}" data-toggle="${k}">${on?'✓ Added':'+ Add'}</button>`; }
+  return stepperHTML(k);
+}
 function modRowHTML(k){
   const m=MODULES[k], n=qtyOf(k);
   return `<div class="mod ${n?'on':''}">
     <div class="mod__body"><b class="mod__name">${m.name}</b><span class="mod__desc">${m.desc}</span></div>
-    <div class="mod__right"><span class="mod__price">${fmt(m.unit)}<em>/ unit</em></span>${stepperHTML(k)}</div>
+    <div class="mod__right"><span class="mod__price">${fmt(m.unit)}${m.toggle?'':'<em>/ unit</em>'}</span>${ctlHTML(k)}</div>
   </div>`;
 }
 function groupHTML(g){
@@ -364,8 +366,11 @@ function showBuilder(order){
     <p class="note">Every module includes copywriting, design and revisions. Adjust anything, anytime before production.</p>`;
   renderBuilder();
   document.getElementById('builder').addEventListener('click',ev=>{
-    const s=ev.target.closest('[data-step]'); if(!s) return;
-    setQty(s.dataset.step, qtyOf(s.dataset.step)+(+s.dataset.d));
+    const s=ev.target.closest('[data-step]');
+    const t=ev.target.closest('[data-toggle]');
+    if(s){ setQty(s.dataset.step, qtyOf(s.dataset.step)+(+s.dataset.d)); }
+    else if(t){ setQty(t.dataset.toggle, qtyOf(t.dataset.toggle)>0?0:1); }
+    else return;
     renderBuilder(); renderRecap();
   });
   recapBtn={label:'Continue to payment →',fn:()=>proceedToPayment(order)};
