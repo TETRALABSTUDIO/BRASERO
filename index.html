@@ -811,7 +811,7 @@ img,svg{display:block}
 
 /* ===== GUARANTEE inline (inside pricing) ===== */
 /* guarantee + custom band sit side by side as two columns */
-.pack__assure{max-width:1000px;margin:24px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+.pack__assure{margin:20px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
 .pgtee{display:flex;flex-direction:column;align-items:flex-start;gap:13px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px 32px}
 .pgtee__hd{display:flex;align-items:center;gap:12px}
 .pgtee__shield{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;flex-shrink:0;box-shadow:0 8px 18px rgba(248,80,0,.28)}
@@ -869,42 +869,65 @@ img,svg{display:block}
 /* ===== drag-and-drop formula composer ===== */
 .cmp{margin-top:8px}
 .cmp__tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.cmp__tier{position:relative;text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;transition:border .2s,box-shadow .2s,transform .15s}
+.cmp__tier{position:relative;display:flex;align-items:center;gap:13px;text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:15px 18px;transition:border .2s,box-shadow .2s,transform .15s}
 .cmp__tier:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.07)}
 .cmp__tier.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
-.cmp__tier b{font-size:17px;font-weight:900;letter-spacing:-.02em;display:flex;align-items:baseline;gap:7px}
-.cmp__tier .cmp__tprice{margin-left:auto;font-size:18px;font-weight:900;letter-spacing:-.03em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.cmp__tier span{font-size:12.5px;color:var(--grey);font-weight:600;display:block;margin-top:3px}
-.cmp__tier .cmp__pop{position:absolute;top:-9px;right:14px;font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--grad);padding:3px 9px;border-radius:100px;box-shadow:0 4px 10px rgba(248,80,0,.3)}
-.cmp__board{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
+.cmp__tlogo{height:34px;width:auto;max-width:42px;object-fit:contain;flex-shrink:0}
+.cmp__tinfo{flex:1;min-width:0}
+.cmp__tinfo b{font-size:16px;font-weight:900;letter-spacing:-.02em;display:block}
+.cmp__tinfo span{font-size:11.5px;color:var(--grey);font-weight:600;display:block;margin-top:2px}
+.cmp__tprice{font-size:19px;font-weight:900;letter-spacing:-.03em;flex-shrink:0;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cmp__pop{position:absolute;top:-9px;right:14px;font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--grad);padding:3px 9px;border-radius:100px;box-shadow:0 4px 10px rgba(248,80,0,.3)}
+.cmp__board{display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:start}
 .cmp__palette{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.05);position:sticky;top:16px}
-.cmp__lbl{font-size:12.5px;font-weight:700;color:var(--grey);display:block;margin-bottom:12px;line-height:1.4}
-.cmp__lbl em{font-style:normal;font-weight:600;opacity:.8}
+.cmp__lbl{font-size:12.5px;font-weight:800;color:var(--ink);display:block;margin-bottom:12px;line-height:1.45}
+.cmp__lbl em{font-style:normal;font-weight:600;color:var(--grey);display:block;margin-top:3px}
 .cmp__cards{display:flex;flex-direction:column;gap:10px}
-.cmp__card{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1.5px solid var(--line);border-radius:14px;background:var(--soft);cursor:grab;user-select:none;transition:border .2s,box-shadow .2s,transform .15s,background .2s}
-.cmp__card:hover{transform:translateY(-1px);border-color:rgba(248,80,0,.5)}
+.cmp__card{display:flex;align-items:center;gap:11px;padding:12px 13px;border:1.5px solid var(--line);border-radius:14px;background:var(--soft);cursor:grab;user-select:none;touch-action:none;transition:border .2s,box-shadow .2s,transform .15s,background .2s}
+.cmp__card:hover{transform:translateY(-1px);border-color:var(--orange);box-shadow:0 8px 20px rgba(248,80,0,.1)}
 .cmp__card:active{cursor:grabbing}
-.cmp__card.picked{border-color:var(--orange);background:#fff;box-shadow:0 0 0 2px rgba(248,80,0,.14)}
-.cmp__card .cmp__ic{width:30px;height:24px;display:grid;place-items:center;flex-shrink:0}
-.cmp__card .cmp__ic svg{width:100%;height:100%;color:var(--ink)}
+.cmp__card .cmp__grip{margin-left:auto;color:#c4c4c4;flex-shrink:0}
+.cmp__card .cmp__grip svg{width:16px;height:16px;display:block}
+.cmp__ic{width:30px;height:24px;display:grid;place-items:center;flex-shrink:0}
+.cmp__ic svg{width:100%;height:100%}
 .cmp__card b{font-size:14px;font-weight:800;display:block;line-height:1.1}
 .cmp__card small{font-size:11px;color:var(--grey);font-weight:600}
 .cmp__tray{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 14px 40px rgba(0,0,0,.05)}
 .cmp__trayhd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
 .cmp__trayhd b{font-size:18px;font-weight:900;letter-spacing:-.02em}
 .cmp__trayhd span{font-size:13px;color:var(--grey);font-weight:700;text-align:right}
-.cmp__slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-bottom:18px}
-.cmp__slot{position:relative;aspect-ratio:1/1.04;border:1.5px dashed var(--line);border-radius:14px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:border .15s,box-shadow .15s,background .15s,transform .12s}
-.cmp__slot.over{border-color:var(--orange);border-style:solid;background:#fff;box-shadow:0 0 0 2px rgba(248,80,0,.16);transform:scale(1.03)}
-.cmp__slot.filled{border-style:solid;border-color:rgba(0,0,0,.12)}
-.cmp__slot .cmp__sic{width:38px;height:30px;display:grid;place-items:center}
-.cmp__slot .cmp__sic svg{width:100%;height:100%;color:var(--ink)}
+.cmp__slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-bottom:16px}
+.cmp__slot{position:relative;aspect-ratio:1/1.04;border:2px dashed rgba(0,0,0,.16);border-radius:14px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:border .15s,box-shadow .15s,background .15s,transform .12s}
+.cmp__slot.empty{cursor:pointer}
+.cmp__slot.empty .cmp__plus{font-size:26px;font-weight:300;color:#c0c0c0;line-height:1}
+.cmp__slot.empty:hover{border-color:rgba(248,80,0,.5);background:#fff}
+.cmp__slot.over{border-color:var(--orange);border-style:solid;background:#fff;box-shadow:0 0 0 3px rgba(248,80,0,.18);transform:scale(1.04)}
+.cmp__slot.filled{border-style:solid;border-color:rgba(0,0,0,.1);background:#fff}
+.cmp__slot .cmp__sic{width:40px;height:32px;display:grid;place-items:center}
+.cmp__slot .cmp__sic svg{width:100%;height:100%}
 .cmp__slot small{font-size:11.5px;font-weight:800;color:#222}
-.cmp__slot .cmp__free{position:absolute;top:6px;right:6px;font-size:8.5px;font-weight:800;letter-spacing:.03em;color:#3d2a00;background:linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a);padding:2px 6px;border-radius:100px}
+.cmp__slot .cmp__free{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;letter-spacing:.03em;color:#3d2a00;background:linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a);padding:2px 7px;border-radius:100px;white-space:nowrap}
+.cmp__rm{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;border:none;background:#111;color:#fff;font-size:12px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:transform .15s,background .2s;z-index:2}
+.cmp__rm:hover{transform:scale(1.12);background:var(--orange)}
+.cmp__brand{margin-bottom:16px}
+.cmp__bcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font-family:inherit;padding:13px 15px;border:1.5px solid var(--line);border-radius:14px;background:var(--soft);cursor:pointer;transition:border .2s,box-shadow .2s,background .2s}
+.cmp__bcard:hover{border-color:var(--orange)}
+.cmp__bcard.on{border-color:var(--orange);background:#fff;box-shadow:0 0 0 2px rgba(248,80,0,.12)}
+.cmp__bcard.locked{cursor:default;border-color:rgba(248,80,0,.45);background:linear-gradient(100deg,#fff,#fff6f1)}
+.cmp__bbody{flex:1;min-width:0}
+.cmp__bbody b{font-size:14.5px;font-weight:800;display:block}
+.cmp__bbody small{font-size:11.5px;color:var(--grey);font-weight:600}
+.cmp__bctl{font-size:13px;font-weight:800;color:var(--orange);white-space:nowrap}
+.cmp__bcard.on .cmp__bctl{color:#15803d}
+.cmp__binc{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:var(--grad);padding:5px 11px;border-radius:100px}
 .cmp__foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line)}
 .cmp__price b{font-size:34px;font-weight:900;letter-spacing:-.03em}
 .cmp__price em{font-style:normal;font-size:12.5px;color:var(--grey);font-weight:600;margin-left:8px}
-@media(max-width:760px){.cmp__board{grid-template-columns:1fr}.cmp__palette{position:static}.cmp__cards{flex-direction:row;flex-wrap:wrap}.cmp__card{flex:1;min-width:128px}.cmp__tiers{grid-template-columns:1fr}}
+#cmpGo:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
+.cmp__ghost{position:fixed;z-index:9999;pointer-events:none;display:flex;align-items:center;gap:9px;padding:10px 14px;background:#fff;border:1.5px solid var(--orange);border-radius:12px;box-shadow:0 16px 36px rgba(0,0,0,.22);transform:translate(-50%,-50%) rotate(-3deg);font-weight:800;font-size:13px}
+.cmp__ghost .cmp__ic{width:26px;height:21px}
+body.cmp-dragging{cursor:grabbing}
+@media(max-width:760px){.cmp__board{grid-template-columns:1fr}.cmp__palette{position:static}.cmp__cards{flex-direction:row;flex-wrap:wrap}.cmp__card{flex:1;min-width:140px}.cmp__tiers{grid-template-columns:1fr}}
 
 /* custom band */
 .pack__custom{display:flex;flex-direction:column;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px 32px}
@@ -1859,21 +1882,22 @@ html{overflow-x:hidden}
   <div class="wrap">
     <div class="pack__head reveal">
       <h2 class="h-lg">Compose<br>your formula.</h2>
-      <p class="lead">Pick a formula, then drag your modules into it. One simple price per formula, paid once, you decide the mix: decks, stories, statics and your brand system, however you want them.</p>
+      <p class="lead">Pick a formula, then drag your modules into the slots, decks, stories and statics, in whatever mix you want. One simple price per formula, paid once. Branding is an add-on, and it's included free in Meteor.</p>
     </div>
 
     <div class="cmp reveal" id="composer">
       <div class="cmp__tiers" id="cmpTiers"></div>
       <div class="cmp__board">
         <div class="cmp__palette">
-          <span class="cmp__lbl">Drag a module into your formula <em>(or tap it, then tap a slot)</em></span>
+          <span class="cmp__lbl">Drag a module into a slot <em>or tap a module to drop it in the next slot. Tap ✕ to remove.</em></span>
           <div class="cmp__cards" id="cmpCards"></div>
         </div>
         <div class="cmp__tray">
           <div class="cmp__trayhd"><b id="cmpTitle">Your formula</b><span id="cmpMix"></span></div>
           <div class="cmp__slots" id="cmpSlots"></div>
+          <div class="cmp__brand" id="cmpBrand"></div>
           <div class="cmp__foot">
-            <div class="cmp__price"><b id="cmpPrice">$240</b><em>paid once · everything included</em></div>
+            <div class="cmp__price"><b id="cmpPrice">$240</b><em id="cmpPnote">paid once</em></div>
             <button type="button" class="btn btn--grad" id="cmpGo">Start this formula →</button>
           </div>
         </div>
@@ -2020,73 +2044,122 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 (function(){
   const root=document.getElementById('composer'); if(!root) return;
   const TIERS=[
-    {key:'starter',n:3, price:120,name:'Ember', sub:'3 elements'},
-    {key:'flame',  n:6, price:240,name:'Flame', sub:'6 elements', popular:true},
-    {key:'burst',  n:10,price:350,name:'Meteor',sub:'9 + 1 free (10)', free:1},
+    {key:'starter',n:3, price:120,name:'Ember', logo:'assets/plans/ember.svg',  sub:'3 elements · paid once'},
+    {key:'flame',  n:6, price:240,name:'Flame', logo:'assets/plans/flame.svg',  sub:'6 elements · paid once', popular:true},
+    {key:'burst',  n:10,price:350,name:'Meteor',logo:'assets/plans/meteor.svg', sub:'9 + 1 free · branding included', free:1, brandIncluded:true},
   ];
   const MODS={
-    carousel:{label:'Deck',     sub:'6–10 slides', svg:'#ic-decks',vb:'0 0 140 94'},
-    story:   {label:'Story',    sub:'9:16 set',    svg:'#ic-story',vb:'0 0 134 122'},
-    static:  {label:'Static',   sub:'single post', svg:'#ic-decks',vb:'0 0 140 94'},
-    branding:{label:'Branding', sub:'brand block', svg:'#ic-brand',vb:'0 0 120 120'},
+    carousel:{label:'Deck',   sub:'6–10 slides', svg:'#ic-decks',vb:'0 0 140 94'},
+    story:   {label:'Story',  sub:'9:16 set',    svg:'#ic-story',vb:'0 0 134 122'},
+    static:  {label:'Static', sub:'single post', svg:'#ic-decks',vb:'0 0 140 94'},
   };
-  const ORDER=['carousel','story','static','branding'];
-  const SING={carousel:'deck',story:'story',static:'static',branding:'branding'};
-  const PLURAL={carousel:'decks',story:'stories',static:'statics',branding:'branding'};
+  const BRAND={label:'Social media branding',sub:'Profile photo, banners & CTAs',svg:'#ic-brand',vb:'0 0 120 120',price:210};
+  const ORDER=['carousel','story','static'];
+  const SING={carousel:'deck',story:'story',static:'static'};
+  const PLURAL={carousel:'decks',story:'stories',static:'statics'};
   const noun=(k,n)=>n>1?PLURAL[k]:SING[k];
   const fmt=n=>'$'+n.toLocaleString('en-US');
-  const ic=k=>`<svg viewBox="${MODS[k].vb}" fill="none"><use href="${MODS[k].svg}"/></svg>`;
-  let tierKey='flame', slots=[], picked=null;
+  const ic=m=>`<svg viewBox="${m.vb}" fill="none"><use href="${m.svg}"/></svg>`;
+  const grip='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';
+  let tierKey='flame', slots=[], brandingOn=false;
   const tier=()=>TIERS.find(t=>t.key===tierKey);
-  function reset(){ slots=Array(tier().n).fill('carousel'); }
-  function setSlot(i,k){ if(!MODS[k]) return; if(k==='branding') slots.forEach((v,j)=>{ if(v==='branding'&&j!==i) slots[j]='carousel'; }); slots[i]=k; }
-  function counts(){ const c={}; slots.forEach(k=>c[k]=(c[k]||0)+1); return c; }
+  const brandIncluded=()=>!!tier().brandIncluded;
+  const brandActive=()=>brandIncluded()||brandingOn;
+  const filled=()=>slots.filter(Boolean).length;
+  function reset(){ slots=Array(tier().n).fill(null); brandingOn=false; }   // EMPTY slots, no pre-fill
+  function counts(){ const c={}; slots.forEach(k=>{ if(k) c[k]=(c[k]||0)+1; }); return c; }
+  function price(){ return tier().price + (brandingOn&&!brandIncluded()?BRAND.price:0); }
 
   const elTiers=document.getElementById('cmpTiers'), elCards=document.getElementById('cmpCards'),
-        elSlots=document.getElementById('cmpSlots'), elMix=document.getElementById('cmpMix'),
-        elPrice=document.getElementById('cmpPrice'), elTitle=document.getElementById('cmpTitle');
+        elSlots=document.getElementById('cmpSlots'), elBrand=document.getElementById('cmpBrand'),
+        elMix=document.getElementById('cmpMix'), elPrice=document.getElementById('cmpPrice'),
+        elTitle=document.getElementById('cmpTitle'), elPnote=document.getElementById('cmpPnote'),
+        elGo=document.getElementById('cmpGo');
 
   function renderTiers(){
     elTiers.innerHTML=TIERS.map(t=>`<button type="button" class="cmp__tier ${t.key===tierKey?'on':''}" data-tier="${t.key}">
       ${t.popular?'<span class="cmp__pop">Most popular</span>':''}
-      <b>${t.name}<span class="cmp__tprice">${fmt(t.price)}</span></b>
-      <span>${t.sub} · paid once</span></button>`).join('');
+      <img class="cmp__tlogo" src="${t.logo}" alt="${t.name}">
+      <span class="cmp__tinfo"><b>${t.name}</b><span>${t.sub}</span></span>
+      <span class="cmp__tprice">${fmt(t.price)}</span></button>`).join('');
   }
   function renderCards(){
-    elCards.innerHTML=ORDER.map(k=>`<div class="cmp__card ${picked===k?'picked':''}" draggable="true" data-card="${k}">
-      <span class="cmp__ic">${ic(k)}</span><span><b>${MODS[k].label}</b><small>${MODS[k].sub}</small></span></div>`).join('');
+    elCards.innerHTML=ORDER.map(k=>`<div class="cmp__card" data-card="${k}">
+      <span class="cmp__ic">${ic(MODS[k])}</span><span><b>${MODS[k].label}</b><small>${MODS[k].sub}</small></span>
+      <span class="cmp__grip" aria-hidden="true">${grip}</span></div>`).join('');
   }
   function renderSlots(){
     elSlots.innerHTML=slots.map((k,i)=>{
       const free=tier().free&&i===slots.length-1;
-      return `<div class="cmp__slot filled ${k==='branding'?'is-brand':''}" data-slot="${i}">
-        ${free?'<span class="cmp__free">+1 FREE</span>':''}
-        <span class="cmp__sic">${ic(k)}</span><small>${MODS[k].label}</small></div>`;
+      if(!k) return `<div class="cmp__slot empty" data-slot="${i}">${free?'<span class="cmp__free">+1 FREE</span>':''}<span class="cmp__plus">+</span></div>`;
+      return `<div class="cmp__slot filled" data-slot="${i}"><button type="button" class="cmp__rm" data-rm="${i}" aria-label="Remove">✕</button>${free?'<span class="cmp__free">+1 FREE</span>':''}<span class="cmp__sic">${ic(MODS[k])}</span><small>${MODS[k].label}</small></div>`;
     }).join('');
   }
-  function renderRecap(){
-    const c=counts();
-    elMix.textContent=ORDER.filter(k=>c[k]).map(k=>`${c[k]} ${noun(k,c[k])}`).join(' · ');
-    elPrice.textContent=fmt(tier().price);
-    elTitle.textContent=`${tier().name} · ${tier().n} elements`;
+  function renderBrand(){
+    const inc=brandIncluded();
+    elBrand.innerHTML=`<button type="button" class="cmp__bcard ${brandActive()?'on':''} ${inc?'locked':''}" ${inc?'':'data-brand'}>
+      <span class="cmp__ic">${ic(BRAND)}</span>
+      <span class="cmp__bbody"><b>${BRAND.label}</b><small>${BRAND.sub}</small></span>
+      ${inc?'<span class="cmp__binc">Included</span>':`<span class="cmp__bctl">${brandingOn?'✓ Added '+fmt(BRAND.price):'+ Add '+fmt(BRAND.price)}</span>`}</button>`;
   }
-  function renderAll(){ renderTiers(); renderCards(); renderSlots(); renderRecap(); }
+  function renderRecap(){
+    const c=counts(), n=filled(), N=tier().n, full=n===N;
+    const parts=ORDER.filter(k=>c[k]).map(k=>`${c[k]} ${noun(k,c[k])}`);
+    if(brandActive()) parts.push('branding');
+    elMix.textContent=parts.join(' · ');
+    elPrice.textContent=fmt(price());
+    elTitle.textContent=`${tier().name} · ${n}/${N} placed`;
+    elGo.disabled=!full;
+    elPnote.textContent=full?(brandActive()?'paid once · branding included':'paid once'):`place ${N-n} more element${N-n>1?'s':''}`;
+  }
+  function renderAll(){ renderTiers(); renderCards(); renderSlots(); renderBrand(); renderRecap(); }
+
+  function quickAdd(k){ const i=slots.indexOf(null); if(i<0)return; slots[i]=k; renderSlots(); renderRecap(); }
+
+  // ----- pointer-based drag (mouse + touch), with a floating ghost -----
+  let drag=null;
+  function startDrag(k,x,y){
+    drag={k};
+    const g=document.createElement('div'); g.className='cmp__ghost';
+    g.innerHTML=`<span class="cmp__ic">${ic(MODS[k])}</span>${MODS[k].label}`;
+    document.body.appendChild(g); drag.g=g; document.body.classList.add('cmp-dragging'); moveGhost(x,y);
+  }
+  function moveGhost(x,y){ if(drag){ drag.g.style.left=x+'px'; drag.g.style.top=y+'px'; } }
+  function hover(x,y){
+    elSlots.querySelectorAll('.over').forEach(s=>s.classList.remove('over'));
+    const el=document.elementFromPoint(x,y), s=el&&el.closest('[data-slot]');
+    if(s&&elSlots.contains(s)) s.classList.add('over');
+    return s;
+  }
+  function endDrag(x,y){
+    if(!drag)return; drag.g.style.display='none';
+    const el=document.elementFromPoint(x,y), s=el&&el.closest('[data-slot]');
+    if(s&&elSlots.contains(s)) slots[+s.dataset.slot]=drag.k;
+    drag.g.remove(); drag=null; document.body.classList.remove('cmp-dragging');
+    elSlots.querySelectorAll('.over').forEach(s=>s.classList.remove('over'));
+    renderSlots(); renderRecap();
+  }
+  elCards.addEventListener('pointerdown',e=>{
+    const c=e.target.closest('[data-card]'); if(!c)return; e.preventDefault();
+    const k=c.dataset.card, sx=e.clientX, sy=e.clientY; let moved=false;
+    function mv(ev){ if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>6){moved=true;startDrag(k,ev.clientX,ev.clientY);} if(moved){moveGhost(ev.clientX,ev.clientY);hover(ev.clientX,ev.clientY);} }
+    function up(ev){ document.removeEventListener('pointermove',mv); document.removeEventListener('pointerup',up); if(moved) endDrag(ev.clientX,ev.clientY); else quickAdd(k); }
+    document.addEventListener('pointermove',mv); document.addEventListener('pointerup',up);
+  });
 
   // tier select
   elTiers.addEventListener('click',e=>{ const b=e.target.closest('[data-tier]'); if(!b)return; tierKey=b.dataset.tier; reset(); renderAll(); });
-  // palette: click to pick (mobile / no-drag fallback)
-  elCards.addEventListener('click',e=>{ const c=e.target.closest('[data-card]'); if(!c)return; picked=picked===c.dataset.card?null:c.dataset.card; renderCards(); });
-  // palette: native drag
-  elCards.addEventListener('dragstart',e=>{ const c=e.target.closest('[data-card]'); if(!c)return; e.dataTransfer.setData('text/plain',c.dataset.card); e.dataTransfer.effectAllowed='copy'; });
-  // slots: drop targets + click-to-place
-  elSlots.addEventListener('dragover',e=>{ const s=e.target.closest('[data-slot]'); if(!s)return; e.preventDefault(); s.classList.add('over'); });
-  elSlots.addEventListener('dragleave',e=>{ const s=e.target.closest('[data-slot]'); if(s)s.classList.remove('over'); });
-  elSlots.addEventListener('drop',e=>{ const s=e.target.closest('[data-slot]'); if(!s)return; e.preventDefault(); const k=e.dataTransfer.getData('text/plain'); setSlot(+s.dataset.slot,k); renderSlots(); renderRecap(); });
-  elSlots.addEventListener('click',e=>{ const s=e.target.closest('[data-slot]'); if(!s||!picked)return; setSlot(+s.dataset.slot,picked); renderSlots(); renderRecap(); });
+  // slots: tap empty to add next module-of-choice (defaults to deck), ✕ to remove
+  elSlots.addEventListener('click',e=>{
+    const rm=e.target.closest('[data-rm]'); if(rm){ slots[+rm.dataset.rm]=null; renderSlots(); renderRecap(); return; }
+    const s=e.target.closest('.cmp__slot.empty'); if(s){ slots[+s.dataset.slot]='carousel'; renderSlots(); renderRecap(); }
+  });
+  // branding upsell toggle (locked/included on Meteor)
+  elBrand.addEventListener('click',e=>{ if(!e.target.closest('[data-brand]'))return; brandingOn=!brandingOn; renderBrand(); renderRecap(); });
 
-  document.getElementById('cmpGo').addEventListener('click',()=>{
-    const mix=counts();
-    sessionStorage.setItem('brasero_formula',JSON.stringify({plan:tierKey,planName:tier().name,price:tier().price,mix}));
+  elGo.addEventListener('click',()=>{
+    if(filled()!==tier().n) return;
+    sessionStorage.setItem('brasero_formula',JSON.stringify({plan:tierKey,planName:tier().name,price:price(),mix:counts(),branding:brandActive(),brandingIncluded:brandIncluded()}));
     location.href='checkout.html';
   });
 

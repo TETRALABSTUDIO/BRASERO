@@ -1,17 +1,21 @@
-import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId, addonLineItems, addonKeys, ITEMS, cartItems } from './_lib.js';
+import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId, addonLineItems, addonKeys, ITEMS, cartItems, MODULES } from './_lib.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, mix } = req.body || {};
+    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, mix, branding } = req.body || {};
     const SITE = siteUrl(req);
 
     // Tier formula ("compose your formula"): pack-priced (3 / 6 / 9+1), one-time payment.
-    // The price comes ONLY from the chosen tier (plan); `mix` is the composition the
-    // client dragged together and just defines which deck rows to seed, never the price.
+    // Price = the chosen tier; `mix` is the content composition the client dragged (decks/
+    // stories/statics) and only defines which deck rows to seed. Branding is an upsell
+    // (+$210) on Ember/Flame, and INCLUDED free on Meteor (burst).
     if (plan && PLANS[plan] && mix && !addon_ref) {
-      const compact = {};
-      for (const it of cartItems(mix)) compact[it.key] = it.qty;     // sanitized {key:qty}
+      const content = {};
+      for (const it of cartItems(mix)) if (it.type !== 'branding') content[it.key] = it.qty;
+      const brandIncluded = plan === 'burst';
+      const brandCharged = !!branding && !brandIncluded;          // only Ember/Flame pay for it
+      const seedMix = { ...content, ...((brandIncluded || !!branding) ? { branding: 1 } : {}) };
       let line_items, amount;
       const priceId = stripePriceId(plan, 'once') || process.env.STRIPE_PRICE_ID;
       if (priceId) {
@@ -22,6 +26,10 @@ export default async function handler(req, res) {
         amount = amountFor(plan, 'once');
         line_items = [{ quantity: 1, price_data: { currency: 'usd', unit_amount: amount, product_data: { name: `Brasero - ${PLANS[plan].name} formula` } } }];
       }
+      if (brandCharged) {
+        amount += MODULES.branding.unit;
+        line_items.push({ quantity: 1, price_data: { currency: 'usd', unit_amount: MODULES.branding.unit, product_data: { name: 'Brasero - Social media branding' } } });
+      }
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         customer_email: email || undefined,
@@ -29,7 +37,7 @@ export default async function handler(req, res) {
         line_items,
         success_url: `${SITE}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${SITE}/checkout.html`,
-        metadata: { plan, billing: 'once', mix: JSON.stringify(compact), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
+        metadata: { plan, billing: 'once', mix: JSON.stringify(seedMix), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
       });
       try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing: 'once', amount, name, email, instagram, handle }); }
       catch (e) { console.error('saveOrder failed', e); }
