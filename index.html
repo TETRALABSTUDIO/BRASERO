@@ -206,10 +206,10 @@ img,svg{display:block}
 @media(max-width:560px){.hslide{width:208px}.hslide.s2{--tx:-92%;--ty:-66%}.hslide.s3{--tx:-8%;--ty:-30%}.hchip,.hmini,.hgig{display:none}}
 
 /* ===== COLLECTION (dark) ===== */
-.collection{padding:118px 0 96px;overflow:visible;position:relative}
+.collection{padding:118px 0 96px;overflow:visible;position:relative;background:#fff}
 .collection>.wrap{position:relative;z-index:1}
-/* the dark section above continues down behind the widget: flat top (seamless with #why), slanted bottom edge so the widget overhangs onto the cream */
-.collection::before{content:"";position:absolute;left:0;right:0;top:0;height:480px;background:var(--black);clip-path:polygon(0 0,100% 0,100% 13%,0 100%);z-index:0}
+/* the dark section above continues down behind the widget: flat top (seamless with #why), gently slanted bottom edge that stays above the heading, so the widget overhangs onto the white */
+.collection::before{content:"";position:absolute;left:0;right:0;top:0;height:215px;background:var(--black);clip-path:polygon(0 0,100% 0,100% 75%,0 100%);z-index:0}
 .cwrap{display:grid;grid-template-columns:1.22fr .78fr;gap:54px;align-items:center}
 .cright{order:-1;position:relative}
 .cright::after{display:none}
