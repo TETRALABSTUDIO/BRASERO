@@ -872,7 +872,8 @@ img,svg{display:block}
 .cmp__bill button{font-family:inherit;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:800;color:var(--grey);padding:8px 15px;border-radius:100px;transition:color .25s,background .25s,box-shadow .25s;display:inline-flex;align-items:center;gap:6px}
 .cmp__bill button.on{color:#fff;background:var(--grad);box-shadow:0 6px 14px rgba(248,80,0,.28)}
 .cmp__save{font-size:10.5px;font-weight:900;color:#16a34a}.cmp__bill button.on .cmp__save{color:#fff}
-.cmp__plabel{display:block;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--orange);margin-bottom:9px}
+.cmp__plabel{display:block;font-size:15px;font-weight:900;letter-spacing:-.01em;color:var(--ink);margin-bottom:11px}
+.cmp__plabel:not(:first-child){margin-top:4px}
 .cmp__tiers{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
 .cmp__tier{position:relative;display:flex;align-items:center;gap:12px;text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1.5px solid var(--line);border-radius:15px;padding:12px 14px;transition:border .2s,box-shadow .2s,transform .15s}
 .cmp__tier:hover{border-color:rgba(248,80,0,.5);box-shadow:0 8px 20px rgba(0,0,0,.06)}
@@ -902,6 +903,10 @@ img,svg{display:block}
 .cmp__trayhd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
 .cmp__trayhd b{font-size:18px;font-weight:900;letter-spacing:-.02em}
 .cmp__trayhd span{font-size:13px;color:var(--grey);font-weight:700;text-align:right}
+#cmpMix{display:inline-flex;align-items:center;gap:13px;flex-wrap:wrap;justify-content:flex-end}
+.cmp__mixi{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:800;color:#222}
+.cmp__mixic{width:21px;height:17px;display:inline-grid;place-items:center}
+.cmp__mixic svg{width:100%;height:100%}
 .cmp__slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-bottom:16px}
 .cmp__slot{position:relative;aspect-ratio:1/1.04;border:2px dashed rgba(0,0,0,.16);border-radius:14px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:border .15s,box-shadow .15s,background .15s,transform .12s}
 .cmp__slot.empty{cursor:pointer}
@@ -935,25 +940,30 @@ img,svg{display:block}
 .cmp__binc svg{width:13px;height:13px}
 .cmp__bsave{display:inline-block;font-size:10.5px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:#15803d;background:rgba(22,163,74,.12);padding:3px 9px;border-radius:100px;margin-left:6px;vertical-align:middle}
 .cmp__bopt{font-size:12px;font-weight:700;color:var(--grey);white-space:nowrap;flex-shrink:0}
-.cmp__ball{font-family:inherit;font-size:12px;font-weight:800;color:var(--orange);background:none;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;padding:6px 4px;text-decoration:underline;text-underline-offset:3px}
-.cmp__bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:0;padding:14px 0 0;border-top:1px solid var(--line);width:100%}
-.cmp__bcard.locked .cmp__bgrid{border-top-color:rgba(248,80,0,.18)}
-.cmp__bplat{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:12px 12px;cursor:pointer;transition:border .18s,box-shadow .18s,transform .12s}
-.cmp__bplat[data-plat]:hover{border-color:rgba(248,80,0,.55);transform:translateY(-2px)}
-.cmp__bplat.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
+.cmp__ball{font-family:inherit;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:900;color:#fff;background:var(--grad);border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;padding:9px 15px;border-radius:100px;box-shadow:0 6px 14px rgba(248,80,0,.28);transition:transform .15s,box-shadow .2s}
+.cmp__ball:hover{transform:translateY(-1px);box-shadow:0 9px 20px rgba(248,80,0,.34)}
+.cmp__ball.is-clear{background:#f1f1f1;color:#555;box-shadow:none}
+.cmp__ball .cmp__bsave{margin:0;background:rgba(255,255,255,.22);color:#fff}
+.cmp__bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:0;padding:0;width:100%}
+.cmp__bplat{position:relative;background:var(--soft);border:1.5px solid var(--line);border-radius:14px;padding:13px 13px 14px;cursor:pointer;transition:border .18s,box-shadow .18s,transform .12s,background .18s}
+.cmp__bplat[data-plat]:hover{border-color:rgba(248,80,0,.55);background:#fff;transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.06)}
+.cmp__bplat.on{border-color:var(--orange);background:#fff;box-shadow:0 0 0 2px rgba(248,80,0,.14)}
 .cmp__bplat.locked{cursor:default}
-.cmp__bplath{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:900;letter-spacing:-.01em;margin-bottom:9px}
-.cmp__bpic{width:23px;height:23px;border-radius:7px;flex-shrink:0;display:grid;place-items:center;background:var(--grad);box-shadow:0 4px 9px rgba(248,80,0,.25)}
-.cmp__bpic svg{width:13px;height:13px;color:#fff}
-.cmp__bpprice{margin-left:auto;font-size:11.5px;font-weight:900;color:var(--orange);flex-shrink:0;display:inline-flex;align-items:center}
-.cmp__bplat.on .cmp__bpprice{color:#15803d}
-.cmp__bpprice svg{width:15px;height:15px}
+.cmp__bplath{display:flex;flex-direction:column;align-items:flex-start;gap:9px;margin-bottom:11px}
+.cmp__bptop{display:flex;align-items:center;gap:8px;width:100%}
+.cmp__bptop b{font-size:13px;font-weight:900;letter-spacing:-.01em}
+.cmp__bpic{width:27px;height:27px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;background:var(--grad);box-shadow:0 4px 9px rgba(248,80,0,.25)}
+.cmp__bpic svg{width:15px;height:15px;color:#fff}
+.cmp__bpprice{margin-left:auto;font-size:11px;font-weight:900;color:var(--orange);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(248,80,0,.1);border-radius:100px;padding:3px 9px;min-width:40px}
+.cmp__bplat.on .cmp__bpprice{color:#fff;background:#15803d;padding:3px 6px}
+.cmp__bpprice svg{width:14px;height:14px}
 .cmp__bplat ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin:0;padding:0}
-.cmp__bplat li{position:relative;padding-left:14px;font-size:11.5px;font-weight:600;color:#444;line-height:1.3}
-.cmp__bplat li::before{content:"";position:absolute;left:2px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--orange)}
+.cmp__bplat li{position:relative;padding-left:15px;font-size:11.5px;font-weight:600;color:#444;line-height:1.3}
+.cmp__bplat li::before{content:"";position:absolute;left:3px;top:5px;width:6px;height:6px;border-radius:50%;border:1.5px solid var(--orange);background:transparent}
+.cmp__bplat.on li::before{background:var(--orange)}
 .cmp__per{font-size:15px;font-weight:700;color:var(--grey);margin-left:3px}
 @media(max-width:680px){.cmp__bgrid{grid-template-columns:repeat(2,1fr)}}
-.cmp__foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line)}
+.cmp__foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:16px}
 .cmp__price b{font-size:34px;font-weight:900;letter-spacing:-.03em}
 .cmp__price em{font-style:normal;font-size:12.5px;color:var(--grey);font-weight:600;margin-left:8px}
 #cmpGo:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
@@ -1922,9 +1932,9 @@ html{overflow-x:hidden}
       <div class="cmp__board">
         <div class="cmp__palette">
           <div class="cmp__bill" id="cmpBill"></div>
-          <span class="cmp__plabel">1 · Pick a formula</span>
+          <span class="cmp__plabel">1. Pick your formula</span>
           <div class="cmp__tiers" id="cmpTiers"></div>
-          <span class="cmp__plabel">2 · Fill it with modules</span>
+          <span class="cmp__plabel">2. Add your modules</span>
           <span class="cmp__lbl">Drag a module into a slot <em>or tap a module to drop it in the next slot. Tap ✕ to remove.</em></span>
           <div class="cmp__cards" id="cmpCards"></div>
         </div>
@@ -2163,9 +2173,9 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     const save=BRAND.per*BPLATS.length-BRAND.price;
     let ctl;
     if(inc) ctl='<span class="cmp__binc">'+chkSvg+'Included free</span>';
-    else if(n) ctl=`<span class="cmp__bctl">${fmt(brandingExtra())}${all?` <span class="cmp__bsave">save ${fmt(save)}</span>`:''}</span>`;
+    else if(n) ctl=`<span class="cmp__bctl">${fmt(brandingExtra())}</span>`;
     else ctl='<span class="cmp__bopt">Optional add-on</span>';
-    const allBtn=inc?'':`<button type="button" class="cmp__ball" data-ball>${all?'Clear':`All 5 · ${fmt(BRAND.price)}`}</button>`;
+    const allBtn=inc?'':`<button type="button" class="cmp__ball ${all?'is-clear':''}" data-ball>${all?'Clear all':`All 5 · ${fmt(BRAND.price)} <span class="cmp__bsave">Save ${fmt(save)}</span>`}</button>`;
     elBrand.innerHTML=`<div class="cmp__bcard ${brandActive()?'on':''} ${inc?'locked':''}">
       <span class="cmp__bhead">
         <span class="cmp__ic cmp__bic">${ic(BRAND)}</span>
@@ -2176,15 +2186,15 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
         const on=inc||brandSel.has(p.key);
         const tag=inc?'':`<span class="cmp__bpprice">${brandSel.has(p.key)?chkSvg:'+'+fmt(BRAND.per)}</span>`;
         return `<div class="cmp__bplat ${on?'on':''} ${inc?'locked':''}" ${inc?'':`data-plat="${p.key}"`}>
-          <span class="cmp__bplath"><span class="cmp__bpic">${p.ic}</span>${p.name}${tag}</span>
+          <span class="cmp__bplath"><span class="cmp__bptop"><span class="cmp__bpic">${p.ic}</span><b>${p.name}</b>${tag}</span></span>
           <ul>${p.feats.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
       }).join('')}</div></div>`;
   }
   function renderRecap(){
     const c=counts(), n=filled(), N=tier().n, full=n===N, sub=billing==='sub';
-    const parts=ORDER.filter(k=>c[k]).map(k=>`${c[k]} ${noun(k,c[k])}`);
-    if(brandActive()) parts.push('branding');
-    elMix.textContent=parts.join(' · ');
+    const parts=ORDER.filter(k=>c[k]).map(k=>`<span class="cmp__mixi" title="${c[k]} ${noun(k,c[k])}"><span class="cmp__mixic">${ic(MODS[k])}</span>${c[k]}</span>`);
+    if(brandActive()) parts.push(`<span class="cmp__mixi" title="Social media branding"><span class="cmp__mixic">${ic(BRAND)}</span></span>`);
+    elMix.innerHTML=parts.join('');
     elPrice.innerHTML=sub?`${fmt(formulaPrice())}<span class="cmp__per">/mo</span>`:fmt(totalOnce());
     elTitle.textContent=`${tier().name} · ${n}/${N} placed`;
     elGo.disabled=!full;
