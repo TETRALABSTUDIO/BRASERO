@@ -1080,15 +1080,21 @@ body.cmp-dragging{cursor:grabbing}
 .mkt-bar--win .mkt-bar__track{height:18px}
 .mkt-bar--win .mkt-bar__fill{background:var(--grad);box-shadow:0 0 28px rgba(248,80,0,.5)}
 .show .mkt-bar__fill{width:var(--w)}
-/* combined (carousel + single image) stacked fill */
-.mkt-bar__track--stack{display:flex;gap:2px;background:transparent}
-.mkt-bar__seg{position:relative;display:flex;align-items:center;justify-content:center;height:100%;width:0;overflow:hidden;transition:width 1.2s cubic-bezier(.22,.7,.3,1)}
-.mkt-bar__seg em{font-size:9.5px;font-weight:800;font-style:normal;letter-spacing:.02em;white-space:nowrap;color:#fff}
-.mkt-bar__seg--a{background:var(--grad);border-radius:100px 3px 3px 100px;box-shadow:0 0 28px rgba(248,80,0,.5)}
-.mkt-bar__seg--b{background:linear-gradient(90deg,rgba(248,80,0,.55),rgba(248,80,0,.32));border-radius:3px 100px 100px 3px}
-.mkt-bar__seg--b em{color:rgba(255,255,255,.92)}
-.show .mkt-bar__seg{width:var(--w)}
-.mkt-bar__beat{display:block;margin-top:12px;font-size:13px;line-height:1.5;color:#bdbdbd}
+/* combined box: carousel + statics added together */
+.mkt-win__head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:15px}
+.mkt-win__name{font-size:18px;color:#fff;font-weight:900;letter-spacing:-.02em}
+.mkt-win__val{font-size:23px;font-weight:900;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mkt-win__rows{display:flex;flex-direction:column;gap:9px}
+.mkt-srow{display:flex;align-items:center;gap:12px}
+.mkt-srow__lbl{flex:0 0 78px;font-size:12.5px;font-weight:700;color:#cfcfcf}
+.mkt-srow__lbl b{color:var(--orange);font-weight:900;margin-right:3px}
+.mkt-srow__track{flex:1;height:14px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden}
+.mkt-srow__fill{display:block;height:100%;width:0;border-radius:100px;background:var(--grad);box-shadow:0 0 20px rgba(248,80,0,.45);transition:width 1.2s cubic-bezier(.22,.7,.3,1)}
+.mkt-srow__fill--b{background:linear-gradient(90deg,rgba(248,80,0,.6),rgba(248,80,0,.35));box-shadow:none}
+.mkt-srow__val{flex:0 0 44px;font-size:13px;font-weight:900;color:#fff;text-align:right}
+.show .mkt-srow__fill{width:var(--w)}
+.mkt-bar__fill--reels{background:rgba(255,255,255,.85)}
+.mkt-bar__beat{display:block;margin-top:13px;font-size:13px;line-height:1.5;color:#bdbdbd}
 .mkt-bar__beat b{color:#fff;font-weight:900}
 .mkt-bar__beat .up{color:var(--orange)}
 /* stats strip */
@@ -1354,16 +1360,16 @@ html{overflow-x:hidden}
       </div>
       <div class="mkt-bars">
         <div class="mkt-bar mkt-bar--win">
-          <div class="mkt-bar__top"><span class="mkt-bar__name">Carousel + Single image<span class="mkt-bar__tag">What we make</span></span><span class="mkt-bar__val">0.89%</span></div>
-          <span class="mkt-bar__track mkt-bar__track--stack">
-            <i class="mkt-bar__seg mkt-bar__seg--a" style="--w:61%"><em>Carousel · 0.55%</em></i>
-            <i class="mkt-bar__seg mkt-bar__seg--b" style="--w:37%"><em>Single · 0.34%</em></i>
-          </span>
+          <div class="mkt-win__head"><span class="mkt-win__name">Carousel + Statics</span><span class="mkt-win__val">0.89%</span></div>
+          <div class="mkt-win__rows">
+            <div class="mkt-srow"><span class="mkt-srow__lbl">Carousel</span><span class="mkt-srow__track"><i class="mkt-srow__fill" style="--w:62%"></i></span><span class="mkt-srow__val">0.55%</span></div>
+            <div class="mkt-srow"><span class="mkt-srow__lbl"><b>+</b>Statics</span><span class="mkt-srow__track"><i class="mkt-srow__fill mkt-srow__fill--b" style="--w:38%"></i></span><span class="mkt-srow__val">0.34%</span></div>
+          </div>
           <span class="mkt-bar__beat">Run the two static formats together and you clear <b class="up">+71%</b> more engagement than Reels, without ever filming a thing.</span>
         </div>
         <div class="mkt-bar">
           <div class="mkt-bar__top"><span class="mkt-bar__name">Reels</span><span class="mkt-bar__val">0.52%</span></div>
-          <span class="mkt-bar__track"><i class="mkt-bar__fill" style="--w:58%"></i></span>
+          <span class="mkt-bar__track"><i class="mkt-bar__fill mkt-bar__fill--reels" style="--w:58%"></i></span>
         </div>
       </div>
     </div>
