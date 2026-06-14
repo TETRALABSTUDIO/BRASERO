@@ -226,53 +226,22 @@ a{color:inherit;text-decoration:none}
 /* localhost → local Express backend ; otherwise same-origin Vercel /api functions.
    Set to null to force the simulated demo. */
 const API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:4242':'';
-/* ===== Module catalogue (flat unit price, paid once) =====
-   Keys + prices MUST match MODULES in api/_lib.js (the server re-prices every cart). */
-const MODULES={
-  carousel: {name:'Carousel',    group:'content',  unit:40, desc:'A 6 to 10-slide swipeable deck. Hook, copywriting and design, done for you.'},
-  story:    {name:'Story',       group:'content',  unit:30, desc:'A vertical 9:16 story, designed to be tapped through.'},
-  static:   {name:'Static post', group:'content',  unit:25, desc:'A single designed post. One idea, made to be saved and shared.'},
-  branding: {name:'Social media branding', group:'branding', unit:210, toggle:true, desc:'One complete brand block: profile photo, X / LinkedIn / Facebook / YouTube banners and LinkedIn CTA buttons, all matching.'},
-};
-const GROUPS=[
-  {key:'content', title:'Your content', sub:'Decks, stories and static posts. Mix any number, any way.', keys:['carousel','story','static']},
-  {key:'branding',title:'Your brand',   sub:'A complete, matching brand system, added as one block.',    keys:['branding']},
-];
-const qp=new URLSearchParams(location.search);
+/* ===== The formula chosen on the landing (pack-priced 3/6/9+1), read from sessionStorage.
+   The mix only defines the module composition; the price is the tier price. ===== */
+const TIER_NAMES={starter:'Ember',flame:'Flame',burst:'Meteor'};
+const MOD_LABEL={carousel:'Deck',story:'Story',static:'Static post',branding:'Social media branding'};
+const MOD_PLURAL={carousel:'Decks',story:'Stories',static:'Static posts',branding:'Social media branding'};
 const fmt=n=>'$'+n.toLocaleString('en-US');
 const chk='<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#f87000"/><path d="M7 12.5l3.2 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-/* The cart: {moduleKey: qty}. Starts with a sensible 3-carousel baseline; fully editable. */
-const cart={carousel:3};
-let recapBtn=null;
-const qtyOf=k=>Math.max(0,cart[k]|0);
-const setQty=(k,n)=>{const v=Math.max(0,Math.min(99,n|0));if(v) cart[k]=v; else delete cart[k];};
-const cartArr=()=>Object.keys(MODULES).filter(k=>qtyOf(k)>0).map(k=>({key:k,qty:qtyOf(k),...MODULES[k]}));
-const cartTotal=()=>cartArr().reduce((s,it)=>s+it.unit*it.qty,0);
-const cartCount=()=>cartArr().reduce((s,it)=>s+it.qty,0);
-
-function stepperHTML(k){
-  const n=qtyOf(k);
-  return `<span class="stepper"><button type="button" data-step="${k}" data-d="-1" aria-label="Remove one" ${n?'':'disabled'}>−</button><b>${n}</b><button type="button" data-step="${k}" data-d="1" aria-label="Add one">+</button></span>`;
+function loadFormula(){
+  try{ const f=JSON.parse(sessionStorage.getItem('brasero_formula')); if(f&&f.plan&&f.mix) return f; }catch(e){}
+  return {plan:'flame',planName:'Flame',price:240,mix:{carousel:6}}; // fallback if they skip the composer
 }
-function ctlHTML(k){
-  if(MODULES[k].toggle){ const on=qtyOf(k)>0; return `<button type="button" class="modtog ${on?'on':''}" data-toggle="${k}">${on?'✓ Added':'+ Add'}</button>`; }
-  return stepperHTML(k);
-}
-function modRowHTML(k){
-  const m=MODULES[k], n=qtyOf(k);
-  return `<div class="mod ${n?'on':''}">
-    <div class="mod__body"><b class="mod__name">${m.name}</b><span class="mod__desc">${m.desc}</span></div>
-    <div class="mod__right"><span class="mod__price">${fmt(m.unit)}${m.toggle?'':'<em>/ unit</em>'}</span>${ctlHTML(k)}</div>
-  </div>`;
-}
-function groupHTML(g){
-  return `<div class="bgroup"><div class="bgroup__h"><b>${g.title}</b><span>${g.sub}</span></div>${g.keys.map(modRowHTML).join('')}</div>`;
-}
-function renderBuilder(){
-  const el=document.getElementById('builder'); if(!el) return;
-  el.innerHTML=GROUPS.map(groupHTML).join('');
-}
+const formula=loadFormula();
+const mixLines=()=>Object.keys(MOD_LABEL).filter(k=>(formula.mix||{})[k]>0).map(k=>({k,n:formula.mix[k]}));
+const mixCount=()=>mixLines().reduce((s,l)=>s+l.n,0);
+const mixLabel=()=>mixLines().map(l=>`${l.n} ${l.n>1?MOD_PLURAL[l.k].toLowerCase():MOD_LABEL[l.k].toLowerCase()}`).join(', ');
 
 function usernameFrom(link){
   if(!link) return '';
@@ -329,19 +298,18 @@ addBtn.addEventListener('click',async()=>{
 igInput.addEventListener('input',()=>{ig=null;igResult.innerHTML='';addBtn.disabled=false;addBtn.textContent='Add';});
 
 function renderRecap(){
-  const items=cartArr(), total=cartTotal(), empty=!items.length;
+  const lines=mixLines(), name=formula.planName||TIER_NAMES[formula.plan]||'Your formula';
   document.getElementById('recap').innerHTML=`
-    <div class="recap__top"><b class="recap__name">Your pack</b><span class="badge">Pay once</span></div>
-    <p class="recap__sub">Flat pricing. Build exactly what you need, pay one time.</p>
-    ${empty
-      ? `<p class="recap__empty">Add modules on the left and they'll show up here.</p>`
-      : `<div class="recap__addons">${items.map(it=>`<div class="recap__addon">${chk}<span>${it.name} <em>× ${it.qty}</em></span><b>${fmt(it.unit*it.qty)}</b></div>`).join('')}</div>`}
-    <div class="recap__row recap__total"><span>${empty?'Total':cartCount()+' module'+(cartCount()>1?'s':'')+' · one-time'}</span><div class="tot"><b>${fmt(total)}</b></div></div>
-    ${recapBtn?`<button type="button" class="btn btn--grad pay" id="recap-cta" ${empty?'disabled':''}>${recapBtn.label}</button>
-    <p class="recap__promo">🎁 Got a promo code? Add it on the secure payment page.</p>`:`<p class="recap__fine">You'll fine-tune your pack on the next step.</p>`}`;
-  if(recapBtn){const b=document.getElementById('recap-cta');if(b)b.addEventListener('click',recapBtn.fn);}
+    <div class="recap__top"><b class="recap__name">${name}</b><span class="badge">Pay once</span></div>
+    <p class="recap__sub">The formula you composed on the homepage. One price, everything included.</p>
+    <div class="recap__addons">${lines.map(l=>`<div class="recap__addon">${chk}<span>${MOD_LABEL[l.k]}</span><b>× ${l.n}</b></div>`).join('')}</div>
+    <div class="recap__row recap__total"><span>${mixCount()} elements · one-time</span><div class="tot"><b>${fmt(formula.price)}</b></div></div>
+    <p class="recap__fine">Strategy, copywriting, design &amp; revisions included. Want to tweak the mix? <a href="index.html#packages" style="color:var(--orange);font-weight:700">Re-compose your formula</a> or adjust it with us before production.</p>`;
 }
 renderRecap();
+
+const payBtn=document.querySelector('#contact .pay');
+if(payBtn) payBtn.innerHTML='Continue to payment →';
 
 document.getElementById('contact').addEventListener('submit',async e=>{
   e.preventDefault();
@@ -351,44 +319,20 @@ document.getElementById('contact').addEventListener('submit',async e=>{
   // if they typed a handle but didn't hit Add, import on the fly
   if(!ig && u) ig=await addInstagram(u);
   const order={name:fd.get('name'),email:fd.get('email'),instagram,niche:fd.get('niche'),
-    handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone')};
+    handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone'),
+    plan:formula.plan,planName:formula.planName||TIER_NAMES[formula.plan],price:formula.price,mix:formula.mix,label:mixLabel()};
   sessionStorage.setItem('brasero_order',JSON.stringify(order));
-  showBuilder(order); // step 2 → compose your pack, then payment
+  await proceedToPayment(order);
 });
 
-/* ===== step 2 : compose your pack ===== */
-function showBuilder(order){
-  document.getElementById('left').innerHTML=`
-    <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
-    <h1 class="co__title">Compose your pack</h1>
-    <p class="co__sub">Pick how many of each module you want. One flat price per module, paid once, your brand system on top.</p>
-    <div class="build" id="builder"></div>
-    <p class="note">Every module includes copywriting, design and revisions. Adjust anything, anytime before production.</p>`;
-  renderBuilder();
-  document.getElementById('builder').addEventListener('click',ev=>{
-    const s=ev.target.closest('[data-step]');
-    const t=ev.target.closest('[data-toggle]');
-    if(s){ setQty(s.dataset.step, qtyOf(s.dataset.step)+(+s.dataset.d)); }
-    else if(t){ setQty(t.dataset.toggle, qtyOf(t.dataset.toggle)>0?0:1); }
-    else return;
-    renderBuilder(); renderRecap();
-  });
-  recapBtn={label:'Continue to payment →',fn:()=>proceedToPayment(order)};
-  renderRecap();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ===== step 3 : payment (Stripe) ===== */
+/* ===== payment (Stripe) : pack-priced tier + the composed mix ===== */
 async function proceedToPayment(order){
-  if(!cartArr().length) return;
-  order.cart={...cart}; order.label=cartArr().map(it=>`${it.qty}× ${it.name}`).join(', '); order.price=cartTotal();
-  sessionStorage.setItem('brasero_order',JSON.stringify(order));
-  const btn=document.getElementById('recap-cta');if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
+  const btn=payBtn; if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
   try{
     const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({cart,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,niche:order.niche})});
+      body:JSON.stringify({plan:order.plan,mix:order.mix,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,niche:order.niche})});
     const d=await r.json();
-    if(d.label) order.label=d.label;
+    if(d.label) order.planName=d.label;
     sessionStorage.setItem('brasero_order',JSON.stringify(order));
     if(d.url){location.href=d.url;return;}
     throw new Error(d.error||'No checkout URL');

@@ -43,18 +43,18 @@ export default async function handler(req, res) {
       return res.json({ received: true });
     }
 
-    // Modular orders carry a `cart` in metadata; legacy orders carry plan/addons.
-    let cart = null;
-    if (m.cart) { try { cart = JSON.parse(m.cart); } catch (e) { console.error('bad cart metadata', e); } }
-    const offerLabel = cart ? cartLabel(cart) : (PLANS[m.plan]?.name || m.plan);
+    // Tier-formula orders carry a `mix` (composition) in metadata; legacy orders carry plan/addons.
+    let mix = null;
+    if (m.mix) { try { mix = JSON.parse(m.mix); } catch (e) { console.error('bad mix metadata', e); } }
+    const offerLabel = PLANS[m.plan]?.name || m.plan || (mix ? cartLabel(mix) : '');
 
     let order = null, persistFailed = false;
     try { order = await markPaid(s.id, s.amount_total); } catch (e) { console.error(e); persistFailed = true; }
     // Create/link the client account (their space aggregates every order they place).
     try { await upsertClient({ email: s.customer_email || m.email, name: m.name }); } catch (e) { console.error('client upsert failed', e); }
-    // Seed the full board so the talent opens a ready-to-fill order: every purchased module (or, for legacy orders, plan decks + upsells).
+    // Seed the board: the dragged composition (mix) → those deck types; else legacy plan decks + upsells.
     try {
-      if (order && cart) await populateFromCart(order.id, cart);
+      if (order && mix) await populateFromCart(order.id, mix);
       else if (order) await populateOrderElements(order.id, { plan: m.plan, addons: (m.addons || '').split(',').map(a => a.trim()).filter(Boolean) });
     } catch (e) { console.error('populate elements failed', e); persistFailed = true; }
     // A paid order that didn't persist is a silent loss: 500 so Stripe retries.
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
       const to = s.customer_email || m.email;
       const trackUrl = to ? clientMagicLink(siteUrl(req), to, ref) : '';
       await sendTo(to, 'Your Brasero order is confirmed 🎉', clientOrderEmail({
-        name: m.name, planName: offerLabel, billing: cart ? 'once' : m.billing,
+        name: m.name, planName: offerLabel, billing: m.billing || 'once',
         amountCents: s.amount_total, handle: m.handle, ref, trackUrl,
       }));
     } catch (e) { console.error('client email failed', e); }
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
     try {
       await send(`💸 New order - ${m.name || s.customer_email}`,
         `<h2>Payment received</h2>
-         <p><b>Order:</b> ${offerLabel || '-'} (${cart ? 'one-time' : (m.billing === 'sub' ? 'subscription' : 'one-time')})</p>
+         <p><b>Order:</b> ${offerLabel || '-'}${mix ? ' · ' + cartLabel(mix) : ''} (${m.billing === 'sub' ? 'subscription' : 'one-time'})</p>
          <p><b>Amount:</b> $${(s.amount_total / 100).toFixed(2)}</p>
          <p><b>Name:</b> ${m.name || '-'}</p>
          <p><b>Email:</b> ${s.customer_email || m.email || '-'}</p>
