@@ -885,6 +885,10 @@ img,svg{display:block}
 .cmp__tprice{font-size:18px;font-weight:900;letter-spacing:-.03em;flex-shrink:0;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .cmp__tprice em{font-style:normal;font-size:10px;font-weight:700;-webkit-text-fill-color:var(--grey);color:var(--grey)}
 .cmp__pop{position:absolute;top:-8px;right:12px;font-size:8.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--grad);padding:3px 8px;border-radius:100px;box-shadow:0 4px 10px rgba(248,80,0,.3)}
+.cmp__tbadge{position:absolute;top:-8px;right:12px;font-size:8.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#3d2a00;background:linear-gradient(135deg,#fde08a,#e8b53a 45%,#c8901a);padding:3px 9px;border-radius:100px;box-shadow:0 4px 10px rgba(200,144,26,.4)}
+.cmp__tinc{display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10.5px;font-weight:800;letter-spacing:-.01em;color:var(--orange)}
+.cmp__tincic{width:15px;height:14px;flex-shrink:0;display:inline-grid;place-items:center}
+.cmp__tincic svg{width:100%;height:100%}
 .cmp__board{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
 .cmp__palette{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 14px 40px rgba(0,0,0,.05);position:sticky;top:16px}
 .cmp__lbl{font-size:12px;font-weight:800;color:var(--ink);display:block;margin-bottom:11px;line-height:1.4}
@@ -954,10 +958,12 @@ img,svg{display:block}
 .cmp__bpprice{margin-left:auto;font-size:11px;font-weight:900;color:var(--orange);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(248,80,0,.1);border-radius:100px;padding:3px 9px;min-width:40px}
 .cmp__bplat.on .cmp__bpprice{color:#fff;background:#15803d;padding:3px 6px}
 .cmp__bpprice svg{width:14px;height:14px}
-.cmp__bplat ul{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0;padding:0}
-.cmp__bplat li{position:relative;padding-left:15px;font-size:11px;font-weight:600;color:#444;line-height:1.35}
-.cmp__bplat li::before{content:"";position:absolute;left:2px;top:5px;width:6px;height:6px;border-radius:50%;border:1.5px solid var(--orange);background:transparent}
-.cmp__bplat.on li::before{background:var(--orange)}
+.cmp__bplat ul{list-style:none;display:flex;flex-direction:column;margin:0;padding:0}
+.cmp__bplat li{display:flex;align-items:flex-start;gap:7px;font-size:11px;font-weight:600;color:#444;line-height:1.3;padding:7px 0;border-top:1px solid var(--line)}
+.cmp__bplat li:first-child{border-top:none;padding-top:0}
+.cmp__bplat li:last-child{padding-bottom:0}
+.cmp__bchk{flex-shrink:0;width:13px;height:13px;color:var(--orange);margin-top:0}
+.cmp__bchk svg{width:100%;height:100%}
 .cmp__per{font-size:15px;font-weight:700;color:var(--grey);margin-left:3px}
 @media(max-width:680px){.cmp__bgrid{grid-template-columns:repeat(2,1fr)}}
 .cmp__foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:16px}
@@ -2087,14 +2093,14 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   const TIERS=[
     {key:'starter',n:3, price:120,name:'Ember', logo:'assets/plans/ember.svg',  sub:'3 elements'},
     {key:'flame',  n:6, price:240,name:'Flame', logo:'assets/plans/flame.svg',  sub:'6 elements', popular:true},
-    {key:'burst',  n:10,price:350,name:'Meteor',logo:'assets/plans/meteor.svg', sub:'9 + 1 free · branding included', free:1, brandIncluded:true},
+    {key:'burst',  n:10,price:350,name:'Meteor',logo:'assets/plans/meteor.svg', sub:'9 elements', free:1, brandIncluded:true},
   ];
   const MODS={
     carousel:{label:'Deck',   sub:'6–10 slides', svg:'#ic-decks',vb:'0 0 140 94'},
     story:   {label:'Story',  sub:'9:16 set',    svg:'#ic-story',vb:'0 0 134 122'},
     static:  {label:'Static', sub:'single post', svg:'#ic-decks',vb:'0 0 140 94'},
   };
-  const BRAND={label:'Social media branding',svg:'#ic-brand',vb:'0 0 120 120',price:210,per:50};
+  const BRAND={label:'Social media branding',svg:'#ic-brand',vb:'0 0 120 120',price:190,per:50};
   const PIC={
     instagram:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg>',
     x:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 3h3l-7.1 8.1L22 21h-6.4l-4.6-5.9L5.6 21H2.5l7.4-8.5L2 3h6.5l4.1 5.4zM16.4 19.1h1.7L7.7 4.8H5.9z"/></svg>',
@@ -2139,10 +2145,12 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   function renderTiers(){
     elTiers.innerHTML=TIERS.map(t=>{
       const p=billing==='sub'?Math.round(t.price*0.9):t.price;
+      const badge=t.free?'<span class="cmp__tbadge">+1 FREE</span>':(t.popular?'<span class="cmp__pop">Most popular</span>':'');
+      const inc=t.brandIncluded?`<span class="cmp__tinc"><span class="cmp__tincic">${ic(BRAND)}</span>Branding included</span>`:'';
       return `<button type="button" class="cmp__tier ${t.key===tierKey?'on':''}" data-tier="${t.key}">
-      ${t.popular?'<span class="cmp__pop">Most popular</span>':''}
+      ${badge}
       <img class="cmp__tlogo" src="${t.logo}" alt="${t.name}">
-      <span class="cmp__tinfo"><b>${t.name}</b><span class="cmp__tsub">${t.sub}</span></span>
+      <span class="cmp__tinfo"><b>${t.name}</b><span class="cmp__tsub">${t.sub}</span>${inc}</span>
       <span class="cmp__tprice">${fmt(p)}${billing==='sub'?'<em>/mo</em>':''}</span></button>`;
     }).join('');
   }
@@ -2177,7 +2185,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
         const tag=inc?'':`<span class="cmp__bpprice">${brandSel.has(p.key)?chkSvg:'+'+fmt(BRAND.per)}</span>`;
         return `<div class="cmp__bplat ${on?'on':''} ${inc?'locked':''}" ${inc?'':`data-plat="${p.key}"`}>
           <span class="cmp__bplath"><span class="cmp__bptop"><span class="cmp__bpic">${p.ic}</span><b>${p.name}</b>${tag}</span></span>
-          <ul>${p.feats.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
+          <ul>${p.feats.map(f=>`<li><span class="cmp__bchk">${chkSvg}</span>${f}</li>`).join('')}</ul></div>`;
       }).join('')}</div></div>`;
   }
   function renderRecap(){
@@ -2234,7 +2242,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     const rm=e.target.closest('[data-rm]'); if(rm){ slots[+rm.dataset.rm]=null; renderSlots(); renderRecap(); return; }
     const s=e.target.closest('.cmp__slot.empty'); if(s){ slots[+s.dataset.slot]='carousel'; renderSlots(); renderRecap(); }
   });
-  // branding: pick platforms individually (+$50), or "All 5" for $210 (locked on Meteor)
+  // branding: pick platforms individually (+$50), or "All 5" for $190 (locked on Meteor)
   elBrand.addEventListener('click',e=>{
     if(brandIncluded())return;
     const all=e.target.closest('[data-ball]');

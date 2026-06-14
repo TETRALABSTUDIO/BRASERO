@@ -115,7 +115,7 @@ app.post('/api/checkout-session', async (req, res) => {
 
     // Tier formula ("compose your formula"): pack-priced (3 / 6 / 9+1).
     // Price = tier; `mix` = content composition. Branding is per-platform ($50 each,
-    // $210 for all 5) on Ember/Flame, included free on Meteor (burst).
+    // $190 for all 5) on Ember/Flame, included free on Meteor (burst).
     if (plan && PLANS[plan] && mix && !addon_ref) {
       const content = {};
       for (const it of cartItems(mix)) if (it.type !== 'branding') content[it.key] = it.qty;

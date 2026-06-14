@@ -896,7 +896,7 @@ export const MODULES = {
   // Branding is sold as ONE block (not à la carte): a single module that seeds the
   // full set of brand pieces. Qty is capped at 1 in cartItems.
   branding: { name: 'Social media branding', type: 'branding', unit: 21000, group: 'branding',
-              // Per-platform deliverables (the complete pack = $210, vs $50/platform). Seeded as branding deck rows.
+              // Per-platform deliverables (the complete pack = $190, vs $50/platform). Seeded as branding deck rows.
               pieces: [
                 'Instagram profile image', 'Instagram story highlight 1', 'Instagram story highlight 2', 'Instagram story highlight 3', 'Instagram story highlight 4',
                 'X / Twitter profile image', 'X / Twitter banner',
@@ -968,9 +968,9 @@ export async function populateFromCart(orderId, cart) {
   return { created };
 }
 
-/* ===== Branding, sold per platform ($50 each) or complete ($210 for all 5, save $40) ===== */
+/* ===== Branding, sold per platform ($50 each) or complete ($190 for all 5, save $60) ===== */
 export const BRAND_PER = 5000;        // cents, per platform
-export const BRAND_COMPLETE = 21000;  // cents, all 5 platforms
+export const BRAND_COMPLETE = 19000;  // cents, all 5 platforms
 export const BRAND_PLATFORMS = {
   instagram: { name: 'Instagram',   pieces: ['Instagram profile image', 'Instagram story highlight 1', 'Instagram story highlight 2', 'Instagram story highlight 3', 'Instagram story highlight 4'] },
   x:         { name: 'X / Twitter',  pieces: ['X / Twitter profile image', 'X / Twitter banner'] },

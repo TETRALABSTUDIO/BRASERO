@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     // Tier formula ("compose your formula"): pack-priced (3 / 6 / 9+1), one-time payment.
     // Price = the chosen tier; `mix` is the content composition the client dragged (decks/
     // stories/statics) and only defines which deck rows to seed. Branding is an upsell
-    // (+$210) on Ember/Flame, and INCLUDED free on Meteor (burst).
+    // (+$190) on Ember/Flame, and INCLUDED free on Meteor (burst).
     if (plan && PLANS[plan] && mix && !addon_ref) {
       const content = {};
       for (const it of cartItems(mix)) if (it.type !== 'branding') content[it.key] = it.qty;
