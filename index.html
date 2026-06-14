@@ -207,9 +207,9 @@ img,svg{display:block}
 
 /* ===== COLLECTION (dark) ===== */
 .collection{padding:118px 0 96px;overflow:visible;position:relative}
-.collection>.wrap{position:relative}
-/* dark tilted slab sits BEHIND the profile card; its slanted bottom edge passes behind the card so the card overhangs onto the cream */
-.cright::before{content:"";position:absolute;left:50%;top:-24px;bottom:78px;width:min(96%,452px);transform:translateX(-50%) skewY(-3.2deg);background:#0c0c0c;border-radius:30px;box-shadow:0 44px 90px rgba(0,0,0,.28);z-index:0}
+.collection>.wrap{position:relative;z-index:1}
+/* the dark section above continues down behind the widget: flat top (seamless with #why), slanted bottom edge so the widget overhangs onto the cream */
+.collection::before{content:"";position:absolute;left:0;right:0;top:0;height:480px;background:var(--black);clip-path:polygon(0 0,100% 0,100% 13%,0 100%);z-index:0}
 .cwrap{display:grid;grid-template-columns:1.22fr .78fr;gap:54px;align-items:center}
 .cright{order:-1;position:relative}
 .cright::after{display:none}
@@ -228,7 +228,7 @@ img,svg{display:block}
 .cstack--big.in-r{animation:fanInR .4s cubic-bezier(.22,.7,.3,1)}
 .cstack--big.in-l{animation:fanInL .4s cubic-bezier(.22,.7,.3,1)}
 @media(max-width:1150px) and (min-width:901px){.cright{gap:10px}.cstack--big{width:288px;height:366px;margin:-64px 0}.cstack--big .cstack__card{width:206px}}
-@media(max-width:900px){.collection{padding:80px 0}.cright::before{display:none}.cwrap{grid-template-columns:1fr;gap:40px}.cright{order:0}.cright::after{display:none}.cleft .collection__head .lead{max-width:none}.cstack--big{width:300px;height:390px;margin:0}.cstack--big .cstack__card{width:216px}.cfan{min-height:400px;transform:none}}
+@media(max-width:900px){.collection{padding:80px 0}.collection::before{display:none}.cwrap{grid-template-columns:1fr;gap:40px}.cright{order:0}.cright::after{display:none}.cleft .collection__head .lead{max-width:none}.cstack--big{width:300px;height:390px;margin:0}.cstack--big .cstack__card{width:216px}.cfan{min-height:400px;transform:none}}
 .cstat{flex:1;min-width:78px}
 .cstat b{display:block;font-size:clamp(22px,2.3vw,30px);font-weight:900;letter-spacing:-.03em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .cstat span{font-size:12px;color:var(--grey);font-weight:500;display:block;margin-top:5px;line-height:1.2}
@@ -237,30 +237,30 @@ img,svg{display:block}
 .cformats svg{width:15px;height:15px;color:var(--orange)}
 
 /* ===== collection : example branded social profile ===== */
-.profmock{width:100%;max-width:418px;background:#141414;border:1px solid var(--line-light);border-radius:24px;overflow:hidden;box-shadow:0 34px 80px rgba(0,0,0,.55);position:relative;z-index:2}
+.profmock{width:100%;max-width:418px;background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 34px 80px rgba(0,0,0,.22);position:relative;z-index:2}
 .pm__banner{height:104px;background:var(--grad-r);position:relative}
 .pm__banner::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 140% at 80% -10%,rgba(255,255,255,.28),transparent 55%)}
 .pm__top{display:flex;justify-content:space-between;align-items:flex-end;padding:0 20px;margin-top:-40px;position:relative;z-index:2}
-.pm__avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(150deg,#2a2a2a,#0c0c0c);border:4px solid #141414;position:relative;flex-shrink:0;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+.pm__avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(150deg,#e9e9ee,#cfcfd6);border:4px solid #fff;position:relative;flex-shrink:0;box-shadow:0 10px 26px rgba(0,0,0,.18)}
 .pm__avatar::after{content:"";position:absolute;inset:18px;border-radius:50%;background:var(--grad);opacity:.92}
 .pm__follow{font-family:inherit;font-size:13px;font-weight:800;color:#fff;background:var(--grad);border:none;border-radius:100px;padding:9px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(248,80,0,.3)}
 .pm__id{padding:12px 20px 0}
-.pm__name{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:900;letter-spacing:-.02em;color:#fff}
+.pm__name{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:900;letter-spacing:-.02em;color:var(--ink)}
 .pm__verif{width:16px;height:16px;flex-shrink:0}
 .pm__handle{display:block;font-size:13px;color:#9a9a9a;font-weight:500;margin-top:3px}
 .pm__nums{display:flex;gap:26px;padding:14px 20px 4px}
 .pm__nums span{display:flex;flex-direction:column;font-size:12px;color:#9a9a9a;font-weight:500}
-.pm__nums b{font-size:16px;font-weight:900;color:#fff;letter-spacing:-.02em}
+.pm__nums b{font-size:16px;font-weight:900;color:var(--ink);letter-spacing:-.02em}
 .pm__stories{display:flex;gap:15px;padding:14px 20px 18px}
 .pm__story{display:flex;flex-direction:column;align-items:center;gap:7px}
 .pm__ring{width:52px;height:52px;border-radius:50%;padding:2.5px;background:var(--grad);position:relative}
-.pm__ring::after{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid #141414}
+.pm__ring::after{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid #fff}
 .pm__ring--a{background:linear-gradient(140deg,#ff1a00,#f87000)}
 .pm__ring--b{background:linear-gradient(140deg,#8b3df0,#4a13aa)}
 .pm__ring--c{background:linear-gradient(140deg,#0f9d58,#04663a)}
 .pm__ring--d{background:linear-gradient(140deg,#2b6cff,#0b2e8a)}
-.pm__story em{font-size:11px;font-style:normal;font-weight:600;color:#cfcfcf}
-.pm__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-top:1px solid var(--line-light)}
+.pm__story em{font-size:11px;font-style:normal;font-weight:600;color:#555}
+.pm__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-top:1px solid var(--line)}
 .pm__post{aspect-ratio:4/5;position:relative;padding:13px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
 .pm__post b{display:block;height:7px;border-radius:3px;background:rgba(255,255,255,.92);width:82%}
 .pm__post i{display:block;height:5px;border-radius:3px;background:rgba(255,255,255,.5);width:56%;margin-top:6px}
@@ -270,6 +270,12 @@ img,svg{display:block}
 .pm__tag{position:absolute;top:11px;left:11px;font-size:8.5px;font-weight:800;letter-spacing:.05em;color:#fff;background:rgba(0,0,0,.32);backdrop-filter:blur(4px);padding:3px 7px;border-radius:100px}
 .pm__plus{position:absolute;top:9px;right:9px;width:18px;height:18px;border-radius:5px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:13px;font-weight:700;line-height:16px;text-align:center}
 @media(max-width:900px){.profmock{margin:0 auto}}
+/* case-study nav arrows flanking the widget */
+.cnav{flex-shrink:0;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);display:grid;place-items:center;cursor:pointer;transition:background .2s,color .2s,border-color .2s,transform .2s;box-shadow:0 8px 22px rgba(0,0,0,.12);position:relative;z-index:3}
+.cnav:hover{background:var(--grad);color:#fff;border-color:transparent;transform:translateY(-2px)}
+.cnav svg{width:20px;height:20px}
+@media(max-width:900px){.cnav{width:42px;height:42px}}
+@media(max-width:560px){.cnav{width:38px;height:38px}}
 
 .carousel{position:relative}
 .ctrack{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:4px 2px 10px;scrollbar-width:none}
@@ -1429,6 +1435,7 @@ html{overflow-x:hidden}
       </div>
 
       <div class="cright">
+        <button class="cnav cnav--prev" type="button" aria-label="Previous case study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
         <div class="profmock reveal" aria-label="Example branded profile">
           <div class="pm__banner"></div>
           <div class="pm__top">
@@ -1456,6 +1463,7 @@ html{overflow-x:hidden}
             <div class="pm__post pm__post--3"><b></b><i></i></div>
           </div>
         </div>
+        <button class="cnav cnav--next" type="button" aria-label="Next case study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
       </div>
     </div>
   </div>
