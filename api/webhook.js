@@ -1,4 +1,4 @@
-import { stripe, send, sendTo, markPaid, populateOrderElements, populateFromCart, cartLabel, PLANS, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, siteUrl, clientMagicLink, upsertClient } from './_lib.js';
+import { stripe, send, sendTo, markPaid, populateOrderElements, populateFromCart, populateBranding, cartLabel, PLANS, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, siteUrl, clientMagicLink, upsertClient } from './_lib.js';
 
 // Stripe needs the raw request body to verify the signature.
 export const config = { api: { bodyParser: false } };
@@ -56,6 +56,7 @@ export default async function handler(req, res) {
     try {
       if (order && mix) await populateFromCart(order.id, mix);
       else if (order) await populateOrderElements(order.id, { plan: m.plan, addons: (m.addons || '').split(',').map(a => a.trim()).filter(Boolean) });
+      if (order && m.brand) await populateBranding(order.id, m.brand.split(',').filter(Boolean));
     } catch (e) { console.error('populate elements failed', e); persistFailed = true; }
     // A paid order that didn't persist is a silent loss: 500 so Stripe retries.
     // markPaid + populateOrderElements are both idempotent, and emails are sent

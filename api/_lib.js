@@ -968,6 +968,44 @@ export async function populateFromCart(orderId, cart) {
   return { created };
 }
 
+/* ===== Branding, sold per platform ($50 each) or complete ($210 for all 5, save $40) ===== */
+export const BRAND_PER = 5000;        // cents, per platform
+export const BRAND_COMPLETE = 21000;  // cents, all 5 platforms
+export const BRAND_PLATFORMS = {
+  instagram: { name: 'Instagram',   pieces: ['Instagram profile image', 'Instagram story highlight 1', 'Instagram story highlight 2', 'Instagram story highlight 3', 'Instagram story highlight 4'] },
+  x:         { name: 'X / Twitter',  pieces: ['X / Twitter profile image', 'X / Twitter banner'] },
+  linkedin:  { name: 'LinkedIn',     pieces: ['LinkedIn profile image', 'LinkedIn banner', 'LinkedIn CTA buttons'] },
+  facebook:  { name: 'Facebook',     pieces: ['Facebook profile image', 'Facebook banner'] },
+  youtube:   { name: 'YouTube',      pieces: ['YouTube profile image', 'YouTube banner'] },
+};
+export const BRAND_ALL = Object.keys(BRAND_PLATFORMS);
+// Keep only valid platform keys (de-duplicated, in canonical order).
+export function brandKeys(platforms) {
+  const set = new Set(Array.isArray(platforms) ? platforms : []);
+  return BRAND_ALL.filter(k => set.has(k));
+}
+// Price (cents): all 5 → the complete-pack price; fewer → per-platform.
+export function brandingAmount(platforms) {
+  const keys = brandKeys(platforms);
+  if (keys.length >= BRAND_ALL.length) return BRAND_COMPLETE;
+  return keys.length * BRAND_PER;
+}
+export function brandingPieces(platforms) {
+  return brandKeys(platforms).flatMap(k => BRAND_PLATFORMS[k].pieces);
+}
+// Seed the selected platforms' branding deck rows (idempotent by title).
+export async function populateBranding(orderId, platforms) {
+  const pieces = brandingPieces(platforms);
+  if (!pieces.length) return { created: 0 };
+  const existing = await decksForOrder(orderId);
+  let pos = existing.length, created = 0;
+  for (const title of pieces) {
+    if (existing.some(d => d.title === title)) continue;
+    if (await createDeck(orderId, { title, position: pos++, type: 'branding' })) created++;
+  }
+  return { created };
+}
+
 const mailer = process.env.SMTP_HOST ? nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT || 587),

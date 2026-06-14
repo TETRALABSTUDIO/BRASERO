@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { saveOrder, markPaid, saveOnboarding, verifyPaidSession, onboardingDone, sendTo, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, stripePriceId, addonLineItems, addonKeys, clientMagicLink, ITEMS, cartItems, cartLabel, populateFromCart, MODULES } from '../api/_lib.js';
+import { saveOrder, markPaid, saveOnboarding, verifyPaidSession, onboardingDone, sendTo, clientOrderEmail, addonClientEmail, addDecksToOrder, addItemsToOrder, stripePriceId, addonLineItems, addonKeys, clientMagicLink, ITEMS, cartItems, cartLabel, populateFromCart, brandKeys, brandingAmount, brandingPieces, populateBranding, BRAND_ALL } from '../api/_lib.js';
 import orderHandler from '../api/order.js';
 import deckHandler from '../api/deck.js';
 import adminHandler from '../api/admin.js';
@@ -81,7 +81,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
     const offerLabel = PLANS[m.plan]?.name || m.plan || (mix ? cartLabel(mix) : '');
     const ref = s.id.slice(-8).toUpperCase();
     markPaid(s.id, s.amount_total)
-      .then(order => { if (order && mix) return populateFromCart(order.id, mix); })
+      .then(async order => { if (order && mix) await populateFromCart(order.id, mix); if (order && m.brand) await populateBranding(order.id, m.brand.split(',').filter(Boolean)); })
       .catch(console.error);
     const to = s.customer_email || m.email;
     const trackUrl = to ? clientMagicLink(SITE_URL, to, ref) : '';
@@ -111,18 +111,18 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 /* Create a Stripe Checkout Session and return its URL */
 app.post('/api/checkout-session', async (req, res) => {
   try {
-    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, mix, branding } = req.body || {};
+    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, mix, brandPlatforms } = req.body || {};
 
-    // Tier formula ("compose your formula"): pack-priced (3 / 6 / 9+1), one-time.
-    // Price = tier; `mix` is the content composition to seed. Branding is an upsell
-    // (+$210) on Ember/Flame, included free on Meteor (burst).
+    // Tier formula ("compose your formula"): pack-priced (3 / 6 / 9+1).
+    // Price = tier; `mix` = content composition. Branding is per-platform ($50 each,
+    // $210 for all 5) on Ember/Flame, included free on Meteor (burst).
     if (plan && PLANS[plan] && mix && !addon_ref) {
       const content = {};
       for (const it of cartItems(mix)) if (it.type !== 'branding') content[it.key] = it.qty;
       const bill = billing === 'sub' ? 'sub' : 'once';
       const brandIncluded = plan === 'burst';
-      const brandCharged = !!branding && !brandIncluded;
-      const seedMix = { ...content, ...((brandIncluded || !!branding) ? { branding: 1 } : {}) };
+      const brand = brandIncluded ? BRAND_ALL.slice() : brandKeys(brandPlatforms);
+      const brandCharge = brandIncluded ? 0 : brandingAmount(brand);
       let line_items, amount, mode;
       const priceId = stripePriceId(plan, bill) || process.env.STRIPE_PRICE_ID;
       if (priceId) {
@@ -135,9 +135,10 @@ app.post('/api/checkout-session', async (req, res) => {
         amount = amountFor(plan, bill);
         line_items = [{ quantity: 1, price_data: { currency: 'usd', unit_amount: amount, product_data: { name: `Brasero - ${PLANS[plan].name} formula` }, ...(mode === 'subscription' ? { recurring: { interval: 'month' } } : {}) } }];
       }
-      if (brandCharged) {
-        amount += MODULES.branding.unit;
-        line_items.push({ quantity: 1, price_data: { currency: 'usd', unit_amount: MODULES.branding.unit, product_data: { name: 'Brasero - Social media branding' } } });
+      if (brandCharge > 0) {
+        amount += brandCharge;
+        const blabel = brand.length >= BRAND_ALL.length ? 'Social media branding (all platforms)' : `Social media branding (${brand.length} platform${brand.length > 1 ? 's' : ''})`;
+        line_items.push({ quantity: 1, price_data: { currency: 'usd', unit_amount: brandCharge, product_data: { name: `Brasero - ${blabel}` } } });
       }
       const session = await stripe.checkout.sessions.create({
         mode,
@@ -145,7 +146,7 @@ app.post('/api/checkout-session', async (req, res) => {
         line_items,
         success_url: `${SITE_URL}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${SITE_URL}/checkout.html`,
-        metadata: { plan, billing: bill, mix: JSON.stringify(seedMix), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
+        metadata: { plan, billing: bill, mix: JSON.stringify(content), brand: brand.join(','), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
       });
       try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing: bill, amount, name, email, instagram, handle }); }
       catch (e) { console.error('saveOrder failed', e); }

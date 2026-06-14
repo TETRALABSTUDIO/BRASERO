@@ -868,25 +868,25 @@ img,svg{display:block}
 
 /* ===== drag-and-drop formula composer ===== */
 .cmp{margin-top:8px}
-.cmp__billrow{display:flex;justify-content:center;margin-bottom:16px}
-.cmp__bill{display:inline-flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:100px;padding:5px;box-shadow:0 6px 18px rgba(0,0,0,.05)}
-.cmp__bill button{font-family:inherit;border:none;background:none;cursor:pointer;font-size:13.5px;font-weight:800;color:var(--grey);padding:10px 20px;border-radius:100px;transition:color .25s,background .25s,box-shadow .25s;display:inline-flex;align-items:center;gap:7px}
-.cmp__bill button.on{color:#fff;background:var(--grad);box-shadow:0 8px 18px rgba(248,80,0,.28)}
-.cmp__save{font-size:11px;font-weight:900;color:#16a34a}.cmp__bill button.on .cmp__save{color:#fff}
-.cmp__tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.cmp__tier{position:relative;display:flex;align-items:center;gap:15px;text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px 20px;transition:border .2s,box-shadow .2s,transform .15s}
-.cmp__tier:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.07)}
+.cmp__bill{display:flex;align-items:center;width:fit-content;margin:0 auto 16px;background:var(--soft);border:1px solid var(--line);border-radius:100px;padding:4px}
+.cmp__bill button{font-family:inherit;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:800;color:var(--grey);padding:8px 15px;border-radius:100px;transition:color .25s,background .25s,box-shadow .25s;display:inline-flex;align-items:center;gap:6px}
+.cmp__bill button.on{color:#fff;background:var(--grad);box-shadow:0 6px 14px rgba(248,80,0,.28)}
+.cmp__save{font-size:10.5px;font-weight:900;color:#16a34a}.cmp__bill button.on .cmp__save{color:#fff}
+.cmp__plabel{display:block;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--orange);margin-bottom:9px}
+.cmp__tiers{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+.cmp__tier{position:relative;display:flex;align-items:center;gap:12px;text-align:left;font-family:inherit;cursor:pointer;background:#fff;border:1.5px solid var(--line);border-radius:15px;padding:12px 14px;transition:border .2s,box-shadow .2s,transform .15s}
+.cmp__tier:hover{border-color:rgba(248,80,0,.5);box-shadow:0 8px 20px rgba(0,0,0,.06)}
 .cmp__tier.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
-.cmp__tlogo{height:68px;width:auto;max-width:78px;object-fit:contain;flex-shrink:0}
+.cmp__tlogo{height:44px;width:auto;max-width:50px;object-fit:contain;flex-shrink:0}
 .cmp__tinfo{flex:1;min-width:0}
-.cmp__tinfo b{font-size:20px;font-weight:900;letter-spacing:-.02em;display:block}
-.cmp__tsub{font-size:13px;color:#444;font-weight:700;display:block;margin-top:3px;line-height:1.3}
-.cmp__tprice{font-size:22px;font-weight:900;letter-spacing:-.03em;flex-shrink:0;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.cmp__tprice em{font-style:normal;font-size:11px;font-weight:700;-webkit-text-fill-color:var(--grey);color:var(--grey)}
-.cmp__pop{position:absolute;top:-9px;right:14px;font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--grad);padding:3px 9px;border-radius:100px;box-shadow:0 4px 10px rgba(248,80,0,.3)}
-.cmp__board{display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:start}
-.cmp__palette{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.05);position:sticky;top:16px}
-.cmp__lbl{font-size:12.5px;font-weight:800;color:var(--ink);display:block;margin-bottom:12px;line-height:1.45}
+.cmp__tinfo b{font-size:16px;font-weight:900;letter-spacing:-.02em;display:block}
+.cmp__tsub{font-size:11.5px;color:#555;font-weight:700;display:block;margin-top:2px;line-height:1.25}
+.cmp__tprice{font-size:18px;font-weight:900;letter-spacing:-.03em;flex-shrink:0;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cmp__tprice em{font-style:normal;font-size:10px;font-weight:700;-webkit-text-fill-color:var(--grey);color:var(--grey)}
+.cmp__pop{position:absolute;top:-8px;right:12px;font-size:8.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--grad);padding:3px 8px;border-radius:100px;box-shadow:0 4px 10px rgba(248,80,0,.3)}
+.cmp__board{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+.cmp__palette{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 14px 40px rgba(0,0,0,.05);position:sticky;top:16px}
+.cmp__lbl{font-size:12px;font-weight:800;color:var(--ink);display:block;margin-bottom:11px;line-height:1.4}
 .cmp__lbl em{font-style:normal;font-weight:600;color:var(--grey);display:block;margin-top:3px}
 .cmp__cards{display:flex;flex-direction:column;gap:10px}
 .cmp__card{display:flex;align-items:center;gap:11px;padding:12px 13px;border:1.5px solid var(--line);border-radius:14px;background:var(--soft);cursor:grab;user-select:none;touch-action:none;transition:border .2s,box-shadow .2s,transform .15s,background .2s}
@@ -933,18 +933,26 @@ img,svg{display:block}
 .cmp__bcard.on .cmp__bctl{color:#15803d}
 .cmp__binc{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:#fff;background:var(--grad);padding:7px 14px;border-radius:100px;white-space:nowrap;flex-shrink:0;box-shadow:0 6px 14px rgba(248,80,0,.32)}
 .cmp__binc svg{width:13px;height:13px}
-.cmp__bsave{display:inline-block;font-size:10.5px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:#15803d;background:rgba(22,163,74,.12);padding:2px 8px;border-radius:100px;margin-left:4px;vertical-align:middle}
-.cmp__bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:0;padding:14px 0 0;border-top:1px solid var(--line);width:100%}
+.cmp__bsave{display:inline-block;font-size:10.5px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:#15803d;background:rgba(22,163,74,.12);padding:3px 9px;border-radius:100px;margin-left:6px;vertical-align:middle}
+.cmp__bopt{font-size:12px;font-weight:700;color:var(--grey);white-space:nowrap;flex-shrink:0}
+.cmp__ball{font-family:inherit;font-size:12px;font-weight:800;color:var(--orange);background:none;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;padding:6px 4px;text-decoration:underline;text-underline-offset:3px}
+.cmp__bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:0;padding:14px 0 0;border-top:1px solid var(--line);width:100%}
 .cmp__bcard.locked .cmp__bgrid{border-top-color:rgba(248,80,0,.18)}
-.cmp__bplat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 13px}
-.cmp__bcard.locked .cmp__bplat{background:rgba(255,255,255,.7)}
-.cmp__bplath{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;letter-spacing:-.01em;margin-bottom:8px}
-.cmp__bpic{width:24px;height:24px;border-radius:7px;flex-shrink:0;display:grid;place-items:center;background:var(--grad);box-shadow:0 4px 9px rgba(248,80,0,.25)}
-.cmp__bpic svg{width:14px;height:14px;color:#fff}
-.cmp__bplat ul{list-style:none;display:flex;flex-direction:column;gap:5px;margin:0;padding:0}
-.cmp__bplat li{position:relative;padding-left:15px;font-size:12px;font-weight:600;color:#444;line-height:1.3}
-.cmp__bplat li::before{content:"";position:absolute;left:3px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--orange)}
+.cmp__bplat{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:12px 12px;cursor:pointer;transition:border .18s,box-shadow .18s,transform .12s}
+.cmp__bplat[data-plat]:hover{border-color:rgba(248,80,0,.55);transform:translateY(-2px)}
+.cmp__bplat.on{border-color:var(--orange);box-shadow:0 0 0 2px rgba(248,80,0,.14)}
+.cmp__bplat.locked{cursor:default}
+.cmp__bplath{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:900;letter-spacing:-.01em;margin-bottom:9px}
+.cmp__bpic{width:23px;height:23px;border-radius:7px;flex-shrink:0;display:grid;place-items:center;background:var(--grad);box-shadow:0 4px 9px rgba(248,80,0,.25)}
+.cmp__bpic svg{width:13px;height:13px;color:#fff}
+.cmp__bpprice{margin-left:auto;font-size:11.5px;font-weight:900;color:var(--orange);flex-shrink:0;display:inline-flex;align-items:center}
+.cmp__bplat.on .cmp__bpprice{color:#15803d}
+.cmp__bpprice svg{width:15px;height:15px}
+.cmp__bplat ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin:0;padding:0}
+.cmp__bplat li{position:relative;padding-left:14px;font-size:11.5px;font-weight:600;color:#444;line-height:1.3}
+.cmp__bplat li::before{content:"";position:absolute;left:2px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--orange)}
 .cmp__per{font-size:15px;font-weight:700;color:var(--grey);margin-left:3px}
+@media(max-width:680px){.cmp__bgrid{grid-template-columns:repeat(2,1fr)}}
 .cmp__foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line)}
 .cmp__price b{font-size:34px;font-weight:900;letter-spacing:-.03em}
 .cmp__price em{font-style:normal;font-size:12.5px;color:var(--grey);font-weight:600;margin-left:8px}
@@ -1911,10 +1919,12 @@ html{overflow-x:hidden}
     </div>
 
     <div class="cmp reveal" id="composer">
-      <div class="cmp__tiers" id="cmpTiers"></div>
-      <div class="cmp__billrow"><div class="cmp__bill" id="cmpBill"></div></div>
       <div class="cmp__board">
         <div class="cmp__palette">
+          <div class="cmp__bill" id="cmpBill"></div>
+          <span class="cmp__plabel">1 · Pick a formula</span>
+          <div class="cmp__tiers" id="cmpTiers"></div>
+          <span class="cmp__plabel">2 · Fill it with modules</span>
           <span class="cmp__lbl">Drag a module into a slot <em>or tap a module to drop it in the next slot. Tap ✕ to remove.</em></span>
           <div class="cmp__cards" id="cmpCards"></div>
         </div>
@@ -2088,12 +2098,13 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     youtube:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.5a3 3 0 0 0-2.1-2.1C19 5 12 5 12 5s-7 0-8.9.4A3 3 0 0 0 1 7.5 31 31 0 0 0 .6 12 31 31 0 0 0 1 16.5a3 3 0 0 0 2.1 2.1C5 19 12 19 12 19s7 0 8.9-.4a3 3 0 0 0 2.1-2.1A31 31 0 0 0 23.4 12 31 31 0 0 0 23 7.5zM9.8 15.3V8.7l5.7 3.3z"/></svg>',
   };
   const BPLATS=[
-    {name:'Instagram', ic:PIC.instagram, feats:['On-brand profile image','Story highlights ×4']},
-    {name:'X / Twitter',ic:PIC.x,        feats:['On-brand profile image','High-conversion banner']},
-    {name:'LinkedIn',  ic:PIC.linkedin, feats:['On-brand profile image','High-conversion banner','Conversion-oriented CTAs']},
-    {name:'Facebook',  ic:PIC.facebook, feats:['On-brand profile image','High-conversion banner']},
-    {name:'YouTube',   ic:PIC.youtube,  feats:['On-brand profile image','High-conversion banner']},
+    {key:'instagram',name:'Instagram', ic:PIC.instagram, feats:['On-brand profile image','Story highlights ×4']},
+    {key:'x',        name:'X / Twitter',ic:PIC.x,        feats:['On-brand profile image','High-conversion banner']},
+    {key:'linkedin', name:'LinkedIn',  ic:PIC.linkedin, feats:['On-brand profile image','High-conversion banner','Conversion-oriented CTAs']},
+    {key:'facebook', name:'Facebook',  ic:PIC.facebook, feats:['On-brand profile image','High-conversion banner']},
+    {key:'youtube',  name:'YouTube',   ic:PIC.youtube,  feats:['On-brand profile image','High-conversion banner']},
   ];
+  const chkSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10"/></svg>';
   const ORDER=['carousel','story','static'];
   const SING={carousel:'deck',story:'story',static:'static'};
   const PLURAL={carousel:'decks',story:'stories',static:'statics'};
@@ -2101,15 +2112,17 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   const fmt=n=>'$'+n.toLocaleString('en-US');
   const ic=m=>`<svg viewBox="${m.vb}" fill="none"><use href="${m.svg}"/></svg>`;
   const grip='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';
-  let tierKey='flame', slots=[], brandingOn=false, billing='once';
+  let tierKey='flame', slots=[], billing='once';
+  const brandSel=new Set();                                    // selected branding platform keys (Ember/Flame)
   const tier=()=>TIERS.find(t=>t.key===tierKey);
-  const brandIncluded=()=>!!tier().brandIncluded;
-  const brandActive=()=>brandIncluded()||brandingOn;
+  const brandIncluded=()=>!!tier().brandIncluded;              // Meteor: all 5, free
+  const brandActive=()=>brandIncluded()||brandSel.size>0;
   const filled=()=>slots.filter(Boolean).length;
-  function reset(){ slots=Array(tier().n).fill(null); brandingOn=false; }   // EMPTY slots, no pre-fill
+  function reset(){ slots=Array(tier().n).fill(null); brandSel.clear(); }   // EMPTY slots, no pre-fill
   function counts(){ const c={}; slots.forEach(k=>{ if(k) c[k]=(c[k]||0)+1; }); return c; }
+  function brandPlatforms(){ return brandIncluded()?BPLATS.map(p=>p.key):[...brandSel]; }
   const formulaPrice=()=>billing==='sub'?Math.round(tier().price*0.9):tier().price;
-  const brandingExtra=()=>brandingOn&&!brandIncluded()?BRAND.price:0;
+  const brandingExtra=()=>brandIncluded()?0:(brandSel.size>=BPLATS.length?BRAND.price:brandSel.size*BRAND.per);
   const totalOnce=()=>formulaPrice()+brandingExtra();          // single number for one-time
 
   const elBill=document.getElementById('cmpBill'),
@@ -2146,14 +2159,26 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     }).join('');
   }
   function renderBrand(){
-    const inc=brandIncluded(), full=BRAND.per*BPLATS.length, save=full-BRAND.price;
-    elBrand.innerHTML=`<button type="button" class="cmp__bcard ${brandActive()?'on':''} ${inc?'locked':''}" ${inc?'':'data-brand'}>
+    const inc=brandIncluded(), n=inc?BPLATS.length:brandSel.size, all=n>=BPLATS.length;
+    const save=BRAND.per*BPLATS.length-BRAND.price;
+    let ctl;
+    if(inc) ctl='<span class="cmp__binc">'+chkSvg+'Included free</span>';
+    else if(n) ctl=`<span class="cmp__bctl">${fmt(brandingExtra())}${all?` <span class="cmp__bsave">save ${fmt(save)}</span>`:''}</span>`;
+    else ctl='<span class="cmp__bopt">Optional add-on</span>';
+    const allBtn=inc?'':`<button type="button" class="cmp__ball" data-ball>${all?'Clear':`All 5 · ${fmt(BRAND.price)}`}</button>`;
+    elBrand.innerHTML=`<div class="cmp__bcard ${brandActive()?'on':''} ${inc?'locked':''}">
       <span class="cmp__bhead">
         <span class="cmp__ic cmp__bic">${ic(BRAND)}</span>
-        <span class="cmp__bbody"><b>${BRAND.label}</b><small>${fmt(BRAND.per)}/platform, or <b>${fmt(BRAND.price)}</b> for all ${BPLATS.length} <span class="cmp__bsave">save ${fmt(save)}</span></small></span>
-        ${inc?'<span class="cmp__binc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10"/></svg>Included free</span>':`<span class="cmp__bctl">${brandingOn?'✓ Added · '+fmt(BRAND.price):'+ Add · '+fmt(BRAND.price)}</span>`}
+        <span class="cmp__bbody"><b>${BRAND.label}</b><small>On-brand across every platform you pick.</small></span>
+        ${ctl}${allBtn}
       </span>
-      <div class="cmp__bgrid">${BPLATS.map(p=>`<div class="cmp__bplat"><span class="cmp__bplath"><span class="cmp__bpic">${p.ic}</span>${p.name}</span><ul>${p.feats.map(f=>`<li>${f}</li>`).join('')}</ul></div>`).join('')}</div></button>`;
+      <div class="cmp__bgrid">${BPLATS.map(p=>{
+        const on=inc||brandSel.has(p.key);
+        const tag=inc?'':`<span class="cmp__bpprice">${brandSel.has(p.key)?chkSvg:'+'+fmt(BRAND.per)}</span>`;
+        return `<div class="cmp__bplat ${on?'on':''} ${inc?'locked':''}" ${inc?'':`data-plat="${p.key}"`}>
+          <span class="cmp__bplath"><span class="cmp__bpic">${p.ic}</span>${p.name}${tag}</span>
+          <ul>${p.feats.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
+      }).join('')}</div></div>`;
   }
   function renderRecap(){
     const c=counts(), n=filled(), N=tier().n, full=n===N, sub=billing==='sub';
@@ -2211,15 +2236,22 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     const rm=e.target.closest('[data-rm]'); if(rm){ slots[+rm.dataset.rm]=null; renderSlots(); renderRecap(); return; }
     const s=e.target.closest('.cmp__slot.empty'); if(s){ slots[+s.dataset.slot]='carousel'; renderSlots(); renderRecap(); }
   });
-  // branding upsell toggle (locked/included on Meteor)
-  elBrand.addEventListener('click',e=>{ if(!e.target.closest('[data-brand]'))return; brandingOn=!brandingOn; renderBrand(); renderRecap(); });
+  // branding: pick platforms individually (+$50), or "All 5" for $210 (locked on Meteor)
+  elBrand.addEventListener('click',e=>{
+    if(brandIncluded())return;
+    const all=e.target.closest('[data-ball]');
+    if(all){ if(brandSel.size>=BPLATS.length) brandSel.clear(); else BPLATS.forEach(p=>brandSel.add(p.key)); renderBrand(); renderRecap(); return; }
+    const p=e.target.closest('[data-plat]'); if(!p)return;
+    const k=p.dataset.plat; brandSel.has(k)?brandSel.delete(k):brandSel.add(k);
+    renderBrand(); renderRecap();
+  });
 
   elGo.addEventListener('click',()=>{
     if(filled()!==tier().n) return;
     const sub=billing==='sub';
     sessionStorage.setItem('brasero_formula',JSON.stringify({
       plan:tierKey,planName:tier().name,billing,mix:counts(),
-      branding:brandActive(),brandingIncluded:brandIncluded(),brandingExtra:brandingExtra(),
+      branding:brandActive(),brandingIncluded:brandIncluded(),brandPlatforms:brandPlatforms(),brandingExtra:brandingExtra(),
       formulaPrice:formulaPrice(),price:sub?formulaPrice():totalOnce()
     }));
     location.href='checkout.html';

@@ -1,9 +1,9 @@
-import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId, addonLineItems, addonKeys, ITEMS, cartItems, MODULES } from './_lib.js';
+import { stripe, PLANS, amountFor, siteUrl, saveOrder, stripePriceId, addonLineItems, addonKeys, ITEMS, cartItems, brandKeys, brandingAmount, BRAND_ALL } from './_lib.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, mix, branding } = req.body || {};
+    const { plan, billing, name, email, handle, instagram, niche, addon_ref, addons, addon_item, mix, brandPlatforms } = req.body || {};
     const SITE = siteUrl(req);
 
     // Tier formula ("compose your formula"): pack-priced (3 / 6 / 9+1), one-time payment.
@@ -14,9 +14,9 @@ export default async function handler(req, res) {
       const content = {};
       for (const it of cartItems(mix)) if (it.type !== 'branding') content[it.key] = it.qty;
       const bill = billing === 'sub' ? 'sub' : 'once';            // monthly (−10%) or one-time
-      const brandIncluded = plan === 'burst';
-      const brandCharged = !!branding && !brandIncluded;          // only Ember/Flame pay for it
-      const seedMix = { ...content, ...((brandIncluded || !!branding) ? { branding: 1 } : {}) };
+      const brandIncluded = plan === 'burst';                     // Meteor includes all 5 platforms free
+      const brand = brandIncluded ? BRAND_ALL.slice() : brandKeys(brandPlatforms);
+      const brandCharge = brandIncluded ? 0 : brandingAmount(brand);
       let line_items, amount, mode;
       const priceId = stripePriceId(plan, bill) || process.env.STRIPE_PRICE_ID;
       if (priceId) {
@@ -29,9 +29,10 @@ export default async function handler(req, res) {
         amount = amountFor(plan, bill);
         line_items = [{ quantity: 1, price_data: { currency: 'usd', unit_amount: amount, product_data: { name: `Brasero - ${PLANS[plan].name} formula` }, ...(mode === 'subscription' ? { recurring: { interval: 'month' } } : {}) } }];
       }
-      if (brandCharged) {       // branding is always a ONE-TIME add-on (first invoice in subscriptions)
-        amount += MODULES.branding.unit;
-        line_items.push({ quantity: 1, price_data: { currency: 'usd', unit_amount: MODULES.branding.unit, product_data: { name: 'Brasero - Social media branding' } } });
+      if (brandCharge > 0) {    // branding is always a ONE-TIME add-on (first invoice in subscriptions)
+        amount += brandCharge;
+        const blabel = brand.length >= BRAND_ALL.length ? 'Social media branding (all platforms)' : `Social media branding (${brand.length} platform${brand.length > 1 ? 's' : ''})`;
+        line_items.push({ quantity: 1, price_data: { currency: 'usd', unit_amount: brandCharge, product_data: { name: `Brasero - ${blabel}` } } });
       }
       const session = await stripe.checkout.sessions.create({
         mode,
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
         line_items,
         success_url: `${SITE}/onboarding.html?paid=1&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${SITE}/checkout.html`,
-        metadata: { plan, billing: bill, mix: JSON.stringify(seedMix), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
+        metadata: { plan, billing: bill, mix: JSON.stringify(content), brand: brand.join(','), name: name || '', email: email || '', handle: handle || '', instagram: instagram || '', niche: niche || '' },
       });
       try { await saveOrder({ stripe_session_id: session.id, status: 'pending', plan, billing: bill, amount, name, email, instagram, handle }); }
       catch (e) { console.error('saveOrder failed', e); }

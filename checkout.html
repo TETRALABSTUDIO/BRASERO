@@ -324,7 +324,7 @@ document.getElementById('contact').addEventListener('submit',async e=>{
   const order={name:fd.get('name'),email:fd.get('email'),instagram,niche:fd.get('niche'),
     handle:(ig&&ig.handle)||(u?'@'+u:''),photo:(ig&&ig.photo)||'',phone:fd.get('phone'),
     plan:formula.plan,planName:formula.planName||TIER_NAMES[formula.plan],billing:formula.billing||'once',
-    price:formula.price,mix:formula.mix,branding:!!formula.branding,label:mixLabel()};
+    price:formula.price,mix:formula.mix,branding:!!formula.branding,brandPlatforms:formula.brandPlatforms||[],label:mixLabel()};
   sessionStorage.setItem('brasero_order',JSON.stringify(order));
   await proceedToPayment(order);
 });
@@ -334,7 +334,7 @@ async function proceedToPayment(order){
   const btn=payBtn; if(btn){btn.disabled=true;btn.textContent='Redirecting to payment…';}
   try{
     const r=await fetch(API+'/api/checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({plan:order.plan,billing:order.billing,mix:order.mix,branding:order.branding,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,niche:order.niche})});
+      body:JSON.stringify({plan:order.plan,billing:order.billing,mix:order.mix,brandPlatforms:order.brandPlatforms,name:order.name,email:order.email,handle:order.handle,instagram:order.instagram,niche:order.niche})});
     const d=await r.json();
     if(d.label) order.planName=d.label;
     sessionStorage.setItem('brasero_order',JSON.stringify(order));
